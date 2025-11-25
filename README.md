@@ -1,4 +1,4 @@
-## Hi there 👋
+## Học Từ Thiện 👋
 
 <!--
 **hoctuthien/hoctuthien** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
