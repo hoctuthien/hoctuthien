@@ -16,6 +16,3 @@ Here are some ideas to get you started:
 - ⚡ Fun fact: ...
 - Hi Everyone
 -->
-
-dang1407
-Galaticos402
