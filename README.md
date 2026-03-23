@@ -4,7 +4,7 @@ HocTuThien là một nền tảng mã nguồn mở (**Open Source**) được x�
 
 ---
 
-## 🌟 Tầm nhìn và Bài toán Thực tế
+## 🔹Tầm nhìn và Bài toán Thực tế
 
 Hiện nay, nhu cầu mentoring 1:1 trong các lĩnh vực như lập trình, thiết kế và định hướng nghề nghiệp đang tăng cao, nhưng việc kết nối vẫn còn phân mảnh trên các mạng xã hội. Ở chiều ngược lại, các nền tảng thiện nguyện dù đã giải quyết tốt bài toán minh bạch nhưng chưa có sự gắn kết chặt chẽ với hành trình học tập. 
 
@@ -15,7 +15,7 @@ Dự án HocTuThien tập trung giải quyết ba yếu tố cốt lõi:
 
 ---
 
-## 💡 Giải pháp Đề xuất
+## 🔹 Giải pháp Đề xuất
 
 Hệ thống cung cấp hai chế độ linh hoạt cho Mentor:
 - **Chế độ Miễn phí**: Mentor chia sẻ kiến thức, định hướng và phỏng vấn thử hoàn toàn miễn phí cho học viên.
@@ -23,7 +23,7 @@ Hệ thống cung cấp hai chế độ linh hoạt cho Mentor:
 
 ---
 
-## 🛠 Danh mục Công nghệ
+## 🔹 Danh mục Công nghệ
 
 Hệ thống dự kiến được triển khai trên các công nghệ hiện đại đảm bảo tính bảo mật và khả năng mở rộng:
 - **Frontend**: Next.js (App Router), TypeScript.
@@ -32,7 +32,7 @@ Hệ thống dự kiến được triển khai trên các công nghệ hiện đ
 
 ---
 
-## 👥 Đội ngũ Phát triển
+## 🔹 Đội ngũ Phát triển chính
 
 | Họ và Tên | Vai trò |
 | :--- | :--- |
@@ -45,6 +45,6 @@ Hệ thống dự kiến được triển khai trên các công nghệ hiện đ
 | **Đào Thị Út Trinh** | Front-end Member |
 
 ---
-*<small>Dự án mã nguồn mở (Open Source) HocTuThien luôn chào đón và kêu gọi sự đóng góp, cống hiến từ cộng đồng để cùng tạo ra một sản phẩm có tác động xã hội thực chất.</small>*
+*<small>Dự án mã nguồn mở (Open Source) HocTuThien luôn chào đón và kêu gọi sự đóng góp, cống hiến từ cộng đồng để cùng tạo ra một sản phẩm có tác động tích cực đến xã hội.</small>*
 
 © 2026 HocTuThien Development Team.
