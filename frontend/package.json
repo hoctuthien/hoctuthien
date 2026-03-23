@@ -1,31 +1,8 @@
 {
   "name": "hoctuthien-frontend",
   "version": "1.0.0",
-  "description": "Frontend for HocTuThien using Next.js 14 App Router.",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "storybook": "storybook dev",
-    "dep-cruiser": "depcruise src --config dependency-cruiser.config.js"
-  },
   "dependencies": {
     "next": "14.x",
-    "react": "18.x",
-    "react-dom": "18.x",
-    "axios": "^1.x",
-    "@tanstack/react-query": "^5.x",
-    "msw": "^2.x",
-    "tailwind-merge": "^2.x"
-  },
-  "devDependencies": {
-    "typescript": "^5.x",
-    "eslint": "^8.x",
-    "eslint-config-next": "14.x",
-    "eslint-plugin-boundaries": "^4.x",
-    "dependency-cruiser": "^16.x",
-    "@storybook/nextjs": "^7.x",
-    "msw-storybook-addon": "^2.x"
+    "react": "18.x"
   }
 }

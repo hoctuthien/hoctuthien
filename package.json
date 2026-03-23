@@ -1,0 +1,17 @@
+{
+  "name": "hoctuthien-monorepo",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "fe": "cd frontend && npm run dev",
+    "be": "cd backend && npm run dev",
+    "dev": "docker-compose up",
+    "test:fe": "cd frontend && npm test",
+    "test:be": "cd backend && npm test"
+  },
+  "devDependencies": {
+    "husky": "^9.0.0",
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0"
+  }
+}

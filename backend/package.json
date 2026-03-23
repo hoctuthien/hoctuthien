@@ -1,0 +1,9 @@
+{
+  "name": "hoctuthien-backend",
+  "version": "1.0.0",
+  "dependencies": {
+    "@nestjs/common": "10.x",
+    "@nestjs/core": "10.x",
+    "typeorm": "0.3.x"
+  }
+}
