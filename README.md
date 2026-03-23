@@ -1,44 +1,50 @@
-# 🤝 HocTuThien (Học Từ Thiện)
+# 🤝 HocTuThien Project: Connecting Mentorship and Social Impact
 
-> **Empowering Growth Through Mentorship While Building a Better Community.**
-
-HocTuThien là một dự án **Open Source** (Mã nguồn mở) được phát triển với sứ mệnh kết nối mô hình Mentoring 1:1 và hoạt động Thiện nguyện minh bạch. Chúng tôi kêu gọi sự tham gia của cộng đồng để cùng kiến tạo một không gian nơi tri thức không chỉ được sẻ chia mà còn trực tiếp chuyển hóa thành giá trị đóng góp cho cộng đồng.
+HocTuThien là một nền tảng mã nguồn mở (**Open Source**) được xây dựng nhằm giải quyết bài toán hài hòa giữa nhu cầu học tập chuyên môn và hoạt động đóng góp cộng đồng. Dự án hướng đến việc kiến tạo một hệ sinh thái bền vững, nơi tri thức của các Mentor trở thành nguồn lực trực tiếp hỗ trợ các hoạt động thiện nguyện minh bạch.
 
 ---
 
-## 🚀 Key Features
-- **Flexible Mentoring Modes:** Miễn phí (Free) hoặc Donation-based sessions.
-- **Transparent Donations:** Cơ chế đối soát trực tiếp với các quỹ thiện nguyện uy tín.
-- **Expert Connection:** Quy trình phê duyệt Mentor nghiêm ngặt, đảm bảo chất lượng hướng dẫn.
+## 🌟 Tầm nhìn và Bài toán Thực tế
 
-## 🛠 Tech Stack
-| Category | Technology |
-| :--- | :--- |
-| **Frontend** | React, Next.js (App Router), TypeScript |
-| **Backend** | NestJS, TypeORM |
-| **Data & Caching** | PostgreSQL, Redis |
+Hiện nay, nhu cầu mentoring 1:1 trong các lĩnh vực như lập trình, thiết kế và định hướng nghề nghiệp đang tăng cao, nhưng việc kết nối vẫn còn phân mảnh trên các mạng xã hội. Ở chiều ngược lại, các nền tảng thiện nguyện dù đã giải quyết tốt bài toán minh bạch nhưng chưa có sự gắn kết chặt chẽ với hành trình học tập. 
 
-## 📂 Project Structure
-- **/frontend**: Client-side application (Next.js)
-- **/backend**: Server-side API & Logic (NestJS)
-- **README.md**: Project documentation
+Dự án HocTuThien tập trung giải quyết ba yếu tố cốt lõi:
+1. **Kết nối Mentee với các Mentor uy tín và phù hợp**: Cung cấp nền tảng tập trung cho các phiên học chất lượng.
+2. **Cơ chế Cam kết Học tập**: Thiết lập các khoản cam kết tài chính/donation để đảm bảo mức độ nghiêm túc của Mentee.
+3. **Minh bạch hóa Đóng góp Xã hội**: Tự động hóa quy trình đối soát với các quỹ thiện nguyện, chuyển hóa giá trị tri thức thành những tác động hữu hình cho cộng đồng.
 
-## 🤝 Contributing
-Chúng tôi luôn chào đón mọi sự đóng góp từ cộng đồng (Mentors, Developers, Designers, BAs, Testers,...). Hãy cùng chúng tôi xây dựng một nền tảng chuyên nghiệp và mang lại giá trị xã hội thực chất.
-1. **Fork** dự án.
-2. **Clone** bản fork và tạo nhánh mới cho tính năng của bạn.
-3. **Commit** thay đổi và tạo **Pull Request**.
+---
 
-## 👥 Core Team
-| Name | Role |
+## 💡 Giải pháp Đề xuất
+
+Hệ thống cung cấp hai chế độ linh hoạt cho Mentor:
+- **Chế độ Miễn phí**: Mentor chia sẻ kiến thức, định hướng và phỏng vấn thử hoàn toàn miễn phí cho học viên.
+- **Chế độ Quyên góp/Cam kết**: Mentee đóng góp trực tiếp vào các chiến dịch thiện nguyện được hệ thống xác thực để nhận buổi học, giúp xây dựng uy tín cho Mentor và tạo giá trị xã hội bền vững.
+
+---
+
+## 🛠 Danh mục Công nghệ
+
+Hệ thống dự kiến được triển khai trên các công nghệ hiện đại đảm bảo tính bảo mật và khả năng mở rộng:
+- **Frontend**: Next.js (App Router), TypeScript.
+- **Backend**: NestJS, TypeORM, Node.js.
+- **Data Persistence**: PostgreSQL, Redis.
+
+---
+
+## 👥 Đội ngũ Phát triển
+
+| Họ và Tên | Vai trò |
 | :--- | :--- |
 | **Bạch Hồng Vinh** | Project Manager (PM) |
 | **Nguyễn Hoàng Tùng** | Business Analyst (BA) |
-| **Dương Phạm Trọng Nghĩa** | Front-end Lead |
 | **Phan Văn Ngọc Thắng** | Back-end Lead |
-| **Đào Thị Út Trinh** | Front-end Member |
 | **Trần Thị Hồng Gấm** | Back-end Member |
 | **Lưu Việt Hoàng** | Back-end Member |
+| **Dương Phạm Trọng Nghĩa** | Front-end Lead |
+| **Đào Thị Út Trinh** | Front-end Member |
 
 ---
+*<small>Dự án mã nguồn mở (Open Source) HocTuThien luôn chào đón và kêu gọi sự đóng góp, cống hiến từ cộng đồng để cùng tạo ra một sản phẩm có tác động xã hội thực chất.</small>*
+
 © 2026 HocTuThien Development Team.
