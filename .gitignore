@@ -1,0 +1,12 @@
+node_modules/
+package-lock.json
+.env
+.DS_Store
+dist/
+build/
+.next/
+.turbo/
+*.log
+coverage/
+.vscode/
+.idea/
