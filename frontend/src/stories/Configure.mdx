@@ -4,294 +4,453 @@ import Image from "next/image";
 import Github from "./assets/github.svg";
 import Discord from "./assets/discord.svg";
 import Youtube from "./assets/youtube.svg";
-import Tutorials from "./assets/tutorials.svg";
-import Styling from "./assets/styling.png";
-import Context from "./assets/context.png";
-import Assets from "./assets/assets.png";
-import Docs from "./assets/docs.png";
-import Share from "./assets/share.png";
-import FigmaPlugin from "./assets/figma-plugin.png";
-import Testing from "./assets/testing.png";
-import Accessibility from "./assets/accessibility.png";
-import Theming from "./assets/theming.png";
 import AddonLibrary from "./assets/addon-library.png";
+import Avatar1 from "./assets/avatar1.png";
+import Avatar2 from "./assets/avatar2.png";
+import Avatar3 from "./assets/avatar3.png";
+import Avatar4 from "./assets/avatar4.png";
+import Avatar5 from "./assets/avatar5.png";
 
-export const RightArrow = () => <svg 
-    viewBox="0 0 14 14" 
-    width="8px" 
-    height="14px" 
-    style={{ 
-      marginLeft: '4px',
-      display: 'inline-block',
-      shapeRendering: 'inherit',
-      verticalAlign: 'middle',
-      fill: 'currentColor',
-      'path fill': 'currentColor'
+export const RightArrow = () => (
+  <svg
+    viewBox="0 0 14 14"
+    width="8px"
+    height="14px"
+    style={{
+      marginLeft: "4px",
+      display: "inline-block",
+      shapeRendering: "inherit",
+      verticalAlign: "middle",
+      fill: "currentColor",
+      "path fill": "currentColor",
     }}
->
-  <path d="m11.1 7.35-5.5 5.5a.5.5 0 0 1-.7-.7L10.04 7 4.9 1.85a.5.5 0 1 1 .7-.7l5.5 5.5c.2.2.2.5 0 .7Z" />
-</svg>
+  >
+    <path d="m11.1 7.35-5.5 5.5a.5.5 0 0 1-.7-.7L10.04 7 4.9 1.85a.5.5 0 1 1 .7-.7l5.5 5.5c.2.2.2.5 0 .7Z" />
+  </svg>
+);
 
-<Meta title="Configure your project" />
+<Meta title="Dự án Học Từ Thiện" />
+
+<div className="htt-hero">
+  <div className="htt-hero-content">
+    <span className="htt-badge">🤝 Open Source · Mã nguồn mở</span>
+    <h1 className="htt-hero-title">HocTuThien</h1>
+    <p className="htt-hero-sub">
+      Kết nối Mentorship · Kiến tạo Tác động Xã hội
+    </p>
+    <p className="htt-hero-desc">
+      Nền tảng mã nguồn mở kết nối Mentee với các Mentor uy tín, đồng thời
+      chuyển hóa giá trị tri thức thành những đóng góp thiện nguyện minh bạch và
+      có tác động thực tế đến cộng đồng.
+    </p>
+    <div className="htt-hero-tags">
+      <span className="htt-tag">Next.js</span>
+      <span className="htt-tag">NestJS</span>
+      <span className="htt-tag">TypeScript</span>
+      <span className="htt-tag">PostgreSQL</span>
+      <span className="htt-tag">Redis</span>
+    </div>
+  </div>
+</div>
 
 <div className="sb-container">
-  <div className='sb-section-title'>
-    # Configure your project
+  <div className="sb-section-title">
+    # Bài toán &amp; Giải pháp
 
-    Because Storybook works separately from your app, you'll need to configure it for your specific stack and setup. Below, explore guides for configuring Storybook with popular frameworks and tools. If you get stuck, learn how you can ask for help from our community.
+    HocTuThien tập trung giải quyết khoảng trống giữa nhu cầu học tập chuyên môn và hoạt động đóng góp cộng đồng — nơi tri thức của Mentor trở thành nguồn lực trực tiếp hỗ trợ các hoạt động thiện nguyện minh bạch.
+
   </div>
+
   <div className="sb-section">
-    <div className="sb-section-item">
-      <Image
-        src={Styling}
-        alt="A wall of logos representing different styling technologies"
-        width={0}
-        height={0}
-        style={{ width: '100%', height: 'auto' }}
-      />
-      <h4 className="sb-section-item-heading">Add styling and CSS</h4>
-      <p className="sb-section-item-paragraph">Like with web applications, there are many ways to include CSS within Storybook. Learn more about setting up styling within Storybook.</p>
-      <a
-        href="https://storybook.js.org/docs/configure/styling-and-css/?renderer=react&ref=configure"
-        target="_blank"
-      >Learn more<RightArrow /></a>
+    <div className="htt-card htt-card--blue">
+      <div className="htt-card-icon">🎓</div>
+      <h4 className="htt-card-title">Kết nối Mentor uy tín</h4>
+      <p className="htt-card-desc">
+        Cung cấp nền tảng tập trung cho các phiên học chất lượng trong lĩnh vực
+        lập trình, thiết kế và định hướng nghề nghiệp — thay thế mô hình phân
+        mảnh trên mạng xã hội.
+      </p>
     </div>
-    <div className="sb-section-item">
-      <Image 
-        width={0}
-        height={0}
-        style={{ width: '100%', height: 'auto' }}
-        src={Context}
-        alt="An abstraction representing the composition of data for a component"
-      />
-      <h4 className="sb-section-item-heading">Provide context and mocking</h4>
-      <p className="sb-section-item-paragraph">Often when a story doesn't render, it's because your component is expecting a specific environment or context (like a theme provider) to be available.</p>
-      <a
-        href="https://storybook.js.org/docs/writing-stories/decorators/?renderer=react&ref=configure#context-for-mocking"
-        target="_blank"
-      >Learn more<RightArrow /></a>
+    <div className="htt-card htt-card--green">
+      <div className="htt-card-icon">🤝</div>
+      <h4 className="htt-card-title">Cam kết Học tập</h4>
+      <p className="htt-card-desc">
+        Cơ chế cam kết tài chính / donation giúp đảm bảo mức độ nghiêm túc của
+        Mentee, đồng thời tạo nguồn lực trực tiếp cho các tổ chức thiện nguyện
+        được xác thực.
+      </p>
     </div>
-    <div className="sb-section-item">
-      <Image 
-        width={0}
-        height={0}
-        style={{ width: '100%', height: 'auto' }} 
-        src={Assets} 
-        alt="A representation of typography and image assets" 
-      />
+    <div className="htt-card htt-card--purple">
+      <div className="htt-card-icon">✨</div>
+      <h4 className="htt-card-title">Minh bạch Xã hội</h4>
+      <p className="htt-card-desc">
+        Tự động hóa quy trình đối soát với các quỹ thiện nguyện, chuyển hóa
+        giá trị tri thức thành tác động hữu hình và minh bạch cho cộng đồng.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div className="sb-container">
+  <div className="sb-section-title">
+    # Cấu hình Storybook chung
+
+    Các thiết lập toàn cục đang được áp dụng trong <code>preview.ts</code> cho toàn bộ component của dự án.
+
+  </div>
+
+  <div className="htt-config-grid">
+    <div className="htt-config-item">
+      <span className="htt-config-icon">🎨</span>
       <div>
-        <h4 className="sb-section-item-heading">Load assets and resources</h4>
-        <p className="sb-section-item-paragraph">To link static files (like fonts) to your projects and stories, use the
-        `staticDirs` configuration option to specify folders to load when
-        starting Storybook.</p>
-        <a
-          href="https://storybook.js.org/docs/configure/images-and-assets/?renderer=react&ref=configure"
-          target="_blank"
-        >Learn more<RightArrow /></a>
+        <strong className="htt-config-label">Font chữ chung</strong>
+        <p className="htt-config-desc">
+          Font được cấu hình thống nhất trong <code>preview.ts</code>, kế thừa
+          toàn bộ component — đảm bảo tính nhất quán về giao diện.
+        </p>
+      </div>
+    </div>
+    <div className="htt-config-item">
+      <span className="htt-config-icon">🎛️</span>
+      <div>
+        <strong className="htt-config-label">Controls Matchers</strong>
+        <p className="htt-config-desc">
+          Tự động hiển thị <strong>color-picker</strong> cho <code>background/color</code> và{" "}
+          <strong>date-picker</strong> cho thuộc tính <code>Date</code>.
+        </p>
+      </div>
+    </div>
+    <div className="htt-config-item">
+      <span className="htt-config-icon">♿</span>
+      <div>
+        <strong className="htt-config-label">Accessibility · a11y</strong>
+        <p className="htt-config-desc">
+          Chế độ <code>todo</code> — vi phạm a11y hiển thị trong test UI nhưng chưa fail CI.
+          Chuyển sang <code>error</code> để enforce cứng khi cần.
+        </p>
+      </div>
+    </div>
+    <div className="htt-config-item">
+      <span className="htt-config-icon">⚡</span>
+      <div>
+        <strong className="htt-config-label">Builder · Vite + Next.js</strong>
+        <p className="htt-config-desc">
+          Storybook chạy với <code>@storybook/nextjs-vite</code>, hỗ trợ đầy đủ
+          App Router, TypeScript và hot module replacement nhanh.
+        </p>
       </div>
     </div>
   </div>
 </div>
+
 <div className="sb-container">
   <div className='sb-section-title'>
-    # Do more with Storybook
+    # Logo & Brand Assets
 
-    Now that you know the basics, let's explore other parts of Storybook that will improve your experience. This list is just to get you started. You can customise Storybook in many ways to fit your needs.
+    Các biến thể logo chính thức của dự án **Học Từ Thiện**. Sử dụng nhất quán trong toàn bộ sản phẩm và tài liệu.
+
   </div>
 
-  <div className="sb-section">
-    <div className="sb-features-grid">
-      <div className="sb-grid-item">
-        <Image 
-          width={0}
-          height={0}
-          style={{ width: '100%', height: 'auto' }} 
-          src={Docs} 
-          alt="A screenshot showing the autodocs tag being set, pointing a docs page being generated" 
-        />
-        <h4 className="sb-section-item-heading">Autodocs</h4>
-        <p className="sb-section-item-paragraph">Auto-generate living,
-          interactive reference documentation from your components and stories.</p>
-        <a
-          href="https://storybook.js.org/docs/writing-docs/autodocs/?renderer=react&ref=configure"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <Image 
-          width={0}
-          height={0}
-          style={{ width: '100%', height: 'auto' }} 
-          src={Share} 
-          alt="A browser window showing a Storybook being published to a chromatic.com URL" 
-        />
-        <h4 className="sb-section-item-heading">Publish to Chromatic</h4>
-        <p className="sb-section-item-paragraph">Publish your Storybook to review and collaborate with your entire team.</p>
-        <a
-          href="https://storybook.js.org/docs/sharing/publish-storybook/?renderer=react&ref=configure#publish-storybook-with-chromatic"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <Image 
-          width={0}
-          height={0}
-          style={{ width: '100%', height: 'auto' }} 
-          src={FigmaPlugin} 
-          alt="Windows showing the Storybook plugin in Figma" 
-        />
-        <h4 className="sb-section-item-heading">Figma Plugin</h4>
-        <p className="sb-section-item-paragraph">Embed your stories into Figma to cross-reference the design and live
-          implementation in one place.</p>
-        <a
-          href="https://storybook.js.org/docs/sharing/design-integrations/?renderer=react&ref=configure#embed-storybook-in-figma-with-the-plugin"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <Image 
-          width={0}
-          height={0}
-          style={{ width: '100%', height: 'auto' }} 
-          src={Testing} 
-          alt="Screenshot of tests passing and failing" 
-        />
-        <h4 className="sb-section-item-heading">Testing</h4>
-        <p className="sb-section-item-paragraph">Use stories to test a component in all its variations, no matter how
-          complex.</p>
-        <a
-          href="https://storybook.js.org/docs/writing-tests/?renderer=react&ref=configure"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <Image 
-          width={0}
-          height={0}
-          style={{ width: '100%', height: 'auto' }} 
-          src={Accessibility} 
-          alt="Screenshot of accessibility tests passing and failing" 
-        />
-        <h4 className="sb-section-item-heading">Accessibility</h4>
-        <p className="sb-section-item-paragraph">Automatically test your components for a11y issues as you develop.</p>
-        <a
-          href="https://storybook.js.org/docs/writing-tests/accessibility-testing/?renderer=react&ref=configure"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <Image 
-          width={0}
-          height={0}
-          style={{ width: '100%', height: 'auto' }} 
-          src={Theming} 
-          alt="Screenshot of Storybook in light and dark mode" 
-        />
-        <h4 className="sb-section-item-heading">Theming</h4>
-        <p className="sb-section-item-paragraph">Theme Storybook's UI to personalize it to your project.</p>
-        <a
-          href="https://storybook.js.org/docs/configure/theming/?renderer=react&ref=configure"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
+  <div className="sb-logo-grid">
+    <div className="sb-logo-item">
+      <Image
+        src={Avatar1}
+        alt="Logo Học Từ Thiện - biến thể 1"
+        width={0}
+        height={0}
+        style={{ width: '100%', height: 'auto', maxHeight: '80px', objectFit: 'contain' }}
+      />
+      <p className="sb-logo-label">Logo chính</p>
+    </div>
+    <div className="sb-logo-item">
+      <Image
+        src={Avatar2}
+        alt="Logo Học Từ Thiện - biến thể 2"
+        width={0}
+        height={0}
+        style={{ width: '100%', height: 'auto', maxHeight: '80px', objectFit: 'contain' }}
+      />
+      <p className="sb-logo-label">Logo ngang</p>
+    </div>
+    <div className="sb-logo-item">
+      <Image
+        src={Avatar3}
+        alt="Logo Học Từ Thiện - biến thể 3"
+        width={0}
+        height={0}
+        style={{ width: '100%', height: 'auto', maxHeight: '80px', objectFit: 'contain' }}
+      />
+      <p className="sb-logo-label">Logo thu nhỏ</p>
+    </div>
+    <div className="sb-logo-item">
+      <Image
+        src={Avatar4}
+        alt="Logo Học Từ Thiện - biến thể 4"
+        width={0}
+        height={0}
+        style={{ width: '100%', height: 'auto', maxHeight: '80px', objectFit: 'contain' }}
+      />
+      <p className="sb-logo-label">Logo nền tối</p>
+    </div>
+    <div className="sb-logo-item">
+      <Image
+        src={Avatar5}
+        alt="Logo Học Từ Thiện - biến thể 5"
+        width={0}
+        height={0}
+        style={{ width: '100%', height: 'auto', maxHeight: '80px', objectFit: 'contain' }}
+      />
+      <p className="sb-logo-label">Logo icon</p>
     </div>
   </div>
 </div>
-<div className='sb-addon'>
-  <div className='sb-addon-text'>
-    <h4>Addons</h4>
-    <p className="sb-section-item-paragraph">Integrate your tools with Storybook to connect workflows.</p>
+
+<div className="sb-addon">
+  <div className="sb-addon-text">
+    <span className="sb-addon-badge">🧩 Storybook Ecosystem</span>
+    <h3 className="sb-addon-title">Addon &amp; Plugins</h3>
+    <p className="sb-addon-desc">
+      Mở rộng Storybook với hàng trăm addon — từ kiểm thử, thiết kế đến tài
+      liệu. Tích hợp công cụ yêu thích của bạn vào quy trình phát triển một cách
+      liền mạch.
+    </p>
     <a
-        href="https://storybook.js.org/addons/?ref=configure"
-        target="_blank"
-      >Discover all addons<RightArrow /></a>
+      className="sb-addon-cta"
+      href="https://storybook.js.org/addons/?ref=configure"
+      target="_blank"
+    >
+      Khám phá tất cả addon <RightArrow />
+    </a>
   </div>
-  <div className='sb-addon-img'>
-    <Image 
+  <div className="sb-addon-img">
+    <div className="sb-addon-img-fade" />
+    <Image
       width={650}
       height={347}
-      src={AddonLibrary} 
-      alt="Integrate your tools with Storybook to connect workflows." 
+      src={AddonLibrary}
+      alt="Kết hợp các công cụ với Storybook để kết nối quy trình làm việc."
     />
   </div>
 </div>
 
 <div className="sb-section sb-socials">
     <div className="sb-section-item">
-      <Image 
+      <Image
         width={32}
         height={32}
         layout="fixed"
-        src={Github} 
-        alt="Github logo" 
-        className="sb-explore-image"
-      />
-      Join our contributors building the future of UI development.
-
-      <a
-        href="https://github.com/storybookjs/storybook"
-        target="_blank"
-      >Star on GitHub<RightArrow /></a>
-    </div>
-    <div className="sb-section-item">
-      <Image 
-        width={33}
-        height={32}
-        layout="fixed"
-        src={Discord} 
-        alt="Discord logo" 
+        src={Github}
+        alt="Github logo"
         className="sb-explore-image"
       />
       <div>
-        Get support and chat with frontend developers.
+        Theo dõi mã nguồn, đóng góp tính năng, báo lỗi hoặc tạo pull request
+        cùng cộng đồng. Mọi đóng góp đều được chào đón trên kho mã chính thức.
 
         <a
-          href="https://discord.gg/storybook"
+          href="https://github.com/hoctuthien/hoctuthien"
           target="_blank"
-        >Join Discord server<RightArrow /></a>
+        >Xem mã nguồn trên GitHub<RightArrow /></a>
       </div>
     </div>
     <div className="sb-section-item">
-      <Image 
+      <Image
+        width={33}
+        height={32}
+        layout="fixed"
+        src={Discord}
+        alt="Discord logo"
+        className="sb-explore-image"
+      />
+      <div>
+        Tham gia cộng đồng Học Từ Thiện — trao đổi, góp ý và cập nhật tin
+        tức mới nhất về dự án. Đây là nơi kết nối trực tiếp với đội ngũ phát triển.
+
+        <a
+          href="https://discord.gg/8gknfuGb"
+          target="_blank"
+        >Tham gia Discord dự án<RightArrow /></a>
+      </div>
+    </div>
+    <div className="sb-section-item">
+      <Image
         width={32}
         height={32}
         layout="fixed"
-        src={Youtube} 
-        alt="Youtube logo" 
+        src={Youtube}
+        alt="Youtube logo"
         className="sb-explore-image"
       />
       <div>
-        Watch tutorials, feature previews and interviews.
+        Xem video giới thiệu và hướng dẫn sử dụng nền tảng Học Từ Thiện.
+        Cập nhật các tính năng mới nhất qua kênh YouTube chính thức của dự án.
 
         <a
-          href="https://www.youtube.com/@chromaticui"
+          href="https://www.youtube.com/watch?v=UJ_AOlM3cr0"
           target="_blank"
-        >Watch on YouTube<RightArrow /></a>
+        >Xem video giới thiệu<RightArrow /></a>
       </div>
     </div>
-    <div className="sb-section-item">
-      <Image 
-        width={33}
-        height={32}
-        layout="fixed"
-        src={Tutorials} 
-        alt="A book" 
-        className="sb-explore-image"
-      />
-      <p>Follow guided walkthroughs on for key workflows.</p>
 
-      <a
-          href="https://storybook.js.org/tutorials/?ref=configure"
-          target="_blank"
-        >Discover tutorials<RightArrow /></a>
-    </div>
 </div>
 
 <style>
   {`
+  /* ── HTT Hero ─────────────────────────────── */
+  .htt-hero {
+    background: linear-gradient(135deg, #e8f4fd 0%, #dbeeff 50%, #e0f0ff 100%);
+    border-radius: 16px;
+    padding: 48px 56px;
+    margin-bottom: 48px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #bee3f8;
+    box-shadow: 0 4px 24px rgba(37, 99, 168, 0.1);
+  }
+  .htt-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 65%);
+    border-radius: 50%;
+  }
+  .htt-hero-content { position: relative; z-index: 1; max-width: 680px; }
+  .htt-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid #93c5fd;
+    margin-bottom: 16px;
+  }
+  .htt-hero-title {
+    color: #0f2d5e !important;
+    font-size: 42px !important;
+    font-weight: 800 !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 !important;
+    line-height: 1.15 !important;
+    letter-spacing: -0.02em;
+  }
+  .htt-hero-sub {
+    color: #1e56a0;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    padding: 0;
+  }
+  .htt-hero-desc {
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0 0 24px 0;
+    padding: 0;
+  }
+  .htt-hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .htt-tag {
+    background: #ffffff;
+    color: #1e40af;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #93c5fd;
+  }
+
+  /* ── HTT Cards (3 vấn đề) ──────────────────── */
+  .htt-card {
+    flex: 1;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid transparent;
+  }
+  .htt-card--blue  { background: #eff6ff; border-color: #bfdbfe; }
+  .htt-card--green { background: #f0fdf4; border-color: #bbf7d0; }
+  .htt-card--purple{ background: #faf5ff; border-color: #e9d5ff; }
+  .htt-card-icon { font-size: 28px; margin-bottom: 12px; }
+  .htt-card-title {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 !important;
+    color: #1e293b;
+  }
+  .htt-card-desc {
+    font-size: 13px;
+    line-height: 1.65;
+    color: #475569;
+    margin: 0; padding: 0;
+  }
+
+  /* ── HTT Mode Cards (2 chế độ) ─────────────── */
+  .htt-mode-card {
+    flex: 1;
+    border-radius: 12px;
+    padding: 28px 28px 28px 32px;
+    border-left: 4px solid transparent;
+  }
+  .htt-mode--free   { background: #f0fdf4; border-left-color: #22c55e; }
+  .htt-mode--donate { background: #fffbeb; border-left-color: #f59e0b; }
+  .htt-mode-title {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    margin: 0 0 10px 0 !important;
+    padding: 0 !important;
+    color: #1e293b;
+  }
+  .htt-mode-desc {
+    font-size: 13px;
+    line-height: 1.65;
+    color: #475569;
+    margin: 0; padding: 0;
+  }
+
+  /* ── HTT Config Grid (cấu hình) ─────────────── */
+  .htt-config-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .htt-config-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .htt-config-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .htt-config-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+  }
+  .htt-config-desc {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: #64748b;
+    margin: 0; padding: 0;
+  }
+
+  @media screen and (max-width: 600px) {
+    .htt-hero { padding: 32px 24px; }
+    .htt-hero-title { font-size: 28px !important; }
+    .htt-config-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Storybook base ───────────────────────── */
   .sb-container {
     margin-bottom: 48px;
   }
+
 
   .sb-section {
     width: 100%;
@@ -338,9 +497,36 @@ export const RightArrow = () => <svg
     grid-gap: 32px 20px;
   }
 
+  .sb-logo-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .sb-logo-item {
+    flex: 1;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    background: #fafafa;
+  }
+
+  .sb-logo-label {
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 12px;
+    color: #666;
+  }
+
   .sb-socials {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .sb-socials p {
@@ -357,45 +543,108 @@ export const RightArrow = () => <svg
     display: flex;
     align-items: center;
     position: relative;
-    background-color: #EEF3F8;
-    border-radius: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    background: #EEF3F8;
-    height: 180px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #e0f2fe 100%);
+    border-radius: 12px;
+    border: 1px solid #bfdbfe;
+    height: 220px;
     margin-bottom: 48px;
     overflow: hidden;
+    box-shadow: 0 4px 20px rgba(37, 99, 168, 0.1);
   }
 
   .sb-addon-text {
     padding-left: 48px;
-    max-width: 240px;
+    max-width: 320px;
+    z-index: 1;
+    position: relative;
   }
 
-  .sb-addon-text h4 {
-    padding-top: 0px;
+  .sb-addon-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+    border: 1px solid #93c5fd;
+  }
+
+  .sb-addon-title {
+    color: #0f2d5e;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    padding: 0;
+    line-height: 1.3;
+  }
+
+  .sb-addon-desc {
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+    padding: 0;
+  }
+
+  .sb-addon-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ffffff;
+    color: #1d4ed8 !important;
+    font-size: 13px !important;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1.5px solid #93c5fd;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .sb-addon-cta:hover {
+    background: #eff6ff;
+    border-color: #3b82f6;
   }
 
   .sb-addon-img {
     position: absolute;
-    left: 345px;
+    right: 0;
     top: 0;
     height: 100%;
-    width: 200%;
+    width: 60%;
     overflow: hidden;
   }
 
+  .sb-addon-img-fade {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 120px;
+    height: 100%;
+    background: linear-gradient(to right, #dbeafe, transparent);
+    z-index: 1;
+  }
+
   .sb-addon-img img {
-    width: 650px;
-    transform: rotate(-15deg);
-    margin-left: 40px;
-    margin-top: -72px;
-    box-shadow: 0 0 1px rgba(255, 255, 255, 0);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center;
+    transform: rotate(-8deg) scale(1.15);
+    margin-top: 10px;
+    opacity: 0.85;
     backface-visibility: hidden;
   }
 
   @media screen and (max-width: 800px) {
     .sb-addon-img {
-      left: 300px;
+      width: 45%;
+    }
+    .sb-addon-text {
+      max-width: 240px;
     }
   }
 
