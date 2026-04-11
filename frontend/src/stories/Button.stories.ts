@@ -1,54 +1,158 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { fn } from "storybook/test";
+import { Button } from "./Button";
 
-import { fn } from 'storybook/test';
-
-import { Button } from './Button';
-
-// More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
-  title: 'Example/Button',
+  title: "Components/Button",
   component: Button,
   parameters: {
-    // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
-    layout: 'centered',
+    layout: "centered",
+    docs: {
+      description: {
+        component:
+          "Button component đa năng theo hướng dẫn thiết kế của dự án Học Từ Thiện. Hỗ trợ 5 loại hiển thị, 3 kích cỡ, hỗ trợ icon, trạng thái tải và độ rộng đầy đủ.",
+      },
+    },
   },
-  // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-  tags: ['autodocs'],
-  // More on argTypes: https://storybook.js.org/docs/api/argtypes
+  tags: ["autodocs"],
   argTypes: {
-    backgroundColor: { control: 'color' },
+    variant: {
+      control: "select",
+      options: ["primary", "secondary", "danger", "outline", "text"],
+      description: "Kiểu hiển thị của nút",
+    },
+    size: {
+      control: "select",
+      options: ["sm", "md", "lg"],
+      description: "Kích thước của nút",
+    },
+    label: {
+      control: "text",
+      description: "Nội dung hiển thị bên trong nút",
+    },
+    disabled: {
+      control: "boolean",
+      description: "Trạng thái vô hiệu hóa",
+    },
+    loading: {
+      control: "boolean",
+      description: "Trạng thái đang tải (hiển thị spinner)",
+    },
+    fullWidth: {
+      control: "boolean",
+      description: "Chiều rộng đầy đủ 100% container",
+    },
   },
-  // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#story-args
   args: { onClick: fn() },
 } satisfies Meta<typeof Button>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
+// ── Các loại nút ──────────────────────────────────────────────
+
+/** Nút hành động chính của trang hoặc phân đoạn */
 export const Primary: Story = {
   args: {
-    primary: true,
-    label: 'Button',
+    variant: "primary",
+    label: "Hành động chính",
+    size: "md",
   },
 };
 
+/** Nút hành động phụ hỗ trợ cho hành động chính */
 export const Secondary: Story = {
   args: {
-    label: 'Button',
+    variant: "secondary",
+    label: "Hành động phụ",
+    size: "md",
+  },
+};
+
+/** Nút cho các hành động nguy hiểm — cần người dùng chú ý */
+export const Danger: Story = {
+  args: {
+    variant: "danger",
+    label: "Xóa tài khoản",
+    size: "md",
+  },
+};
+
+/** Nút có viền nét đứt — dùng cho các khu vực tương tác tạo nội dung */
+export const Outline: Story = {
+  args: {
+    variant: "outline",
+    label: "Thêm mục mới",
+    size: "md",
+  },
+};
+
+/** Nút dạng văn bản — dùng cho điều hướng hoặc nút Hủy */
+export const Text: Story = {
+  args: {
+    variant: "text",
+    label: "Tìm hiểu thêm",
+    size: "md",
+  },
+};
+
+// ── Trạng thái ───────────────────────────────────────────────────
+
+/** Trạng thái khi hành động không khả dụng */
+export const Disabled: Story = {
+  args: {
+    variant: "primary",
+    label: "Không khả dụng",
+    disabled: true,
+    size: "md",
+  },
+};
+
+/** Trạng thái khi đang xử lý dữ liệu */
+export const Loading: Story = {
+  args: {
+    variant: "primary",
+    label: "Đang xử lý...",
+    loading: true,
+    size: "md",
+  },
+};
+
+// ── Kích thước ────────────────────────────────────────────────────
+
+export const Small: Story = {
+  args: {
+    variant: "primary",
+    label: "Nút nhỏ",
+    size: "sm",
+  },
+};
+
+export const Medium: Story = {
+  args: {
+    variant: "primary",
+    label: "Nút vừa",
+    size: "md",
   },
 };
 
 export const Large: Story = {
   args: {
-    size: 'large',
-    label: 'Button',
+    variant: "primary",
+    label: "Nút lớn",
+    size: "lg",
   },
 };
 
-export const Small: Story = {
+// ── Độ rộng đầy đủ ────────────────────────────────────────────────
+
+export const FullWidth: Story = {
   args: {
-    size: 'small',
-    label: 'Button',
+    variant: "primary",
+    label: "Nút rộng toàn màn hình",
+    fullWidth: true,
+  },
+  parameters: {
+    layout: "padded",
   },
 };
