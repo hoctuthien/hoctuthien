@@ -1,0 +1,78 @@
+.htt-breadcrumb-nav {
+  display: flex;
+  padding: var(--spacing-2, 8px) 0;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.htt-breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: var(--spacing-2, 8px);
+}
+
+.htt-breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2, 8px);
+  font-size: var(--font-size-body-sm, 14px);
+}
+
+/* Link: Màu xanh mặc định theo yêu cầu mới nhất */
+.htt-breadcrumb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--clr-primary, #1B4FBF);
+  text-decoration: none;
+  transition: opacity var(--transition-fast, 150ms) ease;
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.htt-breadcrumb-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Trang hiện tại: Màu xanh đậm và Bold */
+.htt-breadcrumb-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--clr-primary, #1B4FBF);
+  font-weight: var(--font-weight-bold, 700);
+  cursor: default;
+}
+
+/* Variant: Pill button cho mục cuối */
+.htt-breadcrumb--pill {
+  background-color: var(--clr-primary, #1B4FBF);
+  color: white !important;
+  padding: 6px 16px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 13px;
+  box-shadow: var(--shadow-sm);
+}
+
+.htt-breadcrumb__separator {
+  color: var(--color-text-disabled, #B8C4D8);
+  font-size: 12px;
+  user-select: none;
+  font-weight: 300;
+}
+
+.htt-breadcrumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+}
+
+.htt-breadcrumb-ellipsis {
+  color: var(--clr-text-muted, #7A8BB0);
+  cursor: help;
+  font-weight: bold;
+}
