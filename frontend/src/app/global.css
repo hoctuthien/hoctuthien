@@ -1,78 +1,47 @@
 @import "tailwindcss";
 
-/* ============================================================
-   DESIGN SYSTEM — Hoc Tu Thien Platform
-   Based on Color Guideline & Editorial Typography Guide
-   ============================================================ */
-
-/* ---- Google Fonts: Montserrat ---- */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap');
 
-/* ============================================================
-   TAILWIND v4: CSS-FIRST THEME CONFIGURATION
-   ============================================================ */
 @theme {
-  /* --- Font Family --- */
   --font-family-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
   --font-family-mono: 'Courier New', Courier, monospace;
 
-  /* -----------------------------------------------
-     PRIMARY & SECONDARY PALETTE
-     ----------------------------------------------- */
-
-  /* Professional Blue (Primary Anchor) */
   --color-primary:          #1B4FBF;
   --color-primary-deep:     #0F3399;
   --color-primary-hover:    #1A4AD4;
   --color-primary-light:    #E8EFFE;
   --color-primary-surface:  #C7D8F8;
 
-  /* Growth Green (Secondary / Growth Tone) */
   --color-secondary:        #0A5C36;
   --color-secondary-deep:   #074528;
   --color-secondary-hover:  #0D7044;
   --color-secondary-light:  #E6F4EC;
   --color-secondary-surface:#B2DECE;
 
-  /* Fixed Light (Free Variant) */
   --color-fixed-light:      #E3F0FB;
   --color-fixed-light-border:#B3D4EF;
 
-  /* Success Fixed (Success Accent) */
   --color-success:          #4ADE80;
   --color-success-deep:     #16A34A;
   --color-success-light:    #DCFCE7;
 
-  /* -----------------------------------------------
-     FUNCTIONAL COLORS
-     ----------------------------------------------- */
-
-  /* Growth Green Functional */
   --color-growth-green:         #0A5C36;
   --color-growth-green-surface: #B2DECE;
   --color-growth-green-deep:    #074528;
 
-  /* Insight Orange */
   --color-insight-orange:         #8A6000;
   --color-insight-orange-surface: #F5D98B;
   --color-insight-orange-deep:    #5C3D00;
 
-  /* Guidance Red */
   --color-guidance-red:         #A8001C;
   --color-guidance-red-surface: #F5A0AD;
   --color-guidance-red-deep:    #6B0011;
 
-  /* -----------------------------------------------
-     NEUTRAL / SURFACE PALETTE
-     ----------------------------------------------- */
   --color-surface-page:     #F4F7FB;
   --color-surface-card:     #FFFFFF;
   --color-surface-elevated: #EEF3FA;
   --color-surface-overlay:  rgba(15, 51, 153, 0.06);
 
-  /* -----------------------------------------------
-     TEXT COLORS
-     ----------------------------------------------- */
   --color-text-heading:   #0D1A33;
   --color-text-body:      #2C3E60;
   --color-text-muted:     #7A8BB0;
@@ -81,54 +50,39 @@
   --color-text-link:      #1B4FBF;
   --color-text-accent:    #0A5C36;
 
-  /* -----------------------------------------------
-     BORDER COLORS
-     ----------------------------------------------- */
   --color-border-default:  #D1DCF0;
   --color-border-strong:   #9AAED4;
   --color-border-subtle:   #E8EEF8;
   --color-border-focus:    #1B4FBF;
 
-  /* -----------------------------------------------
-     TYPOGRAPHY SCALE — The Editorial Typography Guide
-     Typeface: Montserrat
-     ----------------------------------------------- */
-
-  /* Font Weights */
   --font-weight-black:      900;
   --font-weight-bold:       700;
   --font-weight-semibold:   600;
   --font-weight-medium:     500;
   --font-weight-regular:    400;
 
-  /* Font Sizes — Type Scale */
-  --font-size-hero:       clamp(2.5rem, 5vw, 4rem);       /* Hero H1 */
-  --font-size-h1:         clamp(1.875rem, 3.5vw, 2.5rem); /* Section Title */
-  --font-size-h2:         clamp(1.5rem, 2.5vw, 1.875rem); /* Sub-section */
-  --font-size-h3:         clamp(1.25rem, 2vw, 1.5rem);    /* Card Title */
-  --font-size-h4:         1.125rem;                        /* Label/Tag */
-  --font-size-body-lg:    1rem;       /* Body large */
-  --font-size-body:       0.9375rem;  /* Body normal */
-  --font-size-body-sm:    0.875rem;   /* Body small */
-  --font-size-caption:    0.75rem;    /* Caption / Metadata */
+  --font-size-hero:       clamp(2.5rem, 5vw, 4rem);
+  --font-size-h1:         clamp(1.875rem, 3.5vw, 2.5rem);
+  --font-size-h2:         clamp(1.5rem, 2.5vw, 1.875rem);
+  --font-size-h3:         clamp(1.25rem, 2vw, 1.5rem);
+  --font-size-h4:         1.125rem;
+  --font-size-body-lg:    1rem;
+  --font-size-body:       0.9375rem;
+  --font-size-body-sm:    0.875rem;
+  --font-size-caption:    0.75rem;
 
-  /* Line Heights */
   --line-height-tight:    1.2;
   --line-height-snug:     1.35;
   --line-height-normal:   1.5;
   --line-height-relaxed:  1.65;
   --line-height-loose:    1.8;
 
-  /* Letter Spacing */
   --letter-spacing-tight:   -0.02em;
   --letter-spacing-normal:   0em;
   --letter-spacing-wide:     0.04em;
   --letter-spacing-wider:    0.08em;
   --letter-spacing-widest:   0.12em;
 
-  /* -----------------------------------------------
-     SPACING SCALE
-     ----------------------------------------------- */
   --spacing-0:    0px;
   --spacing-1:    4px;
   --spacing-2:    8px;
@@ -143,9 +97,6 @@
   --spacing-20:   80px;
   --spacing-24:   96px;
 
-  /* -----------------------------------------------
-     BORDER RADIUS
-     ----------------------------------------------- */
   --radius-sm:   4px;
   --radius-md:   8px;
   --radius-lg:   12px;
@@ -153,25 +104,16 @@
   --radius-2xl:  24px;
   --radius-full: 9999px;
 
-  /* -----------------------------------------------
-     SHADOWS
-     ----------------------------------------------- */
   --shadow-xs:  0 1px 2px rgba(27, 79, 191, 0.06);
   --shadow-sm:  0 2px 6px rgba(27, 79, 191, 0.08);
   --shadow-md:  0 4px 16px rgba(27, 79, 191, 0.12);
   --shadow-lg:  0 8px 32px rgba(27, 79, 191, 0.14);
   --shadow-xl:  0 16px 48px rgba(27, 79, 191, 0.18);
 
-  /* -----------------------------------------------
-     TRANSITIONS
-     ----------------------------------------------- */
   --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base:   250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* -----------------------------------------------
-     Z-INDEX SCALE
-     ----------------------------------------------- */
   --z-base:     0;
   --z-above:    10;
   --z-dropdown: 100;
@@ -181,25 +123,19 @@
   --z-tooltip:  500;
 }
 
-/* ============================================================
-   CSS CUSTOM PROPERTIES (Runtime tokens for dynamic theming)
-   ============================================================ */
 :root {
-  /* Semantic aliases — Primary */
   --clr-primary:         var(--color-primary);
   --clr-primary-dark:    var(--color-primary-deep);
   --clr-primary-hover:   var(--color-primary-hover);
   --clr-primary-surface: var(--color-primary-surface);
   --clr-primary-light:   var(--color-primary-light);
 
-  /* Semantic aliases — Secondary */
   --clr-secondary:         var(--color-secondary);
   --clr-secondary-dark:    var(--color-secondary-deep);
   --clr-secondary-hover:   var(--color-secondary-hover);
   --clr-secondary-surface: var(--color-secondary-surface);
   --clr-secondary-light:   var(--color-secondary-light);
 
-  /* Semantic aliases — Status */
   --clr-success:         var(--color-success);
   --clr-success-dark:    var(--color-success-deep);
   --clr-success-light:   var(--color-success-light);
@@ -210,28 +146,22 @@
   --clr-error-surface:   var(--color-guidance-red-surface);
   --clr-error-dark:      var(--color-guidance-red-deep);
 
-  /* Semantic aliases — Surface */
   --clr-bg-page:         var(--color-surface-page);
   --clr-bg-card:         var(--color-surface-card);
   --clr-bg-elevated:     var(--color-surface-elevated);
 
-  /* Semantic aliases — Text */
   --clr-text-heading:    var(--color-text-heading);
   --clr-text-body:       var(--color-text-body);
   --clr-text-muted:      var(--color-text-muted);
   --clr-text-disabled:   var(--color-text-disabled);
   --clr-text-inverse:    var(--color-text-inverse);
 
-  /* Semantic aliases — Border */
   --clr-border:          var(--color-border-default);
   --clr-border-strong:   var(--color-border-strong);
   --clr-border-subtle:   var(--color-border-subtle);
   --clr-border-focus:    var(--color-border-focus);
 }
 
-/* ============================================================
-   CSS RESET & BASE STYLES
-   ============================================================ */
 *,
 *::before,
 *::after {
@@ -257,11 +187,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ============================================================
-   TYPOGRAPHY BASE — The Editorial Typography Guide
-   ============================================================ */
-
-/* Hero H1 — Main Page Header (Black 900, on-primary / on-surface) */
 h1, .h1 {
   font-family: 'Montserrat', sans-serif;
   font-size: var(--font-size-hero);
@@ -271,7 +196,6 @@ h1, .h1 {
   color: var(--clr-text-heading);
 }
 
-/* H2 — Section Title (Bold 700) */
 h2, .h2 {
   font-family: 'Montserrat', sans-serif;
   font-size: var(--font-size-h1);
@@ -281,7 +205,6 @@ h2, .h2 {
   color: var(--clr-text-heading);
 }
 
-/* H3 — Sub-section (SemiBold 600) */
 h3, .h3 {
   font-family: 'Montserrat', sans-serif;
   font-size: var(--font-size-h2);
@@ -290,7 +213,6 @@ h3, .h3 {
   color: var(--clr-text-heading);
 }
 
-/* H4 — Data Points / Labels (Bold 700) */
 h4, .h4 {
   font-family: 'Montserrat', sans-serif;
   font-size: var(--font-size-h3);
@@ -299,7 +221,6 @@ h4, .h4 {
   color: var(--clr-text-heading);
 }
 
-/* H5 — Card Title (SemiBold 600) */
 h5, .h5 {
   font-family: 'Montserrat', sans-serif;
   font-size: var(--font-size-h4);
@@ -308,7 +229,6 @@ h5, .h5 {
   color: var(--clr-text-heading);
 }
 
-/* H6 — Small Label (Medium 500) */
 h6, .h6 {
   font-family: 'Montserrat', sans-serif;
   font-size: var(--font-size-body-lg);
@@ -317,7 +237,6 @@ h6, .h6 {
   color: var(--clr-text-body);
 }
 
-/* Body text */
 p, .body {
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
@@ -325,7 +244,6 @@ p, .body {
   color: var(--clr-text-body);
 }
 
-/* Small / Caption / Metadata */
 small, .caption {
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-medium);
@@ -335,7 +253,6 @@ small, .caption {
   text-transform: uppercase;
 }
 
-/* Eyebrow / Overline label */
 .overline {
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-bold);
@@ -344,7 +261,6 @@ small, .caption {
   color: var(--clr-primary);
 }
 
-/* Link styles */
 a {
   color: var(--clr-text-link);
   text-decoration: none;
@@ -355,13 +271,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* ============================================================
-   BUTTON SYSTEM — Button State Matrix
-   Based on: Primary (blue), Secondary (green), Outline (ghost)
-   States: Default → Hover → Clicked/Active → Disabled
-   ============================================================ */
-
-/* --- Base Button Reset --- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -398,7 +307,6 @@ a:hover {
   transform: translateY(1px);
 }
 
-/* --- Primary Button (Professional Blue) --- */
 .btn-primary {
   background-color: var(--clr-primary);
   border-color: var(--clr-primary);
@@ -426,7 +334,6 @@ a:hover {
   transform: none;
 }
 
-/* --- Secondary Button (Growth Green) --- */
 .btn-secondary {
   background-color: var(--clr-secondary);
   border-color: var(--clr-secondary);
@@ -454,7 +361,6 @@ a:hover {
   transform: none;
 }
 
-/* --- Outline / Ghost Button --- */
 .btn-outline {
   background-color: transparent;
   border-color: var(--clr-border-strong);
@@ -481,7 +387,6 @@ a:hover {
   transform: none;
 }
 
-/* --- Button Size Variants --- */
 .btn-sm {
   font-size: var(--font-size-caption);
   padding: 7px 14px;
@@ -494,9 +399,6 @@ a:hover {
   border-radius: var(--radius-lg);
 }
 
-/* ============================================================
-   CARD COMPONENTS
-   ============================================================ */
 .card {
   background-color: var(--clr-bg-card);
   border-radius: var(--radius-xl);
@@ -519,9 +421,6 @@ a:hover {
   padding: var(--spacing-6);
 }
 
-/* ============================================================
-   BADGE / TAG COMPONENTS — Functional Color System
-   ============================================================ */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -560,9 +459,6 @@ a:hover {
   color: var(--clr-secondary-dark);
 }
 
-/* ============================================================
-   INPUT / FORM COMPONENTS
-   ============================================================ */
 .input {
   display: block;
   width: 100%;
@@ -596,9 +492,6 @@ a:hover {
   font-weight: var(--font-weight-regular);
 }
 
-/* ============================================================
-   PROGRESS BAR — Growth Meter / Progress Tracking Pattern
-   ============================================================ */
 .progress-bar {
   width: 100%;
   height: 8px;
@@ -618,11 +511,6 @@ a:hover {
   background: linear-gradient(90deg, var(--clr-secondary) 0%, var(--color-success) 100%);
 }
 
-/* ============================================================
-   STATUS COLORS — Functional Color Surfaces
-   ============================================================ */
-
-/* Growth Green surfaces */
 .surface-growth {
   background-color: var(--color-growth-green);
   color: var(--clr-text-inverse);
@@ -632,7 +520,6 @@ a:hover {
   color: var(--color-growth-green-deep);
 }
 
-/* Insight Orange surfaces */
 .surface-warning {
   background-color: var(--color-insight-orange);
   color: var(--clr-text-inverse);
@@ -642,7 +529,6 @@ a:hover {
   color: var(--color-insight-orange-deep);
 }
 
-/* Guidance Red surfaces */
 .surface-error {
   background-color: var(--color-guidance-red);
   color: var(--clr-text-inverse);
@@ -652,18 +538,12 @@ a:hover {
   color: var(--color-guidance-red-deep);
 }
 
-/* ============================================================
-   UTILITY CLASSES
-   ============================================================ */
-
-/* Text color utilities */
 .text-primary   { color: var(--clr-primary); }
 .text-secondary { color: var(--clr-secondary); }
 .text-muted     { color: var(--clr-text-muted); }
 .text-inverse   { color: var(--clr-text-inverse); }
 .text-heading   { color: var(--clr-text-heading); }
 
-/* Background utilities */
 .bg-primary      { background-color: var(--clr-primary); }
 .bg-secondary    { background-color: var(--clr-secondary); }
 .bg-page         { background-color: var(--clr-bg-page); }
@@ -671,14 +551,12 @@ a:hover {
 .bg-primary-soft { background-color: var(--clr-primary-light); }
 .bg-success-soft { background-color: var(--color-success-light); }
 
-/* Font weight utilities */
 .font-black    { font-weight: var(--font-weight-black); }
 .font-bold     { font-weight: var(--font-weight-bold); }
 .font-semibold { font-weight: var(--font-weight-semibold); }
 .font-medium   { font-weight: var(--font-weight-medium); }
 .font-regular  { font-weight: var(--font-weight-regular); }
 
-/* Asymmetric Tonal Layering — Editorial Precision */
 .tonal-primary {
   background: linear-gradient(135deg, var(--clr-primary) 0%, var(--clr-primary-hover) 100%);
   color: var(--clr-text-inverse);
@@ -689,14 +567,12 @@ a:hover {
   color: var(--clr-text-inverse);
 }
 
-/* Divider */
 .divider {
   border: none;
   border-top: 1px solid var(--clr-border-subtle);
   margin: var(--spacing-4) 0;
 }
 
-/* Focus ring for accessibility — WCAG AA */
 .focus-ring:focus-visible {
   outline: 2px solid var(--clr-border-focus);
   outline-offset: 3px;

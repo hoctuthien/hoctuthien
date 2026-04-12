@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-2, 8px);
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: var(--font-weight-semibold, 600);
   border-radius: var(--radius-md, 8px);
   border: 2px solid transparent;
@@ -210,7 +210,9 @@
 }
 
 @keyframes htt-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ─────────────────────────────────────────

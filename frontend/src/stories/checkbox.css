@@ -4,7 +4,7 @@
   gap: var(--spacing-3, 12px);
   cursor: pointer;
   user-select: none;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .htt-checkbox--disabled {
@@ -34,7 +34,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  border: 1.5px solid var(--clr-border-strong, #9AAED4);
+  border: 1.5px solid var(--clr-border-strong, #9aaed4);
   border-radius: var(--radius-lg, 12px);
   background-color: var(--color-surface-card, #ffffff);
   transition: all var(--transition-fast, 150ms) cubic-bezier(0.4, 0, 0.2, 1);
@@ -46,21 +46,21 @@
 
 /* Hover State */
 .htt-checkbox-input:hover ~ .htt-checkbox-control {
-  border-color: var(--clr-primary, #1B4FBF);
+  border-color: var(--clr-primary, #1b4fbf);
   border-width: 2px;
 }
 
 /* Checked / Selected State */
 .htt-checkbox-input:checked ~ .htt-checkbox-control,
 .htt-checkbox-input:indeterminate ~ .htt-checkbox-control {
-  background-color: var(--clr-primary, #1B4FBF);
-  border-color: var(--clr-primary, #1B4FBF);
+  background-color: var(--clr-primary, #1b4fbf);
+  border-color: var(--clr-primary, #1b4fbf);
 }
 
 /* Focused State */
 .htt-checkbox-input:focus-visible ~ .htt-checkbox-control {
   box-shadow: 0 0 0 4px var(--clr-primary-surface, rgba(27, 79, 191, 0.3));
-  border-color: var(--clr-primary, #1B4FBF);
+  border-color: var(--clr-primary, #1b4fbf);
 }
 
 /* Checkmark and Dash icons */
@@ -73,13 +73,13 @@
 /* Label styling */
 .htt-checkbox-label {
   font-size: var(--font-size-body-sm, 14px);
-  color: var(--clr-text-body, #2C3E60);
+  color: var(--clr-text-body, #2c3e60);
   font-weight: var(--font-weight-medium, 500);
   cursor: inherit;
 }
 
 /* Disabled State */
 .htt-checkbox-input:disabled ~ .htt-checkbox-control {
-  background-color: var(--color-text-disabled, #B8C4D8);
-  border-color: var(--color-text-disabled, #B8C4D8);
+  background-color: var(--color-text-disabled, #b8c4d8);
+  border-color: var(--color-text-disabled, #b8c4d8);
 }
