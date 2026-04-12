@@ -1,1 +1,1 @@
-export * from "../shared/components/SelectionControls/Radio";
+export * from "../shared/components/Selection/Radio";

@@ -1,1 +1,1 @@
-export * from "../shared/components/SelectionControls/Checkbox";
+export * from "../shared/components/Selection/Checkbox";

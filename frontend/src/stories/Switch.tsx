@@ -1,1 +1,1 @@
-export * from "../shared/components/SelectionControls/Switch";
+export * from "../shared/components/Selection/Switch";
