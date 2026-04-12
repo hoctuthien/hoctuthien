@@ -1,10 +1,3 @@
-/* ─────────────────────────────────────────────────────────────
-   HocTuThien — Button Component Styles
-   Variants: primary | secondary | danger | outline | text
-   Sizes:    sm | md | lg
-───────────────────────────────────────────────────────────── */
-
-/* === Base === */
 .htt-btn {
   display: inline-flex;
   align-items: center;
@@ -30,7 +23,6 @@
   -webkit-user-select: none;
 }
 
-/* === Sizes === */
 .htt-btn--sm {
   font-size: 13px;
   padding: 6px 14px;
@@ -49,14 +41,10 @@
   min-height: 52px;
 }
 
-/* === Full width === */
 .htt-btn--full {
   width: 100%;
 }
 
-/* ─────────────────────────────────────────
-   VARIANT: Primary (Blue filled)
-───────────────────────────────────────── */
 .htt-btn--primary {
   background-color: var(--clr-primary, #1d4ed8);
   color: var(--clr-text-inverse, #ffffff);
@@ -78,9 +66,6 @@
   box-shadow: 0 0 0 3px var(--clr-primary-surface, rgba(29, 78, 216, 0.4));
 }
 
-/* ─────────────────────────────────────────
-   VARIANT: Secondary (Green filled)
-───────────────────────────────────────── */
 .htt-btn--secondary {
   background-color: var(--clr-secondary, #15803d);
   color: var(--clr-text-inverse, #ffffff);
@@ -102,9 +87,6 @@
   box-shadow: 0 0 0 3px var(--clr-secondary-light, rgba(21, 128, 61, 0.4));
 }
 
-/* ─────────────────────────────────────────
-   VARIANT: Danger (Red filled)
-───────────────────────────────────────── */
 .htt-btn--danger {
   background-color: var(--clr-error, #dc2626);
   color: var(--clr-text-inverse, #ffffff);
@@ -126,9 +108,6 @@
   box-shadow: 0 0 0 3px var(--clr-error-surface, rgba(220, 38, 38, 0.4));
 }
 
-/* ─────────────────────────────────────────
-   VARIANT: Outline (Dashed border)
-───────────────────────────────────────── */
 .htt-btn--outline {
   background-color: transparent;
   color: var(--clr-primary, #1d4ed8);
@@ -148,9 +127,6 @@
   box-shadow: 0 0 0 3px var(--clr-primary-surface, rgba(29, 78, 216, 0.3));
 }
 
-/* ─────────────────────────────────────────
-   VARIANT: Text (No background)
-───────────────────────────────────────── */
 .htt-btn--text {
   background-color: transparent;
   color: #1d4ed8;
@@ -170,9 +146,6 @@
   border-radius: 4px;
 }
 
-/* ─────────────────────────────────────────
-   STATE: Disabled
-───────────────────────────────────────── */
 .htt-btn--disabled,
 .htt-btn:disabled {
   background-color: #e5e7eb !important;
@@ -184,9 +157,6 @@
   opacity: 1;
 }
 
-/* ─────────────────────────────────────────
-   STATE: Loading
-───────────────────────────────────────── */
 .htt-btn--loading {
   cursor: wait;
 }
@@ -202,7 +172,6 @@
   flex-shrink: 0;
 }
 
-/* Spinner cho variant outline và text */
 .htt-btn--outline .htt-btn__spinner,
 .htt-btn--text .htt-btn__spinner {
   border-color: rgba(29, 78, 216, 0.3);
@@ -215,9 +184,6 @@
   }
 }
 
-/* ─────────────────────────────────────────
-   Icon slots
-───────────────────────────────────────── */
 .htt-btn__icon {
   display: inline-flex;
   align-items: center;

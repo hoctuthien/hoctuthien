@@ -121,6 +121,21 @@
   --z-modal:    300;
   --z-toast:    400;
   --z-tooltip:  500;
+  --z-tooltip-matrix:  600;
+
+  --color-surface-container-lowest: #FFFFFF;
+
+  --color-primary-matrix-hover:   #3B82F6;
+  --color-primary-matrix-clicked: #0F3399;
+  
+  --color-secondary-matrix-hover:   #22C55E;
+  --color-secondary-matrix-clicked: #074528;
+
+  --color-danger-matrix-hover:   #EF4444;
+  --color-danger-matrix-clicked: #6B0011;
+
+  --shadow-fab: 0 12px 40px -8px rgba(27, 79, 191, 0.25);
+  --shadow-fab-hover: 0 20px 50px -12px rgba(27, 79, 191, 0.35);
 }
 
 :root {

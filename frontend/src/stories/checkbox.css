@@ -44,33 +44,28 @@
   color: white;
 }
 
-/* Hover State */
 .htt-checkbox-input:hover ~ .htt-checkbox-control {
   border-color: var(--clr-primary, #1b4fbf);
   border-width: 2px;
 }
 
-/* Checked / Selected State */
 .htt-checkbox-input:checked ~ .htt-checkbox-control,
 .htt-checkbox-input:indeterminate ~ .htt-checkbox-control {
   background-color: var(--clr-primary, #1b4fbf);
   border-color: var(--clr-primary, #1b4fbf);
 }
 
-/* Focused State */
 .htt-checkbox-input:focus-visible ~ .htt-checkbox-control {
   box-shadow: 0 0 0 4px var(--clr-primary-surface, rgba(27, 79, 191, 0.3));
   border-color: var(--clr-primary, #1b4fbf);
 }
 
-/* Checkmark and Dash icons */
 .htt-checkbox-icon {
   width: 16px;
   height: 16px;
   stroke: white;
 }
 
-/* Label styling */
 .htt-checkbox-label {
   font-size: var(--font-size-body-sm, 14px);
   color: var(--clr-text-body, #2c3e60);
@@ -78,7 +73,6 @@
   cursor: inherit;
 }
 
-/* Disabled State */
 .htt-checkbox-input:disabled ~ .htt-checkbox-control {
   background-color: var(--color-text-disabled, #b8c4d8);
   border-color: var(--color-text-disabled, #b8c4d8);

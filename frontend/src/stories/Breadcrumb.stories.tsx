@@ -14,7 +14,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Icon SVG đơn sắc chuẩn
 const HomeIcon = (
   <svg
     width="16"
@@ -87,7 +86,7 @@ export const WithIcons: Story = {
 export const WithPill: Story = {
   args: {
     items: [
-      { label: "Settings", href: "/settings", icon: HomeIcon }, // Dùng tạm icon Home cho Settings
+      { label: "Settings", href: "/settings", icon: HomeIcon },
       {
         label: "Security",
         isPill: true,

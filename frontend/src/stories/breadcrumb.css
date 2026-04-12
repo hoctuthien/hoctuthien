@@ -21,7 +21,6 @@
   font-size: var(--font-size-body-sm, 14px);
 }
 
-/* Link: Màu xanh mặc định theo yêu cầu mới nhất */
 .htt-breadcrumb-link {
   display: inline-flex;
   align-items: center;
@@ -37,7 +36,6 @@
   text-decoration: underline;
 }
 
-/* Trang hiện tại: Màu xanh đậm và Bold */
 .htt-breadcrumb-current {
   display: inline-flex;
   align-items: center;
@@ -47,7 +45,6 @@
   cursor: default;
 }
 
-/* Variant: Pill button cho mục cuối */
 .htt-breadcrumb--pill {
   background-color: var(--clr-primary, #1B4FBF);
   color: white !important;

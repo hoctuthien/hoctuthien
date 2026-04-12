@@ -51,7 +51,6 @@
   box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
 }
 
-/* Checked State */
 .htt-switch-input:checked ~ .htt-switch-track {
   background-color: var(--clr-primary, #1B4FBF);
 }
@@ -60,7 +59,6 @@
   transform: translateX(20px);
 }
 
-/* Focused State */
 .htt-switch-input:focus-visible ~ .htt-switch-track {
   box-shadow: 0 0 0 4px var(--clr-primary-surface, rgba(27, 79, 191, 0.3));
 }
@@ -72,7 +70,6 @@
   cursor: inherit;
 }
 
-/* Disabled State */
 .htt-switch-input:disabled ~ .htt-switch-track {
   background-color: var(--color-text-disabled, #B8C4D8);
 }

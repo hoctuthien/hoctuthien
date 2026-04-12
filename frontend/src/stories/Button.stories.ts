@@ -49,9 +49,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// ── Các loại nút ──────────────────────────────────────────────
-
-/** Nút hành động chính của trang hoặc phân đoạn */
 export const Primary: Story = {
   args: {
     variant: "primary",
@@ -60,7 +57,6 @@ export const Primary: Story = {
   },
 };
 
-/** Nút hành động phụ hỗ trợ cho hành động chính */
 export const Secondary: Story = {
   args: {
     variant: "secondary",
@@ -69,7 +65,6 @@ export const Secondary: Story = {
   },
 };
 
-/** Nút cho các hành động nguy hiểm — cần người dùng chú ý */
 export const Danger: Story = {
   args: {
     variant: "danger",
@@ -78,7 +73,6 @@ export const Danger: Story = {
   },
 };
 
-/** Nút có viền nét đứt — dùng cho các khu vực tương tác tạo nội dung */
 export const Outline: Story = {
   args: {
     variant: "outline",
@@ -87,7 +81,6 @@ export const Outline: Story = {
   },
 };
 
-/** Nút dạng văn bản — dùng cho điều hướng hoặc nút Hủy */
 export const Text: Story = {
   args: {
     variant: "text",
@@ -96,9 +89,6 @@ export const Text: Story = {
   },
 };
 
-// ── Trạng thái ───────────────────────────────────────────────────
-
-/** Trạng thái khi hành động không khả dụng */
 export const Disabled: Story = {
   args: {
     variant: "primary",
@@ -108,7 +98,6 @@ export const Disabled: Story = {
   },
 };
 
-/** Trạng thái khi đang xử lý dữ liệu */
 export const Loading: Story = {
   args: {
     variant: "primary",
@@ -117,8 +106,6 @@ export const Loading: Story = {
     size: "md",
   },
 };
-
-// ── Kích thước ────────────────────────────────────────────────────
 
 export const Small: Story = {
   args: {
@@ -143,8 +130,6 @@ export const Large: Story = {
     size: "lg",
   },
 };
-
-// ── Độ rộng đầy đủ ────────────────────────────────────────────────
 
 export const FullWidth: Story = {
   args: {
