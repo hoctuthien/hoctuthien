@@ -40,6 +40,11 @@
   --color-surface-elevated: #EEF3FA;
   --color-surface-overlay:  rgba(15, 51, 153, 0.06);
 
+  --color-sidebar-surface:     #F7F9FF;
+  --color-sidebar-surface-sub: #F1F4FA;
+  --color-sidebar-item-hover:  #E8EFFE;
+  --color-sidebar-item-active: #E3F0FB;
+
   --color-text-heading:   #0D1A33;
   --color-text-body:      #2C3E60;
   --color-text-muted:     #7A8BB0;
