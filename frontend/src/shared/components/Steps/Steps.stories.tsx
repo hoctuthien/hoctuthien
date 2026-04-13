@@ -3,7 +3,7 @@ import { Steps, StatusPill, StatusCard } from "./Steps";
 import { LuCheck } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/Navigation/Steps",
+  title: "Components/Navigation/Steps",
   component: Steps,
   parameters: {
     layout: "centered",

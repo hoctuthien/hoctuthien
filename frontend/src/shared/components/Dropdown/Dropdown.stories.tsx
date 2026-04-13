@@ -4,7 +4,7 @@ import { Dropdown } from "./Dropdown";
 import { LuUser, LuCalendar, LuTrendingUp, LuLogOut } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/Action/Dropdown",
+  title: "Components/Action/Dropdown",
   component: Dropdown,
   parameters: {
     layout: "centered",

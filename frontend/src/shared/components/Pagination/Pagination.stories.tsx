@@ -3,7 +3,7 @@ import { fn } from "storybook/test";
 import { Pagination } from "./Pagination";
 
 const meta = {
-  title: "Shared/Navigation/Pagination",
+  title: "Components/Navigation/Pagination",
   component: Pagination,
   parameters: {
     layout: "centered",
