@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤝 HocTuThien Frontend - MentorConnect Design System
 
-## Getting Started
+Chào mừng bạn đến với kho mã nguồn Frontend của dự án **Học Từ Thiện (HocTuThien)**. Đây là phần giao diện được xây dựng dựa trên hệ thống thiết kế **MentorConnect**, tập trung vào trải nghiệm người dùng hiện đại, tinh tế và chuyên nghiệp.
 
-First, run the development server:
+---
 
+## 🚀 Công nghệ sử dụng
+
+Hệ thống được xây dựng trên nền tảng công nghệ mới nhất để đảm bảo hiệu suất và khả năng mở rộng:
+
+- **Framework**: [Next.js 15+ (App Router)](https://nextjs.org/)
+- **Library**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & Vanilla CSS (Design Tokens)
+- **Component Lab**: [Storybook](https://storybook.js.org/) - Dùng để phát triển và kiểm thử component độc lập.
+- **Icons**: [Lucide React](https://lucide.dev/) (thông qua `react-icons/lu`)
+- **Language**: TypeScript
+
+---
+
+## 🧩 Hệ thống Component (MentorConnect UI)
+
+Chúng tôi ưu tiên xây dựng các component có tính tái sử dụng cao, tuân thủ chặt chẽ Design Guideline:
+
+- **Navigation**: Sidebar đa cấp, Breadcrumbs, Steps (Horizontal & Vertical).
+- **Actions**: Button, Dropdown (nhiều biến thể), Pagination.
+- **Forms**: Input, Checkbox, Selection components.
+- **Feedback**: Alerts, Badges, Progress bars.
+
+Tất cả các component đều có thể xem và tương tác trực tiếp thông qua Storybook.
+
+---
+
+## 🛠 Hướng dẫn phát triển
+
+### 1. Cài đặt
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Chạy môi trường Development
+```bash
+npm run dev
+```
+Truy cập: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Chạy Storybook (Khuyên dùng khi phát triển UI)
+```bash
+npm run storybook
+```
+Truy cập: [http://localhost:6006](http://localhost:6006)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📂 Thư mục quan trọng
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app`: Chứa logic routing và các trang (Pages).
+- `src/shared/components`: Thư viện UI components dùng chung.
+- `src/shared/hooks`: Các custom hooks dùng chung.
+- `src/core`: Chứa các cấu hình hệ thống, constants và types.
+- `src/modules`: Chứa logic theo từng tính năng nghiệp vụ (Auth, Booking, Charity...).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📜 Quy ước chung
 
-## Deploy on Vercel
+### 1. Ghi chú Commit
+Dự án sử dụng chuẩn **Conventional Commits**. Mọi commit phải có định dạng:
+`<type>(<scope>): <mô tả ngắn bằng tiếng Anh>`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ví dụ: `feat(shared): implement dropdown component`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2. Đặt tên Branch
+`<type>/<tên-dev>/<scope>/<mô-tả-ngắn>`
+
+Ví dụ: `feat/nghia/shared/dropdown-component`
+
+---
+
+© 2026 HocTuThien Development Team.
