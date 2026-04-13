@@ -1,0 +1,57 @@
+.htt-badge-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.htt-badge-icon {
+  display: inline-flex;
+  margin-right: 4px;
+}
+
+.htt-badge-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.htt-badge-dot--error { background-color: var(--color-guidance-red); }
+.htt-badge-dot--success { background-color: var(--color-success-deep); }
+
+.htt-badge-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--color-guidance-red);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid white;
+}
+
+/* Custom variants matching design image */
+.badge-growth {
+  background-color: #D1FFD6; /* Light green for UX Design */
+  color: #0A5C36;
+}
+
+.badge-leadership {
+  background-color: #E0E7FF; /* Light blue for Leadership */
+  color: #4338CA;
+}
+
+.badge-warning {
+  background-color: #FEF3C7; /* Light orange for Top Rated */
+  color: #92400E;
+}

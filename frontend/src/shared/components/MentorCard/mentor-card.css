@@ -1,0 +1,51 @@
+.htt-mentor-card {
+  background-color: var(--clr-bg-card);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-lg);
+  max-width: 320px;
+  border: 1px solid var(--clr-border-subtle);
+}
+
+.htt-mentor-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+}
+
+.htt-mentor-card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.htt-mentor-card-name {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-black);
+  color: var(--clr-text-heading);
+  margin: 0;
+}
+
+.htt-mentor-card-title {
+  font-size: var(--font-size-caption);
+  color: var(--clr-text-muted);
+  margin: 0;
+}
+
+.htt-mentor-card-description {
+  font-size: 11px; /* Very small like in design */
+  line-height: var(--line-height-relaxed);
+  color: var(--clr-text-muted);
+  margin-bottom: var(--spacing-6);
+}
+
+.htt-mentor-card-actions {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.htt-mentor-card-actions .btn {
+  flex: 1;
+  font-size: 10px;
+  padding: 8px 0;
+}
