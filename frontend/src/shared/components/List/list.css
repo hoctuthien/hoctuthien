@@ -40,10 +40,6 @@
   color: var(--clr-primary);
 }
 
-.htt-list-avatar {
-  /* No changes needed as it's now handled by Avatar component */
-}
-
 .htt-list-item-content {
   display: flex;
   flex-direction: column;
