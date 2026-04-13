@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
 import { Button } from "./Button";
+import { LuArrowRight, LuSend, LuTrash2 } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/Button",
+  title: "Shared/Action/Button",
   component: Button,
   parameters: {
     layout: "centered",
@@ -128,6 +129,24 @@ export const Large: Story = {
     variant: "primary",
     label: "Nút lớn",
     size: "lg",
+  },
+};
+
+export const WithIcon: Story = {
+  args: {
+    variant: "primary",
+    label: "Gửi lời nhắn",
+    iconRight: <LuSend size={18} />,
+    size: "md",
+  },
+};
+
+export const DangerWithIcon: Story = {
+  args: {
+    variant: "danger",
+    label: "Xóa dữ liệu",
+    iconLeft: <LuTrash2 size={18} />,
+    size: "md",
   },
 };
 

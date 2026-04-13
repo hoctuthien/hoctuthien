@@ -1,16 +1,14 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap');
-
 @theme {
   --font-family-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
   --font-family-mono: 'Courier New', Courier, monospace;
 
-  --color-primary:          #1B4FBF;
-  --color-primary-deep:     #0F3399;
-  --color-primary-hover:    #1A4AD4;
-  --color-primary-light:    #E8EFFE;
-  --color-primary-surface:  #C7D8F8;
+   --color-primary:          #005BBF;
+   --color-primary-deep:     #003E82;
+   --color-primary-hover:    #006CE0;
+   --color-primary-light:    #E3F0FB;
+   --color-primary-surface:  #C7D8F8;
 
   --color-secondary:        #0A5C36;
   --color-secondary-deep:   #074528;
@@ -125,11 +123,11 @@
 
   --color-surface-container-lowest: #FFFFFF;
 
-  --color-primary-matrix-hover:   #3B82F6;
-  --color-primary-matrix-clicked: #0F3399;
-  
-  --color-secondary-matrix-hover:   #22C55E;
-  --color-secondary-matrix-clicked: #074528;
+   --color-primary-matrix-hover:   #006CE0;
+   --color-primary-matrix-clicked: #003E82;
+   
+   --color-secondary-matrix-hover:   #4ADE80;
+   --color-secondary-matrix-clicked: #074528;
 
   --color-danger-matrix-hover:   #EF4444;
   --color-danger-matrix-clicked: #6B0011;

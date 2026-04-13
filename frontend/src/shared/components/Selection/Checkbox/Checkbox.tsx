@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useId } from "react";
+import { LuCheck, LuMinus } from "react-icons/lu";
 import "./checkbox.css";
 
 export interface CheckboxProps
@@ -40,30 +41,10 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           />
           <div className="htt-checkbox-control">
             {(checked && !indeterminate) && (
-              <svg
-                className="htt-checkbox-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+              <LuCheck className="htt-checkbox-icon" strokeWidth={3.5} />
             )}
             {indeterminate && (
-              <svg
-                className="htt-checkbox-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
+              <LuMinus className="htt-checkbox-icon" strokeWidth={4} />
             )}
           </div>
         </div>
