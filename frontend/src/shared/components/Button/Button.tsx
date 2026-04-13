@@ -15,6 +15,7 @@ export interface ButtonProps {
   iconRight?: React.ReactNode;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   type?: 'button' | 'submit' | 'reset';
+  className?: string;
 }
 
 export const Button = ({
@@ -28,6 +29,7 @@ export const Button = ({
   iconRight,
   onClick,
   type = 'button',
+  className = '',
 }: ButtonProps) => {
   const isDisabled = disabled || loading;
 
@@ -38,6 +40,7 @@ export const Button = ({
     fullWidth ? 'htt-btn--full' : '',
     isDisabled ? 'htt-btn--disabled' : '',
     loading ? 'htt-btn--loading' : '',
+    className,
   ]
     .filter(Boolean)
     .join(' ');
