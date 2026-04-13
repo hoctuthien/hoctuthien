@@ -1,39 +1,66 @@
+import React from 'react';
 import './button.css';
 
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline' | 'text';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+
 export interface ButtonProps {
-  /** Is this the principal call to action on the page? */
-  primary?: boolean;
-  /** What background color to use */
-  backgroundColor?: string;
-  /** How large should the button be? */
-  size?: 'small' | 'medium' | 'large';
-  /** Button contents */
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   label: string;
-  /** Optional click handler */
-  onClick?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+  fullWidth?: boolean;
+  iconLeft?: React.ReactNode;
+  iconRight?: React.ReactNode;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  type?: 'button' | 'submit' | 'reset';
 }
 
-/** Primary UI component for user interaction */
 export const Button = ({
-  primary = false,
-  size = 'medium',
-  backgroundColor,
+  variant = 'primary',
+  size = 'md',
   label,
-  ...props
+  disabled = false,
+  loading = false,
+  fullWidth = false,
+  iconLeft,
+  iconRight,
+  onClick,
+  type = 'button',
 }: ButtonProps) => {
-  const mode = primary ? 'storybook-button--primary' : 'storybook-button--secondary';
+  const isDisabled = disabled || loading;
+
+  const classNames = [
+    'htt-btn',
+    `htt-btn--${variant}`,
+    `htt-btn--${size}`,
+    fullWidth ? 'htt-btn--full' : '',
+    isDisabled ? 'htt-btn--disabled' : '',
+    loading ? 'htt-btn--loading' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <button
-      type="button"
-      className={['storybook-button', `storybook-button--${size}`, mode].join(' ')}
-      {...props}
+      type={type}
+      className={classNames}
+      disabled={isDisabled}
+      onClick={onClick}
+      aria-busy={loading}
+      aria-disabled={isDisabled}
     >
-      {label}
-      <style jsx>{`
-        button {
-          background-color: ${backgroundColor};
-        }
-      `}</style>
+      {loading && (
+        <span className="htt-btn__spinner" aria-hidden="true" />
+      )}
+      {!loading && iconLeft && (
+        <span className="htt-btn__icon htt-btn__icon--left">{iconLeft}</span>
+      )}
+      <span className="htt-btn__label">{label}</span>
+      {!loading && iconRight && (
+        <span className="htt-btn__icon htt-btn__icon--right">{iconRight}</span>
+      )}
     </button>
   );
 };
