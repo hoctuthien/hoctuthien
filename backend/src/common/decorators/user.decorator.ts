@@ -1,5 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { UserPayload } from '../constants/user.payload'; // Import interface vừa tạo
+import { UserPayload } from '../types/user-payload.type';
+ // Import interface vừa tạo
 
 export const User = createParamDecorator(
   // data chỉ được phép là một trong các key của UserPayload
