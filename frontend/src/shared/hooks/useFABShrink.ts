@@ -22,13 +22,13 @@ export function useFABShrink({ threshold = 50, shrinkOnScrollDelay = 100 }: UseF
   }, [lastScrollY, threshold]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const throttledScroll = () => {
       if (timeoutId) return;
       timeoutId = setTimeout(() => {
         handleScroll();
-        timeoutId = undefined as any;
+        timeoutId = undefined;
       }, shrinkOnScrollDelay);
     };
 
