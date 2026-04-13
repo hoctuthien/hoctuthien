@@ -1,0 +1,196 @@
+.steps-container {
+  font-family: var(--font-family-sans);
+  width: 100%;
+}
+
+/* === Horizontal Steps === */
+.steps-horizontal {
+  display: flex;
+  width: 100%;
+  padding: var(--spacing-6) 0;
+  position: relative;
+}
+
+.step-item-horizontal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 120px; /* Đảm bảo nhãn không bị chồng chéo */
+}
+
+/* Thanh nối nằm ngang */
+.step-item-horizontal:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 16px; /* Giữa node 32px */
+  left: calc(50% + 20px); /* Bắt đầu sau node */
+  right: calc(-50% + 20px); /* Kết thúc trước node tiếp theo */
+  height: 2px;
+  background-color: var(--clr-border-subtle);
+  z-index: 0;
+  transition: background-color var(--transition-base);
+}
+
+.step-item-horizontal.completed:not(:last-child)::after {
+  background-color: var(--clr-primary);
+}
+
+.step-node {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  border: 2px solid var(--clr-border-subtle);
+  background-color: var(--clr-bg-card);
+  color: var(--clr-text-muted);
+  position: relative;
+  z-index: 1; /* Nằm trên thanh nối */
+  transition: all var(--transition-base);
+  margin-bottom: var(--spacing-3);
+}
+
+.step-item-horizontal.completed .step-node {
+  background-color: var(--clr-primary);
+  border-color: var(--clr-primary);
+  color: var(--clr-text-inverse);
+}
+
+.step-item-horizontal.active .step-node {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+  background-color: var(--clr-bg-card);
+}
+
+.step-item-horizontal.error .step-node {
+  background-color: var(--clr-error);
+  border-color: var(--clr-error);
+  color: var(--clr-text-inverse);
+}
+
+.step-label {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--clr-text-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.step-item-horizontal.active .step-label {
+  color: var(--clr-primary);
+}
+
+.step-item-horizontal.error .step-label {
+  color: var(--clr-error);
+  font-weight: var(--font-weight-bold);
+}
+
+/* === Vertical Steps === */
+.steps-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-0);
+}
+
+.step-item-vertical {
+  display: flex;
+  gap: var(--spacing-4);
+  position: relative;
+  padding-bottom: var(--spacing-8);
+}
+
+.step-item-vertical:last-child {
+  padding-bottom: 0;
+}
+
+.step-item-vertical:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 32px;
+  left: 15px; /* Center of 32px node */
+  bottom: 0;
+  width: 2px;
+  background-color: var(--clr-border-subtle);
+}
+
+.step-item-vertical.active:not(:last-child)::before,
+.step-item-vertical.completed:not(:last-child)::before {
+  background-color: var(--clr-primary);
+}
+
+.step-content-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding-top: 4px;
+}
+
+.step-title-vertical {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  color: var(--clr-text-heading);
+}
+
+.step-item-vertical.completed .step-title-vertical {
+  color: var(--clr-text-heading);
+}
+
+.step-item-vertical.disabled .step-title-vertical {
+  color: var(--clr-text-disabled);
+}
+
+.step-desc-vertical {
+  font-size: var(--font-size-caption);
+  color: var(--clr-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.step-info-box {
+  margin-top: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--clr-bg-elevated);
+  border-radius: var(--radius-md);
+  color: var(--clr-text-body);
+  font-size: var(--font-size-caption);
+  font-style: italic;
+  max-width: 320px;
+  line-height: var(--line-height-relaxed);
+}
+
+/* === Status Pill Tags === */
+.status-pill-container {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  background-color: var(--clr-border-subtle);
+  color: var(--clr-text-muted);
+  transition: all var(--transition-base);
+}
+
+.status-pill-active {
+  background-color: var(--clr-primary);
+  color: var(--clr-text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.status-pill-outline {
+  background-color: transparent;
+  border: 2px solid var(--clr-primary);
+  color: var(--clr-primary);
+}
