@@ -12,17 +12,20 @@ import {
   LuCircleHelp 
 } from 'react-icons/lu';
 
-const meta = {
+const meta: Meta<typeof Sidebar> = {
   title: 'Shared/Navigation/Sidebar',
   component: Sidebar,
   parameters: {
     layout: 'fullscreen',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof Sidebar>;
+  args: {
+    children: null
+  }
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Sidebar>;
 
 export const SingleLayer: Story = {
   render: () => (
