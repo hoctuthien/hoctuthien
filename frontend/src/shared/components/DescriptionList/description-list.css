@@ -1,0 +1,93 @@
+.htt-description-list {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 2), 1fr);
+  gap: var(--spacing-6);
+  font-family: var(--font-family-sans);
+}
+
+.htt-description-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.htt-description-label {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-black);
+  color: var(--clr-primary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.htt-description-value {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--clr-text-heading);
+}
+
+.htt-description-list--bordered {
+  gap: 0;
+  border: 1px solid var(--clr-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: white;
+}
+
+.htt-description-list--bordered .htt-description-item {
+  padding: var(--spacing-4);
+  border: 1px solid var(--clr-border-subtle);
+}
+
+.htt-description-list--vertical {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.htt-description-list--vertical .htt-description-item {
+  padding: var(--spacing-4) 0;
+  border-bottom: 1px solid var(--clr-border-subtle);
+}
+
+.htt-description-list--vertical .htt-description-item:last-child {
+  border-bottom: none;
+}
+
+.htt-description-list--bordered-vertical {
+  grid-template-columns: repeat(var(--columns, 2), 1fr);
+  gap: var(--spacing-6);
+  padding: var(--spacing-6);
+  background: white;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--clr-border-subtle);
+  position: relative;
+}
+
+.htt-description-list--bordered-vertical::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 24px;
+  bottom: 24px;
+  width: 3px;
+  background-color: var(--clr-primary);
+  border-radius: 0 4px 4px 0;
+}
+
+.htt-description-list--bordered-vertical .htt-description-label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.htt-description-list--bordered-vertical .htt-description-icon {
+  color: var(--clr-primary);
+  display: flex;
+  align-items: center;
+}
+
+.htt-description-list--bordered-vertical .htt-description-value {
+  background-color: #F3F6FA; 
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  margin-top: 4px;
+}

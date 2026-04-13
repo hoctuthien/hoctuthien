@@ -25,7 +25,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--clr-primary, #1B4FBF);
+  color: var(--clr-primary);
   text-decoration: none;
   transition: opacity var(--transition-fast, 150ms) ease;
   font-weight: var(--font-weight-medium, 500);
@@ -40,13 +40,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--clr-primary, #1B4FBF);
+  color: var(--clr-primary);
   font-weight: var(--font-weight-bold, 700);
   cursor: default;
 }
 
 .htt-breadcrumb--pill {
-  background-color: var(--clr-primary, #1B4FBF);
+  background-color: var(--clr-primary);
   color: white !important;
   padding: 6px 16px;
   border-radius: var(--radius-full, 9999px);
