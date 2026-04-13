@@ -15,6 +15,4 @@ export class ParseMentorIdPipe extends DynamicRegexPipe {
   }
 }
 
-// ParseCustomId thực chất là một Factory Function
-// giúp bạn khởi tạo nhanh một Pipe instance mà
-// không cần viết new DynamicRegexPipe(...) rườm rà nhe.
+
