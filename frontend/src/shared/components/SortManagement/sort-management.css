@@ -37,7 +37,6 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Grid Sort */
 .htt-sort-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

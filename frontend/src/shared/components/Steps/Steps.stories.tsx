@@ -78,8 +78,6 @@ export const VerticalNarrative: Story = {
   },
 };
 
-/* --- Status Tag Stories --- */
-
 export const StatusPillNavigation = {
   render: () => (
     <div className="status-pill-container">

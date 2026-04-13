@@ -74,7 +74,6 @@ export const Steps: React.FC<StepsProps> = ({ items, orientation = 'horizontal' 
   );
 };
 
-/* --- Status Tag Components --- */
 
 export interface StatusPillProps {
   label: string;

@@ -23,7 +23,7 @@
 }
 
 .htt-accordion-header:hover {
-  background-color: #F1F7FE; /* Hover state from design */
+  background-color: #F1F7FE; 
 }
 
 .htt-accordion-title {
@@ -32,7 +32,6 @@
   color: var(--clr-text-heading);
 }
 
-/* Open State */
 .htt-accordion--open {
   border-color: var(--clr-primary);
   box-shadow: var(--shadow-lg);

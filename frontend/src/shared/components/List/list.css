@@ -1,9 +1,9 @@
 .htt-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-4); /* Increased gap between list items */
+  gap: var(--spacing-4);
   width: 100%;
-  max-width: 480px; /* Slightly wider */
+  max-width: 480px;
 }
 
 .htt-list-item {
@@ -48,20 +48,20 @@
 
 .htt-list-item-title {
   font-size: var(--font-size-body);
-  font-weight: 800; /* Extra bold for emphasis */
+  font-weight: 800;
   color: var(--clr-text-heading);
   letter-spacing: var(--letter-spacing-tight);
 }
 
 .htt-list-item-subtitle {
-  font-size: var(--font-size-body-sm); /* Slightly larger */
+  font-size: var(--font-size-body-sm);
   color: #7a8bb0;
   font-weight: 500;
 }
 
 .htt-list-item-actions {
   display: flex;
-  gap: var(--spacing-3); /* More gap between action buttons */
+  gap: var(--spacing-3);
   margin-left: var(--spacing-4);
 }
 

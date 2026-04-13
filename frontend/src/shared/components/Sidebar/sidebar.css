@@ -67,7 +67,6 @@
   border-radius: var(--radius-full) 0 0 var(--radius-full);
 }
 
-/* Hierarchical Styles */
 .htt-sidebar-group {
   display: flex;
   flex-direction: column;
@@ -97,7 +96,6 @@
   transform: rotate(90deg);
 }
 
-/* Section Headings as mentioned in guideline */
 .htt-sidebar-section-title {
   margin: var(--spacing-8) 0 var(--spacing-2) var(--spacing-4);
   font-size: 0.75rem;

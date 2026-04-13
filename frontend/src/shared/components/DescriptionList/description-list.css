@@ -25,7 +25,6 @@
   color: var(--clr-text-heading);
 }
 
-/* Variant: Bordered */
 .htt-description-list--bordered {
   gap: 0;
   border: 1px solid var(--clr-border-subtle);
@@ -39,7 +38,6 @@
   border: 1px solid var(--clr-border-subtle);
 }
 
-/* Variant: Vertical (Horizontal separators) */
 .htt-description-list--vertical {
   grid-template-columns: 1fr;
   gap: 0;
@@ -54,7 +52,6 @@
   border-bottom: none;
 }
 
-/* Variant: Bordered Vertical */
 .htt-description-list--bordered-vertical {
   grid-template-columns: repeat(var(--columns, 2), 1fr);
   gap: var(--spacing-6);
@@ -89,7 +86,7 @@
 }
 
 .htt-description-list--bordered-vertical .htt-description-value {
-  background-color: #F3F6FA; /* Light blue/grey bg for value */
+  background-color: #F3F6FA; 
   padding: 10px 14px;
   border-radius: var(--radius-md);
   margin-top: 4px;

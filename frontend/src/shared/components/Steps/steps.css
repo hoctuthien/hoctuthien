@@ -3,7 +3,6 @@
   width: 100%;
 }
 
-/* === Horizontal Steps === */
 .steps-horizontal {
   display: flex;
   width: 100%;
@@ -17,16 +16,15 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  min-width: 120px; /* Đảm bảo nhãn không bị chồng chéo */
+  min-width: 120px;
 }
 
-/* Thanh nối nằm ngang */
 .step-item-horizontal:not(:last-child)::after {
   content: '';
   position: absolute;
-  top: 16px; /* Giữa node 32px */
-  left: calc(50% + 20px); /* Bắt đầu sau node */
-  right: calc(-50% + 20px); /* Kết thúc trước node tiếp theo */
+  top: 16px;
+  left: calc(50% + 20px);
+  right: calc(-50% + 20px);
   height: 2px;
   background-color: var(--clr-border-subtle);
   z-index: 0;
@@ -50,7 +48,7 @@
   background-color: var(--clr-bg-card);
   color: var(--clr-text-muted);
   position: relative;
-  z-index: 1; /* Nằm trên thanh nối */
+  z-index: 1;
   transition: all var(--transition-base);
   margin-bottom: var(--spacing-3);
 }
@@ -90,7 +88,6 @@
   font-weight: var(--font-weight-bold);
 }
 
-/* === Vertical Steps === */
 .steps-vertical {
   display: flex;
   flex-direction: column;
@@ -112,7 +109,7 @@
   content: '';
   position: absolute;
   top: 32px;
-  left: 15px; /* Center of 32px node */
+  left: 15px;
   bottom: 0;
   width: 2px;
   background-color: var(--clr-border-subtle);
@@ -162,7 +159,6 @@
   line-height: var(--line-height-relaxed);
 }
 
-/* === Status Pill Tags === */
 .status-pill-container {
   display: flex;
   gap: var(--spacing-3);

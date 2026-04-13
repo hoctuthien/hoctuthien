@@ -6,7 +6,6 @@
   user-select: none;
 }
 
-/* Base Button Styles */
 .pagination-btn {
   display: inline-flex;
   align-items: center;
@@ -49,7 +48,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* TYPE 01: Standard */
 .pagination-standard {
   justify-content: space-between;
   width: 100%;
@@ -102,7 +100,6 @@
   align-items: center;
 }
 
-/* TYPE 02: Multi-page */
 .pagination-multi-page {
   gap: var(--spacing-6);
   padding: var(--spacing-6) var(--spacing-8);
@@ -161,7 +158,6 @@
   width: 32px;
 }
 
-/* TYPE 05: Simple version */
 .pagination-simple {
   justify-content: center;
   gap: var(--spacing-10);

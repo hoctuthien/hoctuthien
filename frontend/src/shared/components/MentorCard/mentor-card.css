@@ -33,7 +33,7 @@
 }
 
 .htt-mentor-card-description {
-  font-size: 11px; /* Very small like in design */
+  font-size: 11px; 
   line-height: var(--line-height-relaxed);
   color: var(--clr-text-muted);
   margin-bottom: var(--spacing-6);

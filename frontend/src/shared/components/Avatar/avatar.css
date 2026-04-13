@@ -17,7 +17,7 @@
   width: 100px; 
   height: 100px; 
   border-width: 5px; 
-  border-color: #DDEAFC; /* Matching the light blue outline in design */
+  border-color: #DDEAFC; 
 }
 
 .htt-avatar-img {
@@ -33,7 +33,6 @@
   font-size: 0.8em;
 }
 
-/* Avatar Stack */
 .htt-avatar-stack {
   display: inline-flex;
   align-items: center;

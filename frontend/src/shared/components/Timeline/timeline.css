@@ -21,7 +21,7 @@
 .htt-timeline-line {
   position: absolute;
   top: 40px;
-  bottom: -32px; /* Pull down to connect to next */
+  bottom: -32px;
   width: 2px;
   background-color: var(--clr-border-default);
 }
@@ -43,7 +43,6 @@
   transition: all var(--transition-base);
 }
 
-/* Completed Status */
 .htt-timeline-item--completed .htt-timeline-icon-box {
   background-color: var(--color-success-deep);
   border-color: var(--color-success-deep);
@@ -53,7 +52,6 @@
   background-color: var(--color-success-deep);
 }
 
-/* Active Status */
 .htt-timeline-item--active .htt-timeline-icon-box {
   background-color: var(--clr-primary);
   border-color: var(--clr-primary);
@@ -64,7 +62,6 @@
   background-color: var(--clr-border-default);
 }
 
-/* Pending Status */
 .htt-timeline-item--pending .htt-timeline-icon-box {
   background-color: #F1F4FA;
   color: var(--clr-text-disabled);
