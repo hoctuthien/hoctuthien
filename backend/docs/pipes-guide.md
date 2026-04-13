@@ -4,6 +4,9 @@
 Trong dự án này, Pipe được sử dụng để đảm bảo dữ liệu đầu vào (từ URL hoặc Query) luôn đúng định dạng trước khi đi vào logic xử lý của Controller.
 Chúng ta sử dụng một Dynamic Pipe kết hợp với Factory Function để tối ưu việc tái sử dụng code.
 
+Luồng hoạt động
+`Regex (constant) ➔ Factory (util) ➔ Validation (controller)`
+
 ### 2. Cấu trúc bộ công cụ
 `Constants (validation.constant.ts)`: Nơi định nghĩa các luật (Regex) và thông báo lỗi.
 
