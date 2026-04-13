@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useId } from "react";
+import "./checkbox.css";
 
 export interface CheckboxProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
@@ -20,9 +21,9 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
 
     return (
       <div 
-        className={`inline-flex items-center gap-3 cursor-pointer select-none group relative ${disabled ? "cursor-not-allowed" : ""} ${className || ""}`}
+        className={`htt-checkbox-wrapper ${disabled ? "htt-checkbox--disabled" : ""} ${className || ""}`}
       >
-        <div className="relative w-6 h-6 flex items-center justify-center">
+        <div className="htt-checkbox-container">
           <input
             type="checkbox"
             id={id}
@@ -34,28 +35,13 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             checked={checked}
             disabled={disabled}
             onChange={handleChange}
-            className="sr-only peer"
+            className="htt-checkbox-input"
             {...props}
           />
-          <div className={`absolute -inset-2.5 rounded-full transition-colors ${disabled ? "" : "peer-focus-visible:bg-primary-light/50 group-hover:bg-primary-light/30"}`} />
-          
-          <div
-            className={`
-              relative z-10 w-6 h-6 border-[1.5px] transition-all duration-150 ease-in-out flex items-center justify-center
-              rounded-lg
-              border-border-strong 
-              bg-white
-              peer-hover:border-primary peer-hover:border-2
-              peer-checked:bg-primary peer-checked:border-primary peer-checked:text-white
-              peer-indeterminate:bg-primary peer-indeterminate:border-primary peer-indeterminate:text-white
-              peer-focus-visible:ring-4 peer-focus-visible:ring-primary-surface peer-focus-visible:border-primary
-              ${disabled ? "opacity-60 peer-checked:bg-text-disabled peer-checked:border-text-disabled border-border-default bg-surface-elevated" : ""}
-            `}
-          >
+          <div className="htt-checkbox-control">
             {(checked && !indeterminate) && (
               <svg
-                width="16"
-                height="16"
+                className="htt-checkbox-icon"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -68,8 +54,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             )}
             {indeterminate && (
               <svg
-                width="16"
-                height="16"
+                className="htt-checkbox-icon"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -83,7 +68,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           </div>
         </div>
         {label && (
-          <label htmlFor={id} className={`text-sm font-medium text-text-body cursor-inherit relative z-10 ${disabled ? "opacity-60" : ""}`}>
+          <label htmlFor={id} className="htt-checkbox-label">
             {label}
           </label>
         )}

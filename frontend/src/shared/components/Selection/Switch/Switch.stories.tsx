@@ -1,16 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from 'storybook/test';
+import { fn } from "storybook/test";
 import { Switch } from "./Switch";
 
 const meta = {
-  title: "Components/Switch",
+  title: "Shared/Selection/Switch",
   component: Switch,
   parameters: {
     layout: "centered",
+    docs: {
+      description: {
+        component: "Component Switch (Toggle) chuẩn dành cho các cài đặt bật/tắt.",
+      },
+    },
   },
   tags: ["autodocs"],
   argTypes: {
-    onChange: { action: "changed" },
+    checked: { control: "boolean" },
+    disabled: { control: "boolean" },
+    label: { control: "text" },
   },
   args: { onChange: fn() },
 } satisfies Meta<typeof Switch>;
@@ -18,24 +25,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Off: Story = {
+export const Default: Story = {
   args: {
-    label: "Tắt",
+    label: "Toggle Switch",
     checked: false,
   },
 };
 
-export const On: Story = {
+export const Checked: Story = {
   args: {
-    label: "Bật",
+    label: "Switch is On",
     checked: true,
   },
 };
 
 export const Disabled: Story = {
   args: {
-    label: "Bị vô hiệu hóa",
+    label: "Disabled Switch",
     disabled: true,
-    checked: true,
   },
 };
