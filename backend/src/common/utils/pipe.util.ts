@@ -1,10 +1,19 @@
 import { VALIDATION_RULES } from '../constants/validation.constant';
 import { DynamicRegexPipe } from '../pipes/dynamic-regex.pipe';
 
-export const ParseCustomId = (key: keyof typeof VALIDATION_RULES) => {
-  const { regex, message } = VALIDATION_RULES[key];
-  return new DynamicRegexPipe(regex, message);
-};
+// Class dành riêng cho Mentee ID
+export class ParseMenteeIdPipe extends DynamicRegexPipe {
+  constructor() {
+    super(VALIDATION_RULES.MENTEE_ID.regex, VALIDATION_RULES.MENTEE_ID.message);
+  }
+}
+
+// Class dành riêng cho Mentor ID
+export class ParseMentorIdPipe extends DynamicRegexPipe {
+  constructor() {
+    super(VALIDATION_RULES.MENTOR_ID.regex, VALIDATION_RULES.MENTOR_ID.message);
+  }
+}
 
 // ParseCustomId thực chất là một Factory Function
 // giúp bạn khởi tạo nhanh một Pipe instance mà
