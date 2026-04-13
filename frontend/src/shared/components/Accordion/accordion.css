@@ -1,0 +1,61 @@
+.htt-accordion {
+  width: 100%;
+  max-width: 400px;
+  background-color: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all var(--transition-base);
+  border: 1.5px solid var(--clr-border-subtle);
+}
+
+.htt-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.htt-accordion-header:hover {
+  background-color: #F1F7FE; /* Hover state from design */
+}
+
+.htt-accordion-title {
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-black);
+  color: var(--clr-text-heading);
+}
+
+/* Open State */
+.htt-accordion--open {
+  border-color: var(--clr-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.htt-accordion--open .htt-accordion-header {
+  background-color: var(--clr-primary);
+}
+
+.htt-accordion--open .htt-accordion-title,
+.htt-accordion--open .htt-accordion-header svg {
+  color: white;
+}
+
+.htt-accordion-content {
+  padding: 24px;
+  font-size: 11px;
+  line-height: var(--line-height-relaxed);
+  color: var(--clr-text-muted);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
