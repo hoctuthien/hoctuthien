@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Select } from './Select';
 
 const meta: Meta<typeof Select> = {
-  title: 'Shared/Selection/Select',
+  title: 'Shared/Select',
   component: Select,
   parameters: {
     layout: 'centered',

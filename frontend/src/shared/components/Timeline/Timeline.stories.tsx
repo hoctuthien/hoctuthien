@@ -1,10 +1,11 @@
-import React from 'react';
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Timeline } from "./Timeline";
-import { LuMenu, LuCheck, LuCalendar, LuAward } from 'react-icons/lu';
+import { LuCheck, LuCalendar, LuAward } from "react-icons/lu";
+import { LucideFileEdit } from "lucide-react";
 
 const meta = {
-  title: "Shared/Data Display/Timeline",
+  title: "Shared/Timeline",
   component: Timeline,
   parameters: {
     layout: "centered",
@@ -23,28 +24,28 @@ export const ConnectionLifecycle: Story = {
         title: "APPLICATION",
         description: "Mentor review in progress (24h)",
         status: "active",
-        icon: <LuMenu size={18} />,
+        icon: <LucideFileEdit size={24} />,
       },
       {
         id: "2",
         title: "MATCHING",
         description: "Confirmed by Senior Architect",
         status: "completed",
-        icon: <LuCheck size={18} />,
+        icon: <LuCheck size={24} />,
       },
       {
         id: "3",
         title: "SESSION 1",
         description: "Next: Oct 24, 2023 at 10:00 AM",
-        status: "active",
-        icon: <LuCalendar size={18} />,
+        status: "upcoming",
+        icon: <LuCalendar size={24} />,
       },
       {
         id: "4",
         title: "COMPLETION",
         description: "Final outcome and certification",
-        status: "pending",
-        icon: <LuAward size={18} />,
+        status: "future",
+        icon: <LuAward size={24} />,
       },
     ],
   },

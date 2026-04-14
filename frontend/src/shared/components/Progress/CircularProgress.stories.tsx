@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { CircularProgress } from "./CircularProgress";
 
 const meta = {
-  title: "Shared/Progress/CircularProgress",
+  title: "Shared/CircularProgress",
   component: CircularProgress,
   parameters: {
     layout: "centered",

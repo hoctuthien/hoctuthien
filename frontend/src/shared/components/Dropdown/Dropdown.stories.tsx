@@ -10,7 +10,7 @@ import {
 import { User, LogOut, ArrowUpCircle, Calendar } from "lucide-react";
 
 const meta: Meta<typeof Dropdown> = {
-  title: "Shared/Feedback/Dropdown",
+  title: "Shared/Dropdown",
   component: Dropdown,
   tags: ["autodocs"],
 };
@@ -101,7 +101,7 @@ export const TextTriggers: StoryObj = {
 export const FullPanelTemplates: StoryObj = {
   render: () => (
     <div className="flex gap-20 p-20 items-start justify-center min-h-[400px]">
-      {/* Basic Panel */}
+
       <div className="flex flex-col gap-2">
         <h4 className="text-caption font-bold text-text-muted uppercase">
           Basic Panel
@@ -117,7 +117,7 @@ export const FullPanelTemplates: StoryObj = {
         </Dropdown>
       </div>
 
-      {/* Dividers & Icons */}
+
       <div className="flex flex-col gap-2">
         <h4 className="text-caption font-bold text-text-muted uppercase">
           Dividers & Icons

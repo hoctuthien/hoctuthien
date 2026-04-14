@@ -29,7 +29,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         )}
       >
         <div className="relative flex items-center justify-center w-6 h-6">
-          <div className="absolute inset-0 rounded-full scale-150 bg-primary-opacity opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+          <div className="absolute inset-0 rounded-sm scale-150 bg-primary-opacity opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
           <input
             type="checkbox"
@@ -47,7 +47,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           />
           <div
             className={cn(
-              "flex items-center justify-center w-6 h-6 rounded-md border-2 z-10 transition-all duration-200",
+              "flex items-center justify-center w-6 h-6 rounded-sm border-2 z-10 transition-all duration-200",
               "border-outline-variant bg-surface",
               "group-hover:border-primary",
               "peer-checked:bg-primary peer-checked:border-primary peer-indeterminate:bg-primary peer-indeterminate:border-primary",

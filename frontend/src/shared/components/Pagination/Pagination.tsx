@@ -112,29 +112,29 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   const renderMultiPage = () => {
     return (
-      <div className={cn("flex items-center justify-center gap-6 p-6 px-8 bg-surface rounded-3xl shadow-md border border-border-subtle font-sans", className)}>
+      <div className={cn("inline-flex items-center justify-center gap-5 p-5 px-7 bg-surface rounded-lg shadow-sm border border-outline-variant font-sans", className)}>
         <button
-          className={cn(btnClasses, 'h-12 px-6 font-bold bg-surface-elevated border-border-subtle flex gap-2')}
+          className={cn(btnClasses, 'h-10 px-5 font-bold bg-surface-variant text-text-body border-none flex gap-2 rounded-sm hover:bg-border-default transition-all duration-300')}
           onClick={handlePrev}
           disabled={currentPage === 1}
         >
-          <LuArrowLeft size={18} />
+          <LuArrowLeft size={18} className="text-text-body" />
           Previous
         </button>
-        <div className="flex gap-2 items-center">
-          {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => (
+        <div className="flex gap-2.5 items-center mx-1">
+          {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
               className={cn(
-                'h-2.5 rounded-full bg-border-strong transition-all duration-300 cursor-pointer hover:bg-primary-fixed',
-                currentPage === i + 1 ? 'w-8 bg-primary' : 'w-2.5'
+                'h-2 w-2 rounded-full transition-all duration-300 cursor-pointer',
+                currentPage === i + 1 ? 'bg-primary' : 'bg-primary-fixed'
               )}
               onClick={() => onPageChange(i + 1)}
             />
           ))}
         </div>
         <button
-          className={cn(btnClasses, 'h-12 px-6 font-bold bg-primary text-text-inverse border-primary hover:bg-primary-dark hover:text-text-inverse flex gap-2 overflow-hidden')}
+          className={cn(btnClasses, 'h-10 px-5 font-bold !bg-primary !text-text-inverse border-none hover:opacity-90 flex gap-2 rounded-sm shadow-sm transition-all duration-300')}
           onClick={handleNext}
           disabled={currentPage === totalPages}
         >

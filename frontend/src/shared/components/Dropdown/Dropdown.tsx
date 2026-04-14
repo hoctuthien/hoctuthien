@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect, createContext, useContext } from "r
 import { ChevronDown, Check } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
-// Context for managing dropdown state
 interface DropdownContextType {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -19,7 +18,6 @@ const useDropdown = () => {
   return context;
 };
 
-// Root Dropdown Component
 export const Dropdown: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className,
@@ -46,7 +44,6 @@ export const Dropdown: React.FC<{ children: React.ReactNode; className?: string 
   );
 };
 
-// DropdownTrigger Component
 interface DropdownTriggerProps {
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "text";
@@ -68,19 +65,19 @@ export const DropdownTrigger: React.FC<DropdownTriggerProps> = ({
   
   const variants = {
     primary: cn(
-      "bg-primary text-white border-none rounded-full font-bold shadow-sm",
-      "hover:brightness-110 hover:shadow-lg",
+      "bg-[#2D89FF] !text-white border-none rounded-full font-bold shadow-sm",
+      "hover:bg-[#1C75E5] hover:shadow-lg",
       "focus:ring-4 focus:ring-primary-opacity active:scale-95",
-      disabled && "bg-border-default text-white opacity-50 shadow-none pointer-events-none"
+      disabled && "bg-border-default !text-white opacity-50 shadow-none pointer-events-none"
     ),
     secondary: cn(
-      "bg-white text-primary border border-outline-variant rounded-full font-semibold",
-      "hover:border-primary hover:bg-surface-variant",
-      "focus:ring-4 focus:ring-primary-opacity focus:border-primary active:scale-95",
+      "bg-white !text-[#2D89FF] border border-outline-variant rounded-full font-semibold",
+      "hover:border-[#2D89FF] hover:bg-surface-variant",
+      "focus:ring-4 focus:ring-primary-opacity focus:border-[#2D89FF] active:scale-95",
       disabled && "bg-surface-variant text-text-muted border-outline-variant shadow-none pointer-events-none"
     ),
     text: cn(
-      "bg-transparent text-text-heading hover:text-primary font-extrabold",
+      "bg-transparent !text-[#2D89FF] hover:text-[#1C75E5] font-extrabold",
       "focus:underline active:opacity-70",
       disabled && "text-text-muted opacity-50 pointer-events-none"
     ),
@@ -104,15 +101,15 @@ export const DropdownTrigger: React.FC<DropdownTriggerProps> = ({
         className={cn(
           "transition-all duration-300", 
           isOpen && "rotate-180",
-          variant === "secondary" && "text-text-muted group-hover:text-primary",
-          variant === "text" && "text-text-body group-hover:text-primary"
+          variant === "primary" && "!text-white",
+          variant === "secondary" && "!text-[#2D89FF]",
+          variant === "text" && "!text-[#2D89FF] group-hover:text-[#1C75E5]"
         )}
       />
     </button>
   );
 };
 
-// DropdownMenu Component (Panel)
 export const DropdownMenu: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className,
@@ -186,7 +183,6 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   );
 };
 
-// DropdownDivider Component
 export const DropdownDivider: React.FC = () => (
   <div className="h-px bg-outline-variant my-1 mx-2" />
 );

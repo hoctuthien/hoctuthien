@@ -35,7 +35,7 @@ export const TransactionalModal = ({
       containerClassName="max-w-[760px] p-0"
     >
       <div className="flex flex-col">
-        {/* Header */}
+
         <div className="border-b border-[#E8EEF8] px-10 py-8 pr-16">
           <h3 className="text-3xl font-black text-[#0D1A33] tracking-tight">
             {title}
@@ -47,12 +47,12 @@ export const TransactionalModal = ({
           )}
         </div>
 
-        {/* Content */}
+
         <div className="px-10 py-8 overflow-y-auto max-h-[70vh]">
           {children}
         </div>
 
-        {/* Footer */}
+
         {(primaryActionLabel || secondaryActionLabel) && (
           <div className="flex items-center justify-end gap-6 border-t border-[#E8EEF8] px-10 py-6 bg-slate-50/50">
             {secondaryActionLabel && (

@@ -17,7 +17,7 @@ export const Showcase: StoryObj = {
     <div className="min-h-screen bg-[#F7F9FF] p-6 md:p-10 lg:p-20 font-sans">
       <div className="max-w-[1152px] mx-auto space-y-12 md:space-y-20">
         
-        {/* Alerts Section */}
+
         <section className="space-y-6">
           <h2 className="text-[14px] font-bold uppercase tracking-[0.2em] text-[#005BBF]/60">Alerts & Banners</h2>
           <div className="space-y-4">
@@ -44,9 +44,9 @@ export const Showcase: StoryObj = {
           </div>
         </section>
 
-        {/* Bento Grid Section */}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20">
-          {/* Notifications */}
+
           <section className="space-y-6">
             <h2 className="text-[14px] font-bold uppercase tracking-[0.2em] text-[#005BBF]/60">Notifications</h2>
             <div className="space-y-4">
@@ -77,7 +77,7 @@ export const Showcase: StoryObj = {
             </div>
           </section>
 
-          {/* Inline Messages */}
+
           <section className="space-y-6">
             <h2 className="text-[14px] font-bold uppercase tracking-[0.2em] text-[#005BBF]/60">Inline Messages</h2>
             <div className="space-y-4">
@@ -105,7 +105,7 @@ export const Showcase: StoryObj = {
           </section>
         </div>
 
-        {/* Toasts Section */}
+
         <section className="space-y-10 flex flex-col items-center">
           <h2 className="text-[14px] font-bold uppercase tracking-[0.2em] text-[#005BBF]/60 w-full text-center">Toasts & Snackbars</h2>
           <div className="flex flex-wrap items-center justify-center gap-6">

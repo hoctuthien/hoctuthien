@@ -4,7 +4,7 @@ import { Avatar, IdentityBadge } from './index';
 import { IoShieldCheckmark } from 'react-icons/io5';
 
 const meta: Meta = {
-  title: 'Shared/Data Display/Profile',
+  title: 'Shared/Profile',
   parameters: { 
     layout: 'fullscreen',
   },

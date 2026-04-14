@@ -3,10 +3,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { DataTable, TableRow } from "./DataTable";
 
 const meta = {
-  title: "Shared/Data Display/DataTable",
+  title: "Shared/DataTable",
   component: DataTable,
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof DataTable>;
@@ -27,6 +27,17 @@ export const Default: Story = {
       setRows(rows.map(r => r.id === id ? { ...r, selected: !r.selected } : r));
     };
 
-    return <DataTable rows={rows} onSelect={handleSelect} />;
+    return (
+      <div className="p-10 bg-white min-h-screen">
+        <div className="flex flex-col gap-8 w-full max-w-[1200px]">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-1.5 bg-[#3b60c0] rounded-full" />
+            <h2 className="text-[28px] font-bold text-[#1e293b] tracking-tight m-0">Data Tables</h2>
+          </div>
+          <DataTable rows={rows} onSelect={handleSelect} />
+        </div>
+      </div>
+    );
   }
 };
+

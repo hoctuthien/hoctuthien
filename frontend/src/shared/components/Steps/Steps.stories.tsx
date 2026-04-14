@@ -3,7 +3,7 @@ import { Steps, StatusPill, StatusCard } from "./Steps";
 import { LuCheck } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/Navigation/Steps",
+  title: "Shared/Steps",
   component: Steps,
   parameters: {
     layout: "centered",
@@ -80,12 +80,12 @@ export const VerticalNarrative: Story = {
 
 export const StatusPillNavigation = {
   render: () => (
-    <div className="status-pill-container">
+    <div className="flex flex-col gap-3 items-center">
       <StatusPill
         label="Welcome"
         variant="filled"
         isActive
-        icon={<LuCheck size={14} />}
+        icon={<LuCheck size={16} strokeWidth={3} />}
       />
       <StatusPill label="Profile" variant="outline" isActive />
       <StatusPill label="Portfolio" variant="ghost" />

@@ -30,7 +30,7 @@ export const Select = ({
 
   const selectedOption = options.find((opt) => opt.value === value);
 
-  // Close when clicking outside
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -50,7 +50,7 @@ export const Select = ({
       )}
 
       <div className="relative">
-        {/* Trigger Button */}
+
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
@@ -68,7 +68,7 @@ export const Select = ({
           />
         </button>
 
-        {/* Dropdown Menu */}
+
         {isOpen && (
           <div className="absolute z-50 w-full mt-2 py-2 bg-white border border-slate-100 rounded-2xl shadow-xl animate-in fade-in zoom-in duration-200 origin-top">
             {options.map((option) => (

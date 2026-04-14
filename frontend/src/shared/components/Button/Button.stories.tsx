@@ -4,7 +4,7 @@ import { Button } from "./Button";
 import { LuArrowRight, LuSend, LuTrash2 } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/Action/Button",
+  title: "Shared/Button",
   component: Button,
   parameters: {
     layout: "centered",

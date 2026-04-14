@@ -1,13 +1,18 @@
-import React from 'react';
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { List } from "./List";
-import { LuGraduationCap, LuLayoutDashboard, LuPencil, LuTrash2 } from 'react-icons/lu';
+import {
+  LuGraduationCap,
+  LuBookOpen,
+  LuPencil,
+  LuTrash2,
+} from "react-icons/lu";
 
 const meta = {
-  title: "Shared/Data Display/List",
+  title: "Shared/List",
   component: List,
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof List>;
@@ -15,54 +20,64 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof List>;
 
-export const BasicList: Story = {
-  args: {
-    variant: 'basic',
-    items: [
-      {
-        id: '1',
-        title: 'Advanced Pedagogy 101',
-        subtitle: '42 Students Enrolled',
-        icon: <LuGraduationCap size={20} />,
-      },
-      {
-        id: '2',
-        title: 'Curriculum Development',
-        subtitle: '12 Modules Completed',
-        icon: <LuLayoutDashboard size={20} />,
-      },
-    ],
-  },
+const ActionButtons = () => (
+  <div className="flex gap-2">
+    <button className="w-9 h-9 rounded-full bg-[#E0ECFC] text-[#3b60c0] flex items-center justify-center border-none cursor-pointer transition-all hover:bg-[#cbdcf7] active:scale-90">
+      <LuPencil size={18} />
+    </button>
+    <button className="w-9 h-9 rounded-full bg-[#FEE2E2] text-[#B91C1C] flex items-center justify-center border-none cursor-pointer transition-all hover:bg-[#FCA5A5] active:scale-90">
+      <LuTrash2 size={18} />
+    </button>
+  </div>
+);
+
+export const Basic: Story = {
+  render: () => (
+    <div className="p-10 bg-white min-h-[400px] flex items-start justify-center">
+      <List
+        title="BASIC LIST"
+        items={[
+          {
+            id: "1",
+            title: "Advanced Pedagogy 101",
+            subtitle: "42 Students Enrolled",
+            icon: <LuGraduationCap size={22} />,
+          },
+          {
+            id: "2",
+            title: "Curriculum Development",
+            subtitle: "12 Modules Completed",
+            icon: <LuBookOpen size={22} />,
+          },
+        ]}
+      />
+    </div>
+  ),
 };
 
-export const ListWithActions: Story = {
-  args: {
-    variant: 'action',
-    items: [
-      {
-        id: '3',
-        title: 'Marcus Sterling',
-        subtitle: 'Senior Design Mentor',
-        avatar: 'https://i.pravatar.cc/150?u=a',
-        actions: (
-          <>
-            <button className="htt-list-action-btn"><LuPencil size={14} /></button>
-            <button className="htt-list-action-btn htt-list-action-btn--delete"><LuTrash2 size={14} /></button>
-          </>
-        ),
-      },
-      {
-        id: '4',
-        title: 'Elena Rodriguez',
-        subtitle: 'Product Strategy Lead',
-        avatar: 'https://i.pravatar.cc/150?u=b',
-        actions: (
-          <>
-            <button className="htt-list-action-btn"><LuPencil size={14} /></button>
-            <button className="htt-list-action-btn htt-list-action-btn--delete"><LuTrash2 size={14} /></button>
-          </>
-        ),
-      },
-    ],
-  },
+export const WithActions: Story = {
+  render: () => (
+    <div className="p-10 bg-white min-h-[400px] flex items-start justify-center">
+      <List
+        title="LIST WITH ACTIONS"
+        items={[
+          {
+            id: "3",
+            title: "Marcus Sterling",
+            subtitle: "Senior Design Mentor",
+            avatar: "https://xsgames.co/randomusers/assets/avatars/male/40.jpg",
+            actions: <ActionButtons />,
+          },
+          {
+            id: "4",
+            title: "Elena Rodriguez",
+            subtitle: "Product Strategy Lead",
+            avatar:
+              "https://xsgames.co/randomusers/assets/avatars/female/24.jpg",
+            actions: <ActionButtons />,
+          },
+        ]}
+      />
+    </div>
+  ),
 };

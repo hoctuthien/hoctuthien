@@ -26,7 +26,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
     <div className={cn('flex flex-col items-center gap-4', className)} style={{ width: size }}>
       <div className="relative flex items-center justify-center -rotate-90" style={{ width: size, height: size }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
-          {/* Background Circle */}
+
           <circle
             className="fill-none stroke-primary-fixed"
             cx={size / 2}
@@ -34,7 +34,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
             r={radius}
             strokeWidth={strokeWidth}
           />
-          {/* Active Progress Circle */}
+
           <circle
             className="fill-none transition-all duration-1000 ease-out stroke-primary"
             cx={size / 2}

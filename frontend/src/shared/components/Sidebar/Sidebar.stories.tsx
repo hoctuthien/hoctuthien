@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const meta: Meta<typeof Sidebar> = {
-  title: "Shared/Navigation/Sidebar",
+  title: "Shared/Sidebar",
   component: Sidebar,
   parameters: {
     layout: "fullscreen",

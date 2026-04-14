@@ -22,7 +22,7 @@ export interface StepsProps {
 export const Steps: React.FC<StepsProps> = ({ items, orientation = 'horizontal', className }) => {
   const containerClass = cn(
     'w-full font-sans',
-    orientation === 'horizontal' ? 'flex justify-between py-6 relative' : 'flex flex-col gap-0',
+    orientation === 'horizontal' ? 'flex justify-between py-6 relative' : 'flex flex-col gap-4',
     className
   );
 
@@ -129,9 +129,10 @@ export interface StatusPillProps {
 export const StatusPill: React.FC<StatusPillProps> = ({ label, variant = 'ghost', isActive, icon, className }) => {
   return (
     <div className={cn(
-      'flex items-center gap-2 py-2 px-4 rounded-full text-body-sm font-bold bg-border-subtle text-text-muted transition-all duration-300',
-      isActive && 'bg-primary text-text-inverse shadow-sm',
-      variant === 'outline' && 'bg-transparent border-2 border-primary text-primary',
+      'flex items-center gap-2 py-2.5 px-6 rounded-full text-body-sm font-bold transition-all duration-300 w-fit cursor-pointer',
+      (variant === 'filled' || isActive) && !className?.includes('bg-transparent') ? 'bg-primary text-text-inverse shadow-md' : '',
+      variant === 'outline' && 'bg-transparent border-2 border-primary text-primary hover:bg-primary-fixed',
+      variant === 'ghost' && 'bg-transparent text-text-muted hover:text-primary',
       className
     )}>
       {icon}

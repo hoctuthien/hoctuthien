@@ -30,7 +30,7 @@ const config = {
   warning: {
     icon: <HiExclamationTriangle className="text-[#795900]" size={36} />,
     iconBg: "bg-[#ffdea0]",
-    primaryVariant: "primary" as const, // We'll handle custom color via className if needed
+    primaryVariant: "primary" as const,
   },
   danger: {
     icon: <HiExclamationCircle className="text-[#ba1a1a]" size={36} />,
@@ -60,14 +60,14 @@ export const ConfirmModal = ({
       containerClassName="max-w-[420px]"
     >
       <div className="flex flex-col items-center text-center p-10">
-        {/* Icon */}
+
         <div
           className={`mb-8 flex h-20 w-20 items-center justify-center rounded-full ${currentConfig.iconBg} shadow-inner`}
         >
           {currentConfig.icon}
         </div>
 
-        {/* Content */}
+
         <h3 className="mb-3 text-3xl font-black text-[#0D1A33] tracking-tight">
           {title}
         </h3>
@@ -75,7 +75,7 @@ export const ConfirmModal = ({
           {description}
         </p>
 
-        {/* Actions */}
+
         <div className="flex w-full gap-4">
           <Button
             variant="outline"

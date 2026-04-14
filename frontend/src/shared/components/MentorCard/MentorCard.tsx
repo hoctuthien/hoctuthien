@@ -1,5 +1,5 @@
-import React from 'react';
-import { Avatar } from '../Avatar/Avatar';
+import React from "react";
+import { Avatar } from "../Avatar/Avatar";
 
 interface MentorCardProps {
   name: string;
@@ -16,27 +16,36 @@ export const MentorCard: React.FC<MentorCardProps> = ({
   description,
   avatarSrc,
   onConnect,
-  onProfile
+  onProfile,
 }) => {
   return (
-    <div className="bg-surface rounded-2xl p-6 shadow-lg max-w-[320px] border border-surface-variant transition-all hover:shadow-xl">
-      <div className="flex items-center gap-4 mb-4">
-        <Avatar src={avatarSrc} size="md" />
-        <div className="flex flex-col">
-          <h4 className="text-body font-black text-text-heading m-0">{name}</h4>
-          <p className="text-caption text-text-muted m-0">{title}</p>
+    <div className="bg-white rounded-[24px] p-7 shadow-[0_12px_30px_rgba(0,0,0,0.06)] max-w-[340px] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.1)] select-none border border-white/50">
+      <div className="flex items-center gap-4 mb-5">
+        <Avatar
+          src={avatarSrc}
+          className="w-16 h-16 rounded-xl border-none shadow-sm"
+        />
+        <div className="flex flex-col gap-0.5">
+          <h4 className="text-[18px] font-bold text-[#1e293b] m-0 leading-tight tracking-tight">
+            {name}
+          </h4>
+          <p className="text-[13px] text-[#64748b] m-0 font-medium">{title}</p>
         </div>
       </div>
-      <p className="text-[11px] leading-relaxed text-text-muted mb-6">{description}</p>
+
+      <p className="text-[14px] leading-relaxed text-[#475569] mb-7 font-normal">
+        {description}
+      </p>
+
       <div className="flex gap-3">
-        <button 
-          className="flex-1 bg-primary text-text-inverse text-[10px] font-bold py-2 px-4 rounded-sm hover:bg-primary-dark transition-colors uppercase tracking-wider" 
+        <button
+          className="flex-1 bg-[#3b60c0] text-white text-[11px] font-bold py-3 px-6 rounded-lg hover:bg-[#2d4aa0] transition-all active:scale-[0.98] uppercase tracking-[0.05em] shadow-lg shadow-blue-600/10"
           onClick={onConnect}
         >
           CONNECT
         </button>
-        <button 
-          className="flex-1 bg-transparent text-primary border border-primary text-[10px] font-bold py-2 px-4 rounded-sm hover:bg-primary-fixed transition-colors uppercase tracking-wider" 
+        <button
+          className="flex-1 bg-[#e2e8f0] text-[#1e293b] text-[11px] font-bold py-3 px-6 rounded-lg hover:bg-[#cbd5e1] transition-all active:scale-[0.98] uppercase tracking-[0.05em]"
           onClick={onProfile}
         >
           PROFILE
