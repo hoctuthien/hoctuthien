@@ -8,7 +8,7 @@ import { HiAcademicCap } from 'react-icons/hi2';
 import { Select } from '../Selection/Select/Select';
 
 const meta: Meta<typeof Modal> = {
-  title: 'Shared/Modal',
+  title: 'Shared/Overlays/Modal',
   component: Modal,
   parameters: {
     layout: 'centered',
