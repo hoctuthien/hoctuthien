@@ -5,8 +5,14 @@ import { IoShieldCheckmark } from 'react-icons/io5';
 
 const meta: Meta = {
   title: 'Shared/Profile',
+  tags: ['autodocs'],
   parameters: { 
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: 'Components for displaying user profiles, including Avatars and Identity Badges.',
+      },
+    },
   },
 };
 

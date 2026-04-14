@@ -3,10 +3,17 @@ import { IoRibbon, IoSchool, IoShieldCheckmark } from 'react-icons/io5';
 
 export type BadgeType = 'verified' | 'top-rated' | 'expert';
 
+/**
+ * Props for the IdentityBadge component
+ */
 interface IdentityBadgeProps {
+  /** The type/category of the badge */
   type: BadgeType;
+  /** Primary label for the badge */
   title: string;
+  /** Secondary label or description underneath the title */
   subtitle: string;
+  /** Additional CSS classes */
   className?: string;
 }
 
@@ -28,6 +35,9 @@ const config = {
   },
 };
 
+/**
+ * A specialized card component used to showcase user achievements, verification status, or expertise.
+ */
 export const IdentityBadge = ({ type, title, subtitle, className = '' }: IdentityBadgeProps) => {
   const item = config[type];
   

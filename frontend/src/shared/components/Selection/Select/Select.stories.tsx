@@ -5,8 +5,14 @@ import { Select } from './Select';
 const meta: Meta<typeof Select> = {
   title: 'Shared/Select',
   component: Select,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: 'A customizable select component for picking one option from a list.',
+      },
+    },
   },
 };
 

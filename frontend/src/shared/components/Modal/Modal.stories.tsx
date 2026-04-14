@@ -10,6 +10,7 @@ import { Select } from '../Selection/Select/Select';
 const meta: Meta<typeof Modal> = {
   title: 'Shared/Modal',
   component: Modal,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },

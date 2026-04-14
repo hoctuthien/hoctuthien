@@ -5,8 +5,14 @@ import { IoCloudOffline, IoSend, IoCopy, IoFlash } from 'react-icons/io5';
 
 const meta: Meta = {
   title: 'Shared/Feedback',
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: 'A collection of feedback components including Banners, Notifications, Inline Messages, and Toasts for providing system status and user alerts.',
+      },
+    },
   },
 };
 
