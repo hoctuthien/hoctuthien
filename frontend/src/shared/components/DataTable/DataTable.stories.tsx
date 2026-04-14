@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { DataTable, TableRow } from "./DataTable";
 
 const meta = {
-  title: "Components/Data Display/DataTable",
+  title: "Shared/Data Display/DataTable",
   component: DataTable,
   parameters: {
     layout: "centered",

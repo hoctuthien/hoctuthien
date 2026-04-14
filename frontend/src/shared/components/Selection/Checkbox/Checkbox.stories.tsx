@@ -3,7 +3,7 @@ import { fn } from "storybook/test";
 import { Checkbox } from "./Checkbox";
 
 const meta = {
-  title: "Components/Selection/Checkbox",
+  title: "Shared/Selection/Checkbox",
   component: Checkbox,
   parameters: {
     layout: "centered",

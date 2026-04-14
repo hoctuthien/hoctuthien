@@ -4,7 +4,7 @@ import { Timeline } from "./Timeline";
 import { LuMenu, LuCheck, LuCalendar, LuAward } from 'react-icons/lu';
 
 const meta = {
-  title: "Components/Data Display/Timeline",
+  title: "Shared/Data Display/Timeline",
   component: Timeline,
   parameters: {
     layout: "centered",

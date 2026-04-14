@@ -12,7 +12,7 @@ import {
 } from "react-icons/lu";
 
 const meta: Meta<typeof Sidebar> = {
-  title: "Components/Navigation/Sidebar",
+  title: "Shared/Navigation/Sidebar",
   component: Sidebar,
   parameters: {
     layout: "fullscreen",

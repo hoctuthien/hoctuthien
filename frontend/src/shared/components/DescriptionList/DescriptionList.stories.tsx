@@ -4,7 +4,7 @@ import { DescriptionList } from "./DescriptionList";
 import { LuUser, LuMail, LuBriefcase, LuGraduationCap } from 'react-icons/lu';
 
 const meta = {
-  title: "Components/Data Display/DescriptionList",
+  title: "Shared/Data Display/DescriptionList",
   component: DescriptionList,
   parameters: {
     layout: "centered",

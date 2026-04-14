@@ -4,7 +4,7 @@ import { SkillBar } from "./SkillBar";
 import { LuSettings, LuMessageSquare, LuTowerControl } from "react-icons/lu";
 
 const meta = {
-  title: "Components/Progress/SkillBar",
+  title: "Shared/Progress/SkillBar",
   component: SkillBar,
   parameters: {
     layout: "centered",

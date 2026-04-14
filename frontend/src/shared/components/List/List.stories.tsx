@@ -4,7 +4,7 @@ import { List } from "./List";
 import { LuGraduationCap, LuLayoutDashboard, LuPencil, LuTrash2 } from 'react-icons/lu';
 
 const meta = {
-  title: "Components/Data Display/List",
+  title: "Shared/Data Display/List",
   component: List,
   parameters: {
     layout: "centered",

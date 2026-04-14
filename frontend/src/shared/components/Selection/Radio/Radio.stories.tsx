@@ -3,7 +3,7 @@ import { fn } from "storybook/test";
 import { Radio } from "./Radio";
 
 const meta = {
-  title: "Components/Selection/Radio",
+  title: "Shared/Selection/Radio",
   component: Radio,
   parameters: {
     layout: "centered",

@@ -9,7 +9,7 @@ import {
 } from "react-icons/lu";
 
 const meta = {
-  title: "Components/Navigation/Breadcrumb",
+  title: "Shared/Navigation/Breadcrumb",
   component: Breadcrumb,
   parameters: {
     layout: "centered",

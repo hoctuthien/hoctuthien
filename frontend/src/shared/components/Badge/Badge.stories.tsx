@@ -4,7 +4,7 @@ import { Badge } from "./Badge";
 import { LuBell, LuMail } from 'react-icons/lu';
 
 const meta = {
-  title: "Components/Data Display/Badge",
+  title: "Shared/Data Display/Badge",
   component: Badge,
   parameters: {
     layout: "centered",
