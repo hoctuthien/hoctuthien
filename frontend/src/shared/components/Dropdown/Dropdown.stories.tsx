@@ -7,7 +7,7 @@ import {
   DropdownItem,
   DropdownDivider,
 } from "./Dropdown";
-import { User, Settings, Bell, HelpCircle, LogOut, ArrowUpCircle, Calendar } from "lucide-react";
+import { User, LogOut, ArrowUpCircle, Calendar } from "lucide-react";
 
 const meta: Meta<typeof Dropdown> = {
   title: "Shared/Feedback/Dropdown",
@@ -27,9 +27,11 @@ export const PrimaryButton: StoryObj = {
           <DropdownItem>Action 2</DropdownItem>
         </DropdownMenu>
       </Dropdown>
-      
+
       <Dropdown>
-        <DropdownTrigger variant="primary" disabled>Disabled</DropdownTrigger>
+        <DropdownTrigger variant="primary" disabled>
+          Disabled
+        </DropdownTrigger>
         <DropdownMenu>
           <DropdownItem>Should not see</DropdownItem>
         </DropdownMenu>
@@ -42,14 +44,18 @@ export const SecondarySizes: StoryObj = {
   render: () => (
     <div className="flex items-center gap-6 p-20">
       <Dropdown>
-        <DropdownTrigger variant="secondary" size="lg">Large</DropdownTrigger>
+        <DropdownTrigger variant="secondary" size="lg">
+          Large
+        </DropdownTrigger>
         <DropdownMenu>
           <DropdownItem>Item 1</DropdownItem>
         </DropdownMenu>
       </Dropdown>
 
       <Dropdown>
-        <DropdownTrigger variant="secondary" size="md">Default</DropdownTrigger>
+        <DropdownTrigger variant="secondary" size="md">
+          Default
+        </DropdownTrigger>
         <DropdownMenu>
           <DropdownItem>Item 1</DropdownItem>
           <DropdownItem>Item 2</DropdownItem>
@@ -57,7 +63,9 @@ export const SecondarySizes: StoryObj = {
       </Dropdown>
 
       <Dropdown>
-        <DropdownTrigger variant="secondary" size="sm">Small</DropdownTrigger>
+        <DropdownTrigger variant="secondary" size="sm">
+          Small
+        </DropdownTrigger>
         <DropdownMenu>
           <DropdownItem>Item 1</DropdownItem>
         </DropdownMenu>
@@ -70,7 +78,9 @@ export const TextTriggers: StoryObj = {
   render: () => (
     <div className="flex gap-10 p-20">
       <Dropdown>
-        <DropdownTrigger variant="text" className="font-extrabold text-[1rem]">Select Mentor</DropdownTrigger>
+        <DropdownTrigger variant="text" className="font-extrabold text-[1rem]">
+          Select Mentor
+        </DropdownTrigger>
         <DropdownMenu>
           <DropdownItem icon={<User size={18} />}>Mentor A</DropdownItem>
           <DropdownItem icon={<User size={18} />}>Mentor B</DropdownItem>
@@ -93,7 +103,9 @@ export const FullPanelTemplates: StoryObj = {
     <div className="flex gap-20 p-20 items-start justify-center min-h-[400px]">
       {/* Basic Panel */}
       <div className="flex flex-col gap-2">
-        <h4 className="text-caption font-bold text-text-muted uppercase">Basic Panel</h4>
+        <h4 className="text-caption font-bold text-text-muted uppercase">
+          Basic Panel
+        </h4>
         <Dropdown>
           <DropdownTrigger variant="secondary">Edit Profile</DropdownTrigger>
           <DropdownMenu>
@@ -107,16 +119,25 @@ export const FullPanelTemplates: StoryObj = {
 
       {/* Dividers & Icons */}
       <div className="flex flex-col gap-2">
-        <h4 className="text-caption font-bold text-text-muted uppercase">Dividers & Icons</h4>
+        <h4 className="text-caption font-bold text-text-muted uppercase">
+          Dividers & Icons
+        </h4>
         <Dropdown>
           <DropdownTrigger variant="secondary">Options</DropdownTrigger>
           <DropdownMenu>
             <DropdownItem icon={<User size={18} />}>My Mentor</DropdownItem>
             <DropdownItem icon={<Calendar size={18} />}>Schedule</DropdownItem>
             <DropdownDivider />
-            <DropdownItem icon={<ArrowUpCircle size={18} />} className="text-[#00A36C]">Upgrade Pro</DropdownItem>
+            <DropdownItem
+              icon={<ArrowUpCircle size={18} />}
+              className="text-[#00A36C]"
+            >
+              Upgrade Pro
+            </DropdownItem>
             <DropdownDivider />
-            <DropdownItem icon={<LogOut size={18} />} isDanger>Sign Out</DropdownItem>
+            <DropdownItem icon={<LogOut size={18} />} isDanger>
+              Sign Out
+            </DropdownItem>
           </DropdownMenu>
         </Dropdown>
       </div>
