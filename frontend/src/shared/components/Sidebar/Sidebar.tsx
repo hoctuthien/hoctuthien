@@ -1,5 +1,7 @@
-import React from 'react';
-import { cn } from '@/shared/lib/utils';
+"use client";
+
+import React from "react";
+import { cn } from "@/shared/lib/utils";
 
 interface SidebarProps {
   children: React.ReactNode;
@@ -8,17 +10,35 @@ interface SidebarProps {
   className?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ children, header, footer, className }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  children,
+  header,
+  footer,
+  className,
+}) => {
   return (
-    <aside className={cn(
-      'w-[280px] h-full bg-sidebar-surface p-6 px-4 flex flex-col gap-2 border-r border-border-subtle font-sans',
-      className
-    )}>
-      {header && <div className="mb-4">{header}</div>}
-      <nav className="flex-1 flex flex-col gap-1 overflow-y-auto">
+    <aside
+      className={cn(
+        "w-[340px] h-screen bg-background flex flex-col transition-all duration-300",
+        "border-r border-surface-variant",
+        className
+      )}
+    >
+      {header && (
+        <div className="pt-8 pb-4">
+          {header}
+        </div>
+      )}
+
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
         {children}
       </nav>
-      {footer && <div className="mt-auto pt-4 border-t border-border-subtle">{footer}</div>}
+
+      {footer && (
+        <div className="p-6 border-t border-surface-variant">
+          {footer}
+        </div>
+      )}
     </aside>
   );
 };

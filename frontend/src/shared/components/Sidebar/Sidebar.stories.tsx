@@ -2,14 +2,14 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Sidebar, SidebarItem, SidebarGroup } from ".";
 import {
-  LuLayoutDashboard,
-  LuUsers,
-  LuCalendar,
-  LuClipboardList,
-  LuSettings,
-  LuBuilding2,
-  LuCircleHelp,
-} from "react-icons/lu";
+  LayoutDashboard,
+  Users,
+  Calendar,
+  ClipboardList,
+  Settings,
+  Building2,
+  CircleHelp,
+} from "lucide-react";
 
 const meta: Meta<typeof Sidebar> = {
   title: "Shared/Navigation/Sidebar",
@@ -18,9 +18,6 @@ const meta: Meta<typeof Sidebar> = {
     layout: "fullscreen",
   },
   tags: ["autodocs"],
-  args: {
-    children: null,
-  },
 };
 
 export default meta;
@@ -28,16 +25,14 @@ type Story = StoryObj<typeof Sidebar>;
 
 export const SingleLayer: Story = {
   render: () => (
-    <div style={{ height: "600px" }}>
+    <div className="h-[600px] flex">
       <Sidebar>
-        <SidebarItem label="Dashboard" icon={<LuLayoutDashboard />} isActive />
-        <SidebarItem label="My Mentors" icon={<LuUsers />} />
-        <SidebarItem label="Sessions" icon={<LuCalendar />} />
-        <SidebarItem
-          label="Assignments"
-          icon={<LuClipboardList />}
-          isDisabled
-        />
+        <SidebarGroup title="Menu">
+          <SidebarItem label="Dashboard" icon={<LayoutDashboard size={20} />} isActive />
+          <SidebarItem label="My Mentors" icon={<Users size={20} />} />
+          <SidebarItem label="Sessions" icon={<Calendar size={20} />} />
+          <SidebarItem label="Assignments" icon={<ClipboardList size={20} />} isDisabled />
+        </SidebarGroup>
       </Sidebar>
     </div>
   ),
@@ -45,20 +40,21 @@ export const SingleLayer: Story = {
 
 export const MultiLayer: Story = {
   render: () => (
-    <div style={{ height: "600px" }}>
+    <div className="h-[600px] flex">
       <Sidebar>
-        <SidebarItem label="Company Profile" icon={<LuBuilding2 />} />
+        <SidebarItem label="Company Profile" icon={<Building2 size={20} />} />
         <SidebarGroup
-          label="Settings"
-          icon={<LuSettings />}
+          title="Settings"
+          icon={<Settings size={20} />}
+          isCollapsible
+          defaultOpen
           isActive
-          items={[
-            { id: "1", label: "Account Security", isActive: true },
-            { id: "2", label: "Notifications" },
-            { id: "3", label: "Billing History" },
-          ]}
-        />
-        <SidebarItem label="Help Center" icon={<LuCircleHelp />} />
+        >
+          <SidebarItem label="Account Security" isActive isSubItem />
+          <SidebarItem label="Notifications" isSubItem />
+          <SidebarItem label="Billing History" isSubItem />
+        </SidebarGroup>
+        <SidebarItem label="Help Center" icon={<CircleHelp size={20} />} />
       </Sidebar>
     </div>
   ),
@@ -66,38 +62,33 @@ export const MultiLayer: Story = {
 
 export const FullNavigation: Story = {
   render: () => (
-    <div style={{ height: "800px" }}>
+    <div className="h-[800px] flex">
       <Sidebar
         header={
-          <div
-            style={{
-              padding: "0 16px 24px",
-              fontSize: "1.5rem",
-              fontWeight: 900,
-              color: "#005BBF",
-            }}
-          >
+          <div className="text-primary font-black text-h3 px-4 py-2">
             MentorConnect
           </div>
         }
       >
-        <div className="htt-sidebar-section-title">Main Menu</div>
-        <SidebarItem label="Dashboard" icon={<LuLayoutDashboard />} isActive />
-        <SidebarItem label="My Mentors" icon={<LuUsers />} />
+        <SidebarGroup title="Main Menu">
+          <SidebarItem label="Dashboard" icon={<LayoutDashboard size={22} />} isActive />
+          <SidebarItem label="My Mentors" icon={<Users size={22} />} />
+        </SidebarGroup>
 
-        <div className="htt-sidebar-section-title">Management</div>
-        <SidebarGroup
-          label="Settings"
-          icon={<LuSettings />}
-          items={[
-            { id: "1", label: "Account Security" },
-            { id: "2", label: "Billing" },
-          ]}
-        />
-        <SidebarItem label="Assignments" icon={<LuClipboardList />} />
+        <SidebarGroup title="Management">
+          <SidebarGroup
+            title="Settings"
+            icon={<Settings size={22} />}
+            isCollapsible
+          >
+            <SidebarItem label="Account Security" isSubItem />
+            <SidebarItem label="Billing" isSubItem />
+          </SidebarGroup>
+          <SidebarItem label="Assignments" icon={<ClipboardList size={22} />} />
+        </SidebarGroup>
 
-        <div style={{ marginTop: "auto" }}>
-          <SidebarItem label="Help Center" icon={<LuCircleHelp />} />
+        <div className="mt-auto">
+          <SidebarItem label="Help Center" icon={<CircleHelp size={22} />} />
         </div>
       </Sidebar>
     </div>

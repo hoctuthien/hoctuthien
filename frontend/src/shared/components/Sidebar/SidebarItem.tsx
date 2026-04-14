@@ -1,7 +1,9 @@
-import React from 'react';
-import { cn } from '@/shared/lib/utils';
+"use client";
 
-interface SidebarItemProps {
+import React from "react";
+import { cn } from "@/shared/lib/utils";
+
+export interface SidebarItemProps {
   icon?: React.ReactNode;
   label: string;
   isActive?: boolean;
@@ -9,52 +11,73 @@ interface SidebarItemProps {
   isSubItem?: boolean;
   onClick?: () => void;
   indicator?: boolean;
-  arrow?: React.ReactNode;
-  isExpanded?: boolean;
+  suffix?: React.ReactNode;
   className?: string;
 }
 
-export const SidebarItem: React.FC<SidebarItemProps> = ({
-  icon,
-  label,
-  isActive,
-  isDisabled,
-  isSubItem,
-  onClick,
-  indicator,
-  arrow,
-  isExpanded,
-  className
-}) => {
-  return (
-    <div
-      className={cn(
-        'relative flex items-center justify-between p-3 px-4 rounded-md cursor-pointer transition-all duration-200 select-none text-text-muted',
-        'hover:bg-sidebar-item-hover hover:text-primary',
-        isActive && 'bg-sidebar-item-active text-primary font-bold',
-        isDisabled && 'opacity-40 cursor-not-allowed pointer-events-none',
-        isSubItem && 'p-2.5 px-4 text-body-sm',
-        className
-      )}
-      onClick={onClick}
-    >
-      <div className="flex items-center gap-3">
-        {icon && <span className="flex items-center justify-center text-[20px]">{icon}</span>}
-        <span className="text-body transition-none">{label}</span>
-      </div>
-      
-      {arrow && (
-        <span className={cn(
-          'transition-transform duration-200 opacity-60',
-          isExpanded && 'rotate-90'
-        )}>
-          {arrow}
-        </span>
-      )}
+export const SidebarItem = React.forwardRef<HTMLDivElement, SidebarItemProps>(
+  (
+    {
+      icon,
+      label,
+      isActive,
+      isDisabled,
+      isSubItem,
+      onClick,
+      indicator = true,
+      suffix,
+      className,
+    },
+    ref
+  ) => {
+    return (
+      <div
+        ref={ref}
+        onClick={!isDisabled ? onClick : undefined}
+        className={cn(
+          "relative flex items-center justify-between px-6 py-4 cursor-pointer transition-all duration-300 select-none group w-full",
+          isActive ? "bg-surface-variant" : "hover:bg-surface-variant/50",
+          isDisabled && "opacity-40 cursor-not-allowed pointer-events-none",
+          isSubItem && "px-8 py-3",
+          className
+        )}
+      >
+        <div className="flex items-center gap-4">
+          {icon && (
+            <span
+              className={cn(
+                "flex items-center justify-center transition-colors duration-300 w-6 h-6",
+                isActive ? "text-primary" : "text-text-muted group-hover:text-primary"
+              )}
+            >
+              {icon}
+            </span>
+          )}
+          <span
+            className={cn(
+              "text-body font-medium transition-colors duration-300",
+              isActive ? "text-primary" : "text-text-body group-hover:text-primary"
+            )}
+          >
+            {label}
+          </span>
+        </div>
 
-      {isActive && indicator && (
-        <span className="absolute right-0 top-3 bottom-3 w-[3px] bg-primary rounded-l-full" />
-      )}
-    </div>
-  );
-};
+        {suffix && (
+          <span className={cn(
+            "flex items-center justify-center transition-colors duration-300 mr-2",
+            isActive ? "text-primary" : "text-text-muted group-hover:text-primary"
+          )}>
+            {suffix}
+          </span>
+        )}
+
+        {isActive && indicator && (
+          <div className="absolute right-0 top-0 bottom-0 w-[4px] bg-primary" />
+        )}
+      </div>
+    );
+  }
+);
+
+SidebarItem.displayName = "SidebarItem";

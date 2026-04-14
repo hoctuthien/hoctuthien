@@ -1,42 +1,71 @@
-import React from 'react';
-import { cn } from '@/shared/lib/utils';
+"use client";
+
+import React, { useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { cn } from "@/shared/lib/utils";
+import { SidebarItem } from "./SidebarItem";
 
 interface SidebarGroupProps {
   title?: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
-  isExpanded?: boolean;
+  isCollapsible?: boolean;
+  defaultOpen?: boolean;
   className?: string;
+  isActive?: boolean;
 }
 
 export const SidebarGroup: React.FC<SidebarGroupProps> = ({
   title,
+  icon,
   children,
-  isExpanded = true,
-  className
+  isCollapsible = false,
+  defaultOpen = false,
+  className,
+  isActive = false,
 }) => {
-  return (
-    <div className={cn('flex flex-col', className)}>
-      {title && (
-        <h3 className="m-8 mb-2 ml-4 text-[0.75rem] font-bold text-text-muted uppercase tracking-[0.15em] opacity-80">
-          {title}
-        </h3>
-      )}
-      <div className="flex flex-col gap-0.5">
-        {children}
-      </div>
-    </div>
-  );
-};
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
-export const SidebarCollapse: React.FC<{ children: React.ReactNode; isExpanded: boolean }> = ({ 
-  children, 
-  isExpanded 
-}) => {
-  if (!isExpanded) return null;
-  
+  if (!isCollapsible) {
+    return (
+      <div className={cn("flex flex-col", className)}>
+        {title && (
+          <h2 className="px-6 py-6 text-[1.75rem] font-semibold text-text-heading font-sans uppercase tracking-tight">
+            {title}
+          </h2>
+        )}
+        <div className="flex flex-col">{children}</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-1 pl-5 flex flex-col gap-[2px] bg-sidebar-surface-sub rounded-b-md">
-      {children}
+    <div className={cn("flex flex-col transition-all duration-300", className)}>
+      <SidebarItem
+        icon={icon}
+        label={title || ""}
+        onClick={() => setIsOpen(!isOpen)}
+        isActive={isActive}
+        indicator={false}
+        suffix={
+          isOpen ? (
+            <ChevronDown size={20} />
+          ) : (
+            <ChevronRight size={20} />
+          )
+        }
+      />
+      
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-500 ease-in-out",
+          isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        <div className="flex flex-col bg-surface-variant/20">
+          {children}
+        </div>
+      </div>
     </div>
   );
 };
