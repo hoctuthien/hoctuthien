@@ -2,7 +2,7 @@
 
 import React, { useId } from "react";
 import { LuCheck, LuMinus } from "react-icons/lu";
-import "./checkbox.css";
+import { cn } from "@/shared/lib/utils";
 
 export interface CheckboxProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
@@ -22,9 +22,13 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
 
     return (
       <div 
-        className={`htt-checkbox-wrapper ${disabled ? "htt-checkbox--disabled" : ""} ${className || ""}`}
+        className={cn(
+          'inline-flex items-center gap-3 cursor-pointer user-select-none font-sans',
+          disabled && 'cursor-not-allowed opacity-60',
+          className
+        )}
       >
-        <div className="htt-checkbox-container">
+        <div className="relative w-6 h-6">
           <input
             type="checkbox"
             id={id}
@@ -36,20 +40,26 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             checked={checked}
             disabled={disabled}
             onChange={handleChange}
-            className="htt-checkbox-input"
+            className="absolute opacity-0 w-full h-full cursor-inherit m-0 z-[1]"
             {...props}
           />
-          <div className="htt-checkbox-control">
+          <div className={cn(
+            'absolute inset-0 border-1.5 border-border-strong rounded-lg bg-surface transition-all duration-150 flex items-center justify-center text-text-inverse',
+            'hover:border-primary hover:border-2',
+            (checked || indeterminate) && 'bg-primary border-primary',
+            'peer-focus-visible:ring-4 peer-focus-visible:ring-primary-fixed peer-focus-visible:border-primary',
+            disabled && 'bg-text-disabled border-text-disabled',
+          )}>
             {(checked && !indeterminate) && (
-              <LuCheck className="htt-checkbox-icon" strokeWidth={3.5} />
+              <LuCheck className="w-4 h-4" strokeWidth={3.5} />
             )}
             {indeterminate && (
-              <LuMinus className="htt-checkbox-icon" strokeWidth={4} />
+              <LuMinus className="w-4 h-4" strokeWidth={4} />
             )}
           </div>
         </div>
         {label && (
-          <label htmlFor={id} className="htt-checkbox-label">
+          <label htmlFor={id} className="text-body-sm text-text-body font-medium cursor-inherit">
             {label}
           </label>
         )}

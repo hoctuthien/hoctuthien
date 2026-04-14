@@ -17,7 +17,7 @@ export const ProfileScore: Story = {
   args: {
     value: 75,
     label: "PROFILE SCORE",
-    color: "var(--clr-primary)",
+    color: "var(--color-primary)",
   },
 };
 

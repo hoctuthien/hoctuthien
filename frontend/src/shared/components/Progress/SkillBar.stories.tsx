@@ -19,7 +19,7 @@ export const Leadership: Story = {
   args: {
     label: "LEADERSHIP",
     level: "EXPERT",
-    color: "var(--clr-primary)",
+    color: "var(--color-primary)",
     icon: <LuSettings size={20} />,
   },
 };

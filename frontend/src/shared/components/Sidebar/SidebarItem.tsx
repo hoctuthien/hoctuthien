@@ -1,47 +1,60 @@
 import React from 'react';
-import { LuChevronRight } from 'react-icons/lu';
-import './sidebar.css';
+import { cn } from '@/shared/lib/utils';
 
-export interface SidebarItemProps {
-  label: string;
+interface SidebarItemProps {
   icon?: React.ReactNode;
+  label: string;
   isActive?: boolean;
   isDisabled?: boolean;
-  onClick?: () => void;
   isSubItem?: boolean;
-  hasChild?: boolean;
+  onClick?: () => void;
+  indicator?: boolean;
+  arrow?: React.ReactNode;
   isExpanded?: boolean;
+  className?: string;
 }
 
 export const SidebarItem: React.FC<SidebarItemProps> = ({
-  label,
   icon,
-  isActive = false,
-  isDisabled = false,
+  label,
+  isActive,
+  isDisabled,
+  isSubItem,
   onClick,
-  isSubItem = false,
-  hasChild = false,
-  isExpanded = false,
+  indicator,
+  arrow,
+  isExpanded,
+  className
 }) => {
   return (
     <div
-      className={`htt-sidebar-item ${isActive ? 'is-active' : ''} ${
-        isDisabled ? 'is-disabled' : ''
-      } ${isSubItem ? 'is-sub-item' : ''}`}
-      onClick={!isDisabled ? onClick : undefined}
+      className={cn(
+        'relative flex items-center justify-between p-3 px-4 rounded-md cursor-pointer transition-all duration-200 select-none text-text-muted',
+        'hover:bg-sidebar-item-hover hover:text-primary',
+        isActive && 'bg-sidebar-item-active text-primary font-bold',
+        isDisabled && 'opacity-40 cursor-not-allowed pointer-events-none',
+        isSubItem && 'p-2.5 px-4 text-body-sm',
+        className
+      )}
+      onClick={onClick}
     >
-      <div className="htt-sidebar-item__content">
-        {icon && <span className="htt-sidebar-item__icon">{icon}</span>}
-        <span className="htt-sidebar-item__label">{label}</span>
+      <div className="flex items-center gap-3">
+        {icon && <span className="flex items-center justify-center text-[20px]">{icon}</span>}
+        <span className="text-body transition-none">{label}</span>
       </div>
       
-      {hasChild && (
-        <span className={`htt-sidebar-item__arrow ${isExpanded ? 'is-expanded' : ''}`}>
-          <LuChevronRight size={16} />
+      {arrow && (
+        <span className={cn(
+          'transition-transform duration-200 opacity-60',
+          isExpanded && 'rotate-90'
+        )}>
+          {arrow}
         </span>
       )}
-      
-      {isActive && <div className="htt-sidebar-item__indicator" />}
+
+      {isActive && indicator && (
+        <span className="absolute right-0 top-3 bottom-3 w-[3px] bg-primary rounded-l-full" />
+      )}
     </div>
   );
 };

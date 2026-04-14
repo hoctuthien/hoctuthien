@@ -1,5 +1,5 @@
 import React from "react";
-import "./breadcrumb.css";
+import { cn } from "@/shared/lib/utils";
 
 export interface BreadcrumbItem {
   label: string;
@@ -12,43 +12,51 @@ export interface BreadcrumbItem {
 export interface BreadcrumbProps {
   items: BreadcrumbItem[];
   separator?: React.ReactNode;
+  className?: string;
 }
 
 export const Breadcrumb = ({
   items,
-  separator = <span className="htt-breadcrumb__separator">/</span>,
+  separator = <span className="text-text-disabled text-[12px] font-light">/</span>,
+  className
 }: BreadcrumbProps) => {
   return (
-    <nav className="htt-breadcrumb-nav" aria-label="Breadcrumb">
-      <ol className="htt-breadcrumb-list">
+    <nav className={cn('flex py-2 font-sans', className)} aria-label="Breadcrumb">
+      <ol className="flex flex-wrap items-center p-0 m-0 gap-2 list-none">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
 
           if (item.isEllipsis) {
             return (
-              <li key={index} className="htt-breadcrumb-item">
-                <span className="htt-breadcrumb-ellipsis">...</span>
+              <li key={index} className="flex items-center gap-2 text-body-sm">
+                <span className="text-text-muted font-bold cursor-help">...</span>
                 {separator}
               </li>
             );
           }
 
           return (
-            <li key={index} className="htt-breadcrumb-item">
+            <li key={index} className="flex items-center gap-2 text-body-sm">
               {!isLast && item.href ? (
-                <a href={item.href} className="htt-breadcrumb-link">
+                <a 
+                  href={item.href} 
+                  className="inline-flex items-center gap-1.5 text-primary no-underline font-medium transition-opacity hover:opacity-80 hover:underline"
+                >
                   {item.icon && (
-                    <span className="htt-breadcrumb-icon">{item.icon}</span>
+                    <span className="flex items-center justify-center text-[1.1em]">{item.icon}</span>
                   )}
                   {item.label}
                 </a>
               ) : (
                 <span
-                  className={`htt-breadcrumb-current ${item.isPill ? "htt-breadcrumb--pill" : ""}`}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 text-primary font-bold cursor-default',
+                    item.isPill && 'bg-primary text-text-inverse px-4 py-1.5 rounded-full text-[13px] shadow-sm'
+                  )}
                   aria-current="page"
                 >
                   {item.icon && (
-                    <span className="htt-breadcrumb-icon">{item.icon}</span>
+                    <span className="flex items-center justify-center text-[1.1em]">{item.icon}</span>
                   )}
                   {item.label}
                 </span>

@@ -1,5 +1,5 @@
 import React from 'react';
-import './circular-progress.css';
+import { cn } from '@/shared/lib/utils';
 
 interface CircularProgressProps {
   value: number;
@@ -7,6 +7,7 @@ interface CircularProgressProps {
   size?: number;
   strokeWidth?: number;
   color?: string;
+  className?: string;
 }
 
 export const CircularProgress: React.FC<CircularProgressProps> = ({
@@ -14,40 +15,45 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
   label,
   size = 160,
   strokeWidth = 12,
-  color = 'var(--clr-primary)'
+  color = 'var(--color-primary)',
+  className
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (value / 100) * circumference;
 
   return (
-    <div className="htt-circular-progress-container" style={{ width: size }}>
-      <div className="htt-circular-progress" style={{ width: size, height: size }}>
-        <svg width={size} height={size}>
+    <div className={cn('flex flex-col items-center gap-4', className)} style={{ width: size }}>
+      <div className="relative flex items-center justify-center -rotate-90" style={{ width: size, height: size }}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
+          {/* Background Circle */}
           <circle
-            className="htt-circular-progress-bg"
+            className="fill-none stroke-primary-fixed"
             cx={size / 2}
             cy={size / 2}
             r={radius}
             strokeWidth={strokeWidth}
           />
+          {/* Active Progress Circle */}
           <circle
-            className="htt-circular-progress-value"
+            className="fill-none transition-all duration-1000 ease-out stroke-primary"
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={color}
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
-            strokeDashoffset={offset}
+            style={{ 
+              strokeDashoffset: offset,
+              stroke: color !== 'var(--color-primary)' ? color : undefined 
+            }}
             strokeLinecap="round"
           />
         </svg>
-        <div className="htt-circular-progress-text">
-          <span className="htt-circular-progress-number">{value}%</span>
+        <div className="absolute rotate-90 flex flex-col items-center">
+          <span className="text-h2 font-black text-text-heading leading-none">{value}%</span>
         </div>
       </div>
-      <p className="htt-circular-progress-label">{label}</p>
+      <p className="text-[10px] font-black text-text-body uppercase tracking-[0.2em]">{label}</p>
     </div>
   );
 };
