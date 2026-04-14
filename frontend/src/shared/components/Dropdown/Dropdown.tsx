@@ -1,120 +1,192 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { LuChevronDown, LuCheck } from 'react-icons/lu';
-import { cn } from '@/shared/lib/utils';
+"use client";
 
-export interface DropdownItemProps {
-  id: string | number;
-  label?: string;
-  icon?: React.ReactNode;
-  isActive?: boolean;
-  isDanger?: boolean;
-  isDivider?: boolean;
-  onClick?: () => void;
+import React, { useState, useRef, useEffect, createContext, useContext } from "react";
+import { ChevronDown, Check } from "lucide-react";
+import { cn } from "@/shared/lib/utils";
+
+// Context for managing dropdown state
+interface DropdownContextType {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  triggerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export interface DropdownProps {
-  label?: string;
-  variant?: 'primary' | 'secondary' | 'text';
-  size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
-  items: DropdownItemProps[];
-  triggerContent?: React.ReactNode;
-  className?: string;
-}
+const DropdownContext = createContext<DropdownContextType | undefined>(undefined);
 
-export const Dropdown: React.FC<DropdownProps> = ({
-  label,
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  items,
-  triggerContent,
-  className
+const useDropdown = () => {
+  const context = useContext(DropdownContext);
+  if (!context) throw new Error("Dropdown sub-components must be used within a <Dropdown />");
+  return context;
+};
+
+// Root Dropdown Component
+export const Dropdown: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const toggleDropdown = () => {
-    if (!disabled) setIsOpen(!isOpen);
-  };
+  const triggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (triggerRef.current && !triggerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const handleItemClick = (item: DropdownItemProps) => {
-    if (item.onClick) item.onClick();
-    setIsOpen(false);
+  return (
+    <DropdownContext.Provider value={{ isOpen, setIsOpen, triggerRef }}>
+      <div className={cn("relative inline-block text-left font-sans", className)} ref={triggerRef}>
+        {children}
+      </div>
+    </DropdownContext.Provider>
+  );
+};
+
+// DropdownTrigger Component
+interface DropdownTriggerProps {
+  children: React.ReactNode;
+  variant?: "primary" | "secondary" | "text";
+  size?: "sm" | "md" | "lg";
+  disabled?: boolean;
+  className?: string;
+}
+
+export const DropdownTrigger: React.FC<DropdownTriggerProps> = ({
+  children,
+  variant = "primary",
+  size = "md",
+  disabled = false,
+  className,
+}) => {
+  const { isOpen, setIsOpen } = useDropdown();
+
+  const baseStyles = "inline-flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer select-none outline-none disabled:cursor-not-allowed";
+  
+  const variants = {
+    primary: cn(
+      "bg-primary text-white border-none rounded-full font-bold shadow-sm",
+      "hover:brightness-110 hover:shadow-lg",
+      "focus:ring-4 focus:ring-primary-opacity active:scale-95",
+      disabled && "bg-border-default text-white opacity-50 shadow-none pointer-events-none"
+    ),
+    secondary: cn(
+      "bg-white text-primary border border-outline-variant rounded-full font-semibold",
+      "hover:border-primary hover:bg-surface-variant",
+      "focus:ring-4 focus:ring-primary-opacity focus:border-primary active:scale-95",
+      disabled && "bg-surface-variant text-text-muted border-outline-variant shadow-none pointer-events-none"
+    ),
+    text: cn(
+      "bg-transparent text-text-heading hover:text-primary font-extrabold",
+      "focus:underline active:opacity-70",
+      disabled && "text-text-muted opacity-50 pointer-events-none"
+    ),
   };
 
-  const triggerClasses = cn(
-    'inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 select-none font-semibold rounded-md outline-none disabled:bg-surface-elevated disabled:text-text-disabled disabled:border-border-subtle disabled:cursor-not-allowed disabled:shadow-none',
-    
-    variant === 'primary' && 'bg-primary text-text-inverse py-2.5 px-5 border-none hover:bg-primary-dark hover:shadow-md',
-    variant === 'primary' && isOpen && 'bg-primary-dark ring-4 ring-primary-fixed',
-    
-    variant === 'secondary' && 'bg-surface text-primary border-1.5 border-border py-2 px-4 hover:border-primary hover:bg-primary-fixed',
-    variant === 'secondary' && isOpen && 'border-primary ring-4 ring-primary-fixed',
-    
-    variant === 'text' && 'bg-transparent text-primary border-none p-1 px-2 font-bold hover:text-primary-dark hover:underline',
-    
-    size === 'sm' && 'text-caption py-1.5 px-3',
-    size === 'lg' && 'text-body-lg py-3 px-6',
-    
-    className
-  );
+  const sizes = {
+    sm: "px-4 py-1.5 text-caption",
+    md: "px-6 py-2.5 text-body-sm",
+    lg: "px-8 py-3.5 text-body",
+  };
 
   return (
-    <div className="relative inline-block font-sans" ref={dropdownRef}>
-      <button 
-        className={triggerClasses} 
-        onClick={toggleDropdown}
-        disabled={disabled}
-      >
-        {triggerContent || label}
-        <LuChevronDown 
-          size={variant === 'text' ? 18 : 16} 
-          className={cn('transition-transform duration-200', isOpen && 'rotate-180')}
-        />
-      </button>
+    <button
+      onClick={() => !disabled && setIsOpen(!isOpen)}
+      disabled={disabled}
+      className={cn(baseStyles, variants[variant], sizes[size], className)}
+    >
+      {children}
+      <ChevronDown
+        size={variant === "text" ? 18 : 16}
+        className={cn(
+          "transition-all duration-300", 
+          isOpen && "rotate-180",
+          variant === "secondary" && "text-text-muted group-hover:text-primary",
+          variant === "text" && "text-text-body group-hover:text-primary"
+        )}
+      />
+    </button>
+  );
+};
 
-      {isOpen && (
-        <div className="absolute top-[calc(100%+8px)] left-0 min-w-[220px] bg-surface rounded-lg border border-border-subtle shadow-xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200 origin-top-left">
-          {items.map((item, index) => (
-            <React.Fragment key={item.id || index}>
-              {item.isDivider && <div className="h-px bg-border-subtle my-2 mx-2" />}
-              
-              {!item.isDivider && (
-                <button
-                  className={cn(
-                    'flex items-center justify-between w-full p-3 px-4 rounded-md text-text-body text-body-sm font-medium cursor-pointer transition-all duration-150 text-left hover:bg-primary-fixed hover:text-primary',
-                    item.isActive && 'bg-primary-fixed text-primary font-bold',
-                    item.isDanger && 'text-red-600 hover:bg-red-50 hover:text-red-700'
-                  )}
-                  onClick={() => handleItemClick(item)}
-                >
-                  <div className="flex items-center gap-3">
-                    {item.icon && <span className={cn('flex items-center justify-center text-primary', item.isDanger && 'text-red-600')}>{item.icon}</span>}
-                    <span>{item.label}</span>
-                  </div>
-                  {item.isActive && <LuCheck size={16} />}
-                </button>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+// DropdownMenu Component (Panel)
+export const DropdownMenu: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className,
+}) => {
+  const { isOpen } = useDropdown();
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className={cn(
+        "absolute z-50 mt-2 min-w-[240px] origin-top-left rounded-2xl bg-white border border-outline-variant p-2",
+        "shadow-lg animate-in fade-in zoom-in-95 duration-200",
+        className
       )}
+    >
+      <div className="flex flex-col gap-1">{children}</div>
     </div>
   );
 };
+
+interface DropdownItemProps {
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+  isActive?: boolean;
+  isDanger?: boolean;
+  onClick?: () => void;
+  className?: string;
+}
+
+export const DropdownItem: React.FC<DropdownItemProps> = ({
+  children,
+  icon,
+  isActive,
+  isDanger,
+  onClick,
+  className,
+}) => {
+  const { setIsOpen } = useDropdown();
+
+  const handleClick = () => {
+    if (onClick) onClick();
+    setIsOpen(false);
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={cn(
+        "flex items-center justify-between w-full p-3.5 rounded-xl text-left transition-all duration-300 cursor-pointer group",
+        "text-body-sm font-medium",
+        isActive ? "text-primary bg-primary-fixed" : "text-text-body hover:bg-surface-variant hover:text-primary",
+        isDanger && "text-red-600 hover:bg-red-50 hover:text-red-700",
+        className
+      )}
+    >
+      <div className="flex items-center gap-3">
+        {icon && (
+          <span className={cn(
+            "flex items-center justify-center transition-colors duration-200 w-5 h-5", 
+            isActive ? "text-primary" : "text-text-muted group-hover:text-primary",
+            isDanger && "text-red-600 group-hover:text-red-700"
+          )}>
+            {icon}
+          </span>
+        )}
+        <span>{children}</span>
+      </div>
+      {isActive && <Check size={16} className="text-primary" />}
+    </button>
+  );
+};
+
+// DropdownDivider Component
+export const DropdownDivider: React.FC = () => (
+  <div className="h-px bg-outline-variant my-1 mx-2" />
+);

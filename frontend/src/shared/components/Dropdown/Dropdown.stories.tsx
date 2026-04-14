@@ -1,106 +1,125 @@
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from "storybook/test";
-import { Dropdown } from "./Dropdown";
-import { LuUser, LuCalendar, LuTrendingUp, LuLogOut } from "react-icons/lu";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownDivider,
+} from "./Dropdown";
+import { User, Settings, Bell, HelpCircle, LogOut, ArrowUpCircle, Calendar } from "lucide-react";
 
-const meta = {
-  title: "Shared/Action/Dropdown",
+const meta: Meta<typeof Dropdown> = {
+  title: "Shared/Feedback/Dropdown",
   component: Dropdown,
-  parameters: {
-    layout: "centered",
-  },
   tags: ["autodocs"],
-  argTypes: {
-    variant: {
-      control: "select",
-      options: ["primary", "secondary", "text"],
-    },
-    size: {
-      control: "select",
-      options: ["sm", "md", "lg"],
-    },
-  },
-} satisfies Meta<typeof Dropdown>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
 
-const basicItems = [
-  { id: "1", label: "Edit Profile", isActive: true, onClick: fn() },
-  { id: "2", label: "Account Settings", onClick: fn() },
-  { id: "3", label: "Notification Prefs", onClick: fn() },
-  { id: "4", label: "Help Center", onClick: fn() },
-];
-
-const iconItems = [
-  { id: "1", label: "My Mentor", icon: <LuUser />, onClick: fn() },
-  { id: "2", label: "Schedule", icon: <LuCalendar />, onClick: fn() },
-  { id: "3", isDivider: true },
-  { id: "4", label: "Upgrade Pro", icon: <LuTrendingUp />, onClick: fn() },
-  { id: "5", isDivider: true },
-  {
-    id: "6",
-    label: "Sign Out",
-    icon: <LuLogOut />,
-    isDanger: true,
-    onClick: fn(),
-  },
-];
-
-export const Primary: Story = {
-  args: {
-    label: "Default",
-    variant: "primary",
-    items: basicItems,
-  },
+export const PrimaryButton: StoryObj = {
+  render: () => (
+    <div className="flex gap-4 p-20">
+      <Dropdown>
+        <DropdownTrigger variant="primary">Default</DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem>Action 1</DropdownItem>
+          <DropdownItem>Action 2</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+      
+      <Dropdown>
+        <DropdownTrigger variant="primary" disabled>Disabled</DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem>Should not see</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    </div>
+  ),
 };
 
-export const Secondary: Story = {
-  args: {
-    label: "Default",
-    variant: "secondary",
-    items: basicItems,
-  },
+export const SecondarySizes: StoryObj = {
+  render: () => (
+    <div className="flex items-center gap-6 p-20">
+      <Dropdown>
+        <DropdownTrigger variant="secondary" size="lg">Large</DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem>Item 1</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+
+      <Dropdown>
+        <DropdownTrigger variant="secondary" size="md">Default</DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem>Item 1</DropdownItem>
+          <DropdownItem>Item 2</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+
+      <Dropdown>
+        <DropdownTrigger variant="secondary" size="sm">Small</DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem>Item 1</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    </div>
+  ),
 };
 
-export const Large: Story = {
-  args: {
-    label: "Large",
-    variant: "secondary",
-    size: "lg",
-    items: basicItems,
-  },
+export const TextTriggers: StoryObj = {
+  render: () => (
+    <div className="flex gap-10 p-20">
+      <Dropdown>
+        <DropdownTrigger variant="text" className="font-extrabold text-[1rem]">Select Mentor</DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem icon={<User size={18} />}>Mentor A</DropdownItem>
+          <DropdownItem icon={<User size={18} />}>Mentor B</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+
+      <Dropdown>
+        <DropdownTrigger variant="text">All Courses</DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem>Design 101</DropdownItem>
+          <DropdownItem>Frontend Pro</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    </div>
+  ),
 };
 
-export const Small: Story = {
-  args: {
-    label: "Small",
-    variant: "secondary",
-    size: "sm",
-    items: basicItems,
-  },
-};
+export const FullPanelTemplates: StoryObj = {
+  render: () => (
+    <div className="flex gap-20 p-20 items-start justify-center min-h-[400px]">
+      {/* Basic Panel */}
+      <div className="flex flex-col gap-2">
+        <h4 className="text-caption font-bold text-text-muted uppercase">Basic Panel</h4>
+        <Dropdown>
+          <DropdownTrigger variant="secondary">Edit Profile</DropdownTrigger>
+          <DropdownMenu>
+            <DropdownItem isActive>Edit Profile</DropdownItem>
+            <DropdownItem>Account Settings</DropdownItem>
+            <DropdownItem>Notification Prefs</DropdownItem>
+            <DropdownItem>Help Center</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </div>
 
-export const TextTrigger: Story = {
-  args: {
-    label: "Select Mentor",
-    variant: "text",
-    items: basicItems,
-  },
-};
-
-export const WithIcons: Story = {
-  args: {
-    label: "User Menu",
-    variant: "primary",
-    items: iconItems,
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    label: "Disabled",
-    disabled: true,
-    items: basicItems,
-  },
+      {/* Dividers & Icons */}
+      <div className="flex flex-col gap-2">
+        <h4 className="text-caption font-bold text-text-muted uppercase">Dividers & Icons</h4>
+        <Dropdown>
+          <DropdownTrigger variant="secondary">Options</DropdownTrigger>
+          <DropdownMenu>
+            <DropdownItem icon={<User size={18} />}>My Mentor</DropdownItem>
+            <DropdownItem icon={<Calendar size={18} />}>Schedule</DropdownItem>
+            <DropdownDivider />
+            <DropdownItem icon={<ArrowUpCircle size={18} />} className="text-[#00A36C]">Upgrade Pro</DropdownItem>
+            <DropdownDivider />
+            <DropdownItem icon={<LogOut size={18} />} isDanger>Sign Out</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </div>
+    </div>
+  ),
 };
