@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useId } from "react";
+import { cn } from "@/shared/lib/utils";
 
 export interface SwitchProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
@@ -18,10 +19,14 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     };
 
     return (
-      <div 
-        className={`inline-flex items-center gap-3 cursor-pointer select-none group relative ${disabled ? "cursor-not-allowed" : ""} ${className || ""}`}
+      <label
+        className={cn(
+          "inline-flex items-center gap-3 cursor-pointer select-none group py-2.5 px-3 -ml-3 rounded-xl transition-all duration-200",
+          disabled && "cursor-not-allowed opacity-50",
+          className
+        )}
       >
-        <div className="relative w-11 h-6 flex items-center">
+        <div className="relative flex items-center w-11 h-6">
           <input
             type="checkbox"
             id={id}
@@ -29,35 +34,39 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
             checked={checked}
             disabled={disabled}
             onChange={handleChange}
-            className="sr-only peer"
+            className="peer sr-only"
             {...props}
           />
-          <div className={`absolute -inset-2.5 rounded-full transition-colors ${disabled ? "" : "peer-focus-visible:bg-primary-light/50 group-hover:bg-primary-light/30"}`} />
-
           <div
-            className={`
-              relative z-10 w-11 h-6 rounded-full transition-all duration-200 ease-in-out
-              bg-border-default
-              peer-checked:bg-primary
-              peer-focus-visible:ring-4 peer-focus-visible:ring-primary-surface
-              peer-hover:opacity-90
-              ${disabled ? "opacity-60 bg-text-disabled" : ""}
-            `}
+            className={cn(
+              "w-11 h-6 rounded-full transition-all duration-300 ease-in-out border-2",
+              "bg-outline-variant/30 border-outline-variant",
+              "group-hover:border-primary/50",
+              "peer-checked:bg-primary peer-checked:border-primary",
+              "peer-focus-visible:ring-4 peer-focus-visible:ring-primary-opacity",
+              disabled && "bg-surface-variant border-outline-variant peer-checked:bg-text-muted peer-checked:border-text-muted"
+            )}
           />
           <div
-            className={`
-              absolute z-20 left-1 top-1 w-4 h-4 rounded-full bg-white transition-all duration-200 ease-in-out shadow-sm
-              peer-checked:translate-x-5
-              ${disabled ? "bg-white/80" : ""}
-            `}
+            className={cn(
+              "absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-all duration-300 ease-in-out shadow-sm",
+              checked ? "translate-x-5" : "translate-x-0",
+              disabled && "bg-white/80"
+            )}
           />
         </div>
         {label && (
-          <label htmlFor={id} className={`text-sm font-medium text-text-body cursor-inherit relative z-10 ${disabled ? "opacity-60" : ""}`}>
+          <span
+            className={cn(
+              "text-body font-medium text-text-body transition-colors duration-200",
+              !disabled && "group-hover:text-primary",
+              disabled && "text-text-muted"
+            )}
+          >
             {label}
-          </label>
+          </span>
         )}
-      </div>
+      </label>
     );
   }
 );

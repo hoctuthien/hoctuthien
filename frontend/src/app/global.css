@@ -48,6 +48,8 @@
   --color-text-inverse: #FFFFFF;
 
   --color-border-default: #C1C6D6;
+  --color-outline-variant: #E1E4ED;
+  --color-primary-opacity: rgba(0, 91, 191, 0.08);
   
   /* Container & Spacing */
   --radius-xs: 4px;

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useId } from "react";
-import { LuCheck, LuMinus } from "react-icons/lu";
+import { Check, Minus } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 export interface CheckboxProps
@@ -21,49 +21,74 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     };
 
     return (
-      <div 
+      <label
         className={cn(
-          'inline-flex items-center gap-3 cursor-pointer user-select-none font-sans',
-          disabled && 'cursor-not-allowed opacity-60',
+          "inline-flex items-center gap-3 cursor-pointer select-none group py-2.5 px-3 -ml-3 rounded-xl transition-all duration-200",
+          disabled && "cursor-not-allowed opacity-50",
           className
         )}
       >
-        <div className="relative w-6 h-6">
+        <div className="relative flex items-center justify-center w-6 h-6">
+          <div className="absolute inset-0 rounded-full scale-150 bg-primary-opacity opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+
           <input
             type="checkbox"
             id={id}
             ref={(el) => {
               if (typeof ref === "function") ref(el);
-              else if (ref) ref.current = el;
+              else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = el;
               if (el) el.indeterminate = indeterminate || false;
             }}
             checked={checked}
             disabled={disabled}
             onChange={handleChange}
-            className="absolute opacity-0 w-full h-full cursor-inherit m-0 z-[1]"
+            className="peer sr-only"
             {...props}
           />
-          <div className={cn(
-            'absolute inset-0 border-1.5 border-border-strong rounded-lg bg-surface transition-all duration-150 flex items-center justify-center text-text-inverse',
-            'hover:border-primary hover:border-2',
-            (checked || indeterminate) && 'bg-primary border-primary',
-            'peer-focus-visible:ring-4 peer-focus-visible:ring-primary-fixed peer-focus-visible:border-primary',
-            disabled && 'bg-text-disabled border-text-disabled',
-          )}>
-            {(checked && !indeterminate) && (
-              <LuCheck className="w-4 h-4" strokeWidth={3.5} />
+          <div
+            className={cn(
+              "flex items-center justify-center w-6 h-6 rounded-md border-2 z-10 transition-all duration-200",
+              "border-outline-variant bg-surface",
+              "group-hover:border-primary",
+              "peer-checked:bg-primary peer-checked:border-primary peer-indeterminate:bg-primary peer-indeterminate:border-primary",
+              "peer-focus-visible:ring-4 peer-focus-visible:ring-primary-opacity peer-focus-visible:border-primary",
+              "active:scale-90",
+              disabled && "border-outline-variant bg-surface-variant peer-checked:bg-text-muted peer-checked:border-text-muted group-hover:border-outline-variant"
             )}
-            {indeterminate && (
-              <LuMinus className="w-4 h-4" strokeWidth={4} />
+          >
+            {indeterminate ? (
+              <Minus
+                className={cn(
+                  "text-white transition-opacity duration-200",
+                  indeterminate ? "opacity-100" : "opacity-0"
+                )}
+                strokeWidth={3}
+                size={16}
+              />
+            ) : (
+              <Check
+                className={cn(
+                  "text-white transition-opacity duration-200",
+                  checked ? "opacity-100" : "opacity-0"
+                )}
+                strokeWidth={3}
+                size={16}
+              />
             )}
           </div>
         </div>
         {label && (
-          <label htmlFor={id} className="text-body-sm text-text-body font-medium cursor-inherit">
+          <span
+            className={cn(
+              "text-body font-medium text-text-body transition-colors duration-200",
+              !disabled && "group-hover:text-primary",
+              disabled && "text-text-muted"
+            )}
+          >
             {label}
-          </label>
+          </span>
         )}
-      </div>
+      </label>
     );
   }
 );
