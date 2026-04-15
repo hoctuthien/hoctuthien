@@ -39,6 +39,7 @@ export class UserService {
       role: parsed.role ?? 'mentee',
       isVerified: parsed.isVerified ?? false,
       status: parsed.status ?? 'active',
+      passwordHash: parsed.passwordHash ?? null,
     });
 
     return userSchema.parse(created);

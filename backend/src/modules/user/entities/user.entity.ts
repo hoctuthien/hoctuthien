@@ -19,6 +19,14 @@ export class UserEntity extends BaseEntity {
   email: string;
 
   @Column({
+    name: 'password_hash',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  passwordHash?: string | null;
+
+  @Column({
     name: 'phone',
     type: 'varchar',
     length: 50,

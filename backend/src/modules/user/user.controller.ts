@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from './services/user.service';
-import {
+import type {
   CreateUserInput,
   GoogleUserProfile,
   UpdateUserInput,
