@@ -24,22 +24,34 @@ export interface ButtonProps {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-text-inverse border-primary hover:bg-primary-dark hover:border-primary-dark shadow-sm active:scale-95',
-  secondary: 'bg-secondary text-text-inverse border-secondary hover:bg-secondary-dark hover:border-secondary-dark shadow-sm active:scale-95',
-  danger: 'bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 shadow-sm active:scale-95',
-  outline: 'bg-transparent text-primary border-primary border-dashed hover:bg-primary-fixed active:scale-95',
-  text: 'bg-transparent text-primary border-transparent hover:underline hover:text-primary-dark active:scale-95',
+  primary: cn(
+    "bg-primary text-white font-bold",
+    "shadow-[0_4px_6px_-4px_#005BBF,0_10px_15px_-3px_#005BBF]",
+    "hover:bg-primary-dark hover:shadow-lg transition-all active:scale-95"
+  ),
+  secondary: cn(
+    "bg-secondary text-white font-bold",
+    "shadow-[0_4px_6px_-4px_#006E2C,0_10px_15px_-3px_#006E2C]",
+    "hover:bg-secondary-dark hover:shadow-lg transition-all active:scale-95"
+  ),
+  danger: cn(
+    "bg-red-600 text-white font-bold",
+    "shadow-[0_4px_6px_-4px_rgba(220,38,38,0.4),0_10px_15px_-3px_rgba(220,38,38,0.4)]",
+    "hover:bg-red-700 hover:shadow-lg transition-all active:scale-95"
+  ),
+  outline: "bg-transparent text-primary border-primary border-2 hover:bg-primary/5 active:scale-95",
+  text: "bg-transparent text-primary hover:underline hover:text-primary-dark active:scale-95",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'text-[13px] px-3.5 py-1.5 min-h-[32px]',
-  md: 'text-[14px] px-5.5 py-2.5 min-h-[42px]',
-  lg: 'text-[16px] px-8 py-3.5 min-h-[52px]',
+  sm: "text-sm px-5 py-2 h-10",
+  md: "text-base px-8 py-3 h-12",
+  lg: "text-base px-10 py-4 h-[56px]",
 };
 
 export const Button = ({
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   label,
   disabled = false,
   loading = false,
@@ -47,8 +59,8 @@ export const Button = ({
   iconLeft,
   iconRight,
   onClick,
-  type = 'button',
-  className = '',
+  type = "button",
+  className = "",
 }: ButtonProps) => {
   const isDisabled = disabled || loading;
 
@@ -56,11 +68,12 @@ export const Button = ({
     <button
       type={type}
       className={cn(
-        'inline-flex items-center justify-center gap-2 font-semibold rounded-sm border-2 transition-all duration-200 outline-none select-none disabled:opacity-60 disabled:pointer-events-none disabled:bg-text-muted disabled:border-text-muted',
+        "inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none",
+        "disabled:opacity-50 disabled:pointer-events-none disabled:grayscale",
         variantClasses[variant],
         sizeClasses[size],
-        fullWidth && 'w-full',
-        loading && 'cursor-wait',
+        fullWidth && "w-full",
+        loading && "cursor-wait",
         className
       )}
       disabled={isDisabled}
@@ -69,12 +82,12 @@ export const Button = ({
       aria-disabled={isDisabled}
     >
       {loading && (
-        <span className="inline-block w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin flex-shrink-0" />
+        <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin flex-shrink-0" />
       )}
       {!loading && iconLeft && (
         <span className="inline-flex items-center flex-shrink-0">{iconLeft}</span>
       )}
-      <span className="leading-none">{label}</span>
+      <span className="leading-tight">{label}</span>
       {!loading && iconRight && (
         <span className="inline-flex items-center flex-shrink-0">{iconRight}</span>
       )}
