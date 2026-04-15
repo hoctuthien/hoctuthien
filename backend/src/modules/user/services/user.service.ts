@@ -7,6 +7,7 @@ import {
   updateUserSchema,
   userSchema,
 } from '../schema/user.schema';
+import { IUserService } from '../interfaces/user.service.interface';
 import {
   CreateUserInput,
   GoogleUserProfile,
@@ -14,7 +15,7 @@ import {
 } from '../types/user.types';
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
   constructor(private readonly userRepository: UserRepository) {}
 
   async findOne(id: string) {
