@@ -1,10 +1,7 @@
 import React from 'react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import Image from 'next/image';
+import { cn } from '@/shared/lib/utils';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -46,7 +43,7 @@ export const Avatar: React.FC<AvatarProps> = ({
       style={borderColor ? { borderColor } : {}}
     >
       {src ? (
-        <img src={src} alt={alt} className="w-full h-full object-cover" />
+        <Image src={src} alt={alt} fill className="object-cover" />
       ) : (
         <div className="font-sans font-bold text-primary text-[0.8em]">
           {name ? getInitials(name) : '?'}

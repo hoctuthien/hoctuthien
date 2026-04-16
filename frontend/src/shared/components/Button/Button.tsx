@@ -1,10 +1,5 @@
 import React from 'react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '@/shared/lib/utils';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline' | 'text';
 export type ButtonSize = 'sm' | 'md' | 'lg';

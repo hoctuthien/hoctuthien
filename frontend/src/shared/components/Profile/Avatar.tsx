@@ -1,4 +1,7 @@
 import React from 'react';
+import Image from 'next/image';
+import { cn } from '@/shared/lib/utils';
+
 
 export type AvatarSize = 'small' | 'medium' | 'large';
 
@@ -27,22 +30,24 @@ export const Avatar = ({
   const isSmall = size === 'small';
   
   return (
-    <div className={`relative inline-block shrink-0 ${className}`}>
+    <div className={cn('relative inline-block shrink-0', className)}>
       <div 
         style={{ 
           width: config.w, 
           height: config.h, 
           borderRadius: config.r 
         }}
-        className={`overflow-hidden bg-[#F1F4FA] flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.08)]
-          ${!isSmall ? 'shadow-[0_4px_12px_-4px_rgba(0,0,0,0.12),0_12px_24px_-4px_rgba(0,0,0,0.1)]' : ''}
-        `}
+        className={cn(
+          'overflow-hidden bg-[#F1F4FA] flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.08)]',
+          !isSmall && 'shadow-[0_4px_12px_-4px_rgba(0,0,0,0.12),0_12px_24px_-4px_rgba(0,0,0,0.1)]'
+        )}
       >
         {src ? (
-          <img 
+          <Image 
             src={src} 
             alt={alt} 
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         ) : (
           <div className="text-[#A1A7B3] font-bold uppercase select-none text-xl">

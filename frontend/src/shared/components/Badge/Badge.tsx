@@ -1,10 +1,6 @@
 import React from 'react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@/shared/lib/utils';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 export type BadgeVariant = 'primary' | 'success' | 'warning' | 'error' | 'growth' | 'neutral';
 
