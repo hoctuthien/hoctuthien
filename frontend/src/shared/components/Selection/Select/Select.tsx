@@ -1,10 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { HiChevronDown } from "react-icons/hi2";
+import { cn } from "@/shared/lib/utils";
+import { CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
 
 export interface SelectOption {
   label: string;
   value: string;
 }
+
+export type SelectStatus = "default" | "success" | "warning" | "error";
 
 export interface SelectProps {
   options: SelectOption[];
@@ -14,6 +18,8 @@ export interface SelectProps {
   label?: string;
   className?: string;
   error?: string;
+  helperText?: string;
+  status?: SelectStatus;
 }
 
 export const Select = ({
@@ -24,12 +30,38 @@ export const Select = ({
   label,
   className = "",
   error,
+  helperText,
+  status: providedStatus,
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
+  const status = providedStatus || (error ? "error" : "default");
+  const message = error || helperText;
 
+  const statusStyles = {
+    default: {
+      button: "bg-white border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10",
+      text: "text-[#727785]",
+      icon: null,
+    },
+    success: {
+      button: "bg-[#86F898]/30 border-[#006E2C] text-[#006E2C] font-medium",
+      text: "text-[#006E2C]",
+      icon: <CheckCircle2 className="w-5 h-5 text-[#006E2C] mr-2" />,
+    },
+    warning: {
+      button: "bg-[#987000]/10 border-[#795900]",
+      text: "text-[#795900]",
+      icon: <AlertTriangle className="w-5 h-5 text-[#795900] mr-2" />,
+    },
+    error: {
+      button: "bg-[#FFDAD6]/30 border-[#BA1A1A] text-[#BA1A1A]",
+      text: "text-[#BA1A1A]",
+      icon: <AlertCircle className="w-5 h-5 text-[#BA1A1A] mr-2" />,
+    },
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -42,43 +74,47 @@ export const Select = ({
   }, []);
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`} ref={containerRef}>
+    <div className={cn("flex flex-col gap-2 w-full", className)} ref={containerRef}>
       {label && (
-        <label className="text-[11px] font-black uppercase tracking-widest text-slate-500 ml-1">
+        <label className="text-sm font-semibold text-[#181C20] font-[Montserrat]">
           {label}
         </label>
       )}
 
       <div className="relative">
-
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`
-            w-full flex items-center justify-between px-5 py-3.5 rounded-2xl border-2 transition-all text-left font-medium
-            ${isOpen ? "border-[#1B4FBF] bg-white shadow-sm" : "border-slate-100 bg-slate-50/30 hover:border-slate-200"}
-            ${selectedOption ? "text-slate-700" : "text-slate-400"}
-            ${error ? "border-red-500" : ""}
-          `}
+          className={cn(
+            "w-full flex items-center justify-between px-4 h-[50px] transition-all duration-200 outline-none text-left border rounded-xl font-[Montserrat]",
+            statusStyles[status].button,
+            isOpen && status === "default" && "border-primary ring-4 ring-primary/10",
+            selectedOption && status === "default" && "text-[#181C20] font-medium",
+            !selectedOption && status === "default" && "text-[#727785]",
+          )}
         >
-          <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
+          <div className="flex items-center min-w-0 flex-1">
+            {statusStyles[status].icon}
+            <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
+          </div>
           <HiChevronDown 
-            className={`transition-transform duration-300 text-slate-400 ${isOpen ? "rotate-180 text-[#1B4FBF]" : ""}`} 
+            className={cn("transition-transform duration-300 text-[#727785] flex-shrink-0 ml-2", isOpen && "rotate-180 text-primary")} 
             size={20} 
           />
         </button>
 
-
         {isOpen && (
-          <div className="absolute z-50 w-full mt-2 py-2 bg-white border border-slate-100 rounded-2xl shadow-xl animate-in fade-in zoom-in duration-200 origin-top">
+          <div className="absolute z-50 w-full mt-2 py-2 bg-white border border-slate-100 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] animate-in fade-in zoom-in-95 duration-200 origin-top">
             {options.map((option) => (
               <button
                 key={option.value}
                 type="button"
-                className={`
-                  w-full px-5 py-3 text-left text-sm font-medium transition-colors
-                  ${option.value === value ? "text-[#1B4FBF] bg-blue-50/50" : "text-slate-600 hover:bg-slate-50 hover:text-[#1B4FBF]"}
-                `}
+                className={cn(
+                  "w-full px-4 py-3 text-left text-sm font-medium transition-colors font-[Montserrat]",
+                  option.value === value 
+                    ? "text-primary bg-primary/5 font-bold" 
+                    : "text-slate-600 hover:bg-slate-50 hover:text-primary"
+                )}
                 onClick={() => {
                   onChange(option.value);
                   setIsOpen(false);
@@ -91,7 +127,14 @@ export const Select = ({
         )}
       </div>
 
-      {error && <p className="text-xs text-red-500 ml-1">{error}</p>}
+      {message && (
+        <span className={cn(
+          "text-[12px] font-medium font-[Montserrat] mt-1 flex items-center gap-1",
+          statusStyles[status].text
+        )}>
+          {message}
+        </span>
+      )}
     </div>
   );
 };

@@ -82,7 +82,7 @@ function Calendar({
         table: "w-full border-separate border-spacing-y-0.5",
         weekdays: cn("flex mb-2", defaultClassNames.weekdays),
         weekday: cn(
-          "w-10 md:w-12 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center py-2 select-none",
+          "w-10 md:w-12 text-[10px] md:text-[11px] font-bold text-text-muted uppercase tracking-widest text-center py-2 select-none",
           defaultClassNames.weekday
         ),
         week: cn("flex w-full", defaultClassNames.week),
@@ -132,7 +132,7 @@ function Calendar({
           if (orientation === "left") {
             return (
               <ChevronLeftIcon
-                className={cn("size-4 text-slate-500", className)}
+                className={cn("size-4 text-primary", className)}
                 {...props}
               />
             )
@@ -141,7 +141,7 @@ function Calendar({
           if (orientation === "right") {
             return (
               <ChevronRightIcon
-                className={cn("size-4 text-slate-500", className)}
+                className={cn("size-4 text-primary", className)}
                 {...props}
               />
             )
