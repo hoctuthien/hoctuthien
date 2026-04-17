@@ -68,7 +68,7 @@ export class UserEntity extends BaseEntity {
   metadata?: Record<string, unknown> | null;
 
   @Column({ name: 'status', type: 'varchar', length: 50, default: 'active' })
-  status: string;
+  status: string ;
 
   @Column({
     name: 'refresh_token_hash',
