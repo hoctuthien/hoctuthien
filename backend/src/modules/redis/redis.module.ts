@@ -8,7 +8,7 @@ const redisProvider: Provider = {
   provide: REDIS_CLIENT,
   useFactory: (configService: ConfigService) => {
     // Thêm giá trị mặc định hoặc ép kiểu để hết lỗi đỏ ở REDIS_URL
-    const redisUrl = configService.get<string>('REDIS_URL');
+    const redisUrl = configService.get<string>('redis.url');
     if (!redisUrl) {
       throw new Error('[Redis] REDIS_URL không tồn tại trong file .env');
     }

@@ -3,10 +3,10 @@ import { CourseBookingService } from './services/course-booking.service';
 
 @Controller('course-bookings')
 export class CourseBookingController {
-  constructor(private readonly course-bookingService: CourseBookingService) {}
+  constructor(private readonly courseBookingService: CourseBookingService) {}
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.course-bookingService.findOne(id);
+    return this.courseBookingService.findOne(id);
   }
 }

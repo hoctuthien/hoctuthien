@@ -11,16 +11,19 @@ import * as bcrypt from 'bcrypt';
 import { UserEntity } from '../../user/entities/user.entity'; // <--- Dùng UserEntity
 import { LoginDto } from '../dtos/auth.dto';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
-import Redis from 'ioredis/built/Redis';
+
 import { REDIS_CLIENT } from 'src/modules/redis/redis.module';
+import Redis from 'ioredis';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserEntity) // <--- Tiêm UspuerRepository vào
     @Inject(REDIS_CLIENT)
     private readonly redis: Redis,
+
+    @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+
     private readonly jwtService: JwtService,
   ) {}
 

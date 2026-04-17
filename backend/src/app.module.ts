@@ -7,7 +7,6 @@ import { validateEnv } from './config/validation';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { BlackListModule } from './modules/black-list/black-list.module';
 import { RedisModule } from './modules/redis/redis.module';
 
 @Module({
@@ -20,7 +19,6 @@ import { RedisModule } from './modules/redis/redis.module';
     DatabaseModule,
     UserModule,
     AuthModule,
-    BlackListModule,
     RedisModule,
   ],
   controllers: [AppController],
