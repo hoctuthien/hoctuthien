@@ -2,6 +2,6 @@ export type BlackListSchema = {
   name: string;
 };
 
-export const black-listSchema = {
+export const blackListSchema = {
   parse: <T>(payload: T) => payload,
 };

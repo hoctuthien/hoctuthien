@@ -1,4 +1,5 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -10,18 +11,27 @@ import * as bcrypt from 'bcrypt';
 import { UserEntity } from '../../user/entities/user.entity'; // <--- Dùng UserEntity
 import { LoginDto } from '../dtos/auth.dto';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
+import Redis from 'ioredis/built/Redis';
+import { REDIS_CLIENT } from 'src/modules/redis/redis.module';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity) // <--- Tiêm UspuerRepository vào
+    @Inject(REDIS_CLIENT)
+    private readonly redis: Redis,
     private readonly userRepository: Repository<UserEntity>,
     private readonly jwtService: JwtService,
   ) {}
 
   // Hàm lấy thông tin User (ví dụ cho API GET /auths/:id)
-
-
+  async testRedis() {
+    // 1. Lưu một giá trị vào Redis (sau 10 giây tự xóa)
+    await this.redis.set('my_key', 'hello_redis', 'EX', 10);
+    // 2. Lấy giá trị ra
+    const value = await this.redis.get('my_key');
+    console.log('Giá trị lấy từ Redis là:', value);
+  }
   async login(loginDto: LoginDto) {
     const { email, password, deviceId } = loginDto;
 
