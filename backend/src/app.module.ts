@@ -7,6 +7,7 @@ import { validateEnv } from './config/validation';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BlackListModule } from './modules/black-list/black-list.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthModule } from './modules/auth/auth.module';
     DatabaseModule,
     UserModule,
     AuthModule,
+    BlackListModule,
   ],
   controllers: [AppController],
   providers: [AppService],
