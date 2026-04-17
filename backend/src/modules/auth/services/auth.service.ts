@@ -14,7 +14,7 @@ import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserEntity) // <--- Tiêm UserRepository vào
+    @InjectRepository(UserEntity) // <--- Tiêm UspuerRepository vào
     private readonly userRepository: Repository<UserEntity>,
     private readonly jwtService: JwtService,
   ) {}
