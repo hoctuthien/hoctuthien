@@ -53,13 +53,13 @@ export class UserEntity extends BaseEntity {
   timezone?: string | null;
 
   @Column({ name: 'role', type: 'varchar', length: 50, default: 'mentee' })
-  role: string;
+  role: string = 'mentee';
 
   @Column({ name: 'points', type: 'int', default: 0 })
-  points: number;
+  points: number = 0;
 
   @Column({ name: 'is_verified', type: 'boolean', default: false })
-  isVerified: boolean;
+  isVerified: boolean = false;
 
   @Column({ name: 'preferences', type: 'jsonb', nullable: true })
   preferences?: Record<string, unknown> | null;

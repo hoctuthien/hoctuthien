@@ -1,47 +1,61 @@
 import {
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { UserEntity } from '../../user/entities/user.entity'; // <--- Dùng UserEntity
 import { LoginDto } from '../dtos/auth.dto';
-
+import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 
 @Injectable()
 export class AuthService {
-  async findOne(id: string) {
-    if (!id) {
-      throw new NotFoundException('Auth id is required');
-    }
+  constructor(
+    @InjectRepository(UserEntity) // <--- Tiêm UserRepository vào
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly jwtService: JwtService,
+  ) {}
 
-    return {
-      id,
-      message: 'Auth fetched successfully',
-    };
-  }
+  // Hàm lấy thông tin User (ví dụ cho API GET /auths/:id)
+
 
   async login(loginDto: LoginDto) {
-    // 1. Lấy hoặc tạo Device ID
-    const deviceId = loginDto.deviceId || uuidv4();
+    const { email, password, deviceId } = loginDto;
 
-    console.log('Device ID hiện tại là:', deviceId);
+    // 1. Tìm User & Kiểm tra mật khẩu
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user || !user.passwordHash) {
+      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS); // email không tồn tại hoặc user đăng nhập bằng Google (không có passwordHash)
+    }
 
-    // 2. Logic kiểm tra User (Mô phỏng)
-    const { email, password } = loginDto;
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS); // sai mật khẩu
+    }
 
-    // Đoạn này sau này để gọi sang UserService:
-    // const user = await this.userService.findByEmail(email);
-    // if (!user || !comparePassword(password, user.password)) {
-    //   throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
-    // }
+    // 2. TẠO ACCESS TOKEN
+    const payload = { sub: user.id, email: user.email, deviceId: deviceId };
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN as any,
+    }); // Token hết hạn sau 1 giờ
 
-    // 3. Trả về kết quả (Tạm thời trả về deviceId để test)
+    // 3. TẠO REFRESH TOKEN
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN as any,
+    });
+
+    // 4. LƯU REFRESH TOKEN GỐC VÀO DATABASE
+    await this.userRepository.update(user.id, {
+      refreshTokenHash: refreshToken, //  tên cột là Hash nhưng tạm lưu gốc vào đây luôn :))
+    });
+
+    // 5. TRẢ VỀ CHO FRONTEND
     return {
-      message: 'Đăng nhập thành công',
-      data: {
-        email,
-        deviceId,
-        accessToken: 'mock_token_abc123', // Sau này sẽ dùng JwtService để tạo
-      },
+      access_token: accessToken,
+      message: AUTH_MESSAGES.LOGIN_SUCCESS,
     };
   }
 }
