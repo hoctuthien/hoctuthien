@@ -35,4 +35,4 @@ jobs:
         # Bước này cực kỳ quan trọng: Chỉ chạy nếu các bước trên (install/build) đều xanh
         if: success()
         run: |
-          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL }}&force=true'
+          curl --request POST '${{ secrets.COOLIFY_WEBHOOK_URL }}&force=true'
