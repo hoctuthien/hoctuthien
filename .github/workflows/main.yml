@@ -3,7 +3,6 @@ name: Backend CI and Trigger Deploy
 on:
   push:
     branches: [main]
-    # Chỉ chạy workflow này khi có thay đổi trong thư mục backend
     paths:
       - "backend/**"
 
@@ -14,8 +13,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Lấy đầy đủ lịch sử commit để lấy thông tin pusher
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,23 +33,12 @@ jobs:
         if: success()
         run: |
           curl --request POST '${{ secrets.COOLIFY_WEBHOOK_URL }}' \
-               --header 'Content-Type: application/json' \
                --header 'X-GitHub-Event: push' \
-               --data '{
-                 "ref": "refs/heads/main",
-                 "after": "${{ github.sha }}",
-                 "repository": {
-                   "full_name": "${{ github.repository }}"
-                 },
-                 "pusher": {
-                   "name": "${{ github.actor }}"
-                 },
-                 "head_commit": {
-                   "id": "${{ github.sha }}",
-                   "message": "${{ github.event.head_commit.message }}",
-                   "timestamp": "${{ github.event.head_commit.timestamp }}",
-                   "author": {
-                     "name": "${{ github.actor }}"
-                   }
+               --header 'Content-Type: application/json' \
+               --data "{
+                 \"ref\": \"refs/heads/main\",
+                 \"after\": \"${{ github.sha }}\",
+                 \"pusher\": {
+                   \"name\": \"${{ github.actor }}\"
                  }
-               }'
+               }"
