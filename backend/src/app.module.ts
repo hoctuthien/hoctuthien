@@ -6,6 +6,7 @@ import envConfig from './config/env.config';
 import { validateEnv } from './config/validation';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { UserModule } from './modules/user/user.module';
+import { UserSessionModule } from './modules/user-session/user-session.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UserModule } from './modules/user/user.module';
     }),
     DatabaseModule,
     UserModule,
+    UserSessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

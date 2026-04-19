@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import {
   createUserSchema,
   googleUserProfileSchema,
-  updateRefreshTokenSchema,
   updateUserSchema,
   userSchema,
 } from '../schema/user.schema';
@@ -52,24 +51,6 @@ export class UserService implements IUserService {
     return userSchema.parse(updated);
   }
 
-  async updateRefreshTokenHash(
-    userId: string,
-    refreshTokenHash: string | null,
-  ) {
-    const parsed = updateRefreshTokenSchema.parse({ userId, refreshTokenHash });
-    const user = await this.userRepository.findById(parsed.userId);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    user.refreshTokenHash = parsed.refreshTokenHash;
-    const saved = await this.userRepository.updateById(parsed.userId, {
-      refreshTokenHash: parsed.refreshTokenHash,
-    });
-
-    return userSchema.parse(saved);
-  }
 
   async upsertGoogleUser(profile: GoogleUserProfile) {
     const parsedProfile = googleUserProfileSchema.parse(profile);
