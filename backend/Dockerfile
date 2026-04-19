@@ -1,31 +1,26 @@
-# Stage 1: Build dự án
+# Stage 1: Build
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy file quản lý package để install trước
 COPY package*.json ./
 
-# Cài đặt dependencies
-RUN npm install
+# Ép cài tất cả bao gồm cả devDependencies để có Nest CLI mà build
+RUN npm install --include=dev
 
-# Copy toàn bộ code vào
 COPY . .
 
-# Thực hiện build dự án
-RUN npm run build
+# Build dự án (dùng npx cho chắc cú)
+RUN npx nest build
 
-# Stage 2: Chạy dự án (Runtime)
+# Stage 2: Run
 FROM node:20-alpine
 WORKDIR /app
 
-# Copy các file cần thiết từ Stage builder sang
+# Chỉ copy những thứ cần để chạy, bỏ qua rác build
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
-# Mở port cho container (khớp với PORT=5050 trong .env của Gấm)
 EXPOSE 5050
 
-# Lệnh khởi chạy ứng dụng
-# LƯU Ý: Không được có dấu phẩy ở cuối dòng này
 CMD ["npm", "run", "start:prod"]
