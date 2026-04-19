@@ -20,7 +20,6 @@ jobs:
         with:
           node-version: 20
           cache: "npm"
-          # Chỉ định file lock để GitHub cache lại node_modules cho nhanh
           cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
@@ -32,7 +31,8 @@ jobs:
         run: npm run build
 
       - name: Trigger Coolify Deploy
-        # Bước này cực kỳ quan trọng: Chỉ chạy nếu các bước trên (install/build) đều xanh
         if: success()
         run: |
-          curl --request POST '${{ secrets.COOLIFY_WEBHOOK_URL }}'
+          curl --request POST '${{ secrets.COOLIFY_WEBHOOK_URL }}' \
+               --header 'Content-Type: application/json' \
+               --data '{"event": "push"}'
