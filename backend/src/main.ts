@@ -19,7 +19,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(reflector),
-    new ResponseTransformInterceptor(),
+    new ResponseTransformInterceptor(reflector),
   );
 
   // Lắng nghe trên 0.0.0.0 để Coolify có thể map vào container
