@@ -2,10 +2,10 @@ name: Backend CI and Trigger Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     # Chỉ chạy workflow này khi có thay đổi trong thư mục backend
     paths:
-      - 'backend/**'
+      - "backend/**"
 
 jobs:
   check-quality:
@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
           # Chỉ định file lock để GitHub cache lại node_modules cho nhanh
           cache-dependency-path: backend/package-lock.json
 
@@ -35,4 +35,4 @@ jobs:
         # Bước này cực kỳ quan trọng: Chỉ chạy nếu các bước trên (install/build) đều xanh
         if: success()
         run: |
-          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL }}'
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL }}&force=true'
