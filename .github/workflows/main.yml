@@ -3,6 +3,7 @@ name: Backend CI and Trigger Deploy
 on:
   push:
     branches: [main]
+    # Chỉ chạy workflow này khi có thay đổi trong thư mục backend
     paths:
       - "backend/**"
 
@@ -34,11 +35,6 @@ jobs:
         run: |
           curl --request POST '${{ secrets.COOLIFY_WEBHOOK_URL }}' \
                --header 'X-GitHub-Event: push' \
-               --header 'Content-Type: application/json' \
-               --data "{
-                 \"ref\": \"refs/heads/main\",
-                 \"after\": \"${{ github.sha }}\",
-                 \"pusher\": {
-                   \"name\": \"${{ github.actor }}\"
-                 }
-               }"
+               --form 'ref=refs/heads/main' \
+               --form 'after=${{ github.sha }}' \
+               --form 'pusher[name]=${{ github.actor }}'
