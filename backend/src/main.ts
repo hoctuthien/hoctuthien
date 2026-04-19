@@ -17,7 +17,7 @@ async function bootstrap() {
     new ClassSerializerInterceptor(reflector),
     new ResponseTransformInterceptor(),
   );
-  await app.listen(port);
+  await app.listen(process.env.PORT || 5050, '0.0.0.0');
 
   console.log(
     `Server running at http://localhost:${port}/${apiPrefix.replace(/^\//, '')}`,
