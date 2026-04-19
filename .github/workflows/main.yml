@@ -1,0 +1,38 @@
+name: Backend CI and Trigger Deploy
+
+on:
+  push:
+    branches: [ main ]
+    # Chỉ chạy workflow này khi có thay đổi trong thư mục backend
+    paths:
+      - 'backend/**'
+
+jobs:
+  check-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          # Chỉ định file lock để GitHub cache lại node_modules cho nhanh
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Build check
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Trigger Coolify Deploy
+        # Bước này cực kỳ quan trọng: Chỉ chạy nếu các bước trên (install/build) đều xanh
+        if: success()
+        run: |
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL }}'
