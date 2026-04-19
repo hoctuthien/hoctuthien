@@ -14,7 +14,7 @@ RUN npm i
 COPY . .
 
 # Build dự án NestJS sang thư mục dist (chạy lệnh build trong package.json)
-RUN npm run build
+RUN ./node_modules/.bin/nest build
 
 # Stage 2: Chạy dự án (Runtime)
 FROM node:20-alpine
