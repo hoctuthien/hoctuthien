@@ -27,7 +27,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
 # Mở port cho container (thường NestJS là 3000)
-EXPOSE 3000
+EXPOSE 5050
 
 # Lệnh khởi chạy ứng dụng ở chế độ production
 CMD ["npm", "run", "start:prod"]
