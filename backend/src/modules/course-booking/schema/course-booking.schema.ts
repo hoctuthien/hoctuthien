@@ -2,6 +2,6 @@ export type CourseBookingSchema = {
   name: string;
 };
 
-export const course-bookingSchema = {
-  parse: <T>(payload: T) => payload,
+export const courseBookingSchema = {
+  parse: <T,>(payload: T) => payload,
 };
