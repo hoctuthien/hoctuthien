@@ -68,6 +68,7 @@ export class AuthService {
     // 5. TRẢ VỀ CHO FRONTEND
     return {
       access_token: accessToken,
+      refresh_token: refreshToken,
       message: AUTH_MESSAGES.LOGIN_SUCCESS,
     };
   }
