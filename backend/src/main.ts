@@ -10,19 +10,24 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
 
   const apiPrefix = configService.get<string>('apiPrefix') || '/api/v1';
-  const port = configService.get<number>('port') || 3000;
+  const port = configService.get<number>('port') || 5050; 
 
-  app.setGlobalPrefix(apiPrefix.replace(/^\//, ''));
+  // Loại trừ route "/" khỏi Prefix
+  app.setGlobalPrefix(apiPrefix.replace(/^\//, ''), {
+    exclude: ['/'],
+  });
+
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(reflector),
     new ResponseTransformInterceptor(),
   );
+
+  // Lắng nghe trên 0.0.0.0 để Coolify có thể map vào container
   await app.listen(process.env.PORT || 5050, '0.0.0.0');
 
   console.log(
-    `Server running at http://localhost:${port}/${apiPrefix.replace(/^\//, '')}`,
+    `Server running at http://localhost:${process.env.PORT || 5050}/${apiPrefix.replace(/^\//, '')}`,
   );
 }
 
 bootstrap();
-//win win
