@@ -102,15 +102,16 @@ export function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-text-heading mb-2">
-          {UI_LABELS.AUTH.WELCOME_BACK}
-        </h2>
-        <p className="text-text-muted text-sm leading-relaxed font-[Montserrat]">
-          {UI_LABELS.AUTH.LOGIN_SUBTITLE}
-        </p>
-      </div>
+    <div className="w-full max-w-[440px] perspective-1000">
+      <div className="bg-white/80 backdrop-blur-xl border border-white/40 p-8 md:p-10 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-text-heading mb-2.5 tracking-tight transition-all">
+            {UI_LABELS.AUTH.WELCOME_BACK}
+          </h2>
+          <p className="text-text-muted text-sm md:text-base leading-relaxed font-[Montserrat]">
+            {UI_LABELS.AUTH.LOGIN_SUBTITLE}
+          </p>
+        </div>
 
       <GoogleSignInButton
         label={UI_LABELS.AUTH.SIGN_IN_WITH_GOOGLE}
@@ -208,6 +209,7 @@ export function LoginForm() {
           {UI_LABELS.AUTH.CREATE_ACCOUNT}
         </Link>
       </p>
+      </div>
     </div>
   );
 }
