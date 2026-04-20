@@ -13,7 +13,7 @@ export default function AuthLayout({
       <aside className="hidden lg:flex lg:w-1/2 relative flex-col justify-between overflow-hidden bg-[#0A1628]">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 hover:scale-105"
-          style={{ backgroundImage: "url('/images/auth-bg.jpg')" }}
+          style={{ backgroundImage: "url('/images/login-background.jpg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-[#0A1628]/90 via-[#0A1628]/40 to-[#0A1628]/10" />
 
@@ -56,7 +56,10 @@ export default function AuthLayout({
           href="/"
           className="absolute top-10 right-10 z-20 text-white/60 hover:text-white flex items-center gap-1.5 text-sm font-semibold transition-all hover:-translate-x-1 group"
         >
-          <Icon name="ChevronLeft" className="w-4 h-4 transition-transform group-hover:scale-110" />
+          <Icon
+            name="ChevronLeft"
+            className="w-4 h-4 transition-transform group-hover:scale-110"
+          />
           {UI_LABELS.AUTH.BACK_TO_HOME}
         </Link>
       </aside>
@@ -79,8 +82,8 @@ export default function AuthLayout({
               Hoc Tu Thien
             </span>
           </div>
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm border border-slate-100 text-slate-500 hover:text-primary transition-all active:scale-95"
           >
             <Icon name="Home" size={18} />
