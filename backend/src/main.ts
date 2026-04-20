@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { Reflector, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
@@ -17,6 +17,16 @@ async function bootstrap() {
     exclude: ['/'],
   });
 
+  // app.useGlobalPipes(
+  //   new ValidationPipe({
+  //     whitelist: true, // Tự động xóa các trường không có trong DTO
+  //     forbidNonWhitelisted: true, // Trả về lỗi 400 nếu có trường lạ
+  //     transform: true, // Cực kỳ quan trọng
+  //     transformOptions: {
+  //       enableImplicitConversion: true, // Tự động convert kiểu dữ liệu
+  //     },
+  //   }),
+  // );
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(reflector),
     new ResponseTransformInterceptor(reflector),
