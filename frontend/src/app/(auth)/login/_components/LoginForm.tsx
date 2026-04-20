@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/core/ui/Input";
 import { Button } from "@/core/ui/Button";
 import { AuthDivider, GoogleSignInButton } from "@/app/(auth)/_components";
+import { MESSAGES, UI_LABELS } from "@/shared/constants";
+import { Icon } from "@/core/ui/Icon";
+import { Checkbox } from "@/core/ui/Selection/Checkbox";
 
 interface FormState {
   email: string;
   password: string;
+  rememberMe: boolean;
 }
 
 interface FormErrors {
@@ -21,33 +25,49 @@ function validateForm(values: FormState): FormErrors {
   const errors: FormErrors = {};
 
   if (!values.email) {
-    errors.email = "Email is required.";
+    errors.email = MESSAGES.ERROR.AUTH.EMAIL_REQUIRED;
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-    errors.email = "Please enter a valid email address.";
+    errors.email = MESSAGES.ERROR.AUTH.INVALID_EMAIL;
   }
 
   if (!values.password) {
-    errors.password = "Password is required.";
+    errors.password = MESSAGES.ERROR.AUTH.PASSWORD_REQUIRED;
   } else if (values.password.length < 8) {
-    errors.password = "Password must be at least 8 characters.";
+    errors.password = MESSAGES.ERROR.AUTH.PASSWORD_MIN_LENGTH;
   }
 
   return errors;
 }
 
 export function LoginForm() {
-  const [values, setValues] = useState<FormState>({ email: "", password: "" });
+  const [values, setValues] = useState<FormState>({
+    email: "",
+    password: "",
+    rememberMe: false,
+  });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const handleChange =
     (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setValues((prev) => ({ ...prev, [field]: e.target.value }));
-      if (errors[field]) {
+      const value =
+        e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      setValues((prev) => ({ ...prev, [field]: value }));
+      if (errors[field as keyof FormErrors]) {
         setErrors((prev) => ({ ...prev, [field]: undefined }));
       }
     };
+
+  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      passwordRef.current?.focus();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +85,7 @@ export function LoginForm() {
       // TODO: replace with actual auth API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
     } catch {
-      setErrors({ general: "Invalid email or password. Please try again." });
+      setErrors({ general: MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS });
     } finally {
       setIsSubmitting(false);
     }
@@ -85,66 +105,93 @@ export function LoginForm() {
     <div className="w-full max-w-md">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-text-heading mb-2">
-          Login Gateway
+          {UI_LABELS.AUTH.WELCOME_BACK}
         </h2>
-        <p className="text-text-muted text-sm leading-relaxed">
-          Welcome back to the sanctuary. Please enter your details to access
-          your sanctuary.
+        <p className="text-text-muted text-sm leading-relaxed font-[Montserrat]">
+          {UI_LABELS.AUTH.LOGIN_SUBTITLE}
         </p>
       </div>
 
       <GoogleSignInButton
-        label="Sign in with Google"
+        label={UI_LABELS.AUTH.SIGN_IN_WITH_GOOGLE}
         onClick={handleGoogleSignIn}
         loading={isGoogleLoading}
       />
 
-      <AuthDivider text="or continue with email" />
+      <AuthDivider text={UI_LABELS.AUTH.OR_CONTINUE_WITH_EMAIL} />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
         <Input
           id="login-email"
-          label="Email Address"
+          label={UI_LABELS.AUTH.EMAIL_ADDRESS}
           type="email"
           placeholder="name@atelier.edu"
           value={values.email}
           onChange={handleChange("email")}
+          onKeyDown={handleEmailKeyDown}
           error={errors.email}
           autoComplete="email"
         />
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-text-heading">
-              Password
-            </span>
+            <label
+              htmlFor="login-password"
+              className="text-sm font-semibold text-text-heading cursor-pointer font-[Montserrat]"
+            >
+              {UI_LABELS.AUTH.PASSWORD}
+            </label>
             <Link
               href="/forgot-password"
-              className="text-sm font-medium text-primary hover:underline"
+              className="text-sm font-medium text-primary hover:underline font-[Montserrat]"
             >
-              Forgot password?
+              {UI_LABELS.AUTH.FORGOT_PASSWORD}
             </Link>
           </div>
           <Input
             id="login-password"
-            type="password"
+            ref={passwordRef}
+            type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             value={values.password}
             onChange={handleChange("password")}
             error={errors.password}
             autoComplete="current-password"
+            suffix={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-text-muted hover:text-text-heading transition-colors"
+                tabIndex={-1}
+              >
+                <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
+              </button>
+            }
+          />
+        </div>
+
+        <div className="mt-1">
+          <Checkbox
+            id="remember-me"
+            label="Remember me"
+            checked={values.rememberMe}
+            onChange={(checked) =>
+              setValues((prev) => ({ ...prev, rememberMe: checked }))
+            }
           />
         </div>
 
         {errors.general && (
-          <p className="text-sm text-[#BA1A1A] bg-[#FFDAD6]/30 border border-[#BA1A1A]/30 rounded-xl px-4 py-3">
+          <p className="text-sm text-[#BA1A1A] bg-[#FFDAD6]/30 border border-[#BA1A1A]/30 rounded-xl px-4 py-3 font-[Montserrat]">
             {errors.general}
           </p>
         )}
 
+        <AuthDivider />
+
         <Button
           type="submit"
-          label={isSubmitting ? "Entering..." : "Enter the Sanctuary"}
+          label={isSubmitting ? "Entering..." : UI_LABELS.AUTH.ENTER_LOGIN}
           variant="primary"
           size="md"
           fullWidth
@@ -152,13 +199,13 @@ export function LoginForm() {
         />
       </form>
 
-      <p className="text-center text-sm text-text-muted mt-6">
-        New to the sanctuary?{" "}
+      <p className="text-center text-sm text-text-muted mt-6 font-[Montserrat]">
+        {UI_LABELS.AUTH.NEW_TO_ACCOUNT}{" "}
         <Link
           href="/register"
           className="text-primary font-semibold hover:underline"
         >
-          Create an account
+          {UI_LABELS.AUTH.CREATE_ACCOUNT}
         </Link>
       </p>
     </div>
