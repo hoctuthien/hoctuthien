@@ -9,6 +9,8 @@ import { RedisModule } from './modules/redis/redis.module';
 import { UserSessionModule } from './modules/user-session/user-session.module';
 import { TraceIdMiddleware } from './common/middlewares/trace-id.middleware';
 import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { AppController } from './app.controller';
     UserSessionModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
