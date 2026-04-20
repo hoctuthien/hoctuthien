@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 import { CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
 
 export type TextareaStatus = "default" | "success" | "warning" | "error";

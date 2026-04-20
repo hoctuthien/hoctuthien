@@ -1,6 +1,6 @@
 import React from 'react';
 import { LuGripVertical, LuMaximize2 } from 'react-icons/lu';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 interface SortItem {
   id: string;

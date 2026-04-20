@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 import { SidebarItem } from "./SidebarItem";
 
 interface SidebarGroupProps {

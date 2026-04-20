@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 
 export interface SidebarItemProps {
   icon?: React.ReactNode;

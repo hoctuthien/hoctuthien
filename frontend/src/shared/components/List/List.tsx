@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar } from "@ui";
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 export interface ListItemProps {
   id: string;

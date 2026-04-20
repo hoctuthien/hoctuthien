@@ -1,6 +1,6 @@
 import React from 'react';
 import { LuCheck } from 'react-icons/lu';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 export type TimelineStatus = 'completed' | 'active' | 'upcoming' | 'future';
 

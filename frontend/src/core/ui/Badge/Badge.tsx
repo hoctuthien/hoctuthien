@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 
 export type BadgeVariant = 'primary' | 'success' | 'warning' | 'error' | 'growth' | 'neutral';

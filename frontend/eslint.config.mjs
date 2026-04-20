@@ -29,11 +29,11 @@ const eslintConfig = defineConfig([
           "paths": [
             {
               "name": "clsx",
-              "message": "Vui lòng dùng 'cn' từ '@/shared/lib/utils' để đảm bảo thống nhất và xử lý xung đột Tailwind."
+              "message": "Vui lòng dùng 'cn' từ '@/core/utils/cn' để đảm bảo thống nhất và xử lý xung đột Tailwind."
             },
             {
               "name": "tailwind-merge",
-              "message": "Vui lòng dùng 'cn' từ '@/shared/lib/utils' để đảm bảo thống nhất và xử lý xung đột Tailwind."
+              "message": "Vui lòng dùng 'cn' từ '@/core/utils/cn' để đảm bảo thống nhất và xử lý xung đột Tailwind."
             },
             {
               "name": "lucide-react",
@@ -54,6 +54,34 @@ const eslintConfig = defineConfig([
                "message": "Phá vỡ tính bao đóng: Vui lòng chỉ import thông qua file index.ts của module."
             }
           ]
+        }
+      ],
+      "no-restricted-syntax": [
+        "error",
+        {
+          "selector": "CallExpression[callee.object.name='apiService'][callee.property.name='get'][arguments.length<2]",
+          "message": "Các hàm GET fetching dữ liệu bắt buộc phải có cấu hình Cache (revalidate hoặc cache)."
+        },
+        {
+          "selector": "CallExpression[callee.object.name='apiService'][callee.property.name='get'][arguments.length=2][arguments.1.type='ObjectExpression'][arguments.1.properties.length=0]",
+          "message": "Các hàm GET fetching dữ liệu bắt buộc phải có cấu hình Cache (revalidate hoặc cache)."
+        }
+      ]
+    }
+  },
+  {
+    // Ràng buộc Technical Excellence cho Gateway/API
+    files: ["src/core/gateway/**/*.ts", "src/core/api/**/*.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          "selector": "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name=/^get/] > ArrowFunctionExpression:not([callee.name='cache'])",
+          "message": "Các hàm bắt đầu bằng 'get' trong layer Gateway/API phải được bọc trong React.cache để tối ưu RSC."
+        },
+        {
+          "selector": "ExportNamedDeclaration > FunctionDeclaration[id.name=/^get/]",
+          "message": "Vui lòng sử dụng arrow function bọc trong React.cache cho các hàm 'get' để đảm bảo tính bao đóng và memoization."
         }
       ]
     }

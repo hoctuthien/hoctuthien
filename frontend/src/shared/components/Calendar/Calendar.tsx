@@ -13,7 +13,7 @@ import {
   type Locale,
 } from "react-day-picker"
 
-import { cn } from "@/shared/lib/utils"
+import { cn } from "@/core/utils/cn"
 import { Button, buttonVariants } from "@/shared/components/ui/button"
 
 function Calendar({

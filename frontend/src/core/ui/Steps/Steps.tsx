@@ -1,6 +1,6 @@
 import React from 'react';
 import { LuCheck, LuX, LuTimer } from 'react-icons/lu';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 export type StepStatus = 'completed' | 'active' | 'upcoming' | 'error' | 'disabled';
 

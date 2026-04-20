@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useId } from "react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 
 export interface SwitchProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {

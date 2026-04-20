@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { ConfirmModal } from './ConfirmModal';
 import { TransactionalModal } from './TransactionalModal';
-import { Button } from '@ui';
+import { Button, Select } from '@ui';
 import { HiAcademicCap } from 'react-icons/hi2';
-import { Select } from '@ui';
 
 const meta: Meta<typeof Modal> = {
   title: 'Shared/Modal',

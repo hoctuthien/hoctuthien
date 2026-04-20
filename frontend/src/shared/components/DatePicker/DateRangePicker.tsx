@@ -3,7 +3,7 @@
 import React, { useState, useId } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Calendar as CalendarIcon, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 import { Calendar } from "@shared";
 import { DateRange } from "react-day-picker";
 
