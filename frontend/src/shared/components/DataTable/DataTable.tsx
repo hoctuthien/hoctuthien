@@ -1,7 +1,6 @@
 import React from "react";
 import { LuEllipsis } from "react-icons/lu";
-import { Badge } from "../Badge/Badge";
-import { Checkbox } from "../Selection/Checkbox/Checkbox";
+import { Badge, Checkbox } from "@ui";
 import { cn } from "@/shared/lib/utils";
 
 export interface TableRow {

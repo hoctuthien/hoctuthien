@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { DatePicker } from "../DatePicker/DatePicker";
-import { TimePicker } from "../TimePicker/TimePicker";
+import { DatePicker, TimePicker } from "@shared";
 import { cn } from "@/shared/lib/utils";
 
 export interface DateTimePickerProps {
