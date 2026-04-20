@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -7,6 +7,8 @@ import { validateEnv } from './config/validation';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { UserSessionModule } from './modules/user-session/user-session.module';
+import { TraceIdMiddleware } from './common/middlewares/trace-id.middleware';
+
 
 @Module({
   imports: [
@@ -22,4 +24,8 @@ import { UserSessionModule } from './modules/user-session/user-session.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TraceIdMiddleware).forRoutes('*');
+  }
+}
