@@ -61,9 +61,9 @@ export class AuthService {
     });
 
     // 4. LƯU REFRESH TOKEN GỐC VÀO DATABASE
-    await this.userRepository.update(user.id, {
-      refreshTokenHash: refreshToken, //  tên cột là Hash nhưng tạm lưu gốc vào đây luôn :))
-    });
+    // await this.userRepository.update(user.id, {
+    //   refreshTokenHash: refreshToken, //  tên cột là Hash nhưng tạm lưu gốc vào đây luôn :))
+    // });
 
     // 5. TRẢ VỀ CHO FRONTEND
     return {
