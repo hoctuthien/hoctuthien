@@ -9,7 +9,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="flex h-screen overflow-hidden font-[Montserrat]">
-      {/* Branding Panel */}
+      {/* Branding Panel (Desktop) */}
       <aside className="hidden lg:flex lg:w-1/2 relative flex-col justify-between overflow-hidden bg-[#0A1628]">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 hover:scale-105"
@@ -51,7 +51,7 @@ export default function AuthLayout({
           </div>
         </div>
 
-        {/* Home Button */}
+        {/* Home Button (Desktop) */}
         <Link
           href="/"
           className="absolute top-10 right-10 z-20 text-white/60 hover:text-white flex items-center gap-1.5 text-sm font-semibold transition-all hover:-translate-x-1 group"
@@ -61,8 +61,29 @@ export default function AuthLayout({
         </Link>
       </aside>
 
-      <main className="flex w-full lg:w-1/2 items-center justify-center overflow-y-auto bg-background p-8">
-        {children}
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center overflow-y-auto bg-background">
+        {/* Mobile Header (Hidden on Desktop) */}
+        <div className="lg:hidden w-full p-6 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-30 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">H</span>
+            </div>
+            <span className="text-slate-900 font-bold text-lg tracking-tight">
+              Hoc Tu Thien
+            </span>
+          </div>
+          <Link 
+            href="/" 
+            className="text-slate-500 hover:text-primary transition-colors"
+          >
+            <Icon name="Home" size={20} />
+          </Link>
+        </div>
+
+        <div className="w-full flex-1 flex items-center justify-center p-6 md:p-12">
+          {children}
+        </div>
       </main>
     </div>
   );
