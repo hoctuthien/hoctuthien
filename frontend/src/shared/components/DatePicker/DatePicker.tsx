@@ -4,7 +4,7 @@ import React, { useState, useId } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Calendar as CalendarIcon, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
-import { Calendar } from "@/shared/components/Calendar/Calendar";
+import { Calendar } from "@shared";
 
 export type DatePickerStatus = "default" | "success" | "warning" | "error";
 
