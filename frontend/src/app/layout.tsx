@@ -1,9 +1,15 @@
 import type { Metadata } from 'next';
 import './global.css';
-import { Geist } from "next/font/google";
-import { cn } from "@/core/utils/cn";
+import { Montserrat } from 'next/font/google';
+import { cn } from '@/core/utils/cn';
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const montserrat = Montserrat({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700', '900'],
+  style: ['normal', 'italic'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Học Từ Thiện',
@@ -19,13 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className={cn(geist.variable, "font-sans antialiased")}>
+      <body className={cn(montserrat.variable, 'font-sans antialiased')}>
         <Providers>{children}</Providers>
       </body>
     </html>
