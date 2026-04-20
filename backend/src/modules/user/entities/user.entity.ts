@@ -70,11 +70,4 @@ export class UserEntity extends BaseEntity {
   @Column({ name: 'status', type: 'varchar', length: 50, default: 'active' })
   status: string ;
 
-  @Column({
-    name: 'refresh_token_hash',
-    type: 'varchar',
-    length: 255,
-    nullable: true,
-  })
-  refreshTokenHash?: string | null;
 }

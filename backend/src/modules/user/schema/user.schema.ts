@@ -20,7 +20,6 @@ export const userSchema = z.object({
   preferences: z.record(z.string(), z.unknown()).nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).nullable().optional(),
   status: userStatusSchema.default('active'),
-  refreshTokenHash: z.string().max(255).nullable().optional(),
 });
 
 export const createUserSchema = z.object({
@@ -60,7 +59,3 @@ export const googleUserProfileSchema = z.object({
   picture: z.string().url().optional(),
 });
 
-export const updateRefreshTokenSchema = z.object({
-  userId: z.string().min(1),
-  refreshTokenHash: z.string().max(255).nullable(),
-});
