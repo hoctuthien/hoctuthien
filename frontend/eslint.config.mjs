@@ -65,6 +65,10 @@ const eslintConfig = defineConfig([
         {
           "selector": "CallExpression[callee.object.name='apiService'][callee.property.name='get'][arguments.length=2][arguments.1.type='ObjectExpression'][arguments.1.properties.length=0]",
           "message": "Các hàm GET fetching dữ liệu bắt buộc phải có cấu hình Cache (revalidate hoặc cache)."
+        },
+        {
+          "selector": "AssignmentExpression[left.object.name='errors'][right.type='Literal']",
+          "message": "Không được gán chuỗi string thủ công cho lỗi. Vui lòng sử dụng hằng số từ MESSAGES trong '@/shared/constants'."
         }
       ]
     }
