@@ -10,6 +10,8 @@ export const UI_LABELS = {
     PASSWORD: "Password",
     FORGOT_PASSWORD: "Forgot password?",
     ENTER_LOGIN: "Login",
+    ENTERING: "Entering...",
+    REMEMBER_ME: "Remember me",
     NEW_TO_ACCOUNT: "Don't have any account?",
     CREATE_ACCOUNT: "Create an account",
     POLICY: "Policy",

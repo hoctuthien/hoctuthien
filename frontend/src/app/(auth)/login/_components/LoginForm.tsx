@@ -173,7 +173,7 @@ export function LoginForm() {
         <div className="mt-1">
           <Checkbox
             id="remember-me"
-            label="Remember me"
+            label={UI_LABELS.AUTH.REMEMBER_ME}
             checked={values.rememberMe}
             onChange={(checked) =>
               setValues((prev) => ({ ...prev, rememberMe: checked }))
@@ -191,7 +191,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          label={isSubmitting ? "Entering..." : UI_LABELS.AUTH.ENTER_LOGIN}
+          label={isSubmitting ? UI_LABELS.AUTH.ENTERING : UI_LABELS.AUTH.ENTER_LOGIN}
           variant="primary"
           size="md"
           fullWidth
