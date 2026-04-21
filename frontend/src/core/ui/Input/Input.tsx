@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/core/utils/cn";
-import { Loader2, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
+import { Icon } from "@/core/ui/Icon";
 
 export type InputStatus = "default" | "verifying" | "success" | "warning" | "error";
 
@@ -28,22 +28,22 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       },
       verifying: {
         input: "bg-white border-primary focus:border-primary focus:ring-primary/10 pr-10",
-        icon: <Loader2 className="w-5 h-5 text-primary animate-spin" />,
+        icon: <Icon name="Loader2" className="w-5 h-5 text-primary animate-spin" />,
         text: "text-primary",
       },
       success: {
         input: "bg-[#86F898]/30 border-[#006E2C] text-[#006E2C] font-medium pr-10",
-        icon: <CheckCircle2 className="w-5 h-5 text-[#006E2C]" />,
+        icon: <Icon name="CheckCircle2" className="w-5 h-5 text-[#006E2C]" />,
         text: "text-[#006E2C]",
       },
       warning: {
         input: "bg-[#987000]/10 border-[#795900] pr-10",
-        icon: <AlertTriangle className="w-5 h-5 text-[#795900]" />,
+        icon: <Icon name="AlertTriangle" className="w-5 h-5 text-[#795900]" />,
         text: "text-[#795900]",
       },
       error: {
         input: "bg-[#FFDAD6]/30 border-[#BA1A1A] text-[#BA1A1A] pr-10",
-        icon: <AlertCircle className="w-5 h-5 text-[#BA1A1A]" />,
+        icon: <Icon name="AlertCircle" className="w-5 h-5 text-[#BA1A1A]" />,
         text: "text-[#BA1A1A]",
       },
     };

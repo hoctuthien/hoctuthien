@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useId, useRef, useState } from "react";
-import { Minus, Plus, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
+import { Icon } from "@/core/ui/Icon";
 import { cn } from "@/core/utils/cn";
 
 export type InputNumberStatus = "default" | "success" | "warning" | "error";
@@ -43,7 +43,7 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
       helperText,
       status: providedStatus,
     },
-    ref
+    ref,
   ) => {
     const id = useId();
     const inputRef = useRef<HTMLInputElement>(null);
@@ -57,24 +57,25 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
 
     const statusStyles = {
       default: {
-        container: "bg-surface border-slate-200 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10",
+        container:
+          "bg-surface border-slate-200 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10",
         text: "text-[#727785]",
         icon: null,
       },
       success: {
         container: "bg-[#86F898]/30 border-[#006E2C]",
         text: "text-[#006E2C]",
-        icon: <CheckCircle2 className="w-5 h-5 text-[#006E2C]" />,
+        icon: <Icon name="CheckCircle2" className="w-5 h-5 text-[#006E2C]" />,
       },
       warning: {
         container: "bg-[#987000]/10 border-[#795900]",
         text: "text-[#795900]",
-        icon: <AlertTriangle className="w-5 h-5 text-[#795900]" />,
+        icon: <Icon name="AlertTriangle" className="w-5 h-5 text-[#795900]" />,
       },
       error: {
         container: "bg-[#FFDAD6]/30 border-[#BA1A1A]",
         text: "text-[#BA1A1A]",
-        icon: <AlertCircle className="w-5 h-5 text-[#BA1A1A]" />,
+        icon: <Icon name="AlertCircle" className="w-5 h-5 text-[#BA1A1A]" />,
       },
     };
 
@@ -84,7 +85,7 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
         if (!isControlled) setInternalValue(clamped);
         onChange?.(clamped);
       },
-      [min, max, isControlled, onChange]
+      [min, max, isControlled, onChange],
     );
 
     const handleDecrement = () => {
@@ -129,7 +130,7 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             "group/input-number inline-flex items-center h-[50px] rounded-xl p-1 transition-all duration-200 border",
             statusStyles[status].container,
             disabled && "opacity-60 cursor-not-allowed grayscale",
-            className
+            className,
           )}
         >
           {prefix && (
@@ -145,12 +146,13 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             onClick={handleDecrement}
             aria-label="Decrement"
             className={cn(
-              "flex items-center justify-center w-[29px] h-10 rounded-lg shrink-0 transition-all duration-150",
+              "flex items-center justify-center w-[29px] h-10 rounded-lg shrink-0 transition-all duration-150 hover:cursor-pointer",
               "text-primary hover:bg-black/5 active:scale-90",
-              (disabled || isAtMin) && "text-text-muted hover:bg-transparent cursor-not-allowed"
+              (disabled || isAtMin) &&
+                "text-text-muted hover:bg-transparent cursor-not-allowed pointer-events-none",
             )}
           >
-            <Minus size={14} strokeWidth={2.5} />
+            <Icon name="Minus" size={14} strokeWidth={2.5} />
           </button>
 
           <input
@@ -158,8 +160,12 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             ref={(el) => {
               if (typeof ref === "function") ref(el);
               else if (ref)
-                (ref as React.MutableRefObject<HTMLInputElement | null>).current = el;
-              (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = el;
+                (
+                  ref as React.MutableRefObject<HTMLInputElement | null>
+                ).current = el;
+              (
+                inputRef as React.MutableRefObject<HTMLInputElement | null>
+              ).current = el;
             }}
             type="text"
             inputMode="numeric"
@@ -172,7 +178,7 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
               "flex-1 min-w-[40px] h-10 bg-transparent text-center outline-none",
               "font-semibold text-base text-[#181C20] font-[Montserrat]",
               "placeholder:text-[#727785]",
-              disabled && "text-text-muted cursor-not-allowed"
+              disabled && "text-text-muted cursor-not-allowed",
             )}
           />
 
@@ -183,12 +189,13 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             onClick={handleIncrement}
             aria-label="Increment"
             className={cn(
-              "flex items-center justify-center w-[29px] h-10 rounded-lg shrink-0 transition-all duration-150",
+              "flex items-center justify-center w-[29px] h-10 rounded-lg shrink-0 transition-all duration-150 hover:cursor-pointer",
               "text-primary hover:bg-black/5 active:scale-90",
-              (disabled || isAtMax) && "text-text-muted hover:bg-transparent cursor-not-allowed"
+              (disabled || isAtMax) &&
+                "text-text-muted hover:bg-transparent cursor-not-allowed pointer-events-none",
             )}
           >
-            <Plus size={14} strokeWidth={2.5} />
+            <Icon name="Plus" size={14} strokeWidth={2.5} />
           </button>
 
           {statusStyles[status].icon && (
@@ -204,21 +211,22 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
           )}
         </div>
         {message && (
-          <span className={cn(
-            "text-[12px] font-medium font-[Montserrat] mt-1 flex items-center gap-1",
-            statusStyles[status].text
-          )}>
+          <span
+            className={cn(
+              "text-[12px] font-medium font-[Montserrat] mt-1 flex items-center gap-1",
+              statusStyles[status].text,
+            )}
+          >
             {message}
           </span>
         )}
       </div>
     );
-  }
+  },
 );
 
 InputNumber.displayName = "InputNumber";
 
-// ... InputNumberBorderless remains mostly same but I'll update typography
 export interface InputNumberBorderlessProps {
   label: string;
   value?: number;
@@ -249,7 +257,7 @@ export const InputNumberBorderless = React.forwardRef<
       controlVariant = "circle",
       className,
     },
-    ref
+    ref,
   ) => {
     const id = useId();
     const [internalValue, setInternalValue] = useState(defaultValue);
@@ -262,7 +270,7 @@ export const InputNumberBorderless = React.forwardRef<
         if (!isControlled) setInternalValue(clamped);
         onChange?.(clamped);
       },
-      [min, max, isControlled, onChange]
+      [min, max, isControlled, onChange],
     );
 
     const handleDecrement = () => {
@@ -292,13 +300,13 @@ export const InputNumberBorderless = React.forwardRef<
         className={cn(
           "flex items-center justify-between py-1 border-b border-border-default",
           disabled && "opacity-50 cursor-not-allowed",
-          className
+          className,
         )}
       >
         <span
           className={cn(
             "text-sm font-medium text-[#181C20] font-[Montserrat]",
-            disabled && "text-text-muted"
+            disabled && "text-text-muted",
           )}
         >
           {label}
@@ -312,9 +320,10 @@ export const InputNumberBorderless = React.forwardRef<
             onClick={handleDecrement}
             aria-label="Decrement"
             className={cn(
-              "flex items-center justify-center transition-all duration-150",
+              "flex items-center justify-center transition-all duration-150 hover:cursor-pointer",
               "text-primary hover:text-primary-dark active:scale-90",
-              (disabled || isAtMin) && "text-text-muted cursor-not-allowed"
+              (disabled || isAtMin) &&
+                "text-text-muted cursor-not-allowed pointer-events-none",
             )}
           >
             {controlVariant === "circle" ? (
@@ -334,7 +343,7 @@ export const InputNumberBorderless = React.forwardRef<
             disabled={disabled}
             className={cn(
               "w-8 text-center bg-transparent outline-none font-bold text-base text-[#181C20] font-[Montserrat]",
-              disabled && "text-text-muted cursor-not-allowed"
+              disabled && "text-text-muted cursor-not-allowed",
             )}
           />
 
@@ -345,9 +354,10 @@ export const InputNumberBorderless = React.forwardRef<
             onClick={handleIncrement}
             aria-label="Increment"
             className={cn(
-              "flex items-center justify-center transition-all duration-150",
+              "flex items-center justify-center transition-all duration-150 hover:cursor-pointer",
               "text-primary hover:text-primary-dark active:scale-90",
-              (disabled || isAtMax) && "text-text-muted cursor-not-allowed"
+              (disabled || isAtMax) &&
+                "text-text-muted cursor-not-allowed pointer-events-none",
             )}
           >
             {controlVariant === "circle" ? (
@@ -359,7 +369,7 @@ export const InputNumberBorderless = React.forwardRef<
         </div>
       </div>
     );
-  }
+  },
 );
 
 InputNumberBorderless.displayName = "InputNumberBorderless";
@@ -404,10 +414,7 @@ function ChevronDownIcon({ className }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M6 7L0 1L1.4 0L6 4.6L10.6 0L12 1L6 7Z"
-        fill="currentColor"
-      />
+      <path d="M6 7L0 1L1.4 0L6 4.6L10.6 0L12 1L6 7Z" fill="currentColor" />
     </svg>
   );
 }
@@ -420,10 +427,7 @@ function ChevronUpIcon({ className }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M6 0L12 6L10.6 7L6 2.4L1.4 7L0 6L6 0Z"
-        fill="currentColor"
-      />
+      <path d="M6 0L12 6L10.6 7L6 2.4L1.4 7L0 6L6 0Z" fill="currentColor" />
     </svg>
   );
 }

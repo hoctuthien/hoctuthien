@@ -4,6 +4,7 @@ export default () => ({
   apiPrefix: process.env.API_PREFIX || '/api/v1',
   database: {
     url: process.env.DATABASE_URL,
+    synchronize: process.env.DB_SYNCHRONIZE === 'true',
   },
   redis: {
     url: process.env.REDIS_URL,
