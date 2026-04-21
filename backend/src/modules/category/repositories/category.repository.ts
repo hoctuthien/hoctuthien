@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseRepository } from '../../../common/repositories/base.repository';
-import { AuthEntity } from '../entities/auth.entity';
+import { CategoryEntity } from '../entities/category.entity';
 
 @Injectable()
-export class AuthRepository extends BaseRepository<AuthEntity> {
+export class CategoryRepository extends BaseRepository<CategoryEntity> {
   constructor(
-    @InjectRepository(AuthEntity)
-    repo: Repository<AuthEntity>,
+    @InjectRepository(CategoryEntity)
+    repo: Repository<CategoryEntity>,
   ) {
     super(repo);
   }
