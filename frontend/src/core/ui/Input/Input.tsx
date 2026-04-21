@@ -73,7 +73,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {(suffix || statusStyles[status].icon) && (
-            <div className="absolute right-4 flex items-center">
+            <div className="absolute right-4 flex items-center z-10">
               {suffix || statusStyles[status].icon}
             </div>
           )}
