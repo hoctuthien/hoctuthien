@@ -82,7 +82,6 @@ jobs:
         working-directory: ./frontend
         run: |
           npm install --legacy-peer-deps
-          npm install
           npm run build
 
       - name: Trigger Frontend Coolify
