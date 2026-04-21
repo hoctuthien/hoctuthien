@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { donationGateway } from '@/core/gateway';
+// import { donationGateway } from '@/core/gateway';
 
 /**
  * Layer 2 - API Route Handler (BFF Core)
@@ -8,7 +8,8 @@ import { donationGateway } from '@/core/gateway';
 
 export async function GET() {
   try {
-    const donations = await donationGateway.getDonations();
+    // const donations = await donationGateway.getDonations();
+    const donations: any[] = []; // Mock data for now
     return NextResponse.json(donations);
   } catch (error) {
     console.error('[API_ROUTE_ERROR]:', error);

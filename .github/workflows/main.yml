@@ -1,36 +1,91 @@
-name: Backend CI and Trigger Deploy
+name: Monorepo CI and Deploy
 
 on:
   push:
     branches: [main]
     paths:
       - "backend/**"
+      - "frontend/**"
 
 jobs:
-  check-quality:
+  # --- JOB DEPLOY CHO BACKEND ---
+  backend-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Lấy 2 commit gần nhất để so sánh sự thay đổi
 
-      - name: Setup Node.js
+      - name: Check for Backend changes
+        id: check_backend
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q "^backend/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Phát hiện thay đổi trong thư mục backend."
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Không có thay đổi trong backend."
+          fi
+
+      - name: Setup Node.js (Backend)
+        if: steps.check_backend.outputs.changed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "npm"
           cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
+      - name: Build Check Backend
+        if: steps.check_backend.outputs.changed == 'true'
         working-directory: ./backend
-        run: npm install
-
-      - name: Build check
-        working-directory: ./backend
-        run: npm run build
-
-      - name: Trigger Coolify Deploy
-        if: success()
         run: |
-          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL }}' \
+          npm install
+          npm run build
+
+      - name: Trigger Backend Coolify
+        if: steps.check_backend.outputs.changed == 'true'
+        run: |
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_BACKEND }}' \
+               --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
+
+  # --- JOB DEPLOY CHO FRONTEND (NEXT.JS) ---
+  frontend-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for Frontend changes
+        id: check_frontend
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q "^frontend/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Phát hiện thay đổi trong thư mục frontend."
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Không có thay đổi trong frontend."
+          fi
+
+      - name: Setup Node.js (Frontend)
+        if: steps.check_frontend.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Check Frontend
+        if: steps.check_frontend.outputs.changed == 'true'
+        working-directory: ./frontend
+        run: |
+          npm install --legacy-peer-deps
+          npm run build
+
+      - name: Trigger Frontend Coolify
+        if: steps.check_frontend.outputs.changed == 'true'
+        run: |
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_FRONTEND }}' \
                --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
