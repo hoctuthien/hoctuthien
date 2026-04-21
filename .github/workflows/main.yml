@@ -10,48 +10,46 @@ on:
 jobs:
   # --- JOB BACKEND ---
   backend-deploy:
-    if: github.event_name == 'push' && contains(github.event.head_commit.modified, 'backend/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
+          fetch-depth: 2 # Quan trọng để so sánh các thay đổi giữa 2 commit
 
-      - name: Build Check Backend
-        working-directory: ./backend
+      - name: Check for Backend changes
+        id: check_backend
         run: |
-          npm install
-          npm run build
+          if git diff --name-only HEAD^ HEAD | grep -q "^backend/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Trigger Backend Coolify
+      - name: Build and Trigger Backend
+        if: steps.check_backend.outputs.changed == 'true'
         run: |
-          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_BACKEND }}' \
+          echo "Backend changed, starting build..."
+          cd backend && npm install && npm run build
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL }}' \
                --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
 
-  # --- JOB FRONTEND (NEXT.JS) ---
+  # --- JOB FRONTEND ---
   frontend-deploy:
-    if: github.event_name == 'push' && contains(github.event.head_commit.modified, 'frontend/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          fetch-depth: 2
 
-      - name: Build Check Frontend
-        working-directory: ./frontend
+      - name: Check for Frontend changes
+        id: check_frontend
         run: |
-          npm install
-          npm run build
+          if git diff --name-only HEAD^ HEAD | grep -q "^frontend/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Trigger Frontend Coolify
+      - name: Build and Trigger Frontend
+        if: steps.check_frontend.outputs.changed == 'true'
         run: |
+          echo "Frontend changed, starting build..."
+          cd frontend && npm install && npm run build
           curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_FRONTEND }}' \
                --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
