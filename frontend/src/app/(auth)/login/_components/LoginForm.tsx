@@ -161,7 +161,7 @@ export function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-text-muted hover:text-text-heading transition-colors"
+                className="text-text-muted hover:text-text-heading transition-colors cursor-pointer"
                 tabIndex={-1}
               >
                 <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
