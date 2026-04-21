@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Icon } from "@/core/ui/Icon";
 import { UI_LABELS } from "@/shared/constants";
 
@@ -9,7 +10,6 @@ export default function AuthLayout({
 }) {
   return (
     <div className="flex h-screen overflow-hidden font-[Montserrat]">
-      {/* Branding Panel (Desktop) */}
       <aside className="hidden lg:flex lg:w-1/2 relative flex-col justify-between overflow-hidden bg-[#0A1628]">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 hover:scale-105"
@@ -20,9 +20,13 @@ export default function AuthLayout({
         <div className="relative z-10 flex flex-col justify-between h-full p-12">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">H</span>
-            </div>
+            <Image
+              src="/images/avatar_link.png"
+              alt="Hoc Tu Thien"
+              width={56}
+              height={56}
+              className="object-contain rounded-full shadow-lg border border-white/10"
+            />
             <span className="text-white font-bold text-2xl tracking-tight">
               Hoc Tu Thien
             </span>
@@ -30,11 +34,11 @@ export default function AuthLayout({
 
           <div className="max-w-md">
             <h1 className="text-white text-5xl font-bold leading-[1.1] mb-6 tracking-tight">
-              Explore the frontiers of academic excellence.
+              Khám phá những ranh giới mới của học thuật xuất sắc.
             </h1>
             <p className="text-white/70 text-lg leading-relaxed">
-              Our sanctuary provides the instruments and clarity needed to
-              navigate complex intellectual landscapes.
+              Không gian của chúng tôi cung cấp các công cụ và sự rõ ràng cần
+              thiết để định hướng trong các bối cảnh trí tuệ phức tạp.
             </p>
           </div>
 
@@ -75,9 +79,13 @@ export default function AuthLayout({
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="lg:hidden w-full p-6 flex items-center justify-between sticky top-0 bg-[#F8FAFC]/80 backdrop-blur-md z-30 border-b border-slate-100/50">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-              <span className="text-white font-bold text-sm">H</span>
-            </div>
+            <Image
+              src="/images/avatar_link.png"
+              alt="Hoc Tu Thien"
+              width={40}
+              height={40}
+              className="object-contain rounded-full shadow-sm"
+            />
             <span className="text-slate-900 font-bold text-lg tracking-tight">
               Hoc Tu Thien
             </span>
