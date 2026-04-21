@@ -46,7 +46,7 @@ jobs:
       - name: Trigger Backend Coolify
         if: steps.check_backend.outputs.changed == 'true'
         run: |
-          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL }}' \
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_BACKEND }}' \
                --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
 
   # --- JOB DEPLOY CHO FRONTEND (NEXT.JS) ---
