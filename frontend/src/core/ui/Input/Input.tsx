@@ -11,10 +11,11 @@ export interface InputProps
   helperText?: string;
   status?: InputStatus;
   containerClassName?: string;
+  suffix?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, helperText, status: providedStatus, containerClassName, type, ...props }, ref) => {
+  ({ className, label, error, helperText, status: providedStatus, containerClassName, type, suffix, ...props }, ref) => {
     // Determine the status based on error prop or providedStatus
     const status = providedStatus || (error ? "error" : "default");
     const message = error || helperText;
@@ -50,7 +51,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("flex flex-col gap-2 w-full", containerClassName)}>
         {label && (
-          <label className="text-sm font-semibold text-[#181C20] font-[Montserrat]">
+          <label 
+            htmlFor={props.id}
+            className="text-sm font-semibold text-[#181C20] font-[Montserrat] cursor-pointer"
+          >
             {label}
           </label>
         )}
@@ -61,15 +65,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               "flex h-[50px] w-full px-4 py-3.5 text-base font-[Montserrat] transition-all duration-200 outline-none rounded-xl border",
               "placeholder:text-[#727785]",
               statusStyles[status].input,
+              (suffix || statusStyles[status].icon) && "pr-12",
               "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-50",
               className
             )}
             ref={ref}
             {...props}
           />
-          {statusStyles[status].icon && (
-            <div className="absolute right-4 flex items-center pointer-events-none">
-              {statusStyles[status].icon}
+          {(suffix || statusStyles[status].icon) && (
+            <div className="absolute right-4 flex items-center">
+              {suffix || statusStyles[status].icon}
             </div>
           )}
         </div>
