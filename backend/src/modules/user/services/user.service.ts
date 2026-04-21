@@ -1,24 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import {
   createUserSchema,
-  googleUserProfileSchema,
   updateUserSchema,
   userSchema,
 } from '../schema/user.schema';
-import { IUserService } from '../interfaces/user.service.interface';
 import {
   CreateUserInput,
-  GoogleUserProfile,
   UpdateUserInput,
 } from '../types/user.types';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class UserService implements IUserService {
+export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
+  async findAll() {
+    const users = await this.userRepository.findMany();
+    return users.map(user => userSchema.parse(user));
+  }
+
   async findOne(id: string) {
-    const user = await this.userRepository.findByIdOrFail(id, 'User not found');
+    const user = await this.userRepository.findById(id);
+    if (!user) throw new NotFoundException('User not found');
     return userSchema.parse(user);
   }
 
@@ -27,21 +31,17 @@ export class UserService implements IUserService {
     return user ? userSchema.parse(user) : null;
   }
 
-  async findByGoogleId(googleId: string) {
-    const user = await this.userRepository.findByGoogleId(googleId);
-    return user ? userSchema.parse(user) : null;
-  }
-
   async create(payload: CreateUserInput) {
     const parsed = createUserSchema.parse(payload);
-    const created = await this.userRepository.createAndSave({
-      ...parsed,
-      role: parsed.role ?? 'mentee',
-      isVerified: parsed.isVerified ?? false,
-      status: parsed.status ?? 'active',
-      passwordHash: parsed.passwordHash ?? null,
-    });
+    
+    // Tự động hash mật khẩu nếu có
+    const userData: any = { ...parsed };
+    if (parsed.password) {
+      userData.passwordHash = await bcrypt.hash(parsed.password, 10);
+      delete userData.password; // Xóa trường password thô
+    }
 
+    const created = await this.userRepository.createAndSave(userData);
     return userSchema.parse(created);
   }
 
@@ -51,34 +51,7 @@ export class UserService implements IUserService {
     return userSchema.parse(updated);
   }
 
-
-  async upsertGoogleUser(profile: GoogleUserProfile) {
-    const parsedProfile = googleUserProfileSchema.parse(profile);
-
-    let user = await this.userRepository.findByGoogleId(parsedProfile.sub);
-
-    if (!user) {
-      user = await this.userRepository.findByEmail(parsedProfile.email);
-    }
-
-    if (!user) {
-      const created = await this.create({
-        googleId: parsedProfile.sub,
-        email: parsedProfile.email,
-        name: parsedProfile.name,
-        avatarUrl: parsedProfile.picture,
-        isVerified: true,
-      });
-
-      return created;
-    }
-
-    return this.update(user.id, {
-      googleId: user.googleId ?? parsedProfile.sub,
-      name: parsedProfile.name,
-      avatarUrl: parsedProfile.picture,
-      isVerified: true,
-      status: 'active',
-    });
+  async remove(id: string) {
+    await this.userRepository.softDeleteById(id);
   }
 }

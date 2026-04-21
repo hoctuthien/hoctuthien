@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model user_sessions {
+  id                       BigInt    @id(map: "PK_e93e031a5fed190d4789b6bfd83") @default(autoincrement())
+  created_at               DateTime  @default(now()) @db.Timestamp(6)
+  updated_at               DateTime  @default(now()) @db.Timestamp(6)
+  deleted_at               DateTime? @db.Timestamp(6)
+  user_id                  BigInt
+  refresh_token            String    @db.VarChar(255)
+  device_name              String?   @db.VarChar(255)
+  device_type              String?   @db.VarChar(100)
+  user_agent               String?
+  ip_address               String?   @db.Inet
+  refresh_token_expires_at DateTime  @db.Timestamptz(6)
+  last_used_at             DateTime? @db.Timestamptz(6)
+  revoked_at               DateTime? @db.Timestamptz(6)
+  metadata                 Json      @default("{}")
+  status                   String    @default("active") @db.VarChar(50)
+}
+
+model users {
+  id            BigInt    @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(autoincrement())
+  created_at    DateTime  @default(now()) @db.Timestamp(6)
+  updated_at    DateTime  @default(now()) @db.Timestamp(6)
+  deleted_at    DateTime? @db.Timestamp(6)
+  google_id     String?   @unique(map: "UQ_0bd5012aeb82628e07f6a1be53b") @db.VarChar(255)
+  name          String    @db.VarChar(255)
+  email         String    @unique(map: "UQ_97672ac88f789774dd47f7c8be3") @db.VarChar(255)
+  password_hash String?   @db.VarChar(255)
+  phone         String?   @unique(map: "UQ_a000cca60bcf04454e727699490") @db.VarChar(50)
+  avatar_url    String?   @db.VarChar(500)
+  day_of_birth  DateTime? @db.Date
+  gender        String?   @db.VarChar(50)
+  timezone      String?   @db.VarChar(50)
+  role          String    @default("mentee") @db.VarChar(50)
+  points        Int       @default(0)
+  is_verified   Boolean   @default(false)
+  preferences   Json?
+  metadata      Json?
+  status        String    @default("active") @db.VarChar(50)
+}
