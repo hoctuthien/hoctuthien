@@ -18,14 +18,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
+    <html lang="vi" suppressHydrationWarning>
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className={cn(geist.variable, "font-sans antialiased")}>
+      <body className={cn(geist.variable, "font-sans antialiased")} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>
