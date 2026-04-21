@@ -81,6 +81,7 @@ jobs:
         if: steps.check_frontend.outputs.changed == 'true'
         working-directory: ./frontend
         run: |
+          npm install --legacy-peer-deps
           npm install
           npm run build
 
