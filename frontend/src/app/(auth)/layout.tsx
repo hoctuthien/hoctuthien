@@ -19,18 +19,21 @@ export default function AuthLayout({
 
         <div className="relative z-10 flex flex-col justify-between h-full p-12">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex items-center gap-3 w-fit group transition-all active:scale-95 no-underline"
+          >
             <Image
               src="/images/avatar_link.png"
               alt="Hoc Tu Thien"
               width={56}
               height={56}
-              className="object-contain rounded-full shadow-lg border border-white/10"
+              className="object-contain rounded-full shadow-lg border border-white/10 transition-all"
             />
-            <span className="text-white font-bold text-2xl tracking-tight">
+            <span className="text-white font-bold text-2xl tracking-tight group-hover:text-primary transition-colors no-underline">
               Hoc Tu Thien
             </span>
-          </div>
+          </Link>
 
           <div className="max-w-md">
             <h1 className="text-white text-5xl font-bold leading-[1.1] mb-6 tracking-tight">
@@ -78,18 +81,21 @@ export default function AuthLayout({
 
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="lg:hidden w-full p-6 flex items-center justify-between sticky top-0 bg-[#F8FAFC]/80 backdrop-blur-md z-30 border-b border-slate-100/50">
-          <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2 group active:scale-95 transition-all no-underline"
+          >
             <Image
-              src="/images/avatar_link.png"
+              src="/images/avatar_browser.png"
               alt="Hoc Tu Thien"
               width={40}
               height={40}
               className="object-contain rounded-full shadow-sm"
             />
-            <span className="text-slate-900 font-bold text-lg tracking-tight">
+            <span className="text-slate-900 font-bold text-lg tracking-tight group-hover:text-primary transition-colors">
               Hoc Tu Thien
             </span>
-          </div>
+          </Link>
           <Link
             href="/"
             className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm border border-slate-100 text-slate-500 hover:text-primary transition-all active:scale-95"
