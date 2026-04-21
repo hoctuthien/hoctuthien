@@ -8,11 +8,15 @@ import {
   HttpStatus,
   Post,
   Inject,
+  Param,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { LoginDto } from './dtos/auth.dto';
 import { REDIS_CLIENT } from '../redis/redis.module'; // Đảm bảo đường dẫn này đúng
 import { Redis } from 'ioredis';
+import { CreateAuthDataInput, UpdateAuthDataInput } from './types/auth.types';
 
 @Controller('auths')
 export class AuthController {

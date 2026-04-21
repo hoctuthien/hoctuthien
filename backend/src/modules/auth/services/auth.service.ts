@@ -8,12 +8,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from '../../user/entities/user.entity'; // <--- Dùng UserEntity
+import { UserEntity } from '../../user/entities/user.entity';
 import { LoginDto } from '../dtos/auth.dto';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
-
 import { REDIS_CLIENT } from 'src/modules/redis/redis.module';
 import Redis from 'ioredis';
+import { AuthRepository } from '../repositories/auth.repository';
+import { authEntitySchema, createAuthInputSchema, updateAuthInputSchema } from '../schema/auth.schema';
+import { CreateAuthDataInput, UpdateAuthDataInput } from '../types/auth.types';
 
 @Injectable()
 export class AuthService {
@@ -25,9 +27,40 @@ export class AuthService {
     private readonly userRepository: Repository<UserEntity>,
 
     private readonly jwtService: JwtService,
+    private readonly authRepository: AuthRepository,
   ) {}
 
-  // Hàm lấy thông tin User (ví dụ cho API GET /auths/:id)
+  // --- Auth CRUD Methods ---
+
+  async findAll() {
+    const items = await this.authRepository.findMany();
+    return items.map(item => authEntitySchema.parse(item));
+  }
+
+  async findOne(id: string) {
+    const item = await this.authRepository.findById(id);
+    if (!item) throw new NotFoundException('Auth record not found');
+    return authEntitySchema.parse(item);
+  }
+
+  async create(payload: CreateAuthDataInput) {
+    const parsed = createAuthInputSchema.parse(payload);
+    const created = await this.authRepository.createAndSave(parsed);
+    return authEntitySchema.parse(created);
+  }
+
+  async update(id: string, payload: UpdateAuthDataInput) {
+    const parsed = updateAuthInputSchema.parse(payload);
+    const updated = await this.authRepository.updateById(id, parsed);
+    return authEntitySchema.parse(updated);
+  }
+
+  async remove(id: string) {
+    await this.authRepository.softDeleteById(id);
+  }
+
+  // --- Auth Logic ---
+
   async testRedis() {
     // 1. Lưu một giá trị vào Redis (sau 10 giây tự xóa)
     await this.redis.set('my_key', 'hello_redis', 'EX', 10);

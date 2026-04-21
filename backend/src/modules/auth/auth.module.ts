@@ -7,11 +7,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './services/auth.service';
 import { UserEntity } from '../user/entities/user.entity';
+import { AuthEntity } from './entities/auth.entity';
+import { AuthRepository } from './repositories/auth.repository';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
-
+    TypeOrmModule.forFeature([AuthEntity, UserEntity]),
+    RedisModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -27,7 +30,7 @@ import { UserEntity } from '../user/entities/user.entity';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService],
+  providers: [AuthService, AuthRepository],
+  exports: [AuthService, AuthRepository],
 })
 export class AuthModule {}

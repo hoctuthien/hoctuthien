@@ -16,8 +16,4 @@ export class UserRepository extends BaseRepository<UserEntity> {
   async findByEmail(email: string): Promise<UserEntity | null> {
     return this.findOne({ email });
   }
-
-  async findByGoogleId(googleId: string): Promise<UserEntity | null> {
-    return this.findOne({ googleId });
-  }
 }

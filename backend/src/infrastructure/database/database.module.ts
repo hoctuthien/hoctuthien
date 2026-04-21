@@ -20,7 +20,7 @@ import { ConfigService } from '@nestjs/config';
         // Tự động tìm các file .entity.ts trong folder modules
         entities: [__dirname + '/../../modules/**/*.entity{.ts,.js}'],
 
-        synchronize: false, // TUYỆT ĐỐI để false vì DB đã có sẵn data
+        synchronize: configService.get<boolean>('database.synchronize'), // Đọc từ biến môi trường
         logging: true, // Bật để debug SQL
         ssl: false, // Nếu DB server yêu cầu SSL thì mới để true
       }),
