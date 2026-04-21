@@ -9,6 +9,7 @@ import {
   CreateUserInput,
   UpdateUserInput,
 } from '../types/user.types';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -32,7 +33,15 @@ export class UserService {
 
   async create(payload: CreateUserInput) {
     const parsed = createUserSchema.parse(payload);
-    const created = await this.userRepository.createAndSave(parsed);
+    
+    // Tự động hash mật khẩu nếu có
+    const userData: any = { ...parsed };
+    if (parsed.password) {
+      userData.passwordHash = await bcrypt.hash(parsed.password, 10);
+      delete userData.password; // Xóa trường password thô
+    }
+
+    const created = await this.userRepository.createAndSave(userData);
     return userSchema.parse(created);
   }
 
