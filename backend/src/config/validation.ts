@@ -23,6 +23,9 @@ const envSchema = z.object({
     .min(32, 'JWT_REFRESH_SECRET must be at least 32 chars'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   DB_SYNCHRONIZE: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_CALLBACK_URL: z.string().optional(),
 });
 
 export const validateEnv = (config: Record<string, unknown>) => {

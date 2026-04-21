@@ -6,10 +6,18 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private configService: ConfigService) {
+    const clientId = configService.get<string>('google.clientId') || configService.get<string>('GOOGLE_CLIENT_ID');
+    const clientSecret = configService.get<string>('google.clientSecret') || configService.get<string>('GOOGLE_CLIENT_SECRET');
+    const callbackURL = configService.get<string>('google.callbackUrl') || configService.get<string>('GOOGLE_CALLBACK_URL');
+
+    if (!clientId) {
+      console.error('❌ LỖI: GOOGLE_CLIENT_ID không được tìm thấy trong cấu hình!');
+    }
+
     super({
-      clientID: configService.get<string>('google.clientId'),
-      clientSecret: configService.get<string>('google.clientSecret'),
-      callbackURL: configService.get<string>('google.callbackUrl'),
+      clientID: clientId || 'dummy-id', // Tránh crash lúc khởi tạo nếu config chưa load kịp
+      clientSecret: clientSecret || 'dummy-secret',
+      callbackURL: callbackURL || 'http://localhost:5050/callback',
       scope: ['email', 'profile'],
     });
   }

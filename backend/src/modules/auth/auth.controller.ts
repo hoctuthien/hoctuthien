@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import { LoginDto } from './dtos/auth.dto';
+import { LoginDto, GoogleTokenDto } from './dtos/auth.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @Controller('auths')
@@ -28,5 +28,10 @@ export class AuthController {
   async googleAuthRedirect(@Req() req: any) {
     // req.user sẽ chứa dữ liệu từ GoogleStrategy.validate()
     return this.authService.validateGoogleUser(req.user);
+  }
+
+  @Post('google/token')
+  async googleTokenLogin(@Body() googleTokenDto: GoogleTokenDto) {
+    return this.authService.verifyGoogleToken(googleTokenDto.token);
   }
 }

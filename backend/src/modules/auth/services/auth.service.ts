@@ -12,9 +12,13 @@ import { LoginDto } from '../dtos/auth.dto';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { REDIS_CLIENT } from 'src/modules/redis/redis.module';
 import Redis from 'ioredis';
+import { OAuth2Client } from 'google-auth-library';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
+  private googleClient: OAuth2Client;
+
   constructor(
     @Inject(REDIS_CLIENT)
     private readonly redis: Redis,
@@ -23,7 +27,36 @@ export class AuthService {
     private readonly userRepository: Repository<UserEntity>,
 
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.googleClient = new OAuth2Client(
+      this.configService.get<string>('google.clientId') || process.env.GOOGLE_CLIENT_ID,
+    );
+  }
+
+  async verifyGoogleToken(idToken: string) {
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: idToken,
+        audience: this.configService.get<string>('google.clientId') || process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw new UnauthorizedException('Token Google không hợp lệ');
+      }
+
+      const googleUser = {
+        googleId: payload.sub,
+        email: payload.email,
+        name: payload.name,
+        avatarUrl: payload.picture,
+      };
+
+      return this.validateGoogleUser(googleUser);
+    } catch (error) {
+      throw new UnauthorizedException('Xác thực Google thất bại: ' + error.message);
+    }
+  }
 
   async testRedis() {
     await this.redis.set('my_key', 'hello_redis', 'EX', 10);
