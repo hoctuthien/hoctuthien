@@ -1,16 +1,23 @@
 FROM node:20-alpine AS builder
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
+
 COPY . .
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Đổi sang dùng BACKEND_URL cho khớp với Coolify
+ARG BACKEND_URL
+ENV BACKEND_URL=$BACKEND_URL
+
 RUN npm run build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
-# Sửa lỗi LegacyKeyValueFormat: dùng dấu =
+
 ENV NODE_ENV=production
+
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/next.config.mjs ./
 COPY --from=builder /app/public ./public
