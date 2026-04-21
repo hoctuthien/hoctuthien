@@ -1,38 +1,44 @@
-import { Column, Entity } from 'typeorm';
-import { BaseEntity } from '../../../common/entities/base.entity';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
+import { BaseEntity } from 'src/common/entities/base.entity';
 
-@Entity({ name: 'user_sessions' })
+@Entity('user_sessions')
 export class UserSessionEntity extends BaseEntity {
   @Column({ name: 'user_id', type: 'bigint' })
   userId: string;
 
-  @Column({ name: 'refresh_token', type: 'varchar', length: 255 })
+  @Column({ name: 'refresh_token' })
   refreshToken: string;
 
-  @Column({ name: 'device_name', type: 'varchar', length: 255, nullable: true })
-  deviceName?: string | null;
+  @Column({ name: 'device_name', nullable: true })
+  deviceName: string;
 
-  @Column({ name: 'device_type', type: 'varchar', length: 100, nullable: true })
-  deviceType?: string | null;
+  @Column({ name: 'device_type', nullable: true })
+  deviceType: string;
 
   @Column({ name: 'user_agent', type: 'text', nullable: true })
-  userAgent?: string | null;
+  userAgent: string;
 
   @Column({ name: 'ip_address', type: 'inet', nullable: true })
-  ipAddress?: string | null;
+  ipAddress: string;
 
   @Column({ name: 'refresh_token_expires_at', type: 'timestamptz' })
   refreshTokenExpiresAt: Date;
 
   @Column({ name: 'last_used_at', type: 'timestamptz', nullable: true })
-  lastUsedAt?: Date | null;
+  lastUsedAt: Date;
 
   @Column({ name: 'revoked_at', type: 'timestamptz', nullable: true })
-  revokedAt?: Date | null;
+  revokedAt: Date;
 
-  @Column({ name: 'metadata', type: 'jsonb', default: () => "'{}'::jsonb" })
-  metadata: Record<string, unknown>;
+  @Column({ type: 'jsonb', default: {} })
+  metadata: Record<string, any>;
 
-  @Column({ name: 'status', type: 'varchar', length: 50, default: 'active' })
+  @Column({ default: 'active' })
   status: string;
+
+  // Relationship
+  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
 }
