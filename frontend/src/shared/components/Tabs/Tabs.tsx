@@ -1,6 +1,6 @@
 import React from 'react';
 import { LuX } from 'react-icons/lu';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 export interface TabItem {
   id: string;

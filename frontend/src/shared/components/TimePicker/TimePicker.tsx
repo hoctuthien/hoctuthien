@@ -3,7 +3,7 @@
 import React, { useState, useId } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Clock, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 
 export type TimePickerStatus = "default" | "success" | "warning" | "error";
 

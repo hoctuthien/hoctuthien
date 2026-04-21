@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, createContext, useContext } from "react";
 import { ChevronDown, Check } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 
 interface DropdownContextType {
   isOpen: boolean;

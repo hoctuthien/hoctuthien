@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 
 export type AvatarSize = 'small' | 'medium' | 'large';

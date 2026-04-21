@@ -2,7 +2,7 @@
 
 import React, { useCallback, useId, useRef, useState } from "react";
 import { Minus, Plus, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 
 export type InputNumberStatus = "default" | "success" | "warning" | "error";
 

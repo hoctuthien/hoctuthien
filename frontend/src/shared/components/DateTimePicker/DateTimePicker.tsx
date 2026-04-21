@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { DatePicker, TimePicker } from "@shared";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 
 export interface DateTimePickerProps {
   dateValue?: Date;

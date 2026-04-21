@@ -1,6 +1,6 @@
 import React from 'react';
 import { LuCalendar } from 'react-icons/lu';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 import { Button } from "@ui";
 
 interface EmptyStateProps {

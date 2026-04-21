@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/core/utils/cn';
 
 interface AccordionProps {
   title: string;

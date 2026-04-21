@@ -27,10 +27,23 @@ export class ResponseTransformInterceptor implements NestInterceptor {
 
     // 3. Nếu không có nhãn, vẫn bọc JSON như cũ
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        data,
-      })),
+      map((data) => {
+        // Nếu data đã theo chuẩn pagination (có items và meta)
+        if (data && typeof data === 'object' && 'items' in data && 'meta' in data) {
+          return {
+            data: data.items,
+            meta: data.meta,
+            error: null,
+          };
+        }
+
+        // Trường hợp data thông thường
+        return {
+          data: data ?? [],
+          meta: {},
+          error: null,
+        };
+      }),
     );
   }
 }

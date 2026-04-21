@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './global.css';
 import { Geist } from "next/font/google";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/core/utils/cn";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: 'Học Từ Thiện',
   description: 'Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.',
 };
+
+import { Providers } from './providers';
 
 export default function RootLayout({
   children,
@@ -23,7 +25,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body className={cn(geist.variable, "font-sans antialiased")}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

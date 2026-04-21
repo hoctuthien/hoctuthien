@@ -1,9 +1,3 @@
-export class BaseResponseDto<T> {
-  success: boolean;
-  message?: string;
-  data: T;
-}
-
 export class PaginationMetaDto {
   page: number;
   limit: number;
@@ -11,6 +5,15 @@ export class PaginationMetaDto {
   totalPages: number;
 }
 
-export class PaginatedResponseDto<T> extends BaseResponseDto<T[]> {
-  pagination: PaginationMetaDto;
+export class ApiResponseDto<T = any> {
+  data: T | null;
+  meta: PaginationMetaDto | Record<string, any> | null;
+  error: ApiErrorDto | null;
+}
+
+export interface ApiErrorDto {
+  code: string;
+  message: string;
+  traceId?: string;
+  details?: any;
 }

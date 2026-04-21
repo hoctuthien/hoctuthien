@@ -61,11 +61,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     response.status(status).json({
+      data: null,
+      meta: null,
       error: {
         code,
         message,
         traceId: request.traceId || null,
-        details,
+        details: details || null,
       },
     });
   }

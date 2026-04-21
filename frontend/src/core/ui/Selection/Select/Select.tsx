@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+"use client";
+
+import React, { useState } from "react";
 import { HiChevronDown } from "react-icons/hi2";
-import { cn } from "@/shared/lib/utils";
 import { CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
+import { cn } from "@/core/utils/cn";
 
 export interface SelectOption {
   label: string;
@@ -34,7 +36,6 @@ export const Select = ({
   status: providedStatus,
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
   const status = providedStatus || (error ? "error" : "default");
@@ -63,18 +64,18 @@ export const Select = ({
     },
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const handleBlur = (e: React.FocusEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setIsOpen(false);
+    }
+  };
 
   return (
-    <div className={cn("flex flex-col gap-2 w-full", className)} ref={containerRef}>
+    <div 
+      className={cn("flex flex-col gap-2 w-full outline-none", className)} 
+      onBlur={handleBlur}
+      tabIndex={-1}
+    >
       {label && (
         <label className="text-sm font-semibold text-[#181C20] font-[Montserrat]">
           {label}
