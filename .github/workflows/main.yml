@@ -81,7 +81,7 @@ jobs:
         if: steps.check_frontend.outputs.changed == 'true'
         working-directory: ./frontend
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
 
       - name: Trigger Frontend Coolify
