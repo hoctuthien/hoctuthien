@@ -39,7 +39,7 @@ export class ResponseTransformInterceptor implements NestInterceptor {
 
         // Trường hợp data thông thường
         return {
-          data: data ?? [],
+          data: Array.isArray(data) ? data : (data ? [data] : []),
           meta: {},
           error: null,
         };

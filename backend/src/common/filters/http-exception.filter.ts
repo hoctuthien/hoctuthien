@@ -26,34 +26,41 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse() as any;
+      const exceptionMessage = typeof exceptionResponse === 'object' 
+        ? (exceptionResponse.message || exceptionResponse)
+        : exceptionResponse;
       
+      const actualMessage = Array.isArray(exceptionMessage) ? exceptionMessage[0] : exceptionMessage;
+      
+      // Mặc định details sẽ là một Object để FE luôn xử lý đồng nhất
+      details = typeof exceptionMessage === 'object' 
+        ? exceptionMessage 
+        : { message: exceptionMessage };
+
       switch (status) {
         case HttpStatus.BAD_REQUEST:
           code = ERROR_CODES.VALIDATION_FAILED;
           message = ERROR_MESSAGES.VALIDATION_FAILED;
-          // Thông thường ở NestJS, ValidationPipe sẽ trả về mảng các thông báo lỗi trong thuộc tính 'message'
-          details = typeof exceptionResponse === 'object' ? exceptionResponse.message : exceptionResponse;
+          // Đối với Validation, details đã là Mapping Object từ exceptionFactory
           break;
         case HttpStatus.UNAUTHORIZED:
           code = ERROR_CODES.UNAUTHORIZED;
-          message = ERROR_MESSAGES.UNAUTHORIZED;
+          message = exceptionMessage || ERROR_MESSAGES.UNAUTHORIZED;
           break;
         case HttpStatus.FORBIDDEN:
           code = ERROR_CODES.FORBIDDEN;
-          message = ERROR_MESSAGES.FORBIDDEN;
+          message = exceptionMessage || ERROR_MESSAGES.FORBIDDEN;
           break;
         case HttpStatus.NOT_FOUND:
           code = ERROR_CODES.NOT_FOUND;
-          message = ERROR_MESSAGES.NOT_FOUND;
+          message = exceptionMessage || ERROR_MESSAGES.NOT_FOUND;
           break;
         case HttpStatus.CONFLICT:
           code = ERROR_CODES.CONFLICT;
-          message = ERROR_MESSAGES.CONFLICT;
+          message = exceptionMessage || ERROR_MESSAGES.CONFLICT;
           break;
         default:
-          message = typeof exceptionResponse === 'object' && exceptionResponse.message 
-            ? exceptionResponse.message 
-            : exception.message;
+          message = exceptionMessage || exception.message;
       }
     } else {
       // Log generic error here if needed

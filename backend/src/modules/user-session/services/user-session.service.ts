@@ -18,6 +18,11 @@ export class UserSessionService {
     return userSessionSchema.parse(item);
   }
 
+  async findOneBy(where: any) {
+    const item = await this.userSessionRepository.findOne(where);
+    return item ? userSessionSchema.parse(item) : null;
+  }
+
   async create(payload: CreateUserSessionInput) {
     const parsed = createUserSessionSchema.parse(payload);
     const created = await this.userSessionRepository.createAndSave(parsed);

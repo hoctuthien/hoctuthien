@@ -33,3 +33,21 @@ export class GoogleTokenDto {
   @IsNotEmpty()
   token: string; // idToken từ Frontend
 }
+export class RegisterDto {
+  @IsEmail({}, { message: AUTH_MESSAGES.INVALID_EMAIL })
+  @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_EMAIL })
+  email!: string;
+
+  @IsString()
+  @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_PASSWORD })
+  @MinLength(6, { message: AUTH_MESSAGES.INVALID_PASSWORD })
+  password!: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Tên không được để trống' })
+  name!: string;
+
+  @IsString()
+  @IsOptional()
+  deviceId?: string;
+}
