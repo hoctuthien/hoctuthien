@@ -48,7 +48,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
           message = exceptionMessage || ERROR_MESSAGES.UNAUTHORIZED;
           break;
         case HttpStatus.FORBIDDEN:
-          code = ERROR_CODES.FORBIDDEN;
+          code = actualMessage === 'Tài khoản của bạn đã bị khóa bởi quản trị viên.' 
+            ? ERROR_CODES.ACCOUNT_BANNED 
+            : ERROR_CODES.FORBIDDEN;
           message = exceptionMessage || ERROR_MESSAGES.FORBIDDEN;
           break;
         case HttpStatus.NOT_FOUND:

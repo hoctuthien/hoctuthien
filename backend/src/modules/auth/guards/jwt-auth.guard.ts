@@ -27,7 +27,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   handleRequest(err, user, info) {
     // Bạn có thể tùy chỉnh lỗi trả về ở đây
     if (err || !user) {
-      throw err || new UnauthorizedException('Bạn cần đăng nhập để thực hiện hành động này');
+      throw err || new UnauthorizedException('Phiên làm việc đã hết hạn, vui lòng đăng nhập lại.');
     }
     return user;
   }
