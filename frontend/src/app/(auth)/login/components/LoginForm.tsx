@@ -6,16 +6,18 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/core/ui/Input";
 import { Button } from "@/core/ui/Button";
-import { AuthDivider, GoogleSignInButton, GitHubSignInButton } from "@/app/(auth)/components";
+import { AuthDivider, GoogleSignInButton } from "@/app/(auth)/components";
 import { MESSAGES, UI_LABELS } from "@/shared/constants";
 import { Icon } from "@/core/ui/Icon";
 import { Checkbox } from "@/core/ui/Selection/Checkbox";
-import { loginSchema, type LoginFormData } from "@/app/(auth)/login/login.schema";
+import {
+  loginSchema,
+  type LoginFormData,
+} from "@/app/(auth)/login/login.schema";
 
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isGitHubLoading, setIsGitHubLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
 
@@ -49,29 +51,34 @@ export function LoginForm() {
     }
   };
 
-  const handleSocialSignIn = async (provider: 'google' | 'github') => {
-    if (provider === 'google') setIsGoogleLoading(true);
-    if (provider === 'github') setIsGitHubLoading(true);
-    
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
     try {
-      // TODO: replace with actual OAuth flow
+      // TODO: replace with actual Google OAuth flow
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } finally {
-      if (provider === 'google') setIsGoogleLoading(false);
-      if (provider === 'github') setIsGitHubLoading(false);
+      setIsGoogleLoading(false);
     }
   };
 
   return (
     <div className="w-full max-w-md">
-      <div className="mb-10 text-left">
-        <h2 className="text-3xl font-bold text-text-heading mb-3 tracking-tight">
+      <div className="mb-10">
+        <h2 className="text-3xl md:text-4xl font-bold text-text-heading mb-3 tracking-tight">
           {UI_LABELS.AUTH.WELCOME_BACK}
         </h2>
         <p className="text-text-muted text-base leading-relaxed font-[Montserrat]">
           {UI_LABELS.AUTH.LOGIN_SUBTITLE}
         </p>
       </div>
+
+      <GoogleSignInButton
+        label={UI_LABELS.AUTH.SIGN_IN_WITH_GOOGLE}
+        onClick={handleGoogleSignIn}
+        loading={isGoogleLoading}
+      />
+
+      <AuthDivider text={UI_LABELS.AUTH.OR_CONTINUE_WITH_EMAIL} />
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -82,10 +89,9 @@ export function LoginForm() {
           id="login-email"
           label={UI_LABELS.AUTH.EMAIL_ADDRESS}
           type="email"
-          placeholder="example@academic.edu"
+          placeholder="name@atelier.edu"
           error={errors.email?.message}
           autoComplete="email"
-          iconLeft={<Icon name="Mail" size={20} />}
           {...register("email")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -102,7 +108,6 @@ export function LoginForm() {
           placeholder="••••••••"
           error={errors.password?.message}
           autoComplete="current-password"
-          iconLeft={<Icon name="Lock" size={20} />}
           {...register("password")}
           labelAction={
             <Link
@@ -141,52 +146,37 @@ export function LoginForm() {
         </div>
 
         {generalError && (
-          <p className="text-sm text-[#BA1A1A] bg-[#FFDAD6]/30 border border-[#BA1A1A]/30 rounded-xl px-4 py-3 font-[Montserrat]" role="alert">
+          <p
+            className="text-sm text-[#BA1A1A] bg-[#FFDAD6]/30 border border-[#BA1A1A]/30 rounded-xl px-4 py-3 font-[Montserrat]"
+            role="alert"
+          >
             {generalError}
           </p>
         )}
 
+        <AuthDivider />
+
         <Button
           type="submit"
           label={
-            <span className="flex items-center justify-center gap-2">
-              {isSubmitting ? UI_LABELS.AUTH.ENTERING : UI_LABELS.AUTH.ENTER_LOGIN}
-              {!isSubmitting && <Icon name="ArrowRight" size={18} />}
-            </span>
+            isSubmitting ? UI_LABELS.AUTH.ENTERING : UI_LABELS.AUTH.ENTER_LOGIN
           }
           variant="primary"
           size="md"
           fullWidth
           loading={isSubmitting}
-          className="h-[52px] rounded-full text-base font-bold shadow-lg shadow-primary/20"
         />
-
-        <p className="text-center text-sm text-text-muted mt-2 font-[Montserrat]">
-          {UI_LABELS.AUTH.NEW_TO_ACCOUNT}{" "}
-          <Link
-            href="/register"
-            className="text-primary font-bold hover:underline"
-          >
-            {UI_LABELS.AUTH.CREATE_ACCOUNT}
-          </Link>
-        </p>
       </form>
 
-      <div className="mt-8">
-        <AuthDivider text={UI_LABELS.AUTH.OR_QUICK_AUTH} />
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          <GoogleSignInButton
-            label={UI_LABELS.AUTH.SIGN_UP_WITH_GOOGLE}
-            onClick={() => handleSocialSignIn('google')}
-            loading={isGoogleLoading}
-          />
-          <GitHubSignInButton
-            label={UI_LABELS.AUTH.SIGN_IN_WITH_GITHUB}
-            onClick={() => handleSocialSignIn('github')}
-            loading={isGitHubLoading}
-          />
-        </div>
-      </div>
+      <p className="text-center text-sm text-text-muted mt-6 font-[Montserrat]">
+        {UI_LABELS.AUTH.NEW_TO_ACCOUNT}{" "}
+        <Link
+          href="/register"
+          className="text-primary font-semibold hover:underline"
+        >
+          {UI_LABELS.AUTH.CREATE_ACCOUNT}
+        </Link>
+      </p>
     </div>
   );
 }
