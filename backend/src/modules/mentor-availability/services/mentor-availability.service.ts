@@ -29,9 +29,25 @@ export class MentorAvailabilityService {
     return items.map((item) => mentorAvailabilitySchema.parse(item));
   }
 
+  async findByMentorId(mentorId: string) {
+    const items = await this.mentorAvailabilityRepository.findMany({
+      where: { mentorId } as any,
+    });
+    return items.map((item) => mentorAvailabilitySchema.parse(item));
+  }
+
   async findOne(id: string) {
     const item = await this.mentorAvailabilityRepository.findById(id);
     if (!item) throw new NotFoundException('Mentor availability not found');
+    return mentorAvailabilitySchema.parse(item);
+  }
+
+  async findOneForMentor(id: string, mentorId: string) {
+    const item = await this.mentorAvailabilityRepository.findById(id);
+    if (!item) throw new NotFoundException('Mentor availability not found');
+    if (item.mentorId !== mentorId) {
+      throw new NotFoundException('Mentor availability not found');
+    }
     return mentorAvailabilitySchema.parse(item);
   }
 

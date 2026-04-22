@@ -40,13 +40,31 @@ export class MentorAvailabilityController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   findAll() {
     return this.mentorAvailabilityService.findAll();
   }
 
+  @Get('me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  findMyMentorAvailabilities(@User('id') mentorId: string) {
+    return this.mentorAvailabilityService.findByMentorId(mentorId);
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  findOneAdmin(@Param('id') id: string) {
     return this.mentorAvailabilityService.findOne(id);
+  }
+
+  @Get('me/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  findOneMine(@Param('id') id: string, @User('id') mentorId: string) {
+    return this.mentorAvailabilityService.findOneForMentor(id, mentorId);
   }
 
   @Patch(':id')
