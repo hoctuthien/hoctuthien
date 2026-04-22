@@ -58,7 +58,7 @@ export class AuthService implements IAuthService {
     return this.sessionRepository.save(session);
   }
 
-  async verifyGoogleToken(idToken: string) {
+  async verifyGoogleToken(idToken: string, deviceId?: string) {
     try {
       const ticket = await this.googleClient.verifyIdToken({
         idToken: idToken,
@@ -76,7 +76,7 @@ export class AuthService implements IAuthService {
         avatarUrl: payload.picture,
       };
 
-      return this.validateGoogleUser(googleUser);
+      return this.validateGoogleUser(googleUser, deviceId);
     } catch (error) {
       throw new UnauthorizedException('Xác thực Google thất bại: ' + error.message);
     }
@@ -225,7 +225,23 @@ export class AuthService implements IAuthService {
     }
   }
 
-  async logout(refreshToken: string, deviceId: string) {
+  async logout(accessToken: string, refreshToken: string, deviceId: string) {
+    // 1. Blacklist Access Token vào Redis
+    try {
+      const payload = this.jwtService.decode(accessToken) as any;
+      if (payload && payload.exp) {
+        const now = Math.floor(Date.now() / 1000);
+        const ttl = payload.exp - now; // Thời gian còn lại tính bằng giây
+
+        if (ttl > 0) {
+          await this.redis.set(`blacklist:${accessToken}`, '1', 'EX', ttl);
+        }
+      }
+    } catch (error) {
+      console.error('Lỗi khi blacklist token:', error);
+    }
+
+    // 2. Thu hồi Refresh Token trong DB
     const session = await this.userSessionService.findOneBy({
       refreshToken,
       deviceName: deviceId,
@@ -262,7 +278,7 @@ export class AuthService implements IAuthService {
     return now;
   }
 
-  async validateGoogleUser(googleUser: any) {
+  async validateGoogleUser(googleUser: any, deviceId?: string) {
     const { googleId, email, name, avatarUrl } = googleUser;
 
     let user = await this.userRepository.findOne({
@@ -285,7 +301,7 @@ export class AuthService implements IAuthService {
       user = (await this.userRepository.findOne({ where: { id: user.id } }))!;
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role, deviceId: null };
+    const payload = { sub: user.id, email: user.email, role: user.role, deviceId };
     const tokens = await this.generateTokens(payload);
 
     return {

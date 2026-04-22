@@ -8,7 +8,10 @@ import { UserEntity } from '../user/entities/user.entity';
 import { UserSessionEntity } from '../user-session/entities/user-session.entity';
 import { RedisModule } from '../redis/redis.module';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PassportModule } from '@nestjs/passport';
+import { APP_GUARD } from '@nestjs/core';
 import { UserSessionModule } from '../user-session/user-session.module';
 
 @Module({
@@ -28,7 +31,15 @@ import { UserSessionModule } from '../user-session/user-session.module';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, GoogleStrategy],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
   controllers: [AuthController],
   exports: [AuthService],
 })

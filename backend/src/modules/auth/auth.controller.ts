@@ -24,12 +24,7 @@ export class AuthController {
     @Ip() ip: string,
     @Headers('x-device-id') deviceId: string,
   ) {
-    const result = await this.authService.register({ ...registerDto, deviceId }, { ip });
-    
-    return {
-      message: result.message,
-      user: result.user,
-    };
+    return this.authService.register({ ...registerDto, deviceId }, { ip });
   }
 
   @Public()
@@ -44,12 +39,7 @@ export class AuthController {
     @Ip() ip: string,
     @Headers('x-device-id') deviceId: string,
   ) {
-    const result = await this.authService.login({ ...loginDto, deviceId }, { ip });
-    
-    return {
-      message: result.message,
-      user: result.user,
-    };
+    return this.authService.login({ ...loginDto, deviceId }, { ip });
   }
 
   @Public()
@@ -73,8 +63,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Headers('x-device-id') deviceId: string,
   ) {
+    const accessToken = req.cookies['access_token'];
     const refreshToken = req.cookies['refresh_token'];
-    await this.authService.logout(refreshToken, deviceId);
+    
+    await this.authService.logout(accessToken, refreshToken, deviceId);
     
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
@@ -88,22 +80,44 @@ export class AuthController {
     return this.authService.testRedis();
   }
 
+  @Public()
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   async googleAuth(@Req() req: any) {
     // Passport sẽ tự động chuyển hướng sang Google
   }
 
+  @Public()
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
+  @UseInterceptors(SetCookieInterceptor)
+  @SetCookie([
+    { name: 'access_token', field: 'access_token', options: { maxAge: 15 * 60 * 1000 } },
+    { name: 'refresh_token', field: 'refresh_token', options: { maxAge: 7 * 24 * 60 * 60 * 1000 } },
+  ])
   async googleAuthRedirect(@Req() req: any) {
-    // req.user sẽ chứa dữ liệu từ GoogleStrategy.validate()
-    return this.authService.validateGoogleUser(req.user);
+    const result = await this.authService.validateGoogleUser(req.user);
+    return {
+      message: result.message,
+      user: result.user,
+    };
   }
 
   @Public()
   @Post('google/token')
-  async googleTokenLogin(@Body() googleTokenDto: GoogleTokenDto) {
-    return this.authService.verifyGoogleToken(googleTokenDto.token);
+  @UseInterceptors(SetCookieInterceptor)
+  @SetCookie([
+    { name: 'access_token', field: 'access_token', options: { maxAge: 15 * 60 * 1000 } },
+    { name: 'refresh_token', field: 'refresh_token', options: { maxAge: 7 * 24 * 60 * 60 * 1000 } },
+  ])
+  async googleTokenLogin(
+    @Body() googleTokenDto: GoogleTokenDto,
+    @Headers('x-device-id') deviceId: string,
+  ) {
+    const result = await this.authService.verifyGoogleToken(googleTokenDto.token, deviceId);
+    return {
+      message: result.message,
+      user: result.user,
+    };
   }
 }
