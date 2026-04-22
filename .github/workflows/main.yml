@@ -1,4 +1,4 @@
-name: Monorepo CI and Deploy (Full Docker Flow)
+name: Monorepo CI and Deploy (Build & Push Image)
 
 on:
   push:
