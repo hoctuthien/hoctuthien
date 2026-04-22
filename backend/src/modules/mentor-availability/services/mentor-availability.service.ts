@@ -68,6 +68,69 @@ export class MentorAvailabilityService {
     return mentorAvailabilitySchema.parse(updated);
   }
 
+  async updateToInProgress(id: string, adminId: string) {
+    const current = await this.mentorAvailabilityRepository.findById(id);
+
+    if (!current) {
+      throw new NotFoundException('Mentor availability not found');
+    }
+
+    if (current.status !== MentorAvailabilityStatus.PENDING) {
+      throw new BadRequestException('Only pending requests can be moved to in progress');
+    }
+
+    const updated = await this.mentorAvailabilityRepository.updateById(id, {
+      status: MentorAvailabilityStatus.IN_PROGRESS,
+      approvedBy: adminId,
+    });
+
+    return mentorAvailabilitySchema.parse(updated);
+  }
+
+  async approve(id: string, adminId: string) {
+    const current = await this.mentorAvailabilityRepository.findById(id);
+
+    if (!current) {
+      throw new NotFoundException('Mentor availability not found');
+    }
+
+    if (current.status !== MentorAvailabilityStatus.IN_PROGRESS) {
+      throw new BadRequestException('Only in progress requests can be approved');
+    }
+
+    if (current.approvedBy && current.approvedBy !== adminId) {
+      throw new BadRequestException('approved_by does not match the admin who started processing this request');
+    }
+
+    const updated = await this.mentorAvailabilityRepository.updateById(id, {
+      status: MentorAvailabilityStatus.APPROVED,
+    });
+
+    return mentorAvailabilitySchema.parse(updated);
+  }
+
+  async reject(id: string, adminId: string) {
+    const current = await this.mentorAvailabilityRepository.findById(id);
+
+    if (!current) {
+      throw new NotFoundException('Mentor availability not found');
+    }
+
+    if (current.status !== MentorAvailabilityStatus.IN_PROGRESS) {
+      throw new BadRequestException('Only in progress requests can be rejected');
+    }
+
+    if (current.approvedBy && current.approvedBy !== adminId) {
+      throw new BadRequestException('approved_by does not match the admin who started processing this request');
+    }
+
+    const updated = await this.mentorAvailabilityRepository.updateById(id, {
+      status: MentorAvailabilityStatus.REJECTED,
+    });
+
+    return mentorAvailabilitySchema.parse(updated);
+  }
+
   async remove(id: string) {
     await this.mentorAvailabilityRepository.softDeleteById(id);
   }

@@ -48,3 +48,12 @@ export const updateMentorAvailabilitySchema = createMentorAvailabilitySchema.par
   approvedBy: z.string().optional(),
   isActive: z.boolean().optional(),
 });
+
+export const updateMentorAvailabilityStatusSchema = z.object({
+  status: z.enum([
+    MentorAvailabilityStatus.IN_PROGRESS,
+    MentorAvailabilityStatus.APPROVED,
+    MentorAvailabilityStatus.REJECTED,
+  ]),
+  note: z.string().max(500).optional(),
+});

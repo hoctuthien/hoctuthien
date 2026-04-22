@@ -21,7 +21,9 @@ import { User } from '../../common/decorators/user.decorator';
 
 @Controller('mentor-availabilities')
 export class MentorAvailabilityController {
-  constructor(private readonly mentorAvailabilityService: MentorAvailabilityService) {}
+  constructor(
+    private readonly mentorAvailabilityService: MentorAvailabilityService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -44,8 +46,32 @@ export class MentorAvailabilityController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateMentorAvailabilityInput) {
+  update(
+    @Param('id') id: string,
+    @Body() payload: UpdateMentorAvailabilityInput,
+  ) {
     return this.mentorAvailabilityService.update(id, payload);
+  }
+
+  @Patch(':id/in-progress')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  updateToInProgress(@Param('id') id: string, @User('id') adminId: string) {
+    return this.mentorAvailabilityService.updateToInProgress(id, adminId);
+  }
+
+  @Patch(':id/approved')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  approve(@Param('id') id: string, @User('id') adminId: string) {
+    return this.mentorAvailabilityService.approve(id, adminId);
+  }
+
+  @Patch(':id/rejected')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  reject(@Param('id') id: string, @User('id') adminId: string) {
+    return this.mentorAvailabilityService.reject(id, adminId);
   }
 
   @Delete(':id')
