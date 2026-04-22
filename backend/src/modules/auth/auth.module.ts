@@ -5,13 +5,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './auth.controller';
 import { UserEntity } from '../user/entities/user.entity';
+import { UserSessionEntity } from '../user-session/entities/user-session.entity';
 import { RedisModule } from '../redis/redis.module';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, UserSessionEntity]),
     RedisModule,
     PassportModule,
     JwtModule.registerAsync({
