@@ -6,12 +6,15 @@ export const MESSAGES = {
     FORBIDDEN: 'Phiên làm việc đã hết hạn.',
     VALIDATION: 'Dữ liệu không hợp lệ.',
     AUTH: {
-      INVALID_CREDENTIALS: 'Invalid email or password. Please try again.',
-      EMAIL_REQUIRED: 'Email is required.',
-      INVALID_EMAIL: 'Please enter a valid email address.',
-      PASSWORD_REQUIRED: 'Password is required.',
-      PASSWORD_MIN_LENGTH: 'Password must be at least 8 characters.',
-      GENERAL: 'Something went wrong. Please try again later.'
+      INVALID_CREDENTIALS: 'Email hoặc mật khẩu không chính xác. Vui lòng thử lại.',
+      EMAIL_REQUIRED: 'Vui lòng nhập địa chỉ email.',
+      INVALID_EMAIL: 'Địa chỉ email không đúng định dạng.',
+      PASSWORD_REQUIRED: 'Vui lòng nhập mật khẩu.',
+      PASSWORD_MIN_LENGTH: 'Mật khẩu phải có ít nhất 8 ký tự.',
+      FULL_NAME_REQUIRED: 'Vui lòng nhập họ và tên của bạn.',
+      PASSWORD_CONFIRM_REQUIRED: 'Vui lòng xác nhận lại mật khẩu.',
+      PASSWORDS_MUST_MATCH: 'Mật khẩu xác nhận không khớp.',
+      GENERAL: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'
     }
   },
   SUCCESS: {

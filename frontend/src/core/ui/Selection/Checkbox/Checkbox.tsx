@@ -6,7 +6,7 @@ import { cn } from "@/core/utils/cn";
 
 export interface CheckboxProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
-  label?: string;
+  label?: React.ReactNode;
   indeterminate?: boolean;
   onChange?: (checked: boolean) => void;
 }
