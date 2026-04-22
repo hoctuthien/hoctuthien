@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/core/ui/Input";
 import { Button } from "@/core/ui/Button";
-import { AuthDivider, GoogleSignInButton } from "@/app/(auth)/_components";
+import { AuthDivider, GoogleSignInButton } from "@/app/(auth)/components";
 import { MESSAGES, UI_LABELS } from "@/shared/constants";
 import { Icon } from "@/core/ui/Icon";
 import { Checkbox } from "@/core/ui/Selection/Checkbox";
@@ -191,7 +191,9 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          label={isSubmitting ? UI_LABELS.AUTH.ENTERING : UI_LABELS.AUTH.ENTER_LOGIN}
+          label={
+            isSubmitting ? UI_LABELS.AUTH.ENTERING : UI_LABELS.AUTH.ENTER_LOGIN
+          }
           variant="primary"
           size="md"
           fullWidth

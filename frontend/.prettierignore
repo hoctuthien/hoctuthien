@@ -1,0 +1,18 @@
+# Prettier ignore — không format các file này
+# Generated files
+.next/
+out/
+build/
+coverage/
+storybook-static/
+
+# Dependencies
+node_modules/
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Auto-generated type declarations
+next-env.d.ts

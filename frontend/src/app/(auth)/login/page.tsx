@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LoginForm } from "@/app/(auth)/login/_components";
+import { LoginForm } from "@/app/(auth)/login/components";
 
 export const metadata: Metadata = {
   title: "Login | Học Từ Thiện",
