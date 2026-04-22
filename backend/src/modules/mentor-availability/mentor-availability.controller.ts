@@ -6,20 +6,33 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { MentorAvailabilityService } from './services/mentor-availability.service';
 import {
   CreateMentorAvailabilityInput,
   UpdateMentorAvailabilityInput,
 } from './types/mentor-availability.types';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { Role } from '../../common/enums/role.enum';
+import { User } from '../../common/decorators/user.decorator';
 
 @Controller('mentor-availabilities')
 export class MentorAvailabilityController {
-  constructor(private readonly mentorAvailabilityService: MentorAvailabilityService) {}
+  constructor(
+    private readonly mentorAvailabilityService: MentorAvailabilityService,
+  ) {}
 
   @Post()
-  create(@Body() payload: CreateMentorAvailabilityInput) {
-    return this.mentorAvailabilityService.create(payload);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  create(
+    @Body() payload: CreateMentorAvailabilityInput,
+    @User('id') mentorId: string,
+  ) {
+    return this.mentorAvailabilityService.create(mentorId, payload);
   }
 
   @Get()
@@ -33,8 +46,32 @@ export class MentorAvailabilityController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateMentorAvailabilityInput) {
+  update(
+    @Param('id') id: string,
+    @Body() payload: UpdateMentorAvailabilityInput,
+  ) {
     return this.mentorAvailabilityService.update(id, payload);
+  }
+
+  @Patch(':id/in-progress')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  updateToInProgress(@Param('id') id: string, @User('id') adminId: string) {
+    return this.mentorAvailabilityService.updateToInProgress(id, adminId);
+  }
+
+  @Patch(':id/approved')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  approve(@Param('id') id: string, @User('id') adminId: string) {
+    return this.mentorAvailabilityService.approve(id, adminId);
+  }
+
+  @Patch(':id/rejected')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  reject(@Param('id') id: string, @User('id') adminId: string) {
+    return this.mentorAvailabilityService.reject(id, adminId);
   }
 
   @Delete(':id')

@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserEntity } from '../../user/entities/user.entity';
+import { MentorAvailabilityStatus } from '../../../common/enums/mentor-availability-status.enum';
 
 @Entity({ name: 'mentor_availabilities' })
 export class MentorAvailabilityEntity extends BaseEntity {
@@ -18,20 +19,36 @@ export class MentorAvailabilityEntity extends BaseEntity {
   @JoinColumn({ name: 'approved_by' })
   approver: UserEntity | null;
 
-  @Column({ name: 'day_of_week', type: 'integer' })
-  dayOfWeek: number;
+  @Column({ name: 'job_title', type: 'varchar', length: 255, nullable: true })
+  jobTitle: string | null;
 
-  @Column({ name: 'start_time', type: 'time' })
-  startTime: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  company: string | null;
 
-  @Column({ name: 'end_time', type: 'time' })
-  endTime: string;
+  @Column({ type: 'text', nullable: true })
+  bio: string | null;
+
+  @Column({ name: 'linkedin_url', type: 'varchar', length: 500, nullable: true })
+  linkedinUrl: string | null;
+
+  @Column({ name: 'years_of_experience', type: 'integer', nullable: true })
+  yearsOfExperience: number | null;
+
+  @Column({ type: 'jsonb', default: [] })
+  skills: string[];
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
 
-  @Column({ type: 'varchar', length: 50, default: 'active' })
-  status: string;
+  @Column({ type: 'jsonb', default: {} })
+  metadata: Record<string, any>;
+
+  @Column({
+    type: 'enum',
+    enum: ['PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED'],
+    default: 'PENDING',
+  })
+  status: MentorAvailabilityStatus;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   note: string | null;

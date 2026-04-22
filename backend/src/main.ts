@@ -5,11 +5,25 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseTransformInterceptor } from './common/interceptors/response-transform.interceptor';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import { xss } from 'express-xss-sanitizer';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
   const reflector = app.get(Reflector);
+
+  // 1. Bảo mật Header với Helmet
+  app.use(helmet());
+
+  // 2. Chống tấn công XSS (lọc mã độc trong body, query, params)
+  app.use(xss());
+
+  // 3. Cấu hình CORS
+  app.enableCors({
+    origin: true, // Cho phép tất cả các domain trong quá trình dev
+    credentials: true, // Cho phép gửi cookie
+  });
 
   const prefix = config.get('apiPrefix') || 'api/v1';
   app.setGlobalPrefix(prefix.replace(/^\//, ''), { exclude: ['/'] });
