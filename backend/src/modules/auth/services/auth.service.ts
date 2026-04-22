@@ -8,6 +8,8 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserEntity, UserRole } from '../../user/entities/user.entity';
+import { UserSessionEntity } from '../../user-session/entities/user-session.entity';
+import { IAuthService } from '../interfaces/auth.service.interface';
 import { LoginDto, RegisterDto } from '../dtos/auth.dto';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { REDIS_CLIENT } from 'src/modules/redis/redis.module';
@@ -18,7 +20,7 @@ import { UserSessionService } from '../../user-session/services/user-session.ser
 import { ConflictException } from '@nestjs/common';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthService {
   private googleClient: OAuth2Client;
 
   constructor(
@@ -28,6 +30,9 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
 
+    @InjectRepository(UserSessionEntity)
+    private readonly sessionRepository: Repository<UserSessionEntity>,
+
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly userSessionService: UserSessionService,
@@ -35,6 +40,22 @@ export class AuthService {
     this.googleClient = new OAuth2Client(
       this.configService.get<string>('google.clientId') || process.env.GOOGLE_CLIENT_ID,
     );
+  }
+
+  private async createSession(userId: string, refreshToken: string, deviceId?: string) {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // Mặc định 7 ngày
+
+    const session = this.sessionRepository.create({
+      userId,
+      refreshToken,
+      deviceName: deviceId || 'unknown',
+      refreshTokenExpiresAt: expiresAt,
+      lastUsedAt: new Date(),
+      status: 'active',
+    });
+
+    return this.sessionRepository.save(session);
   }
 
   async verifyGoogleToken(idToken: string) {
@@ -264,7 +285,7 @@ export class AuthService {
       user = (await this.userRepository.findOne({ where: { id: user.id } }))!;
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = { sub: user.id, email: user.email, role: user.role, deviceId: null };
     const tokens = await this.generateTokens(payload);
 
     return {
@@ -280,12 +301,15 @@ export class AuthService {
 
   private async generateTokens(payload: any) {
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN as any) || '1h',
+      expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN as any) || '15m',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
       expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN as any) || '7d',
     });
+
+    // Lưu session vào DB
+    await this.createSession(payload.sub, refreshToken, payload.deviceId);
 
     return {
       access_token: accessToken,
