@@ -18,22 +18,37 @@ export default function AuthLayout({
         <div className="absolute inset-0 bg-gradient-to-tr from-[#0A1628]/90 via-[#0A1628]/40 to-[#0A1628]/10" />
 
         <div className="relative z-10 flex flex-col justify-between h-full p-12">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-3 w-fit group transition-all active:scale-95 no-underline"
-          >
-            <Image
-              src="/images/avatar_link.png"
-              alt="Hoc Tu Thien"
-              width={56}
-              height={56}
-              className="object-contain rounded-full shadow-lg border border-white/10 transition-all"
-            />
-            <span className="text-white font-bold text-2xl tracking-tight group-hover:text-primary transition-colors no-underline">
-              Hoc Tu Thien
-            </span>
-          </Link>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex items-center gap-3 w-fit group transition-all active:scale-95 no-underline"
+            >
+              <Image
+                src="/images/avatar_link.png"
+                alt="Hoc Tu Thien"
+                width={56}
+                height={56}
+                className="object-contain rounded-full shadow-lg border border-white/10 transition-all"
+              />
+              <span className="text-white font-bold text-2xl tracking-tight group-hover:text-primary transition-colors no-underline">
+                Hoc Tu Thien
+              </span>
+            </Link>
+
+            {/* Home Button (Desktop - Internal) */}
+            <Link
+              href="/"
+              className="text-white/60 hover:text-white flex items-center gap-1.5 text-sm font-semibold transition-all hover:-translate-x-1 group"
+            >
+              <Icon
+                name="ChevronLeft"
+                className="w-4 h-4 transition-transform group-hover:scale-110"
+              />
+              {UI_LABELS.AUTH.BACK_TO_HOME}
+            </Link>
+          </div>
 
           <div className="max-w-md">
             <h1 className="text-white text-5xl font-bold leading-[1.1] mb-6 tracking-tight">
@@ -57,18 +72,6 @@ export default function AuthLayout({
             </span>
           </div>
         </div>
-
-        {/* Home Button (Desktop) */}
-        <Link
-          href="/"
-          className="absolute top-10 right-10 z-20 text-white/60 hover:text-white flex items-center gap-1.5 text-sm font-semibold transition-all hover:-translate-x-1 group"
-        >
-          <Icon
-            name="ChevronLeft"
-            className="w-4 h-4 transition-transform group-hover:scale-110"
-          />
-          {UI_LABELS.AUTH.BACK_TO_HOME}
-        </Link>
       </aside>
 
       {/* Main Content */}

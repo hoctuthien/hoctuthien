@@ -12,6 +12,7 @@ export const registerSchema = z
       .min(1, MESSAGES.ERROR.AUTH.PASSWORD_REQUIRED)
       .min(8, MESSAGES.ERROR.AUTH.PASSWORD_MIN_LENGTH),
     confirmPassword: z.string().min(1, MESSAGES.ERROR.AUTH.PASSWORD_CONFIRM_REQUIRED),
+    agreeTerms: z.boolean().default(false),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: MESSAGES.ERROR.AUTH.PASSWORDS_MUST_MATCH,

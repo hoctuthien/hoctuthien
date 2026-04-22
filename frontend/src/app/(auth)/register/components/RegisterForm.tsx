@@ -2,20 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/core/ui/Input";
 import { Button } from "@/core/ui/Button";
-import { AuthDivider, GoogleSignInButton, GitHubSignInButton } from "@/app/(auth)/components";
+import { AuthDivider, GoogleSignInButton } from "@/app/(auth)/components";
 import { MESSAGES, UI_LABELS } from "@/shared/constants";
 import { Icon } from "@/core/ui/Icon";
 import { Checkbox } from "@/core/ui/Selection/Checkbox";
-import { registerSchema, type RegisterFormData } from "@/app/(auth)/register/register.schema";
+import {
+  registerSchema,
+  type RegisterFormData,
+} from "@/app/(auth)/register/register.schema";
 
 export function RegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isGitHubLoading, setIsGitHubLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
@@ -24,6 +26,7 @@ export function RegisterForm() {
     register,
     handleSubmit,
     setFocus,
+    control,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -31,6 +34,7 @@ export function RegisterForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      agreeTerms: false,
     },
   });
 
@@ -49,16 +53,14 @@ export function RegisterForm() {
     }
   };
 
-  const handleSocialSignIn = async (provider: 'google' | 'github') => {
-    if (provider === 'google') setIsGoogleLoading(true);
-    if (provider === 'github') setIsGitHubLoading(true);
-    
+  const handleSocialSignIn = async (provider: "google" | "github") => {
+    if (provider === "google") setIsGoogleLoading(true);
+
     try {
       // TODO: replace with actual OAuth flow
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } finally {
-      if (provider === 'google') setIsGoogleLoading(false);
-      if (provider === 'github') setIsGitHubLoading(false);
+      if (provider === "google") setIsGoogleLoading(false);
     }
   };
 
@@ -146,21 +148,35 @@ export function RegisterForm() {
         />
 
         <div className="flex items-center justify-between">
-          <Checkbox
-            id="agree-terms"
-            label={
-              <span className="text-xs">
-                {UI_LABELS.AUTH.AGREE_TO_TERMS}{" "}
-                <Link href="/terms" className="text-primary font-semibold hover:underline">
-                  {UI_LABELS.AUTH.TERMS_OF_SERVICE}
-                </Link>
-              </span>
-            }
+          <Controller
+            name="agreeTerms"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="agree-terms"
+                checked={field.value}
+                onChange={field.onChange}
+                label={
+                  <span className="text-xs">
+                    {UI_LABELS.AUTH.AGREE_TO_TERMS}{" "}
+                    <Link
+                      href="/terms"
+                      className="text-primary font-semibold hover:underline"
+                    >
+                      {UI_LABELS.AUTH.TERMS_OF_SERVICE}
+                    </Link>
+                  </span>
+                }
+              />
+            )}
           />
         </div>
 
         {generalError && (
-          <p className="text-sm text-[#BA1A1A] bg-[#FFDAD6]/30 border border-[#BA1A1A]/30 rounded-xl px-4 py-2 font-[Montserrat]" role="alert">
+          <p
+            className="text-sm text-[#BA1A1A] bg-[#FFDAD6]/30 border border-[#BA1A1A]/30 rounded-xl px-4 py-2 font-[Montserrat]"
+            role="alert"
+          >
             {generalError}
           </p>
         )}
@@ -169,7 +185,9 @@ export function RegisterForm() {
           type="submit"
           label={
             <span className="flex items-center justify-center gap-2">
-              {isSubmitting ? UI_LABELS.AUTH.SIGNING_UP : UI_LABELS.AUTH.CREATE_ACCOUNT}
+              {isSubmitting
+                ? UI_LABELS.AUTH.SIGNING_UP
+                : UI_LABELS.AUTH.CREATE_ACCOUNT}
               {!isSubmitting && <Icon name="ArrowRight" size={18} />}
             </span>
           }
@@ -196,7 +214,7 @@ export function RegisterForm() {
         <div className="mt-4">
           <GoogleSignInButton
             label={UI_LABELS.AUTH.SIGN_UP_WITH_GOOGLE}
-            onClick={() => handleSocialSignIn('google')}
+            onClick={() => handleSocialSignIn("google")}
             loading={isGoogleLoading}
           />
         </div>
