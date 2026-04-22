@@ -24,7 +24,12 @@ export class AuthController {
     @Ip() ip: string,
     @Headers('x-device-id') deviceId: string,
   ) {
-    return this.authService.register({ ...registerDto, deviceId }, { ip });
+    const result = await this.authService.register({ ...registerDto, deviceId }, { ip });
+    
+    return {
+      message: result.message,
+      user: result.user,
+    };
   }
 
   @Public()
