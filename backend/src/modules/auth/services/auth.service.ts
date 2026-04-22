@@ -113,17 +113,6 @@ export class AuthService implements IAuthService {
     const payload = { sub: user.id, email: user.email, role: user.role, deviceId };
     const tokens = await this.generateTokens(payload);
 
-    const refreshTokenExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
-    const expiresAt = this.calculateExpirationDate(refreshTokenExpiresIn);
-
-    await this.userSessionService.create({
-      userId: user.id,
-      refreshToken: tokens.refresh_token,
-      refreshTokenExpiresAt: expiresAt,
-      ipAddress: requestInfo?.ip,
-      deviceName: deviceId,
-    });
-
     return {
       user: {
         id: user.id,
@@ -150,19 +139,6 @@ export class AuthService implements IAuthService {
 
     const payload = { sub: user.id, email: user.email, role: user.role, deviceId };
     const tokens = await this.generateTokens(payload);
-
-    // Create a new session in the database
-    const refreshTokenExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
-    const expiresAt = this.calculateExpirationDate(refreshTokenExpiresIn);
-
-    await this.userSessionService.create({
-      userId: user.id,
-      refreshToken: tokens.refresh_token,
-      refreshTokenExpiresAt: expiresAt,
-      ipAddress: requestInfo?.ip,
-      userAgent: requestInfo?.userAgent,
-      deviceName: deviceId, // Use deviceId as deviceName for now if available
-    });
 
     return {
       user: {
@@ -221,7 +197,8 @@ export class AuthService implements IAuthService {
       };
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
-      throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
+      // Trả về lỗi chi tiết hơn thay vì mask mọi thứ vào DEVICE_INVALID
+      throw new UnauthorizedException(error.message || AUTH_MESSAGES.DEVICE_INVALID);
     }
   }
 
@@ -321,6 +298,7 @@ export class AuthService implements IAuthService {
     });
 
     const refreshToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
       expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN as any) || '7d',
     });
 
