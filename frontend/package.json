@@ -2,13 +2,30 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "type-check": "tsc --noEmit",
+    "validate": "npm run type-check && npm run lint && npm run build",
+    "prepare": "husky",
     "storybook": "storybook dev -p 8000",
     "build-storybook": "storybook build"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --max-warnings=0",
+      "tsc-files --noEmit"
+    ],
+    "*.{ts,tsx,js,jsx,json,css,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@primer/octicons-react": "^19.23.1",
@@ -43,8 +60,12 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "eslint-plugin-storybook": "^10.3.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
     "playwright": "^1.58.2",
+    "prettier": "^3.5.3",
     "storybook": "^10.3.3",
+    "tsc-files": "^1.1.4",
     "typescript": "^5",
     "vite": "^8.0.2",
     "vitest": "^4.1.1"
