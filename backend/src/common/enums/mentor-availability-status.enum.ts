@@ -3,4 +3,5 @@ export enum MentorAvailabilityStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
+  CANCEL = 'CANCEL',
 }
