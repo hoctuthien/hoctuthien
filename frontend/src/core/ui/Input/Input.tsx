@@ -12,10 +12,11 @@ export interface InputProps
   status?: InputStatus;
   containerClassName?: string;
   suffix?: React.ReactNode;
+  labelAction?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, helperText, status: providedStatus, containerClassName, type, suffix, ...props }, ref) => {
+  ({ className, label, error, helperText, status: providedStatus, containerClassName, type, suffix, labelAction, ...props }, ref) => {
     // Determine the status based on error prop or providedStatus
     const status = providedStatus || (error ? "error" : "default");
     const message = error || helperText;
@@ -50,13 +51,18 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className={cn("flex flex-col gap-2 w-full", containerClassName)}>
-        {label && (
-          <label 
-            htmlFor={props.id}
-            className="text-sm font-semibold text-[#181C20] font-[Montserrat] cursor-pointer"
-          >
-            {label}
-          </label>
+        {(label || labelAction) && (
+          <div className="flex items-center justify-between">
+            {label && (
+              <label 
+                htmlFor={props.id}
+                className="text-sm font-semibold text-[#181C20] font-[Montserrat] cursor-pointer"
+              >
+                {label}
+              </label>
+            )}
+            {labelAction}
+          </div>
         )}
         <div className="relative flex items-center">
           <input
