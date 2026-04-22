@@ -7,14 +7,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from '../../user/entities/user.entity';
+import { UserEntity, UserRole } from '../../user/entities/user.entity';
 import { LoginDto } from '../dtos/auth.dto';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { REDIS_CLIENT } from 'src/modules/redis/redis.module';
 import Redis from 'ioredis';
+import { OAuth2Client } from 'google-auth-library';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
+  private googleClient: OAuth2Client;
+
   constructor(
     @Inject(REDIS_CLIENT)
     private readonly redis: Redis,
@@ -23,7 +27,36 @@ export class AuthService {
     private readonly userRepository: Repository<UserEntity>,
 
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.googleClient = new OAuth2Client(
+      this.configService.get<string>('google.clientId') || process.env.GOOGLE_CLIENT_ID,
+    );
+  }
+
+  async verifyGoogleToken(idToken: string) {
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: idToken,
+        audience: this.configService.get<string>('google.clientId') || process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw new UnauthorizedException('Token Google không hợp lệ');
+      }
+
+      const googleUser = {
+        googleId: payload.sub,
+        email: payload.email,
+        name: payload.name,
+        avatarUrl: payload.picture,
+      };
+
+      return this.validateGoogleUser(googleUser);
+    } catch (error) {
+      throw new UnauthorizedException('Xác thực Google thất bại: ' + error.message);
+    }
+  }
 
   async testRedis() {
     await this.redis.set('my_key', 'hello_redis', 'EX', 10);
@@ -45,13 +78,54 @@ export class AuthService {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
-    const payload = { sub: user.id, email: user.email, deviceId: deviceId };
+    const payload = { sub: user.id, email: user.email, role: user.role, deviceId };
+    return this.generateTokens(payload);
+  }
+
+  async validateGoogleUser(googleUser: any) {
+    const { googleId, email, name, avatarUrl } = googleUser;
+
+    let user = await this.userRepository.findOne({
+      where: [{ googleId }, { email }],
+    });
+
+    if (!user) {
+      user = this.userRepository.create({
+        googleId,
+        email,
+        name,
+        avatarUrl,
+        role: UserRole.MENTEE,
+        status: 'active',
+        isVerified: true,
+      });
+      await this.userRepository.save(user);
+    } else if (!user.googleId) {
+      await this.userRepository.update(user.id, { googleId, avatarUrl });
+      user = (await this.userRepository.findOne({ where: { id: user.id } }))!;
+    }
+
+    const payload = { sub: user.id, email: user.email, role: user.role };
+    const tokens = await this.generateTokens(payload);
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+      ...tokens,
+    };
+  }
+
+  private async generateTokens(payload: any) {
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN as any || '1h',
+      expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN as any) || '1h',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN as any || '7d',
+      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN as any) || '7d',
     });
 
     return {

@@ -6,11 +6,14 @@ import { AuthService } from './services/auth.service';
 import { AuthController } from './auth.controller';
 import { UserEntity } from '../user/entities/user.entity';
 import { RedisModule } from '../redis/redis.module';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
     RedisModule,
+    PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -22,7 +25,7 @@ import { RedisModule } from '../redis/redis.module';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService, GoogleStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })

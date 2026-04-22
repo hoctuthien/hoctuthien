@@ -23,3 +23,13 @@ export class LoginDto {
   @IsOptional() // Để là Optional để Server có thể tự điền nếu Client gửi thiếu
   deviceId?: string;
 }
+
+export class GoogleTokenDto {
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  token: string; // idToken từ Frontend
+}
