@@ -5,6 +5,7 @@ import {
   IsString,
   MinLength,
   IsOptional,
+  IsDateString,
 } from 'class-validator';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { v4 as uuidv4 } from 'uuid'; 
@@ -29,6 +30,7 @@ export class GoogleTokenDto {
   @IsOptional()
   email?: string;
 
+
   @IsString()
   @IsNotEmpty()
   token: string; // idToken từ Frontend
@@ -46,6 +48,18 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty({ message: 'Tên không được để trống' })
   name!: string;
+
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @IsDateString()
+  @IsOptional()
+  dayOfBirth?: string;
+
+  @IsString()
+  @IsOptional()
+  gender?: string;
 
   @IsString()
   @IsOptional()

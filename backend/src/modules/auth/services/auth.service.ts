@@ -90,7 +90,7 @@ export class AuthService implements IAuthService {
   }
 
   async register(registerDto: RegisterDto, requestInfo?: { ip?: string; deviceId?: string }) {
-    const { email, password, name, deviceId } = registerDto;
+    const { email, password, name, deviceId, phone, dayOfBirth, gender } = registerDto;
 
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
@@ -104,6 +104,9 @@ export class AuthService implements IAuthService {
       email,
       passwordHash,
       name,
+      phone,
+      dayOfBirth: dayOfBirth ? new Date(dayOfBirth) : null,
+      gender,
       role: UserRole.MENTEE,
       status: 'active',
       isVerified: false,
