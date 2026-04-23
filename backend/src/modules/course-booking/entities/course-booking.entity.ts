@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { CourseEntity } from '../../course/entities/course.entity';
 import { UserEntity } from '../../user/entities/user.entity';
+import { PaymentEntity } from '../../payment/entities/payment.entity';
 
 export enum BookingStatus {
   PENDING = 'pending',
@@ -41,6 +42,13 @@ export class CourseBookingEntity extends BaseEntity {
 
   @Column({ name: 'cancellation_reason', type: 'text', nullable: true })
   cancellationReason: string | null;
+
+  @Column({ name: 'payment_id', type: 'bigint', nullable: true })
+  paymentId: string | null;
+
+  @OneToOne(() => PaymentEntity, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'payment_id' })
+  payment: PaymentEntity | null;
 
   @Column({ type: 'jsonb', default: {} })
   metadata: Record<string, any>;
