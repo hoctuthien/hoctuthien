@@ -1,13 +1,15 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserEntity } from '../../user/entities/user.entity';
+import { PaymentStatus } from '../../../common/enums/database.enum';
 
-export enum PaymentStatus {
-  PENDING = 'pending',
-  SUCCESS = 'success',
-  FAILED = 'failed',
-  REFUNDED = 'refunded',
+// Loại thanh toán — define tại đây vì thuộc domain Payment
+export enum PaymentType {
+  ACTIVATION = 'activation', // Phí kích hoạt tài khoản mentor
 }
+
+export { PaymentStatus };
+
 
 @Entity({ name: 'payments' })
 export class PaymentEntity extends BaseEntity {
@@ -30,6 +32,23 @@ export class PaymentEntity extends BaseEntity {
   @Column({ name: 'transaction_id', type: 'varchar', length: 255, unique: true, nullable: true })
   transactionId: string | null;
 
+  // Nội dung chuyển khoản gửi lên VietQR (ví dụ: "HOCTUTHIEN 123456")
+  @Column({ name: 'description', type: 'varchar', length: 500, nullable: true })
+  description: string | null;
+
+  // Thời điểm QR code hết hạn
+  @Column({ name: 'expired_at', type: 'timestamp with time zone', nullable: true })
+  expiredAt: Date | null;
+
+  // Base64 hoặc URL ảnh QR trả về từ VietQR API
+  @Column({ name: 'vietqr_qr_data_url', type: 'text', nullable: true })
+  vietqrQrDataUrl: string | null;
+
+  // Raw response payload từ VietQR API (bank_code, account_no, qrCode...)
+  @Column({ name: 'vietqr_payload', type: 'jsonb', default: {} })
+  vietqrPayload: Record<string, any>;
+
+  // Generic payload cho các payment gateway khác (giữ lại để backward-compatible)
   @Column({ name: 'payment_gateway_payload', type: 'jsonb', default: {} })
   paymentGatewayPayload: Record<string, any>;
 

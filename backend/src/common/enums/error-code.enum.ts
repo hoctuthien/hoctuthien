@@ -25,6 +25,15 @@ export enum ErrorCode {
   APPLICATION_SUCCESS = 'APPLICATION_SUCCESS',
   APPLICATION_ALREADY_EXISTS = 'APPLICATION_ALREADY_EXISTS',
   APPLICATION_FAILED = 'APPLICATION_FAILED',
+
+  // Payment Error Codes
+  PAYMENT_SUCCESS = 'PAYMENT_SUCCESS',
+  PAYMENT_NOT_FOUND = 'PAYMENT_NOT_FOUND',
+  PAYMENT_ALREADY_PAID = 'PAYMENT_ALREADY_PAID',
+  PAYMENT_QR_EXPIRED = 'PAYMENT_QR_EXPIRED',
+  PAYMENT_GENERATE_QR_FAILED = 'PAYMENT_GENERATE_QR_FAILED',
+  PAYMENT_INVALID_WEBHOOK = 'PAYMENT_INVALID_WEBHOOK',
+  PAYMENT_WEBHOOK_SUCCESS = 'PAYMENT_WEBHOOK_SUCCESS',
 }
 
 export const ErrorMessage: Record<ErrorCode, string> = {
@@ -51,4 +60,12 @@ export const ErrorMessage: Record<ErrorCode, string> = {
   [ErrorCode.APPLICATION_SUCCESS]: 'Gửi đơn đăng ký mentor thành công.',
   [ErrorCode.APPLICATION_ALREADY_EXISTS]: 'Bạn đã có một đơn đăng ký đang chờ duyệt.',
   [ErrorCode.APPLICATION_FAILED]: 'Gửi đơn đăng ký mentor thất bại.',
+
+  [ErrorCode.PAYMENT_SUCCESS]: 'Tạo thanh toán thành công.',
+  [ErrorCode.PAYMENT_NOT_FOUND]: 'Không tìm thấy thông tin thanh toán.',
+  [ErrorCode.PAYMENT_ALREADY_PAID]: 'Booking này đã được thanh toán trước đó.',
+  [ErrorCode.PAYMENT_QR_EXPIRED]: 'Mã QR đã hết hạn, vui lòng tạo lại.',
+  [ErrorCode.PAYMENT_GENERATE_QR_FAILED]: 'Không thể tạo mã QR, vui lòng thử lại.',
+  [ErrorCode.PAYMENT_INVALID_WEBHOOK]: 'Dữ liệu callback từ cổng thanh toán không hợp lệ.',
+  [ErrorCode.PAYMENT_WEBHOOK_SUCCESS]: 'Xác nhận thanh toán thành công.',
 };

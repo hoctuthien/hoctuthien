@@ -13,7 +13,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userRepository: UserRepository) { }
 
   async findAll() {
     const users = await this.userRepository.findMany();
@@ -28,7 +28,7 @@ export class UserService {
 
   async getMe(id: string) {
     const user = await this.userRepository.findById(id);
-    
+
     if (!user) {
       throw new NotFoundException('Không tìm thấy thông tin người dùng.');
     }
@@ -47,7 +47,7 @@ export class UserService {
 
   async create(payload: CreateUserInput) {
     const parsed = createUserSchema.parse(payload);
-    
+
     // Tự động hash mật khẩu nếu có
     const userData: any = { ...parsed };
     if (parsed.password) {
