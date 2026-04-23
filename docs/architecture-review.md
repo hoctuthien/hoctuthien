@@ -130,3 +130,117 @@ Dự án là monorepo gồm:
 **Gap lớn nhất**: Frontend và backend chưa tích hợp thực sự (login form vẫn mock). Giải quyết gap này là tiền đề để mở rộng sang Course/Booking — core domain của sản phẩm.
 
 **Thời gian ước tính đến MVP functional**: 2–3 tuần nếu team tập trung vào các hạng mục Sprint 1 + core domain Sprint 2.
+
+---
+
+# Cập Nhật Review — 2026-04-23
+
+> Dựa trên `main` tại commit `1dc0241`. Delta so với review trước (`4c42e56`): **145 files, +3078 / -600 dòng**.
+
+## 7. Bổ Sung Từ Lần Trước
+
+### Backend — 7 module mới đầy đủ CRUD
+
+Đã wire vào `app.module.ts:28-50`:
+
+| Module | Entity / Đặc điểm |
+|--------|-------------------|
+| `category/` | Danh mục gốc |
+| `course-category/` | Mapping course ↔ category |
+| `mentor-profile/` | `jobTitle`, `company`, `bio`, `linkedinUrl`, `skills[]`, `averageRating`, `totalStudents`, `isApproved`, `approvedBy` FK |
+| `mentor-availability/` | `dayOfWeek`, `startTime`, `endTime`, `isActive` |
+| `message/` | Message trong conversation |
+| `user-review/` | Review giữa user (mentor ↔ mentee) |
+| `penalty-ticket/` | `reason`, `pointsDeducted`, `evidenceUrl` |
+| `system-config/` | Config hệ thống |
+
+### Course module đã thoát stub
+
+- `CourseService` (`backend/src/modules/course/services/course.service.ts`): CRUD thực qua `CourseRepository` (`findAll`, `findOne`, `create`, `update`, `remove`)
+- `CourseController`: 5 endpoints REST đầy đủ
+- `CourseEntity` có relationship `@ManyToOne UserEntity` cho `mentorId` + `approvedBy`, `price decimal(15,2)`, `durationMinutes`, `prerequisites jsonb`
+
+### Cải tiến kiến trúc
+
+- `UserRole` enum (`MENTEE`/`MENTOR`/`ADMIN`) — `user.entity.ts:5-9`
+- Database module dời sang `backend/src/infrastructure/database/`, `synchronize` đọc từ env config (không còn hardcode `true`)
+- Entities mới có FK relationships đúng chuẩn (`@ManyToOne`/`@OneToOne` + `onDelete: CASCADE/SET NULL`)
+
+### Frontend
+
+- Root page `/` có landing hoàn chỉnh: logo bounce, CTA Login/Register — `app/page.tsx`
+- Branding: `avatar_logo.png`, `avatar_browser.png`, `avatar_link.png`
+- Next.js standalone mode + favicon cho Docker deploy
+- Login UX fixes: eye icon interactivity, logo home link
+- Chuyển toàn bộ UI labels sang tiếng Việt
+
+## 8. Vấn Đề Từ Review Cũ **CHƯA Giải Quyết**
+
+| # cũ | Trạng thái |
+|------|-----------|
+| H1 LoginForm mock | **Y NGUYÊN** — `LoginForm.tsx:84` vẫn `setTimeout` |
+| H2 Refresh token không lưu DB | **TỆ HƠN** — code comment intent cũ đã bị xóa hẳn |
+| H3 UserSessionService chưa wire | Y NGUYÊN |
+| H4 Google OAuth stub | Y NGUYÊN |
+| H7 Register flow | Y NGUYÊN |
+| M1 `/auths/test-redis` endpoint | Y NGUYÊN — vẫn public |
+| M2 `process.env` trực tiếp | **TỆ HƠN** — thêm fallback hardcode `\|\| '1h'`, `\|\| '7d'` tại `auth.service.ts:52,56` |
+| M3 File rác `lint-test.ts` | Y NGUYÊN |
+| C1 Shared packages không dùng | Y NGUYÊN — root `package.json` không có `workspaces` |
+| C2 Test coverage ≈ 0 | Y NGUYÊN — 2 file spec |
+| C3 TypeORM migrations | Y NGUYÊN |
+
+## 9. Vấn Đề Mới Phát Sinh
+
+| # | Mô tả | Mức độ |
+|---|-------|--------|
+| N1 | **Zero authorization guards** trên toàn bộ endpoint mới (course, mentor-profile, category, penalty-ticket...). Ai cũng tạo/sửa/xóa/approve được | 🔴 Critical |
+| N2 | **DB credentials thật leak trong comment** `infrastructure/database/database.module.ts:15-18` — IP `103.161.16.77`, user `admin`, password `dungthaydoimatkhau`, db `hoctuthien_v1`. Git history giữ vĩnh viễn | 🔴 Critical |
+| N3 | `synchronize` vẫn có thể bật ở prod (qua env) + `logging: true` cứng luôn → ồn ào, rò rỉ SQL | 🟠 High |
+| N4 | Có field `approvedBy` ở Course + MentorProfile nhưng **không có endpoint approve** → workflow phê duyệt thiếu | 🟠 High |
+| N5 | Services không load `relations` (tất cả `findMany`/`findById` trả flat data) — client không truy cập được mentor thông qua course | 🟡 Medium |
+| N6 | Git history thêm commits rác: `feat(be): deploy heheheheheheehehhe`, `feat(be): loi loi bug bug bug a`, 3× `config: deploy` | 🟡 Medium |
+
+## 10. Hành Động Cấp Bách
+
+1. **[URGENT] Xóa dòng comment leak DB credentials** (`infrastructure/database/database.module.ts:15-18`) + **đổi password DB** — credentials đã vĩnh viễn trong git history
+2. Nếu repo từng public: rotate tất cả secrets (JWT, DB, Redis, Google OAuth)
+3. Scan git history cho leak khác: `git log -p -S 'dungthaydoimatkhau'`
+4. Thêm `JwtAuthGuard` + `RolesGuard` cho toàn bộ write endpoints trước khi mở module mới
+5. `synchronize` cứng `false` ở prod (không đọc từ env), tắt `logging` ngoài dev
+
+## 11. Cập Nhật Tình Trạng Nghiệp Vụ
+
+| Tính năng | Trước | Giờ |
+|-----------|-------|-----|
+| Login E2E | ❌ | ❌ (FE vẫn mock) |
+| Register | ❌ | ❌ |
+| Course CRUD BE | ❌ stub | ✅ (chưa có auth) |
+| Mentor Profile | ❌ | ✅ (chưa có auth) |
+| Mentor Availability | ❌ | ✅ |
+| Category / CourseCategory | ❌ | ✅ |
+| Message | ❌ | ✅ |
+| User Review | ❌ | ✅ |
+| Penalty Ticket | ❌ | ✅ |
+| System Config | ❌ | ✅ |
+| Course Booking BE | ❌ stub | ⚠️ vẫn stub |
+| Payment | ❌ stub | ⚠️ vẫn stub |
+| Notification | ❌ stub | ⚠️ vẫn stub |
+| FE pages ngoài login/homepage | ❌ | ❌ |
+
+## 12. Đánh Giá
+
+**Tốt**: Team đang build schema dữ liệu rất nhanh — 7 module mới trong 1 sprint, entities thiết kế có relationships đúng chuẩn. Core domain data layer gần như xong.
+
+**Lo ngại**:
+- Tốc độ thêm module mới **lớn hơn nhiều** tốc độ đóng E2E flow và xử lý issues cũ. Tất cả vấn đề review trước vẫn nguyên, có mục còn tệ hơn.
+- Zero authorization trên toàn bộ API mới là lỗ hổng nghiêm trọng — dễ sửa bây giờ, càng để lâu càng đắt
+- Leak credentials là sự cố bảo mật cần xử lý ngay
+
+**Khuyến nghị điều chỉnh hướng**: **Dừng thêm module mới** cho đến khi:
+1. Fix credential leak + rotate password
+2. Thêm auth guard cho toàn bộ endpoint hiện có
+3. Wire FE login vào BE thật
+4. Enable TypeORM migrations
+
+Sau đó mới tiếp tục Course Booking / Payment / Notification.
