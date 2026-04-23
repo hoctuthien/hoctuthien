@@ -7,10 +7,23 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { RedisModule } from './modules/redis/redis.module';
 import { UserSessionModule } from './modules/user-session/user-session.module';
+import { MentorProfileModule } from './modules/mentor-profile/mentor-profile.module';
+import { MentorAvailabilityModule } from './modules/mentor-availability/mentor-availability.module';
+import { CategoryModule } from './modules/category/category.module';
+import { CourseModule } from './modules/course/course.module';
+import { CourseCategoryModule } from './modules/course-category/course-category.module';
+import { CourseBookingModule } from './modules/course-booking/course-booking.module';
+import { CourseReviewModule } from './modules/course-review/course-review.module';
+import { UserReviewModule } from './modules/user-review/user-review.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { PenaltyTicketModule } from './modules/penalty-ticket/penalty-ticket.module';
+import { SystemConfigModule } from './modules/system-config/system-config.module';
+import { ConversationModule } from './modules/conversation/conversation.module';
+import { MessageModule } from './modules/message/message.module';
+import { NotificationModule } from './modules/notification/notification.module';
 import { TraceIdMiddleware } from './common/middlewares/trace-id.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
 
 @Module({
   imports: [
@@ -20,10 +33,24 @@ import { AppService } from './app.service';
       validate: validateEnv,
     }),
     DatabaseModule,
-    UserModule,
-    AuthModule,
     RedisModule,
+    AuthModule,
+    UserModule,
     UserSessionModule,
+    MentorProfileModule,
+    MentorAvailabilityModule,
+    CategoryModule,
+    CourseModule,
+    CourseCategoryModule,
+    CourseBookingModule,
+    CourseReviewModule,
+    UserReviewModule,
+    PaymentModule,
+    PenaltyTicketModule,
+    SystemConfigModule,
+    ConversationModule,
+    MessageModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

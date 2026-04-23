@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { HiChevronDown } from "react-icons/hi2";
-import { CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
+import { Icon } from "@/core/ui/Icon";
 import { cn } from "@/core/utils/cn";
 
 export interface SelectOption {
@@ -50,17 +49,17 @@ export const Select = ({
     success: {
       button: "bg-[#86F898]/30 border-[#006E2C] text-[#006E2C] font-medium",
       text: "text-[#006E2C]",
-      icon: <CheckCircle2 className="w-5 h-5 text-[#006E2C] mr-2" />,
+      icon: <Icon name="CheckCircle2" className="w-5 h-5 text-[#006E2C] mr-2" />,
     },
     warning: {
       button: "bg-[#987000]/10 border-[#795900]",
       text: "text-[#795900]",
-      icon: <AlertTriangle className="w-5 h-5 text-[#795900] mr-2" />,
+      icon: <Icon name="AlertTriangle" className="w-5 h-5 text-[#795900] mr-2" />,
     },
     error: {
       button: "bg-[#FFDAD6]/30 border-[#BA1A1A] text-[#BA1A1A]",
       text: "text-[#BA1A1A]",
-      icon: <AlertCircle className="w-5 h-5 text-[#BA1A1A] mr-2" />,
+      icon: <Icon name="AlertCircle" className="w-5 h-5 text-[#BA1A1A] mr-2" />,
     },
   };
 
@@ -87,7 +86,7 @@ export const Select = ({
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            "w-full flex items-center justify-between px-4 h-[50px] transition-all duration-200 outline-none text-left border rounded-xl font-[Montserrat]",
+            "w-full flex items-center justify-between px-4 h-[50px] transition-all duration-200 outline-none text-left border rounded-xl font-[Montserrat] hover:cursor-pointer",
             statusStyles[status].button,
             isOpen && status === "default" && "border-primary ring-4 ring-primary/10",
             selectedOption && status === "default" && "text-[#181C20] font-medium",
@@ -98,7 +97,8 @@ export const Select = ({
             {statusStyles[status].icon}
             <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
           </div>
-          <HiChevronDown 
+          <Icon 
+            name="ChevronDown"
             className={cn("transition-transform duration-300 text-[#727785] flex-shrink-0 ml-2", isOpen && "rotate-180 text-primary")} 
             size={20} 
           />
@@ -111,7 +111,7 @@ export const Select = ({
                 key={option.value}
                 type="button"
                 className={cn(
-                  "w-full px-4 py-3 text-left text-sm font-medium transition-colors font-[Montserrat]",
+                  "w-full px-4 py-3 text-left text-sm font-medium transition-colors font-[Montserrat] hover:cursor-pointer",
                   option.value === value 
                     ? "text-primary bg-primary/5 font-bold" 
                     : "text-slate-600 hover:bg-slate-50 hover:text-primary"

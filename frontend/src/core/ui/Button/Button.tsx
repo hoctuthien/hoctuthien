@@ -63,7 +63,7 @@ export const Button = ({
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none",
+        "inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer",
         "disabled:opacity-50 disabled:pointer-events-none disabled:grayscale",
         variantClasses[variant],
         sizeClasses[size],

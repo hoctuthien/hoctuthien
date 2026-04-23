@@ -47,4 +47,4 @@ Hệ thống dự kiến được triển khai trên các công nghệ hiện đ
 ---
 *<small>Dự án mã nguồn mở (Open Source) HocTuThien luôn chào đón và kêu gọi sự đóng góp, cống hiến từ cộng đồng để cùng tạo ra một sản phẩm có tác động tích cực đến xã hội.</small>*
 
-© 2026 HocTuThien Development Team.
+© 2026 HocTuThien Development Team..

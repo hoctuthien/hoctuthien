@@ -1,2 +1,5 @@
 node_modules
 .env
+/generated/prisma
+database.sql
+hoctuthien_postman_collection.json
