@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { In } from 'typeorm';
 import { ErrorCode, ErrorMessage } from '../../../common/enums/error-code.enum';
 import { MentorAvailabilityStatus } from '../../../common/enums/mentor-availability-status.enum';
@@ -16,11 +20,20 @@ import {
 
 @Injectable()
 export class MentorAvailabilityService {
-  constructor(private readonly mentorAvailabilityRepository: MentorAvailabilityRepository) {}
+  constructor(
+    private readonly mentorAvailabilityRepository: MentorAvailabilityRepository,
+  ) {}
 
   async findAll() {
     const items = await this.mentorAvailabilityRepository.findMany();
-    return items.map(item => mentorAvailabilitySchema.parse(item));
+    return items.map((item) => mentorAvailabilitySchema.parse(item));
+  }
+
+  async findByMentorId(mentorId: string) {
+    const items = await this.mentorAvailabilityRepository.findMany({
+      where: { mentorId } as any,
+    });
+    return items.map((item) => mentorAvailabilitySchema.parse(item));
   }
 
   async findOne(id: string) {
@@ -29,10 +42,22 @@ export class MentorAvailabilityService {
     return mentorAvailabilitySchema.parse(item);
   }
 
+  async findOneForMentor(id: string, mentorId: string) {
+    const item = await this.mentorAvailabilityRepository.findById(id);
+    if (!item) throw new NotFoundException('Mentor availability not found');
+    if (item.mentorId !== mentorId) {
+      throw new NotFoundException('Mentor availability not found');
+    }
+    return mentorAvailabilitySchema.parse(item);
+  }
+
   async create(mentorId: string, payload: CreateMentorAvailabilityInput) {
     const existing = await this.mentorAvailabilityRepository.findOne({
       mentorId,
-      status: In([MentorAvailabilityStatus.PENDING, MentorAvailabilityStatus.IN_PROGRESS]),
+      status: In([
+        MentorAvailabilityStatus.PENDING,
+        MentorAvailabilityStatus.IN_PROGRESS,
+      ]),
     });
 
     if (existing) {
@@ -55,16 +80,45 @@ export class MentorAvailabilityService {
       };
     } catch (error) {
       throw new BadRequestException({
-         code: ErrorCode.APPLICATION_FAILED,
-         message: ErrorMessage[ErrorCode.APPLICATION_FAILED],
-         error: error.message,
+        code: ErrorCode.APPLICATION_FAILED,
+        message: ErrorMessage[ErrorCode.APPLICATION_FAILED],
+        error: error.message,
       });
     }
   }
 
   async update(id: string, payload: UpdateMentorAvailabilityInput) {
+    const current = await this.mentorAvailabilityRepository.findById(id);
+
+    if (!current) {
+      throw new NotFoundException('Mentor availability not found');
+    }
+
     const parsed = updateMentorAvailabilitySchema.parse(payload);
-    const updated = await this.mentorAvailabilityRepository.updateById(id, parsed);
+
+    if (
+      parsed.status === MentorAvailabilityStatus.IN_PROGRESS &&
+      current.status !== MentorAvailabilityStatus.PENDING
+    ) {
+      throw new BadRequestException(
+        'Only pending requests can be moved to in progress',
+      );
+    }
+
+    if (
+      (parsed.status === MentorAvailabilityStatus.APPROVED ||
+        parsed.status === MentorAvailabilityStatus.REJECTED) &&
+      current.status !== MentorAvailabilityStatus.IN_PROGRESS
+    ) {
+      throw new BadRequestException(
+        'Only in progress requests can be approved or rejected',
+      );
+    }
+
+    const updated = await this.mentorAvailabilityRepository.updateById(
+      id,
+      parsed,
+    );
     return mentorAvailabilitySchema.parse(updated);
   }
 
@@ -76,7 +130,9 @@ export class MentorAvailabilityService {
     }
 
     if (current.status !== MentorAvailabilityStatus.PENDING) {
-      throw new BadRequestException('Only pending requests can be moved to in progress');
+      throw new BadRequestException(
+        'Only pending requests can be moved to in progress',
+      );
     }
 
     const updated = await this.mentorAvailabilityRepository.updateById(id, {
@@ -87,7 +143,7 @@ export class MentorAvailabilityService {
     return mentorAvailabilitySchema.parse(updated);
   }
 
-  async approve(id: string, adminId: string) {
+  async approve(id: string, adminId: string, note: string) {
     const current = await this.mentorAvailabilityRepository.findById(id);
 
     if (!current) {
@@ -95,21 +151,26 @@ export class MentorAvailabilityService {
     }
 
     if (current.status !== MentorAvailabilityStatus.IN_PROGRESS) {
-      throw new BadRequestException('Only in progress requests can be approved');
+      throw new BadRequestException(
+        'Only in progress requests can be approved',
+      );
     }
 
     if (current.approvedBy && current.approvedBy !== adminId) {
-      throw new BadRequestException('approved_by does not match the admin who started processing this request');
+      throw new BadRequestException(
+        'approved_by does not match the admin who started processing this request',
+      );
     }
 
     const updated = await this.mentorAvailabilityRepository.updateById(id, {
       status: MentorAvailabilityStatus.APPROVED,
+      note,
     });
 
     return mentorAvailabilitySchema.parse(updated);
   }
 
-  async reject(id: string, adminId: string) {
+  async reject(id: string, adminId: string, note: string) {
     const current = await this.mentorAvailabilityRepository.findById(id);
 
     if (!current) {
@@ -117,15 +178,42 @@ export class MentorAvailabilityService {
     }
 
     if (current.status !== MentorAvailabilityStatus.IN_PROGRESS) {
-      throw new BadRequestException('Only in progress requests can be rejected');
+      throw new BadRequestException(
+        'Only in progress requests can be rejected',
+      );
     }
 
     if (current.approvedBy && current.approvedBy !== adminId) {
-      throw new BadRequestException('approved_by does not match the admin who started processing this request');
+      throw new BadRequestException(
+        'approved_by does not match the admin who started processing this request',
+      );
     }
 
     const updated = await this.mentorAvailabilityRepository.updateById(id, {
       status: MentorAvailabilityStatus.REJECTED,
+      note,
+    });
+
+    return mentorAvailabilitySchema.parse(updated);
+  }
+
+  async cancel(id: string, menteeId: string) {
+    const current = await this.mentorAvailabilityRepository.findById(id);
+
+    if (!current) {
+      throw new NotFoundException('Mentor availability not found');
+    }
+
+    if (current.mentorId !== menteeId) {
+      throw new BadRequestException('Only the owner can cancel this request');
+    }
+
+    if (current.status !== MentorAvailabilityStatus.PENDING) {
+      throw new BadRequestException('Only pending requests can be canceled');
+    }
+
+    const updated = await this.mentorAvailabilityRepository.updateById(id, {
+      status: MentorAvailabilityStatus.CANCEL,
     });
 
     return mentorAvailabilitySchema.parse(updated);

@@ -3,7 +3,6 @@ import { PaymentStatus } from '../entities/payment.entity';
 
 export const paymentSchema = z.object({
   id: z.string(),
-  courseBookingId: z.string(),
   userId: z.string(),
   amount: z.number(),
   currency: z.string().max(10).default('VND'),
@@ -18,7 +17,6 @@ export const paymentSchema = z.object({
 });
 
 export const createPaymentSchema = z.object({
-  courseBookingId: z.string(),
   userId: z.string(),
   amount: z.number(),
   currency: z.string().max(10).optional(),

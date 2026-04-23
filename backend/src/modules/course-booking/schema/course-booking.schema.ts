@@ -5,6 +5,7 @@ export const courseBookingSchema = z.object({
   id: z.string(),
   courseId: z.string(),
   menteeId: z.string(),
+  paymentId: z.string().nullable().optional(),
   meetingTime: z.date(),
   googleMeetUrl: z.string().max(500).nullable().optional(),
   calendarEventId: z.string().max(255).nullable().optional(),
@@ -20,6 +21,7 @@ export const courseBookingSchema = z.object({
 export const createCourseBookingSchema = z.object({
   courseId: z.string(),
   menteeId: z.string(),
+  paymentId: z.string().optional(),
   meetingTime: z.date(),
   notesForMentor: z.string().optional(),
   metadata: z.record(z.string(), z.any()).optional(),
@@ -30,4 +32,5 @@ export const updateCourseBookingSchema = createCourseBookingSchema.partial().ext
   googleMeetUrl: z.string().max(500).optional(),
   calendarEventId: z.string().max(255).optional(),
   cancellationReason: z.string().optional(),
+  paymentId: z.string().optional(),
 });

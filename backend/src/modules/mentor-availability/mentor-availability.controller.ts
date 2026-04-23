@@ -13,6 +13,10 @@ import {
   CreateMentorAvailabilityInput,
   UpdateMentorAvailabilityInput,
 } from './types/mentor-availability.types';
+import {
+  MentorAvailabilityEmptyActionDto,
+  MentorAvailabilityReviewDto,
+} from './dtos/mentor-availability-status.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -36,13 +40,31 @@ export class MentorAvailabilityController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   findAll() {
     return this.mentorAvailabilityService.findAll();
   }
 
+  @Get('me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  findMyMentorAvailabilities(@User('id') mentorId: string) {
+    return this.mentorAvailabilityService.findByMentorId(mentorId);
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  findOneAdmin(@Param('id') id: string) {
     return this.mentorAvailabilityService.findOne(id);
+  }
+
+  @Get('me/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  findOneMine(@Param('id') id: string, @User('id') mentorId: string) {
+    return this.mentorAvailabilityService.findOneForMentor(id, mentorId);
   }
 
   @Patch(':id')
@@ -56,22 +78,45 @@ export class MentorAvailabilityController {
   @Patch(':id/in-progress')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  updateToInProgress(@Param('id') id: string, @User('id') adminId: string) {
+  updateToInProgress(
+    @Param('id') id: string,
+    @Body() _payload: MentorAvailabilityEmptyActionDto,
+    @User('id') adminId: string,
+  ) {
     return this.mentorAvailabilityService.updateToInProgress(id, adminId);
   }
 
   @Patch(':id/approved')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  approve(@Param('id') id: string, @User('id') adminId: string) {
-    return this.mentorAvailabilityService.approve(id, adminId);
+  approve(
+    @Param('id') id: string,
+    @Body() payload: MentorAvailabilityReviewDto,
+    @User('id') adminId: string,
+  ) {
+    return this.mentorAvailabilityService.approve(id, adminId, payload.note);
   }
 
   @Patch(':id/rejected')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  reject(@Param('id') id: string, @User('id') adminId: string) {
-    return this.mentorAvailabilityService.reject(id, adminId);
+  reject(
+    @Param('id') id: string,
+    @Body() payload: MentorAvailabilityReviewDto,
+    @User('id') adminId: string,
+  ) {
+    return this.mentorAvailabilityService.reject(id, adminId, payload.note);
+  }
+
+  @Patch(':id/cancel')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  cancel(
+    @Param('id') id: string,
+    @Body() _payload: MentorAvailabilityEmptyActionDto,
+    @User('id') menteeId: string,
+  ) {
+    return this.mentorAvailabilityService.cancel(id, menteeId);
   }
 
   @Delete(':id')

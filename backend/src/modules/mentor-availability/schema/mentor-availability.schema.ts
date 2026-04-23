@@ -54,6 +54,7 @@ export const updateMentorAvailabilityStatusSchema = z.object({
     MentorAvailabilityStatus.IN_PROGRESS,
     MentorAvailabilityStatus.APPROVED,
     MentorAvailabilityStatus.REJECTED,
+    MentorAvailabilityStatus.CANCEL,
   ]),
   note: z.string().max(500).optional(),
 });
