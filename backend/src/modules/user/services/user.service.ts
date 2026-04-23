@@ -13,7 +13,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) { }
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findAll() {
     const users = await this.userRepository.findMany();
@@ -67,5 +67,15 @@ export class UserService {
 
   async remove(id: string) {
     await this.userRepository.softDeleteById(id);
+  }
+
+  /**
+   * Kích hoạt tài khoản Mentee sau khi thanh toán phí kích hoạt thành công.
+   * Đặt isVerified = true — FE/middleware dùng field này để cho phép truy cập đầy đủ.
+   */
+  async activateMentee(id: string): Promise<void> {
+    const user = await this.userRepository.findById(id);
+    if (!user) throw new NotFoundException('Không tìm thấy thông tin người dùng.');
+    await this.userRepository.updateById(id, { isVerified: true });
   }
 }

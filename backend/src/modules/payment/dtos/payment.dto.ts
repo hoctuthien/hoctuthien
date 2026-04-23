@@ -8,27 +8,19 @@ import {
 import { Type } from 'class-transformer';
 
 /**
- * DTO tạo QR kích hoạt tài khoản Mentor.
+ * DTO tạo QR kích hoạt tài khoản Mentee.
  * Không có thuộc tính nào — amount lấy từ SystemConfig,
  * userId lấy từ JWT Token qua @User('id') ở Controller.
  */
 export class GenerateActivationQrDto { }
 
 /**
- * DTO hứng webhook callback từ VietQR sau khi user chuyển khoản thành công.
- * Cấu trúc dựa theo VietQR Webhook API (v2).
+ * DTO xác minh thanh toán kích hoạt — user bấm "Tôi đã chuyển khoản".
+ * Backend sẽ query TN App API để tìm giao dịch khớp.
  */
-export class VietQrWebhookDto {
+export class VerifyActivationPaymentDto {
   @IsString()
-  @IsNotEmpty()
-  transaction_id: string;
-
-  @IsNumber({}, { message: 'Số tiền phải là số hợp lệ.' })
-  @Min(0)
-  @Type(() => Number)
-  amount: number;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
+  @IsNotEmpty({ message: 'paymentId không được để trống.' })
+  paymentId: string;
 }
+
