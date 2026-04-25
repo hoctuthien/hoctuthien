@@ -7,7 +7,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 export interface ButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  label: string;
+  label: React.ReactNode;
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;

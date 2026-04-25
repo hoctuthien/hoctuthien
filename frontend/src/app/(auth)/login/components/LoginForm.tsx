@@ -1,91 +1,51 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/core/ui/Input";
 import { Button } from "@/core/ui/Button";
 import { AuthDivider, GoogleSignInButton } from "@/app/(auth)/components";
 import { MESSAGES, UI_LABELS } from "@/shared/constants";
 import { Icon } from "@/core/ui/Icon";
 import { Checkbox } from "@/core/ui/Selection/Checkbox";
-
-interface FormState {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
-
-interface FormErrors {
-  email?: string;
-  password?: string;
-  general?: string;
-}
-
-function validateForm(values: FormState): FormErrors {
-  const errors: FormErrors = {};
-
-  if (!values.email) {
-    errors.email = MESSAGES.ERROR.AUTH.EMAIL_REQUIRED;
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-    errors.email = MESSAGES.ERROR.AUTH.INVALID_EMAIL;
-  }
-
-  if (!values.password) {
-    errors.password = MESSAGES.ERROR.AUTH.PASSWORD_REQUIRED;
-  } else if (values.password.length < 8) {
-    errors.password = MESSAGES.ERROR.AUTH.PASSWORD_MIN_LENGTH;
-  }
-
-  return errors;
-}
+import {
+  loginSchema,
+  type LoginFormData,
+} from "@/app/(auth)/login/login.schema";
 
 export function LoginForm() {
-  const [values, setValues] = useState<FormState>({
-    email: "",
-    password: "",
-    rememberMe: false,
-  });
-  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [generalError, setGeneralError] = useState<string | null>(null);
 
-  const passwordRef = useRef<HTMLInputElement>(null);
+  const {
+    register,
+    handleSubmit,
+    setFocus,
+    control,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
+  });
 
-  const handleChange =
-    (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value =
-        e.target.type === "checkbox" ? e.target.checked : e.target.value;
-      setValues((prev) => ({ ...prev, [field]: value }));
-      if (errors[field as keyof FormErrors]) {
-        setErrors((prev) => ({ ...prev, [field]: undefined }));
-      }
-    };
-
-  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      passwordRef.current?.focus();
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const validationErrors = validateForm(values);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
+  const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
-    setErrors({});
+    setGeneralError(null);
 
     try {
       // TODO: replace with actual auth API call
+      console.log("Login data:", data);
       await new Promise((resolve) => setTimeout(resolve, 1500));
     } catch {
-      setErrors({ general: MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS });
+      setGeneralError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
     } finally {
       setIsSubmitting(false);
     }
@@ -120,70 +80,77 @@ export function LoginForm() {
 
       <AuthDivider text={UI_LABELS.AUTH.OR_CONTINUE_WITH_EMAIL} />
 
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="flex flex-col gap-5"
+      >
         <Input
           id="login-email"
           label={UI_LABELS.AUTH.EMAIL_ADDRESS}
           type="email"
           placeholder="name@atelier.edu"
-          value={values.email}
-          onChange={handleChange("email")}
-          onKeyDown={handleEmailKeyDown}
-          error={errors.email}
+          error={errors.email?.message}
           autoComplete="email"
+          {...register("email")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              setFocus("password");
+            }
+          }}
         />
 
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="login-password"
-              className="text-sm font-semibold text-text-heading cursor-pointer font-[Montserrat]"
-            >
-              {UI_LABELS.AUTH.PASSWORD}
-            </label>
+        <Input
+          id="login-password"
+          label={UI_LABELS.AUTH.PASSWORD}
+          type={showPassword ? "text" : "password"}
+          placeholder="••••••••"
+          error={errors.password?.message}
+          autoComplete="current-password"
+          {...register("password")}
+          labelAction={
             <Link
               href="/forgot-password"
               className="text-sm font-medium text-primary hover:underline font-[Montserrat]"
             >
               {UI_LABELS.AUTH.FORGOT_PASSWORD}
             </Link>
-          </div>
-          <Input
-            id="login-password"
-            ref={passwordRef}
-            type={showPassword ? "text" : "password"}
-            placeholder="••••••••"
-            value={values.password}
-            onChange={handleChange("password")}
-            error={errors.password}
-            autoComplete="current-password"
-            suffix={
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-text-muted hover:text-text-heading transition-colors cursor-pointer"
-                tabIndex={-1}
-              >
-                <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
-              </button>
-            }
-          />
-        </div>
+          }
+          suffix={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-text-muted hover:text-text-heading transition-colors cursor-pointer focus:outline-none"
+              aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+              tabIndex={-1}
+            >
+              <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
+            </button>
+          }
+        />
 
         <div className="mt-1">
-          <Checkbox
-            id="remember-me"
-            label={UI_LABELS.AUTH.REMEMBER_ME}
-            checked={values.rememberMe}
-            onChange={(checked) =>
-              setValues((prev) => ({ ...prev, rememberMe: checked }))
-            }
+          <Controller
+            name="rememberMe"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="remember-me"
+                label={UI_LABELS.AUTH.REMEMBER_ME}
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            )}
           />
         </div>
 
-        {errors.general && (
-          <p className="text-sm text-[#BA1A1A] bg-[#FFDAD6]/30 border border-[#BA1A1A]/30 rounded-xl px-4 py-3 font-[Montserrat]">
-            {errors.general}
+        {generalError && (
+          <p
+            className="text-sm text-[#BA1A1A] bg-[#FFDAD6]/30 border border-[#BA1A1A]/30 rounded-xl px-4 py-3 font-[Montserrat]"
+            role="alert"
+          >
+            {generalError}
           </p>
         )}
 
