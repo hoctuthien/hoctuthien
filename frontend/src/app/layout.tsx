@@ -13,7 +13,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hoctuthien.org"),
+  metadataBase: new URL("https://app.hoctuthien.com"),
   title: "Học Từ Thiện",
   description:
     "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
@@ -24,11 +24,11 @@ export const metadata: Metadata = {
     title: "Học Từ Thiện",
     description:
       "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
-    url: "https://hoctuthien.org",
+    url: "https://app.hoctuthien.com",
     siteName: "Học Từ Thiện",
     images: [
       {
-        url: "/images/avatar_main.png",
+        url: "https://app.hoctuthien.com/images/avatar_main.png",
         width: 1200,
         height: 630,
         alt: "Học Từ Thiện - Kết nối tri thức",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     title: "Học Từ Thiện",
     description:
       "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
-    images: ["/images/avatar_main.png"],
+    images: ["https://app.hoctuthien.com/images/avatar_main.png"],
   },
 };
 
