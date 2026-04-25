@@ -13,11 +13,36 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://hoctuthien.org"),
   title: "Học Từ Thiện",
   description:
     "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
   icons: {
     icon: "/images/avatar_browser.png",
+  },
+  openGraph: {
+    title: "Học Từ Thiện",
+    description:
+      "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
+    url: "https://hoctuthien.org",
+    siteName: "Học Từ Thiện",
+    images: [
+      {
+        url: "/images/main_pic.png",
+        width: 1200,
+        height: 630,
+        alt: "Học Từ Thiện - Kết nối tri thức",
+      },
+    ],
+    locale: "vi_VN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Học Từ Thiện",
+    description:
+      "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
+    images: ["/images/main_pic.png"],
   },
 };
 
