@@ -1,6 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { CourseBookingEntity } from '../../course-booking/entities/course-booking.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
 export enum PaymentStatus {
@@ -12,13 +11,6 @@ export enum PaymentStatus {
 
 @Entity({ name: 'payments' })
 export class PaymentEntity extends BaseEntity {
-  @Column({ name: 'course_booking_id', type: 'bigint', unique: true })
-  courseBookingId: string;
-
-  @OneToOne(() => CourseBookingEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'course_booking_id' })
-  courseBooking: CourseBookingEntity;
-
   @Column({ name: 'user_id', type: 'bigint' })
   userId: string;
 

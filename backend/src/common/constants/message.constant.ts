@@ -21,3 +21,9 @@ export const COURSE_MESSAGES = {
   UNBOOKING_SUCCESS: 'Hủy đăng ký khóa học thành công.',
   UNBOOKING_FAILED: 'Hủy đăng ký khóa học thất bại.',
 };
+
+export const APPLICATION_MESSAGES = {
+  SUCCESS: 'Gửi đơn đăng ký mentor thành công.',
+  ALREADY_EXISTS: 'Bạn đã có một đơn đăng ký đang chờ duyệt.',
+  FAILED: 'Gửi đơn đăng ký mentor thất bại.',
+};

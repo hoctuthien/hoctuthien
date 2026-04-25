@@ -1,5 +1,6 @@
 export interface UserPayload {
+  id: string;
   email: string;
-  // Thêm các trường khác tùy vào Token
-  // file này tui tạo để làm frame cho code chính thức nha.
+  role: string;
+  deviceId?: string;
 }

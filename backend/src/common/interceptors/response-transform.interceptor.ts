@@ -37,9 +37,15 @@ export class ResponseTransformInterceptor implements NestInterceptor {
           };
         }
 
+        // Tự động dọn dẹp Token khỏi Body (vì đã có trong Cookie)
+        if (data && typeof data === 'object') {
+          delete data.access_token;
+          delete data.refresh_token;
+        }
+
         // Trường hợp data thông thường
         return {
-          data: data ?? [],
+          data: Array.isArray(data) ? data : (data ? [data] : []),
           meta: {},
           error: null,
         };

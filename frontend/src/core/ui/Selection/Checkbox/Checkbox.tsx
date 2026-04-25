@@ -4,15 +4,29 @@ import React, { useId } from "react";
 import { Check, Minus } from "lucide-react";
 import { cn } from "@/core/utils/cn";
 
-export interface CheckboxProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
-  label?: string;
+export interface CheckboxProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onChange"
+> {
+  label?: React.ReactNode;
   indeterminate?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ label, indeterminate, checked, onChange, disabled, className, id: providedId, ...props }, ref) => {
+  (
+    {
+      label,
+      indeterminate,
+      checked,
+      onChange,
+      disabled,
+      className,
+      id: providedId,
+      ...props
+    },
+    ref
+  ) => {
     const internalId = useId();
     const id = providedId || internalId;
 
@@ -36,7 +50,10 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             id={id}
             ref={(el) => {
               if (typeof ref === "function") ref(el);
-              else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = el;
+              else if (ref)
+                (
+                  ref as React.MutableRefObject<HTMLInputElement | null>
+                ).current = el;
               if (el) el.indeterminate = indeterminate || false;
             }}
             checked={checked}
@@ -53,7 +70,8 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
               "peer-checked:bg-primary peer-checked:border-primary peer-indeterminate:bg-primary peer-indeterminate:border-primary",
               "peer-focus-visible:ring-4 peer-focus-visible:ring-primary-opacity peer-focus-visible:border-primary",
               "active:scale-90",
-              disabled && "border-outline-variant bg-surface-variant peer-checked:bg-text-muted peer-checked:border-text-muted group-hover:border-outline-variant"
+              disabled &&
+                "border-outline-variant bg-surface-variant peer-checked:bg-text-muted peer-checked:border-text-muted group-hover:border-outline-variant"
             )}
           >
             {indeterminate ? (

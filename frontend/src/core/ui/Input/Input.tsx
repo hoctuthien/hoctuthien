@@ -12,10 +12,12 @@ export interface InputProps
   status?: InputStatus;
   containerClassName?: string;
   suffix?: React.ReactNode;
+  labelAction?: React.ReactNode;
+  iconLeft?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, helperText, status: providedStatus, containerClassName, type, suffix, ...props }, ref) => {
+  ({ className, label, error, helperText, status: providedStatus, containerClassName, type, suffix, labelAction, iconLeft, ...props }, ref) => {
     // Determine the status based on error prop or providedStatus
     const status = providedStatus || (error ? "error" : "default");
     const message = error || helperText;
@@ -50,21 +52,32 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className={cn("flex flex-col gap-2 w-full", containerClassName)}>
-        {label && (
-          <label 
-            htmlFor={props.id}
-            className="text-sm font-semibold text-[#181C20] font-[Montserrat] cursor-pointer"
-          >
-            {label}
-          </label>
+        {(label || labelAction) && (
+          <div className="flex items-center justify-between">
+            {label && (
+              <label 
+                htmlFor={props.id}
+                className="text-sm font-semibold text-[#181C20] font-[Montserrat] cursor-pointer"
+              >
+                {label}
+              </label>
+            )}
+            {labelAction}
+          </div>
         )}
         <div className="relative flex items-center">
+          {iconLeft && (
+            <div className="absolute left-4 flex items-center z-10 text-text-muted">
+              {iconLeft}
+            </div>
+          )}
           <input
             type={type}
             className={cn(
               "flex h-[50px] w-full px-4 py-3.5 text-base font-[Montserrat] transition-all duration-200 outline-none rounded-xl border",
               "placeholder:text-[#727785]",
               statusStyles[status].input,
+              iconLeft && "pl-12",
               (suffix || statusStyles[status].icon) && "pr-12",
               "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-50",
               className

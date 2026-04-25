@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import {
   createUserSchema,
@@ -22,7 +22,21 @@ export class UserService {
 
   async findOne(id: string) {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('Không tìm thấy thông tin người dùng.');
+    return userSchema.parse(user);
+  }
+
+  async getMe(id: string) {
+    const user = await this.userRepository.findById(id);
+    
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy thông tin người dùng.');
+    }
+
+    if (user.status !== 'active') {
+      throw new ForbiddenException('Tài khoản của bạn đã bị khóa bởi quản trị viên.');
+    }
+
     return userSchema.parse(user);
   }
 

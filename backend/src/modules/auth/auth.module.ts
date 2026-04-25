@@ -5,12 +5,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './auth.controller';
 import { UserEntity } from '../user/entities/user.entity';
+import { UserSessionEntity } from '../user-session/entities/user-session.entity';
 import { RedisModule } from '../redis/redis.module';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { PassportModule } from '@nestjs/passport';
+import { APP_GUARD } from '@nestjs/core';
+import { UserSessionModule } from '../user-session/user-session.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, UserSessionEntity]),
     RedisModule,
+    PassportModule,
+    UserSessionModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -22,7 +31,15 @@ import { RedisModule } from '../redis/redis.module';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
   controllers: [AuthController],
   exports: [AuthService],
 })
