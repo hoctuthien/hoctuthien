@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { AxiosResponse } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
@@ -15,18 +16,20 @@ export interface TNTransaction {
   incognito: boolean;
 }
 
+export interface TNTransactionPayload {
+  transactions: TNTransaction[];
+  count: number;
+  pageNumber: number;
+  accountNumber: string;
+  accountName: string;
+  hasNextPage: boolean;
+  totalCredit: number;
+  totalDebit: number;
+}
+
 export interface TNTransactionResponse {
   status: number;
-  data: {
-    transactions: TNTransaction[];
-    count: number;
-    pageNumber: number;
-    accountNumber: string;
-    accountName: string;
-    hasNextPage: boolean;
-    totalCredit: number;
-    totalDebit: number;
-  };
+  data: TNTransactionPayload;
 }
 
 export interface FindTransactionResult {
@@ -74,8 +77,8 @@ export class TnAppService {
     let rawResponse: string | undefined;
 
     try {
-      const response = await firstValueFrom(
-        this.httpService.get<TNTransactionResponse>(url, {
+      const response: AxiosResponse<TNTransactionPayload> = await firstValueFrom(
+        this.httpService.get<TNTransactionPayload>(url, {
           headers: { 'Content-Type': 'application/json' },
         }),
       );
@@ -88,7 +91,7 @@ export class TnAppService {
       const data = response.data;
       rawResponse = JSON.stringify(data).slice(0, 2000);
 
-      const match = data.data.transactions.find(
+      const match = data.transactions.find(
         (tx) =>
           tx.type === 'CREDIT' &&
           tx.narrative.toUpperCase().includes(shortCode.toUpperCase()) &&
