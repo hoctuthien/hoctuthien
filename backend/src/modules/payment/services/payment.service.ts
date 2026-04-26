@@ -1,36 +1,186 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  ServiceUnavailableException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { PaymentRepository } from '../repositories/payment.repository';
-import { createPaymentSchema, updatePaymentSchema, paymentSchema } from '../schema/payment.schema';
-import { CreatePaymentInput, UpdatePaymentInput } from '../types/payment.types';
+import { PaymentEntity, PaymentType } from '../entities/payment.entity';
+import { PaymentStatus } from '../../../common/enums/database.enum';
+import { SystemConfigService } from '../../system-config/services/system-config.service';
+import { VietqrService } from './vietqr.service';
+import { TnAppService } from './tn-app.service';
+import { DataSource } from 'typeorm';
+import { UserEntity } from '../../user/entities/user.entity';
+import { ErrorCode, ErrorMessage } from '../../../common/enums/error-code.enum';
+
+const ACTIVATION_FEE_CONFIG_KEY = 'activation_fee';
+const ACTIVATION_FEE_DEFAULT = 10_000;
 
 @Injectable()
 export class PaymentService {
-  constructor(private readonly paymentRepository: PaymentRepository) {}
+  private readonly logger = new Logger(PaymentService.name);
 
-  async findAll() {
-    const items = await this.paymentRepository.findMany();
-    return items.map(item => paymentSchema.parse(item));
+  constructor(
+    private readonly paymentRepository: PaymentRepository,
+    private readonly systemConfigService: SystemConfigService,
+    private readonly vietqrService: VietqrService,
+    private readonly tnAppService: TnAppService,
+    private readonly dataSource: DataSource,
+  ) { }
+
+  async findOne(id: string): Promise<PaymentEntity> {
+    return this.paymentRepository.findByIdOrFail(
+      id,
+      ErrorMessage[ErrorCode.PAYMENT_NOT_FOUND],
+    );
   }
 
-  async findOne(id: string) {
-    const item = await this.paymentRepository.findById(id);
-    if (!item) throw new NotFoundException('Payment not found');
-    return paymentSchema.parse(item);
+  // Tạo QR VietQR để mentee thanh toán phí kích hoạt tài khoản (hết hạn sau 15 phút)
+  async generateActivationQr(userId: string): Promise<{
+    paymentId: string;
+    amount: number;
+    transactionCode: string;
+    qrUrl: string;
+    expiredAt: Date;
+  }> {
+    const existing = await this.paymentRepository.findPendingActivation(userId);
+    if (existing) {
+      const isStillValid = existing.expiredAt && existing.expiredAt > new Date();
+
+      if (isStillValid) {
+        this.logger.log(`User ${userId} đã có QR kích hoạt chưa hết hạn.`);
+        return {
+          paymentId: existing.id,
+          amount: Number(existing.amount),
+          transactionCode: existing.vietqrPayload?.transactionCode ?? '',
+          qrUrl: existing.vietqrQrDataUrl ?? '',
+          expiredAt: existing.expiredAt,
+        };
+      }
+
+      // Lazy Expiry: payment PENDING quá hạn → tự động chuyển EXPIRED
+      this.logger.log(`Payment ${existing.id} đã hết hạn. Chuyển sang EXPIRED.`);
+      await this.paymentRepository.expirePayment(existing.id);
+    }
+
+    let amount = ACTIVATION_FEE_DEFAULT;
+    try {
+      const config = await this.systemConfigService.findByKey(ACTIVATION_FEE_CONFIG_KEY);
+      if (config && typeof config.configValue === 'number') {
+        amount = config.configValue;
+      }
+    } catch {
+      this.logger.warn(
+        `Không tìm thấy config '${ACTIVATION_FEE_CONFIG_KEY}'. Dùng fallback: ${ACTIVATION_FEE_DEFAULT} VND.`,
+      );
+    }
+
+    const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const transactionCode = `KICHHOAT ${userId}${randomStr}`;
+    const qrUrl = this.vietqrService.generateQrUrl(amount, transactionCode);
+
+    const expiredAt = new Date();
+    expiredAt.setMinutes(expiredAt.getMinutes() + 15);
+
+    const payment = await this.paymentRepository.createAndSave({
+      userId,
+      amount,
+      currency: 'VND',
+      paymentMethod: PaymentType.ACTIVATION,
+      status: PaymentStatus.PENDING,
+      description: transactionCode,
+      expiredAt,
+      vietqrQrDataUrl: qrUrl,
+      vietqrPayload: { transactionCode, qrUrl, generatedAt: new Date().toISOString() },
+    } as Partial<PaymentEntity>);
+
+    this.logger.log(`Tạo QR kích hoạt thành công cho user ${userId}: ${transactionCode}`);
+
+    return {
+      paymentId: payment.id,
+      amount: Number(payment.amount),
+      transactionCode,
+      qrUrl,
+      expiredAt,
+    };
   }
 
-  async create(payload: CreatePaymentInput) {
-    const parsed = createPaymentSchema.parse(payload);
-    const created = await this.paymentRepository.createAndSave(parsed);
-    return paymentSchema.parse(created);
-  }
+  // User bấm "Tôi đã chuyển khoản" → query TN App API kiểm tra giao dịch → kích hoạt tài khoản
+  async verifyActivationPayment(
+    userId: string,
+    paymentId: string,
+  ): Promise<{ activated: boolean; message: string }> {
+    const payment = await this.paymentRepository.findByIdOrFail(
+      paymentId,
+      ErrorMessage[ErrorCode.PAYMENT_NOT_FOUND],
+    );
 
-  async update(id: string, payload: UpdatePaymentInput) {
-    const parsed = updatePaymentSchema.parse(payload);
-    const updated = await this.paymentRepository.updateById(id, parsed);
-    return paymentSchema.parse(updated);
-  }
+    if (payment.userId !== userId) {
+      throw new ForbiddenException(ErrorMessage[ErrorCode.PAYMENT_FORBIDDEN]);
+    }
 
-  async remove(id: string) {
-    await this.paymentRepository.softDeleteById(id);
+    // Idempotency: đã kích hoạt rồi thì trả về luôn
+    if (payment.status === PaymentStatus.SUCCESS) {
+      this.logger.log(`Payment ${paymentId} đã SUCCESS, bỏ qua xác minh.`);
+      return { activated: true, message: 'Tài khoản đã được kích hoạt trước đó.' };
+    }
+
+    if (!payment.expiredAt || payment.expiredAt <= new Date()) {
+      throw new UnprocessableEntityException(ErrorMessage[ErrorCode.PAYMENT_QR_EXPIRED]);
+    }
+
+    const transactionCode = payment.vietqrPayload?.transactionCode as string | undefined;
+    if (!transactionCode) {
+      throw new InternalServerErrorException(
+        ErrorMessage[ErrorCode.PAYMENT_INVALID_TRANSACTION_CODE],
+      );
+    }
+
+    const result = await this.tnAppService.findTransactionByCode(
+      transactionCode,
+      payment.createdAt,
+      Number(payment.amount),
+    );
+
+    if (result.error) {
+      this.logger.error(`TN App API lỗi cho payment ${paymentId}: ${result.error}`);
+      throw new ServiceUnavailableException(
+        ErrorMessage[ErrorCode.PAYMENT_VERIFY_SERVICE_UNAVAILABLE],
+      );
+    }
+
+    if (!result.found || !result.transaction) {
+      return {
+        activated: false,
+        message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_NOT_FOUND],
+      };
+    }
+
+    // Cập nhật payment + kích hoạt user trong 1 transaction — all or nothing
+    const tx = result.transaction;
+    await this.dataSource.transaction(async (manager) => {
+      await manager.update(PaymentEntity, { id: paymentId }, {
+        status: PaymentStatus.SUCCESS,
+        transactionId: tx.id,
+        paidAt: new Date(tx.transactionTime + '+07:00'),
+        vietqrPayload: {
+          ...payment.vietqrPayload,
+          ...(result.rawResponse ? { rawResponse: result.rawResponse } : {}),
+        } as Record<string, any>,
+      });
+      await manager.update(UserEntity, { id: userId }, { isVerified: true });
+    });
+
+    this.logger.log(
+      `[Verify] Payment ${paymentId} SUCCESS. User ${userId} đã được kích hoạt.`,
+    );
+
+    return {
+      activated: true,
+      message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_SUCCESS],
+    };
   }
 }

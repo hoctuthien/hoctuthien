@@ -1,13 +1,13 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserEntity } from '../../user/entities/user.entity';
+import { PaymentStatus } from '../../../common/enums/database.enum';
 
-export enum PaymentStatus {
-  PENDING = 'pending',
-  SUCCESS = 'success',
-  FAILED = 'failed',
-  REFUNDED = 'refunded',
+export enum PaymentType {
+  ACTIVATION = 'activation',
 }
+
+export { PaymentStatus };
 
 @Entity({ name: 'payments' })
 export class PaymentEntity extends BaseEntity {
@@ -29,6 +29,19 @@ export class PaymentEntity extends BaseEntity {
 
   @Column({ name: 'transaction_id', type: 'varchar', length: 255, unique: true, nullable: true })
   transactionId: string | null;
+
+  @Column({ name: 'description', type: 'varchar', length: 500, nullable: true })
+  description: string | null;
+
+  @Column({ name: 'expired_at', type: 'timestamp with time zone', nullable: true })
+  expiredAt: Date | null;
+
+  @Column({ name: 'vietqr_qr_data_url', type: 'text', nullable: true })
+  vietqrQrDataUrl: string | null;
+
+  // Lưu transactionCode, qrUrl và raw response từ TN App sau khi verify
+  @Column({ name: 'vietqr_payload', type: 'jsonb', default: {} })
+  vietqrPayload: Record<string, any>;
 
   @Column({ name: 'payment_gateway_payload', type: 'jsonb', default: {} })
   paymentGatewayPayload: Record<string, any>;
