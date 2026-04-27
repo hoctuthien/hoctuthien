@@ -1,4 +1,4 @@
-name: Monorepo CI and Deploy
+name: "PROD: Backend & Frontend"
 
 on:
   push:
@@ -7,41 +7,43 @@ on:
       - "backend/**"
       - "frontend/**"
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  # --- JOB DEPLOY CHO BACKEND ---
   backend-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # Lấy 2 commit gần nhất để so sánh sự thay đổi
+          fetch-depth: 2
 
       - name: Check for Backend changes
         id: check_backend
         run: |
           if git diff --name-only HEAD^ HEAD | grep -q "^backend/"; then
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Phát hiện thay đổi trong thư mục backend."
           else
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "Không có thay đổi trong backend."
           fi
 
-      - name: Setup Node.js (Backend)
+      - name: Login to GHCR
         if: steps.check_backend.outputs.changed == 'true'
-        uses: actions/setup-node@v4
+        uses: docker/login-action@v3
         with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Check Backend
+      - name: Build and Push Backend Image
         if: steps.check_backend.outputs.changed == 'true'
-        working-directory: ./backend
-        run: |
-          npm install
-          npm run build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/backend:latest
 
       - name: Trigger Backend Coolify
         if: steps.check_backend.outputs.changed == 'true'
@@ -49,7 +51,6 @@ jobs:
           curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_BACKEND }}' \
                --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
 
-  # --- JOB DEPLOY CHO FRONTEND (NEXT.JS) ---
   frontend-deploy:
     runs-on: ubuntu-latest
     steps:
@@ -63,26 +64,27 @@ jobs:
         run: |
           if git diff --name-only HEAD^ HEAD | grep -q "^frontend/"; then
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Phát hiện thay đổi trong thư mục frontend."
           else
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "Không có thay đổi trong frontend."
           fi
 
-      - name: Setup Node.js (Frontend)
+      - name: Login to GHCR
         if: steps.check_frontend.outputs.changed == 'true'
-        uses: actions/setup-node@v4
+        uses: docker/login-action@v3
         with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Check Frontend
+      - name: Build and Push Frontend Image
         if: steps.check_frontend.outputs.changed == 'true'
-        working-directory: ./frontend
-        run: |
-          npm install --legacy-peer-deps
-          npm run build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/frontend:latest
+          build-args: |
+            BACKEND_URL=https://api.hoctuthien.com/
 
       - name: Trigger Frontend Coolify
         if: steps.check_frontend.outputs.changed == 'true'
