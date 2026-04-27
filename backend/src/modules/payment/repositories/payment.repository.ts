@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { BaseRepository } from '../../../common/repositories/base.repository';
-import { PaymentEntity } from '../entities/payment.entity';
+import { PaymentEntity, PaymentType } from '../entities/payment.entity';
+import { PaymentStatus } from '../../../common/enums/database.enum';
+
 
 @Injectable()
 export class PaymentRepository extends BaseRepository<PaymentEntity> {
@@ -11,5 +13,34 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
     repo: Repository<PaymentEntity>,
   ) {
     super(repo);
+  }
+
+  async findPendingActivation(userId: string): Promise<PaymentEntity | null> {
+    return this.repo.findOne({
+      where: {
+        userId,
+        paymentMethod: PaymentType.ACTIVATION,
+        status: PaymentStatus.PENDING,
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+
+  async expirePayment(paymentId: string): Promise<void> {
+    await this.repo.update({ id: paymentId }, { status: PaymentStatus.EXPIRED });
+  }
+
+  // Bulk-expire tất cả payment PENDING đã quá expiredAt — có thể gọi từ cron job
+  async expireStaleActivations(): Promise<number> {
+    const result = await this.repo.update(
+      {
+        paymentMethod: PaymentType.ACTIVATION,
+        status: PaymentStatus.PENDING,
+        expiredAt: LessThan(new Date()),
+      },
+      { status: PaymentStatus.EXPIRED },
+    );
+    return result.affected ?? 0;
   }
 }

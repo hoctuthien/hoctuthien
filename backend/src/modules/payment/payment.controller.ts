@@ -1,41 +1,34 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
 import { PaymentService } from './services/payment.service';
-import { CreatePaymentInput, UpdatePaymentInput } from './types/payment.types';
+import { GenerateActivationQrDto, VerifyActivationPaymentDto } from './dtos/payment.dto';
+import { User } from '../../common/decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('payments')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(private readonly paymentService: PaymentService) { }
 
-  @Post()
-  create(@Body() payload: CreatePaymentInput) {
-    return this.paymentService.create(payload);
+  @UseGuards(JwtAuthGuard)
+  @Post('activation/generate-qr')
+  generateActivationQr(
+    @Body() _dto: GenerateActivationQrDto,
+    @User('id') userId: string,
+  ) {
+    return this.paymentService.generateActivationQr(userId);
   }
 
-  @Get()
-  findAll() {
-    return this.paymentService.findAll();
-  }
-
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.paymentService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() payload: UpdatePaymentInput) {
-    return this.paymentService.update(id, payload);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paymentService.remove(id);
+  @UseGuards(JwtAuthGuard)
+  @Post('activation/verify')
+  verifyActivationPayment(
+    @Body() dto: VerifyActivationPaymentDto,
+    @User('id') userId: string,
+  ) {
+    return this.paymentService.verifyActivationPayment(userId, dto.paymentId);
   }
 }
