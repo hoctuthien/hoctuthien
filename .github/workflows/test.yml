@@ -1,0 +1,93 @@
+name: "TEST: Backend & Frontend"
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  backend-deploy-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for Backend changes
+        id: check_backend
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q "^backend/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Login to GHCR
+        if: steps.check_backend.outputs.changed == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Backend Image (TEST)
+        if: steps.check_backend.outputs.changed == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/backend:test # Dùng tag test
+
+      - name: Trigger Backend Coolify (TEST)
+        if: steps.check_backend.outputs.changed == 'true'
+        run: |
+          # BẮT BUỘC DÙNG SECRET MỚI (Trỏ về con App Test trên Coolify)
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_BACKEND_TEST }}' \
+               --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
+
+  frontend-deploy-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for Frontend changes
+        id: check_frontend
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q "^frontend/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Login to GHCR
+        if: steps.check_frontend.outputs.changed == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Frontend Image (TEST)
+        if: steps.check_frontend.outputs.changed == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/frontend:test # Dùng tag test
+
+      - name: Trigger Frontend Coolify (TEST)
+        if: steps.check_frontend.outputs.changed == 'true'
+        run: |
+          # BẮT BUỘC DÙNG SECRET MỚI (Trỏ về con App Test trên Coolify)
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_FRONTEND_TEST }}' \
+               --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
