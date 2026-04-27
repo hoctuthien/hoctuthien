@@ -76,8 +76,4 @@ async function bootstrap() {
   await app.listen(config.get('port') || 5050);
 }
 bootstrap();
-<<<<<<< HEAD
-// test main
-=======
 // test develop
->>>>>>> develop
