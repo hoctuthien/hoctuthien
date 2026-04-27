@@ -1,4 +1,4 @@
-name: "PRODUCTION: Backend & Frontend"
+name: "PROD: Backend & Frontend"
 
 on:
   push:
@@ -12,7 +12,6 @@ permissions:
   packages: write
 
 jobs:
-  # --- JOB CHO BACKEND ---
   backend-deploy:
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +51,6 @@ jobs:
           curl --request GET '${{ secrets.COOLIFY_WEBHOOK_URL_BACKEND }}' \
                --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
 
-  # --- JOB CHO FRONTEND ---
   frontend-deploy:
     runs-on: ubuntu-latest
     steps:
@@ -85,6 +83,8 @@ jobs:
           context: ./frontend
           push: true
           tags: ghcr.io/${{ github.repository }}/frontend:latest
+          build-args: |
+            BACKEND_URL=https://api.hoctuthien.com/
 
       - name: Trigger Frontend Coolify
         if: steps.check_frontend.outputs.changed == 'true'
