@@ -8,7 +8,7 @@ import {
   IsDateString,
 } from 'class-validator';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 
 export class LoginDto {
   @IsEmail({}, { message: AUTH_MESSAGES.INVALID_EMAIL })
@@ -29,7 +29,6 @@ export class GoogleTokenDto {
   @IsEmail()
   @IsOptional()
   email?: string;
-
 
   @IsString()
   @IsNotEmpty()

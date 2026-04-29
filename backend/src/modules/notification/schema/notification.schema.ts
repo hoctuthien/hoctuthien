@@ -25,6 +25,8 @@ export const createNotificationSchema = z.object({
   status: z.string().optional(),
 });
 
-export const updateNotificationSchema = createNotificationSchema.partial().extend({
-  isRead: z.boolean().optional(),
-});
+export const updateNotificationSchema = createNotificationSchema
+  .partial()
+  .extend({
+    isRead: z.boolean().optional(),
+  });

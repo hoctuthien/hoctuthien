@@ -17,7 +17,12 @@ export class PenaltyTicketEntity extends BaseEntity {
   @Column({ name: 'points_deducted', type: 'integer', default: 0 })
   pointsDeducted: number;
 
-  @Column({ name: 'evidence_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'evidence_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   evidenceUrl: string | null;
 
   @Column({ type: 'jsonb', default: {} })

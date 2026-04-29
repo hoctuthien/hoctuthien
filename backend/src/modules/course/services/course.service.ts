@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CourseRepository } from '../repositories/course.repository';
-import { createCourseSchema, updateCourseSchema, courseSchema } from '../schema/course.schema';
+import {
+  createCourseSchema,
+  updateCourseSchema,
+  courseSchema,
+} from '../schema/course.schema';
 import { CreateCourseInput, UpdateCourseInput } from '../types/course.types';
 
 @Injectable()
@@ -9,7 +13,7 @@ export class CourseService {
 
   async findAll() {
     const courses = await this.courseRepository.findMany();
-    return courses.map(course => courseSchema.parse(course));
+    return courses.map((course) => courseSchema.parse(course));
   }
 
   async findOne(id: string) {

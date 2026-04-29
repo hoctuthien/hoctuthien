@@ -8,7 +8,10 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CourseBookingService } from './services/course-booking.service';
-import { CreateCourseBookingInput, UpdateCourseBookingInput } from './types/course-booking.types';
+import {
+  CreateCourseBookingInput,
+  UpdateCourseBookingInput,
+} from './types/course-booking.types';
 
 @Controller('course-bookings')
 export class CourseBookingController {

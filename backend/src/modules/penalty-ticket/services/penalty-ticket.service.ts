@@ -12,11 +12,13 @@ import {
 
 @Injectable()
 export class PenaltyTicketService {
-  constructor(private readonly penaltyTicketRepository: PenaltyTicketRepository) {}
+  constructor(
+    private readonly penaltyTicketRepository: PenaltyTicketRepository,
+  ) {}
 
   async findAll() {
     const items = await this.penaltyTicketRepository.findMany();
-    return items.map(item => penaltyTicketSchema.parse(item));
+    return items.map((item) => penaltyTicketSchema.parse(item));
   }
 
   async findOne(id: string) {

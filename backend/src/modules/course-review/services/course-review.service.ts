@@ -1,15 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CourseReviewRepository } from '../repositories/course-review.repository';
-import { createCourseReviewSchema, updateCourseReviewSchema, courseReviewSchema } from '../schema/course-review.schema';
-import { CreateCourseReviewInput, UpdateCourseReviewInput } from '../types/course-review.types';
+import {
+  createCourseReviewSchema,
+  updateCourseReviewSchema,
+  courseReviewSchema,
+} from '../schema/course-review.schema';
+import {
+  CreateCourseReviewInput,
+  UpdateCourseReviewInput,
+} from '../types/course-review.types';
 
 @Injectable()
 export class CourseReviewService {
-  constructor(private readonly courseReviewRepository: CourseReviewRepository) {}
+  constructor(
+    private readonly courseReviewRepository: CourseReviewRepository,
+  ) {}
 
   async findAll() {
     const items = await this.courseReviewRepository.findMany();
-    return items.map(item => courseReviewSchema.parse(item));
+    return items.map((item) => courseReviewSchema.parse(item));
   }
 
   async findOne(id: string) {

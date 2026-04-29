@@ -12,11 +12,13 @@ import {
 
 @Injectable()
 export class SystemConfigService {
-  constructor(private readonly systemConfigRepository: SystemConfigRepository) {}
+  constructor(
+    private readonly systemConfigRepository: SystemConfigRepository,
+  ) {}
 
   async findAll() {
     const items = await this.systemConfigRepository.findMany();
-    return items.map(item => systemConfigSchema.parse(item));
+    return items.map((item) => systemConfigSchema.parse(item));
   }
 
   async findOne(id: string) {

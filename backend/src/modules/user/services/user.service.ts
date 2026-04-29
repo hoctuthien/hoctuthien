@@ -1,14 +1,15 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import {
   createUserSchema,
   updateUserSchema,
   userSchema,
 } from '../schema/user.schema';
-import {
-  CreateUserInput,
-  UpdateUserInput,
-} from '../types/user.types';
+import { CreateUserInput, UpdateUserInput } from '../types/user.types';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -17,12 +18,13 @@ export class UserService {
 
   async findAll() {
     const users = await this.userRepository.findMany();
-    return users.map(user => userSchema.parse(user));
+    return users.map((user) => userSchema.parse(user));
   }
 
   async findOne(id: string) {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new NotFoundException('Không tìm thấy thông tin người dùng.');
+    if (!user)
+      throw new NotFoundException('Không tìm thấy thông tin người dùng.');
     return userSchema.parse(user);
   }
 
@@ -34,7 +36,9 @@ export class UserService {
     }
 
     if (user.status !== 'active') {
-      throw new ForbiddenException('Tài khoản của bạn đã bị khóa bởi quản trị viên.');
+      throw new ForbiddenException(
+        'Tài khoản của bạn đã bị khóa bởi quản trị viên.',
+      );
     }
 
     return userSchema.parse(user);
@@ -75,7 +79,8 @@ export class UserService {
    */
   async activateMentee(id: string): Promise<void> {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new NotFoundException('Không tìm thấy thông tin người dùng.');
+    if (!user)
+      throw new NotFoundException('Không tìm thấy thông tin người dùng.');
     await this.userRepository.updateById(id, { isVerified: true });
   }
 }

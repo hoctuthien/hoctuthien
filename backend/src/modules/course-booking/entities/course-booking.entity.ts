@@ -31,10 +31,20 @@ export class CourseBookingEntity extends BaseEntity {
   @Column({ name: 'meeting_time', type: 'timestamp with time zone' })
   meetingTime: Date;
 
-  @Column({ name: 'google_meet_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'google_meet_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   googleMeetUrl: string | null;
 
-  @Column({ name: 'calendar_event_id', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'calendar_event_id',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   calendarEventId: string | null;
 
   @Column({ name: 'notes_for_mentor', type: 'text', nullable: true })

@@ -28,9 +28,11 @@ export const createCourseBookingSchema = z.object({
   status: z.nativeEnum(BookingStatus).optional(),
 });
 
-export const updateCourseBookingSchema = createCourseBookingSchema.partial().extend({
-  googleMeetUrl: z.string().max(500).optional(),
-  calendarEventId: z.string().max(255).optional(),
-  cancellationReason: z.string().optional(),
-  paymentId: z.string().optional(),
-});
+export const updateCourseBookingSchema = createCourseBookingSchema
+  .partial()
+  .extend({
+    googleMeetUrl: z.string().max(500).optional(),
+    calendarEventId: z.string().max(255).optional(),
+    cancellationReason: z.string().optional(),
+    paymentId: z.string().optional(),
+  });

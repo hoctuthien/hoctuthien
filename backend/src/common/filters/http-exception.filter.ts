@@ -26,16 +26,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse() as any;
-      const exceptionMessage = typeof exceptionResponse === 'object' 
-        ? (exceptionResponse.message || exceptionResponse)
-        : exceptionResponse;
-      
-      const actualMessage = Array.isArray(exceptionMessage) ? exceptionMessage[0] : exceptionMessage;
-      
+      const exceptionMessage =
+        typeof exceptionResponse === 'object'
+          ? exceptionResponse.message || exceptionResponse
+          : exceptionResponse;
+
+      const actualMessage = Array.isArray(exceptionMessage)
+        ? exceptionMessage[0]
+        : exceptionMessage;
+
       // Mặc định details sẽ là một Object để FE luôn xử lý đồng nhất
-      details = typeof exceptionMessage === 'object' 
-        ? exceptionMessage 
-        : { message: exceptionMessage };
+      details =
+        typeof exceptionMessage === 'object'
+          ? exceptionMessage
+          : { message: exceptionMessage };
 
       switch (status) {
         case HttpStatus.BAD_REQUEST:
@@ -48,9 +52,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
           message = exceptionMessage || ERROR_MESSAGES.UNAUTHORIZED;
           break;
         case HttpStatus.FORBIDDEN:
-          code = actualMessage === 'Tài khoản của bạn đã bị khóa bởi quản trị viên.' 
-            ? ERROR_CODES.ACCOUNT_BANNED 
-            : ERROR_CODES.FORBIDDEN;
+          code =
+            actualMessage === 'Tài khoản của bạn đã bị khóa bởi quản trị viên.'
+              ? ERROR_CODES.ACCOUNT_BANNED
+              : ERROR_CODES.FORBIDDEN;
           message = exceptionMessage || ERROR_MESSAGES.FORBIDDEN;
           break;
         case HttpStatus.NOT_FOUND:

@@ -8,7 +8,10 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CourseReviewService } from './services/course-review.service';
-import { CreateCourseReviewInput, UpdateCourseReviewInput } from './types/course-review.types';
+import {
+  CreateCourseReviewInput,
+  UpdateCourseReviewInput,
+} from './types/course-review.types';
 
 @Controller('course-reviews')
 export class CourseReviewController {

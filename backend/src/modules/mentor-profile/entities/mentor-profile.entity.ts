@@ -20,7 +20,12 @@ export class MentorProfileEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   bio: string | null;
 
-  @Column({ name: 'linkedin_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'linkedin_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   linkedinUrl: string | null;
 
   @Column({ name: 'years_of_experience', type: 'integer', nullable: true })
@@ -29,7 +34,13 @@ export class MentorProfileEntity extends BaseEntity {
   @Column({ type: 'jsonb', default: [] })
   skills: string[];
 
-  @Column({ name: 'average_rating', type: 'decimal', precision: 3, scale: 2, default: 0 })
+  @Column({
+    name: 'average_rating',
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    default: 0,
+  })
   averageRating: number;
 
   @Column({ name: 'total_students', type: 'integer', default: 0 })

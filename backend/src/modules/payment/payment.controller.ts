@@ -1,12 +1,15 @@
 import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
 import { PaymentService } from './services/payment.service';
-import { GenerateActivationQrDto, VerifyActivationPaymentDto } from './dtos/payment.dto';
+import {
+  GenerateActivationQrDto,
+  VerifyActivationPaymentDto,
+} from './dtos/payment.dto';
 import { User } from '../../common/decorators/user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('payments')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) { }
+  constructor(private readonly paymentService: PaymentService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('activation/generate-qr')
