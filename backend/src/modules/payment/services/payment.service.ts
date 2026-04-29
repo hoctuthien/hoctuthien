@@ -29,7 +29,7 @@ export class PaymentService {
     private readonly vietqrService: VietqrService,
     private readonly tnAppService: TnAppService,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async findOne(id: string): Promise<PaymentEntity> {
     return this.paymentRepository.findByIdOrFail(
@@ -48,7 +48,8 @@ export class PaymentService {
   }> {
     const existing = await this.paymentRepository.findPendingActivation(userId);
     if (existing) {
-      const isStillValid = existing.expiredAt && existing.expiredAt > new Date();
+      const isStillValid =
+        existing.expiredAt && existing.expiredAt > new Date();
 
       if (isStillValid) {
         this.logger.log(`User ${userId} đã có QR kích hoạt chưa hết hạn.`);
@@ -62,13 +63,17 @@ export class PaymentService {
       }
 
       // Lazy Expiry: payment PENDING quá hạn → tự động chuyển EXPIRED
-      this.logger.log(`Payment ${existing.id} đã hết hạn. Chuyển sang EXPIRED.`);
+      this.logger.log(
+        `Payment ${existing.id} đã hết hạn. Chuyển sang EXPIRED.`,
+      );
       await this.paymentRepository.expirePayment(existing.id);
     }
 
     let amount = ACTIVATION_FEE_DEFAULT;
     try {
-      const config = await this.systemConfigService.findByKey(ACTIVATION_FEE_CONFIG_KEY);
+      const config = await this.systemConfigService.findByKey(
+        ACTIVATION_FEE_CONFIG_KEY,
+      );
       if (config && typeof config.configValue === 'number') {
         amount = config.configValue;
       }
@@ -94,10 +99,16 @@ export class PaymentService {
       description: transactionCode,
       expiredAt,
       vietqrQrDataUrl: qrUrl,
-      vietqrPayload: { transactionCode, qrUrl, generatedAt: new Date().toISOString() },
+      vietqrPayload: {
+        transactionCode,
+        qrUrl,
+        generatedAt: new Date().toISOString(),
+      },
     } as Partial<PaymentEntity>);
 
-    this.logger.log(`Tạo QR kích hoạt thành công cho user ${userId}: ${transactionCode}`);
+    this.logger.log(
+      `Tạo QR kích hoạt thành công cho user ${userId}: ${transactionCode}`,
+    );
 
     return {
       paymentId: payment.id,
@@ -125,14 +136,21 @@ export class PaymentService {
     // Idempotency: đã kích hoạt rồi thì trả về luôn
     if (payment.status === PaymentStatus.SUCCESS) {
       this.logger.log(`Payment ${paymentId} đã SUCCESS, bỏ qua xác minh.`);
-      return { activated: true, message: 'Tài khoản đã được kích hoạt trước đó.' };
+      return {
+        activated: true,
+        message: 'Tài khoản đã được kích hoạt trước đó.',
+      };
     }
 
     if (!payment.expiredAt || payment.expiredAt <= new Date()) {
-      throw new UnprocessableEntityException(ErrorMessage[ErrorCode.PAYMENT_QR_EXPIRED]);
+      throw new UnprocessableEntityException(
+        ErrorMessage[ErrorCode.PAYMENT_QR_EXPIRED],
+      );
     }
 
-    const transactionCode = payment.vietqrPayload?.transactionCode as string | undefined;
+    const transactionCode = payment.vietqrPayload?.transactionCode as
+      | string
+      | undefined;
     if (!transactionCode) {
       throw new InternalServerErrorException(
         ErrorMessage[ErrorCode.PAYMENT_INVALID_TRANSACTION_CODE],
@@ -146,7 +164,9 @@ export class PaymentService {
     );
 
     if (result.error) {
-      this.logger.error(`TN App API lỗi cho payment ${paymentId}: ${result.error}`);
+      this.logger.error(
+        `TN App API lỗi cho payment ${paymentId}: ${result.error}`,
+      );
       throw new ServiceUnavailableException(
         ErrorMessage[ErrorCode.PAYMENT_VERIFY_SERVICE_UNAVAILABLE],
       );
@@ -162,15 +182,19 @@ export class PaymentService {
     // Cập nhật payment + kích hoạt user trong 1 transaction — all or nothing
     const tx = result.transaction;
     await this.dataSource.transaction(async (manager) => {
-      await manager.update(PaymentEntity, { id: paymentId }, {
-        status: PaymentStatus.SUCCESS,
-        transactionId: tx.id,
-        paidAt: new Date(tx.transactionTime + '+07:00'),
-        vietqrPayload: {
-          ...payment.vietqrPayload,
-          ...(result.rawResponse ? { rawResponse: result.rawResponse } : {}),
-        } as Record<string, any>,
-      });
+      await manager.update(
+        PaymentEntity,
+        { id: paymentId },
+        {
+          status: PaymentStatus.SUCCESS,
+          transactionId: tx.id,
+          paidAt: new Date(tx.transactionTime + '+07:00'),
+          vietqrPayload: {
+            ...payment.vietqrPayload,
+            ...(result.rawResponse ? { rawResponse: result.rawResponse } : {}),
+          } as Record<string, any>,
+        },
+      );
       await manager.update(UserEntity, { id: userId }, { isVerified: true });
     });
 

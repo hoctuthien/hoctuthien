@@ -36,10 +36,13 @@ export const createUserSchema = z.object({
   status: z.string().optional(),
 });
 
-export const updateUserSchema = createUserSchema.partial().omit({ password: true }).extend({
-  isVerified: z.boolean().optional(),
-  points: z.number().optional(),
-  preferences: z.record(z.string(), z.any()).optional(),
-  metadata: z.record(z.string(), z.any()).optional(),
-  timezone: z.string().optional(),
-});
+export const updateUserSchema = createUserSchema
+  .partial()
+  .omit({ password: true })
+  .extend({
+    isVerified: z.boolean().optional(),
+    points: z.number().optional(),
+    preferences: z.record(z.string(), z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
+    timezone: z.string().optional(),
+  });

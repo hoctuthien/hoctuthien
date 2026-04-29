@@ -8,7 +8,10 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Response } from 'express';
-import { SET_COOKIE_KEY, SetCookieOptions } from '../decorators/set-cookie.decorator';
+import {
+  SET_COOKIE_KEY,
+  SetCookieOptions,
+} from '../decorators/set-cookie.decorator';
 
 @Injectable()
 export class SetCookieInterceptor implements NestInterceptor {

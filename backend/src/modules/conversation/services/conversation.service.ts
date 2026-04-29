@@ -1,15 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConversationRepository } from '../repositories/conversation.repository';
-import { createConversationSchema, updateConversationSchema, conversationSchema } from '../schema/conversation.schema';
-import { CreateConversationInput, UpdateConversationInput } from '../types/conversation.types';
+import {
+  createConversationSchema,
+  updateConversationSchema,
+  conversationSchema,
+} from '../schema/conversation.schema';
+import {
+  CreateConversationInput,
+  UpdateConversationInput,
+} from '../types/conversation.types';
 
 @Injectable()
 export class ConversationService {
-  constructor(private readonly conversationRepository: ConversationRepository) {}
+  constructor(
+    private readonly conversationRepository: ConversationRepository,
+  ) {}
 
   async findAll() {
     const items = await this.conversationRepository.findMany();
-    return items.map(item => conversationSchema.parse(item));
+    return items.map((item) => conversationSchema.parse(item));
   }
 
   async findOne(id: string) {

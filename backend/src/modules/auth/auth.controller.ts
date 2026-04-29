@@ -1,4 +1,15 @@
-import { Controller, Post, Body, Get, UseGuards, UseInterceptors, Ip, Headers, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  UseInterceptors,
+  Ip,
+  Headers,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Request, Response } from 'express';
 import { AuthService } from './services/auth.service';
@@ -16,8 +27,16 @@ export class AuthController {
   @Post('register')
   @UseInterceptors(SetCookieInterceptor)
   @SetCookie([
-    { name: 'access_token', field: 'access_token', options: { maxAge: 15 * 60 * 1000 } },
-    { name: 'refresh_token', field: 'refresh_token', options: { maxAge: 7 * 24 * 60 * 60 * 1000 } },
+    {
+      name: 'access_token',
+      field: 'access_token',
+      options: { maxAge: 15 * 60 * 1000 },
+    },
+    {
+      name: 'refresh_token',
+      field: 'refresh_token',
+      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
+    },
   ])
   async register(
     @Body() registerDto: RegisterDto,
@@ -31,8 +50,16 @@ export class AuthController {
   @Post('login')
   @UseInterceptors(SetCookieInterceptor)
   @SetCookie([
-    { name: 'access_token', field: 'access_token', options: { maxAge: 15 * 60 * 1000 } },
-    { name: 'refresh_token', field: 'refresh_token', options: { maxAge: 7 * 24 * 60 * 60 * 1000 } },
+    {
+      name: 'access_token',
+      field: 'access_token',
+      options: { maxAge: 15 * 60 * 1000 },
+    },
+    {
+      name: 'refresh_token',
+      field: 'refresh_token',
+      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
+    },
   ])
   async login(
     @Body() loginDto: LoginDto,
@@ -46,13 +73,18 @@ export class AuthController {
   @Post('refresh')
   @UseInterceptors(SetCookieInterceptor)
   @SetCookie([
-    { name: 'access_token', field: 'access_token', options: { maxAge: 15 * 60 * 1000 } },
-    { name: 'refresh_token', field: 'refresh_token', options: { maxAge: 7 * 24 * 60 * 60 * 1000 } },
+    {
+      name: 'access_token',
+      field: 'access_token',
+      options: { maxAge: 15 * 60 * 1000 },
+    },
+    {
+      name: 'refresh_token',
+      field: 'refresh_token',
+      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
+    },
   ])
-  async refresh(
-    @Req() req: Request,
-    @Headers('x-device-id') deviceId: string,
-  ) {
+  async refresh(@Req() req: Request, @Headers('x-device-id') deviceId: string) {
     const refreshToken = req.cookies['refresh_token'];
     return this.authService.refreshTokens(refreshToken, deviceId);
   }
@@ -65,12 +97,12 @@ export class AuthController {
   ) {
     const accessToken = req.cookies['access_token'];
     const refreshToken = req.cookies['refresh_token'];
-    
+
     await this.authService.logout(accessToken, refreshToken, deviceId);
-    
+
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
-    
+
     return { message: AUTH_MESSAGES.LOGOUT_SUCCESS };
   }
 
@@ -92,8 +124,16 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @UseInterceptors(SetCookieInterceptor)
   @SetCookie([
-    { name: 'access_token', field: 'access_token', options: { maxAge: 15 * 60 * 1000 } },
-    { name: 'refresh_token', field: 'refresh_token', options: { maxAge: 7 * 24 * 60 * 60 * 1000 } },
+    {
+      name: 'access_token',
+      field: 'access_token',
+      options: { maxAge: 15 * 60 * 1000 },
+    },
+    {
+      name: 'refresh_token',
+      field: 'refresh_token',
+      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
+    },
   ])
   async googleAuthRedirect(@Req() req: any) {
     const result = await this.authService.validateGoogleUser(req.user);
@@ -107,14 +147,25 @@ export class AuthController {
   @Post('google/token')
   @UseInterceptors(SetCookieInterceptor)
   @SetCookie([
-    { name: 'access_token', field: 'access_token', options: { maxAge: 15 * 60 * 1000 } },
-    { name: 'refresh_token', field: 'refresh_token', options: { maxAge: 7 * 24 * 60 * 60 * 1000 } },
+    {
+      name: 'access_token',
+      field: 'access_token',
+      options: { maxAge: 15 * 60 * 1000 },
+    },
+    {
+      name: 'refresh_token',
+      field: 'refresh_token',
+      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
+    },
   ])
   async googleTokenLogin(
     @Body() googleTokenDto: GoogleTokenDto,
     @Headers('x-device-id') deviceId: string,
   ) {
-    const result = await this.authService.verifyGoogleToken(googleTokenDto.token, deviceId);
+    const result = await this.authService.verifyGoogleToken(
+      googleTokenDto.token,
+      deviceId,
+    );
     return {
       message: result.message,
       user: result.user,

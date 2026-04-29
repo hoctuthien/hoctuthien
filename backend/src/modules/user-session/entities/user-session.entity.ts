@@ -26,13 +26,24 @@ export class UserSessionEntity extends BaseEntity {
   @Column({ name: 'ip_address', type: 'inet', nullable: true })
   ipAddress: string | null;
 
-  @Column({ name: 'refresh_token_expires_at', type: 'timestamp with time zone' })
+  @Column({
+    name: 'refresh_token_expires_at',
+    type: 'timestamp with time zone',
+  })
   refreshTokenExpiresAt: Date;
 
-  @Column({ name: 'last_used_at', type: 'timestamp with time zone', nullable: true })
+  @Column({
+    name: 'last_used_at',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
   lastUsedAt: Date | null;
 
-  @Column({ name: 'revoked_at', type: 'timestamp with time zone', nullable: true })
+  @Column({
+    name: 'revoked_at',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
   revokedAt: Date | null;
 
   @Column({ type: 'jsonb', default: {} })

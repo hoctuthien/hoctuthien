@@ -14,5 +14,3 @@ export class ParseMentorIdPipe extends DynamicRegexPipe {
     super(VALIDATION_RULES.MENTOR_ID.regex, VALIDATION_RULES.MENTOR_ID.message);
   }
 }
-
-

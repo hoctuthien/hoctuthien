@@ -1,15 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { NotificationRepository } from '../repositories/notification.repository';
-import { createNotificationSchema, updateNotificationSchema, notificationSchema } from '../schema/notification.schema';
-import { CreateNotificationInput, UpdateNotificationInput } from '../types/notification.types';
+import {
+  createNotificationSchema,
+  updateNotificationSchema,
+  notificationSchema,
+} from '../schema/notification.schema';
+import {
+  CreateNotificationInput,
+  UpdateNotificationInput,
+} from '../types/notification.types';
 
 @Injectable()
 export class NotificationService {
-  constructor(private readonly notificationRepository: NotificationRepository) {}
+  constructor(
+    private readonly notificationRepository: NotificationRepository,
+  ) {}
 
   async findAll() {
     const items = await this.notificationRepository.findMany();
-    return items.map(item => notificationSchema.parse(item));
+    return items.map((item) => notificationSchema.parse(item));
   }
 
   async findOne(id: string) {

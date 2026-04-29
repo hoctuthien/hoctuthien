@@ -30,7 +30,9 @@ export const createUserSessionSchema = z.object({
   status: z.string().optional(),
 });
 
-export const updateUserSessionSchema = createUserSessionSchema.partial().extend({
-  lastUsedAt: z.date().optional(),
-  revokedAt: z.date().optional(),
-});
+export const updateUserSessionSchema = createUserSessionSchema
+  .partial()
+  .extend({
+    lastUsedAt: z.date().optional(),
+    revokedAt: z.date().optional(),
+  });

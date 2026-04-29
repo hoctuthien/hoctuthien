@@ -5,10 +5,7 @@ import {
   updateMessageSchema,
   messageSchema,
 } from '../schema/message.schema';
-import {
-  CreateMessageInput,
-  UpdateMessageInput,
-} from '../types/message.types';
+import { CreateMessageInput, UpdateMessageInput } from '../types/message.types';
 
 @Injectable()
 export class MessageService {
@@ -16,12 +13,14 @@ export class MessageService {
 
   async findAll() {
     const items = await this.messageRepository.findMany();
-    return items.map(item => messageSchema.parse(item));
+    return items.map((item) => messageSchema.parse(item));
   }
 
   async findByConversation(conversationId: string) {
-    const items = await this.messageRepository.findMany({ where: { conversationId } as any });
-    return items.map(item => messageSchema.parse(item));
+    const items = await this.messageRepository.findMany({
+      where: { conversationId } as any,
+    });
+    return items.map((item) => messageSchema.parse(item));
   }
 
   async findOne(id: string) {

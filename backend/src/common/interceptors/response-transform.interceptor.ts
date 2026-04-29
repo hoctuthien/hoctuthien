@@ -29,7 +29,12 @@ export class ResponseTransformInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         // Nếu data đã theo chuẩn pagination (có items và meta)
-        if (data && typeof data === 'object' && 'items' in data && 'meta' in data) {
+        if (
+          data &&
+          typeof data === 'object' &&
+          'items' in data &&
+          'meta' in data
+        ) {
           return {
             data: data.items,
             meta: data.meta,
@@ -45,7 +50,7 @@ export class ResponseTransformInterceptor implements NestInterceptor {
 
         // Trường hợp data thông thường
         return {
-          data: Array.isArray(data) ? data : (data ? [data] : []),
+          data: Array.isArray(data) ? data : data ? [data] : [],
           meta: {},
           error: null,
         };

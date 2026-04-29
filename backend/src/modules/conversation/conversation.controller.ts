@@ -8,7 +8,10 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ConversationService } from './services/conversation.service';
-import { CreateConversationInput, UpdateConversationInput } from './types/conversation.types';
+import {
+  CreateConversationInput,
+  UpdateConversationInput,
+} from './types/conversation.types';
 
 @Controller('conversations')
 export class ConversationController {

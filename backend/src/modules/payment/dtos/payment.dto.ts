@@ -12,7 +12,7 @@ import { Type } from 'class-transformer';
  * Không có thuộc tính nào — amount lấy từ SystemConfig,
  * userId lấy từ JWT Token qua @User('id') ở Controller.
  */
-export class GenerateActivationQrDto { }
+export class GenerateActivationQrDto {}
 
 /**
  * DTO xác minh thanh toán kích hoạt — user bấm "Tôi đã chuyển khoản".
@@ -23,4 +23,3 @@ export class VerifyActivationPaymentDto {
   @IsNotEmpty({ message: 'paymentId không được để trống.' })
   paymentId: string;
 }
-

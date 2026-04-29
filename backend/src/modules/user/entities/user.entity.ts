@@ -57,7 +57,12 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'integer', default: 0, nullable: true })
   points: number | null;
 
-  @Column({ name: 'is_verified', type: 'boolean', default: false, nullable: true })
+  @Column({
+    name: 'is_verified',
+    type: 'boolean',
+    default: false,
+    nullable: true,
+  })
   isVerified: boolean | null;
 
   @Column({ type: 'jsonb', default: {}, nullable: true })

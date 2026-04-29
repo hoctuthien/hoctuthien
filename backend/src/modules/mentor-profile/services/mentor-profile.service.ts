@@ -12,11 +12,13 @@ import {
 
 @Injectable()
 export class MentorProfileService {
-  constructor(private readonly mentorProfileRepository: MentorProfileRepository) {}
+  constructor(
+    private readonly mentorProfileRepository: MentorProfileRepository,
+  ) {}
 
   async findAll() {
     const items = await this.mentorProfileRepository.findMany();
-    return items.map(item => mentorProfileSchema.parse(item));
+    return items.map((item) => mentorProfileSchema.parse(item));
   }
 
   async findOne(id: string) {

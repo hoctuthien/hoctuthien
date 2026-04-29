@@ -5,7 +5,6 @@ import { BaseRepository } from '../../../common/repositories/base.repository';
 import { PaymentEntity, PaymentType } from '../entities/payment.entity';
 import { PaymentStatus } from '../../../common/enums/database.enum';
 
-
 @Injectable()
 export class PaymentRepository extends BaseRepository<PaymentEntity> {
   constructor(
@@ -26,9 +25,11 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
     });
   }
 
-
   async expirePayment(paymentId: string): Promise<void> {
-    await this.repo.update({ id: paymentId }, { status: PaymentStatus.EXPIRED });
+    await this.repo.update(
+      { id: paymentId },
+      { status: PaymentStatus.EXPIRED },
+    );
   }
 
   // Bulk-expire tất cả payment PENDING đã quá expiredAt — có thể gọi từ cron job

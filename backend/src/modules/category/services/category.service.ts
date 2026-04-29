@@ -16,7 +16,7 @@ export class CategoryService {
 
   async findAll() {
     const items = await this.categoryRepository.findMany();
-    return items.map(item => categorySchema.parse(item));
+    return items.map((item) => categorySchema.parse(item));
   }
 
   async findOne(id: string) {

@@ -24,7 +24,12 @@ export class CourseEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column({ name: 'thumbnail_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'thumbnail_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   thumbnailUrl: string | null;
 
   @Column({ type: 'decimal', precision: 15, scale: 2 })
