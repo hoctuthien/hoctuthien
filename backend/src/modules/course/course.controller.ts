@@ -33,10 +33,7 @@ export class CourseController {
   @ApiCreateCourseDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTOR)
-  create(
-    @Body() payload: CreateCourseInput,
-    @User('id') mentorId: string,
-  ) {
+  create(@Body() payload: CreateCourseInput, @User('id') mentorId: string) {
     return this.courseService.create(payload, mentorId);
   }
 
