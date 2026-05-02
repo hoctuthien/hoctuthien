@@ -22,9 +22,12 @@ export class CourseService {
     return courseSchema.parse(course);
   }
 
-  async create(payload: CreateCourseInput) {
+  async create(payload: CreateCourseInput, mentorId: string) {
     const parsed = createCourseSchema.parse(payload);
-    const created = await this.courseRepository.createAndSave(parsed);
+    const created = await this.courseRepository.createAndSave({
+      ...parsed,
+      mentorId,
+    });
     return courseSchema.parse(created);
   }
 
