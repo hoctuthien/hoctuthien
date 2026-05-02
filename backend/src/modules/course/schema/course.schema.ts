@@ -27,6 +27,7 @@ export const createCourseSchema = z.object({
   prerequisites: z.array(z.string()).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
   status: z.nativeEnum(CourseStatus).optional(),
+  categoryIds: z.array(z.string()).optional(),
 });
 
 export const updateCourseSchema = createCourseSchema.partial().extend({

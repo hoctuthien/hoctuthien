@@ -17,12 +17,22 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
+import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreateCourseCategoryDoc,
+  ApiFindAllCourseCategoriesDoc,
+  ApiFindOneCourseCategoryDoc,
+  ApiRemoveCourseCategoryDoc,
+  ApiUpdateCourseCategoryDoc,
+} from './swagger/course-category.swagger';
 
+@ApiTags('course-categories')
 @Controller('course-categories')
 export class CourseCategoryController {
   constructor(private readonly courseCategoryService: CourseCategoryService) {}
 
   @Post()
+  @ApiCreateCourseCategoryDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   create(@Body() payload: CreateCourseCategoryInput) {
@@ -30,6 +40,7 @@ export class CourseCategoryController {
   }
 
   @Get()
+  @ApiFindAllCourseCategoriesDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   findAll() {
@@ -37,6 +48,7 @@ export class CourseCategoryController {
   }
 
   @Get(':id')
+  @ApiFindOneCourseCategoryDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   findOne(@Param('id') id: string) {
@@ -44,6 +56,7 @@ export class CourseCategoryController {
   }
 
   @Patch(':id')
+  @ApiUpdateCourseCategoryDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   update(@Param('id') id: string, @Body() payload: UpdateCourseCategoryInput) {
@@ -51,6 +64,7 @@ export class CourseCategoryController {
   }
 
   @Delete(':id')
+  @ApiRemoveCourseCategoryDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
