@@ -11,7 +11,9 @@
 
   "Common": {
     "brandName": "Hoc Tu Thien",
-    "copyright": "© 2026 Hoc Tu Thien. All rights reserved."
+    "copyright": "© 2026 Hoc Tu Thien. All rights reserved.",
+    "tryAgain": "Thử lại",
+    "loading": "Đang tải..."
   },
 
   "Home": {
@@ -41,6 +43,8 @@
     "rememberMe": "Ghi nhớ tôi",
     "noAccount": "Bạn chưa có tài khoản?",
     "createAccount": "Tạo tài khoản mới",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu",
 
     "createAccountTitle": "Khai phá tiềm năng của bạn",
     "createAccountSubtitle": "Tạo tài khoản để truy cập vào kho tài nguyên học thuật độc quyền của chúng tôi.",
@@ -52,7 +56,10 @@
     "signingUp": "Đang tạo tài khoản...",
     "alreadyHaveAccount": "Bạn đã có tài khoản?",
     "agreeToTerms": "Tôi đồng ý với",
-    "termsOfService": "Điều khoản dịch vụ"
+    "termsOfService": "Điều khoản dịch vụ",
+
+    "loginLoadingText": "Đang tải trang đăng nhập...",
+    "registerLoadingText": "Đang chuẩn bị trang đăng ký..."
   },
 
   "Validation": {
@@ -68,6 +75,9 @@
 
   "Error": {
     "default": "Đã có lỗi xảy ra. Vui lòng thử lại sau.",
+    "pageTitle": "Đã có lỗi xảy ra!",
+    "loginPageError": "Không thể tải trang đăng nhập. Vui lòng thử lại.",
+    "registerPageError": "Không thể tải trang đăng ký. Vui lòng thử lại.",
     "network": "Không thể kết nối đến máy chủ.",
     "unauthorized": "Bạn không có quyền truy cập vào tài nguyên này.",
     "forbidden": "Phiên làm việc đã hết hạn.",

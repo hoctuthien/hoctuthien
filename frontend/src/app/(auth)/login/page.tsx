@@ -1,10 +1,13 @@
-import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/app/(auth)/login/components";
 
-export const metadata: Metadata = {
-  title: "Login | Học Từ Thiện",
-  description: "Sign in to access your Học Từ Thiện account.",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("Metadata");
+  return {
+    title: t("loginTitle"),
+    description: t("loginDescription"),
+  };
+}
 
 export default function LoginPage() {
   return <LoginForm />;
