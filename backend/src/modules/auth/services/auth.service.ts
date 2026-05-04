@@ -98,8 +98,8 @@ export class AuthService implements IAuthService {
     registerDto: RegisterDto,
     requestInfo?: { ip?: string; deviceId?: string },
   ) {
-    const { email, password, name, deviceId, phone, dayOfBirth, gender } =
-      registerDto;
+    const { email, password, name, phone, dayOfBirth, gender } = registerDto;
+    const deviceId = requestInfo?.deviceId;
 
     const existingUser = await this.userRepository.findOne({
       where: { email },
@@ -145,9 +145,10 @@ export class AuthService implements IAuthService {
 
   async login(
     loginDto: LoginDto,
-    requestInfo?: { ip?: string; userAgent?: string },
+    requestInfo?: { ip?: string; userAgent?: string; deviceId?: string },
   ) {
-    const { email, password, deviceId } = loginDto;
+    const { email, password } = loginDto;
+    const deviceId = requestInfo?.deviceId;
 
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user || !user.passwordHash) {

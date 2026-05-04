@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { cn } from "@/core/utils/cn";
 import { Providers } from "./providers";
+import { DeviceInitializer } from "@/shared/components/DeviceInitializer";
 import "./global.css";
 
 const montserrat = Montserrat({
@@ -57,6 +58,7 @@ export default function RootLayout({
         className={cn(montserrat.variable, "font-sans antialiased")}
         suppressHydrationWarning
       >
+        <DeviceInitializer />
         <Providers>{children}</Providers>
       </body>
     </html>
