@@ -82,18 +82,28 @@ export class CourseService {
 
       // 2. Update Course Category associations if provided
       if (categoryIds) {
-        // Remove old associations
-        await manager.delete(CourseCategoryEntity, { courseId: id });
+        // Soft delete tất cả liên kết cũ
+        await manager.softDelete(CourseCategoryEntity, { courseId: id });
 
-        // Add new associations
+        // Tạo mới hoặc restore nếu liên kết đã từng tồn tại (soft-deleted)
         if (categoryIds.length > 0) {
-          const courseCategories = categoryIds.map((categoryId) =>
-            manager.create(CourseCategoryEntity, {
-              courseId: id,
-              categoryId,
-            }),
-          );
-          await manager.save(CourseCategoryEntity, courseCategories);
+          for (const categoryId of categoryIds) {
+            const existing = await manager.findOne(CourseCategoryEntity, {
+              where: { courseId: id, categoryId },
+              withDeleted: true,
+            });
+
+            if (existing) {
+              // Restore record đã soft-delete thay vì insert mới (tránh unique constraint)
+              await manager.restore(CourseCategoryEntity, existing.id);
+            } else {
+              const link = manager.create(CourseCategoryEntity, {
+                courseId: id,
+                categoryId,
+              });
+              await manager.save(CourseCategoryEntity, link);
+            }
+          }
         }
       }
 
