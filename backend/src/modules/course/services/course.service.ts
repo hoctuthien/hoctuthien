@@ -1,11 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CourseRepository } from '../repositories/course.repository';
 import {
   createCourseSchema,
   updateCourseSchema,
+  approveCourseSchema,
   courseSchema,
 } from '../schema/course.schema';
-import { CreateCourseInput, UpdateCourseInput } from '../types/course.types';
+import {
+  CreateCourseInput,
+  UpdateCourseInput,
+  ApproveCourseInput,
+} from '../types/course.types';
 import { DataSource } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { CourseCategoryEntity } from '../../course-category/entities/course-category.entity';
@@ -54,13 +63,19 @@ export class CourseService {
     });
   }
 
-  async update(id: string, payload: UpdateCourseInput) {
+  async update(id: string, payload: UpdateCourseInput, mentorId: string) {
     const { categoryIds, ...courseData } = updateCourseSchema.parse(payload);
 
     return this.dataSource.transaction(async (manager) => {
-      // 1. Update Course
+      // 1. Update Course - kiểm tra ownership
       const course = await manager.findOne(CourseEntity, { where: { id } });
       if (!course) throw new NotFoundException('Course not found');
+
+      if (course.mentorId !== mentorId) {
+        throw new ForbiddenException(
+          'Bạn không có quyền cập nhật khóa học của người khác.',
+        );
+      }
 
       Object.assign(course, courseData);
       const updatedCourse = await manager.save(CourseEntity, course);
@@ -86,7 +101,30 @@ export class CourseService {
     });
   }
 
-  async remove(id: string) {
+  async approve(id: string, payload: ApproveCourseInput) {
+    const parsed = approveCourseSchema.parse(payload);
+
+    const course = await this.courseRepository.findById(id);
+    if (!course) throw new NotFoundException('Course not found');
+
+    const updated = await this.courseRepository.updateById(id, {
+      approvedBy: parsed.approvedBy,
+      status: parsed.status,
+    });
+
+    return courseSchema.parse(updated);
+  }
+
+  async remove(id: string, mentorId: string) {
+    const course = await this.courseRepository.findById(id);
+    if (!course) throw new NotFoundException('Course not found');
+
+    if (course.mentorId !== mentorId) {
+      throw new ForbiddenException(
+        'Bạn không có quyền xóa khóa học của người khác.',
+      );
+    }
+
     await this.courseRepository.softDeleteById(id);
   }
 }

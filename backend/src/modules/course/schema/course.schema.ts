@@ -30,6 +30,11 @@ export const createCourseSchema = z.object({
   categoryIds: z.array(z.string()).optional(),
 });
 
-export const updateCourseSchema = createCourseSchema.partial().extend({
-  approvedBy: z.string().optional(),
+// Schema cho Mentor cập nhật khóa học - không cho phép tự set approvedBy
+export const updateCourseSchema = createCourseSchema.partial();
+
+// Schema riêng chỉ dành cho ADMIN duyệt khóa học
+export const approveCourseSchema = z.object({
+  approvedBy: z.string(),
+  status: z.nativeEnum(CourseStatus),
 });

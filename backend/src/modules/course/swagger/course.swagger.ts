@@ -214,3 +214,51 @@ export const ApiRemoveCourseDoc = () => {
     ApiResponse({ status: 404, description: 'Không tìm thấy khóa học' }),
   );
 };
+
+export const ApiApproveCourseDoc = () => {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Duyệt / từ chối khóa học (chỉ ADMIN)' }),
+    ApiParam({
+      name: 'id',
+      description: 'ID của khóa học',
+      example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
+    }),
+    ApiBody({
+      schema: {
+        type: 'object',
+        required: ['status'],
+        properties: {
+          status: {
+            type: 'string',
+            enum: Object.values(CourseStatus),
+            example: CourseStatus.ACTIVE,
+            description: 'Trạng thái mới của khóa học sau khi duyệt',
+          },
+        },
+      },
+    }),
+    ApiResponse({
+      status: 200,
+      description: 'Duyệt khóa học thành công',
+      schema: {
+        type: 'object',
+        properties: {
+          data: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              status: { type: 'string' },
+              approvedBy: { type: 'string' },
+              updatedAt: { type: 'string', format: 'date-time' },
+            },
+          },
+          meta: { type: 'object' },
+          error: { type: 'string', nullable: true },
+        },
+      },
+    }),
+    ApiResponse({ status: 403, description: 'Không có quyền duyệt khóa học' }),
+    ApiResponse({ status: 404, description: 'Không tìm thấy khóa học' }),
+  );
+};
