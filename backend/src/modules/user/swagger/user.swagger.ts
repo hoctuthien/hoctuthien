@@ -55,6 +55,14 @@ export const ApiGetMeDoc = () => {
       status: 401,
       description: 'Chưa đăng nhập hoặc token không hợp lệ',
     }),
+    ApiResponse({
+      status: 403,
+      description: 'Tài khoản đã bị khóa bởi quản trị viên',
+    }),
+    ApiResponse({
+      status: 404,
+      description: 'Không tìm thấy user',
+    }),
   );
 };
 
@@ -69,11 +77,11 @@ export const ApiCreateUserDoc = () => {
           name: { type: 'string', maxLength: 255, example: 'Nguyen Van A' },
           email: { type: 'string', format: 'email', maxLength: 255, example: 'a@gmail.com' },
           password: { type: 'string', minLength: 6, maxLength: 255, example: '123456' },
-          googleId: { type: 'string', maxLength: 255, nullable: true },
-          phone: { type: 'string', maxLength: 50, nullable: true },
-          avatarUrl: { type: 'string', maxLength: 500, nullable: true },
-          dayOfBirth: { type: 'string', nullable: true },
-          gender: { type: 'string', maxLength: 50, nullable: true },
+          googleId: { type: 'string', maxLength: 255 },
+          phone: { type: 'string', maxLength: 50 },
+          avatarUrl: { type: 'string', maxLength: 500 },
+          dayOfBirth: { type: 'string' },
+          gender: { type: 'string', maxLength: 50 },
           role: { type: 'string', enum: Object.values(UserRole), default: 'mentee' },
           status: { type: 'string', maxLength: 50, default: 'active' },
         },
@@ -217,11 +225,11 @@ export const ApiUpdateUserDoc = () => {
         properties: {
           name: { type: 'string', maxLength: 255 },
           email: { type: 'string', format: 'email', maxLength: 255 },
-          googleId: { type: 'string', maxLength: 255, nullable: true },
-          phone: { type: 'string', maxLength: 50, nullable: true },
-          avatarUrl: { type: 'string', maxLength: 500, nullable: true },
-          dayOfBirth: { type: 'string', nullable: true },
-          gender: { type: 'string', maxLength: 50, nullable: true },
+          googleId: { type: 'string', maxLength: 255 },
+          phone: { type: 'string', maxLength: 50 },
+          avatarUrl: { type: 'string', maxLength: 500 },
+          dayOfBirth: { type: 'string' },
+          gender: { type: 'string', maxLength: 50 },
           role: { type: 'string', enum: Object.values(UserRole) },
           status: { type: 'string', maxLength: 50 },
           isVerified: { type: 'boolean' },
