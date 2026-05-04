@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { cn } from "@/core/utils/cn";
 import { Providers } from "./providers";
 import "./global.css";
@@ -46,18 +48,32 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+/**
+ * Root Layout — async vì cần await locale & messages từ server.
+ *
+ * Flow:
+ *   1. getLocale()   → đọc locale từ i18n/request.ts (hiện tại: 'vi')
+ *   2. getMessages() → load messages/vi.json
+ *   3. NextIntlClientProvider → truyền messages xuống Client Components
+ *   4. Providers → QueryClientProvider (React Query)
+ */
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="vi">
+    <html lang={locale}>
       <body
         className={cn(montserrat.variable, "font-sans antialiased")}
         suppressHydrationWarning
       >
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
