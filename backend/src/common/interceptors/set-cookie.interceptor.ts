@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Response } from 'express';
 import {
   SET_COOKIE_KEY,
@@ -30,9 +30,13 @@ export class SetCookieInterceptor implements NestInterceptor {
     const response = context.switchToHttp().getResponse<Response>();
 
     return next.handle().pipe(
-      tap((data) => {
+      map((data) => {
+        if (!data || typeof data !== 'object') {
+          return data;
+        }
+
         optionsList.forEach((options) => {
-          if (data && data[options.field]) {
+          if (data[options.field]) {
             const cookieValue = data[options.field];
             const cookieOptions = {
               httpOnly: true,
@@ -42,8 +46,13 @@ export class SetCookieInterceptor implements NestInterceptor {
             };
 
             response.cookie(options.name, cookieValue, cookieOptions);
+
+            // Xóa field này khỏi response body
+            delete data[options.field];
           }
         });
+
+        return data;
       }),
     );
   }

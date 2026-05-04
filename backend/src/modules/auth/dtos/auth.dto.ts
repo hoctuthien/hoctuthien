@@ -20,9 +20,7 @@ export class LoginDto {
   @MinLength(6, { message: AUTH_MESSAGES.INVALID_PASSWORD })
   password!: string;
 
-  @IsString()
-  @IsOptional() // Để là Optional để Server có thể tự điền nếu Client gửi thiếu
-  deviceId?: string;
+
 }
 
 export class GoogleTokenDto {
@@ -60,7 +58,5 @@ export class RegisterDto {
   @IsOptional()
   gender?: string;
 
-  @IsString()
-  @IsOptional()
-  deviceId?: string;
+
 }
