@@ -28,7 +28,12 @@ export class MentorAvailabilityEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   bio: string | null;
 
-  @Column({ name: 'linkedin_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'linkedin_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   linkedinUrl: string | null;
 
   @Column({ name: 'years_of_experience', type: 'integer', nullable: true })

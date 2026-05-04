@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
 export class VietqrService {
   private readonly logger = new Logger(VietqrService.name);
 
-  constructor(private readonly configService: ConfigService) { }
+  constructor(private readonly configService: ConfigService) {}
 
   // Sinh URL QR theo chuẩn VietQR Quick Link — không cần gọi API VietQR
   generateQrUrl(amount: number, description: string): string {
@@ -24,5 +24,4 @@ export class VietqrService {
 
     return `${baseUrl}?${params.toString()}`;
   }
-
 }

@@ -1,4 +1,7 @@
-import { CreateUserSessionInput, UpdateUserSessionInput } from '../types/user-session.types';
+import {
+  CreateUserSessionInput,
+  UpdateUserSessionInput,
+} from '../types/user-session.types';
 
 export interface IUserSessionService {
   findOne(id: string): Promise<unknown | null>;

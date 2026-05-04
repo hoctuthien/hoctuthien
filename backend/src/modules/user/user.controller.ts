@@ -8,17 +8,22 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './services/user.service';
 import { CreateUserInput, UpdateUserInput } from './types/user.types';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { Role } from '../../common/enums/role.enum';
 import { User } from 'src/common/decorators/user.decorator';
+import {
+  ApiGetMeDoc,
+  ApiCreateUserDoc,
+  ApiFindAllUsersDoc,
+  ApiFindOneUserDoc,
+  ApiUpdateUserDoc,
+  ApiRemoveUserDoc,
+} from './swagger/user.swagger';
 
 @ApiTags('Users')
 @Controller('users')
@@ -27,13 +32,7 @@ export class UserController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Lấy thông tin user đang đăng nhập' })
-  @ApiResponse({ status: 200, description: 'Lấy thông tin user thành công' })
-  @ApiResponse({
-    status: 401,
-    description: 'Chưa đăng nhập hoặc token không hợp lệ',
-  })
+  @ApiGetMeDoc()
   async getMe(@User('id') userId: string) {
     const result = await this.userService.getMe(userId);
 
@@ -59,56 +58,46 @@ export class UserController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Tạo user mới' })
-  @ApiResponse({ status: 201, description: 'Tạo user thành công' })
-  @ApiResponse({ status: 400, description: 'Dữ liệu đầu vào không hợp lệ' })
+  @ApiCreateUserDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   create(@Body() payload: CreateUserInput) {
     return this.userService.create(payload);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Lấy danh sách user' })
-  @ApiResponse({ status: 200, description: 'Lấy danh sách user thành công' })
+  @ApiFindAllUsersDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Lấy chi tiết user theo id' })
-  @ApiParam({
-    name: 'id',
-    description: 'ID của user',
-    example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
-  })
-  @ApiResponse({ status: 200, description: 'Lấy chi tiết user thành công' })
-  @ApiResponse({ status: 404, description: 'Không tìm thấy user' })
+  @ApiFindOneUserDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Cập nhật user theo id' })
-  @ApiParam({
-    name: 'id',
-    description: 'ID của user',
-    example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
-  })
-  @ApiResponse({ status: 200, description: 'Cập nhật user thành công' })
-  @ApiResponse({ status: 400, description: 'Dữ liệu đầu vào không hợp lệ' })
-  @ApiResponse({ status: 404, description: 'Không tìm thấy user' })
-  update(@Param('id') id: string, @Body() payload: UpdateUserInput) {
-    return this.userService.update(id, payload);
+  @ApiUpdateUserDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  update(
+    @Param('id') id: string,
+    @Body() payload: UpdateUserInput,
+    @User('id') requestingUserId: string,
+    @User('role') requestingUserRole: string,
+  ) {
+    return this.userService.update(id, payload, requestingUserId, requestingUserRole);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Xóa user theo id' })
-  @ApiParam({
-    name: 'id',
-    description: 'ID của user',
-    example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
-  })
-  @ApiResponse({ status: 200, description: 'Xóa user thành công' })
-  @ApiResponse({ status: 404, description: 'Không tìm thấy user' })
+  @ApiRemoveUserDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
   }

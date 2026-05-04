@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { CourseStatus } from '../enums/course-status.enum';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
@@ -24,7 +25,12 @@ export class CourseEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column({ name: 'thumbnail_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'thumbnail_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   thumbnailUrl: string | null;
 
   @Column({ type: 'decimal', precision: 15, scale: 2 })
@@ -39,6 +45,10 @@ export class CourseEntity extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata: Record<string, any>;
 
-  @Column({ type: 'varchar', length: 50, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: CourseStatus,
+    default: CourseStatus.DRAFT,
+  })
+  status: CourseStatus;
 }

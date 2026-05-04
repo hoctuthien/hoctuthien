@@ -32,9 +32,11 @@ export const createMentorProfileSchema = z.object({
   status: z.string().optional(),
 });
 
-export const updateMentorProfileSchema = createMentorProfileSchema.partial().extend({
-  isApproved: z.boolean().optional(),
-  approvedBy: z.string().optional(),
-  averageRating: z.number().optional(),
-  totalStudents: z.number().optional(),
-});
+export const updateMentorProfileSchema = createMentorProfileSchema
+  .partial()
+  .extend({
+    isApproved: z.boolean().optional(),
+    approvedBy: z.string().optional(),
+    averageRating: z.number().optional(),
+    totalStudents: z.number().optional(),
+  });

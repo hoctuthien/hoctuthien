@@ -9,10 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { MessageService } from './services/message.service';
-import {
-  CreateMessageInput,
-  UpdateMessageInput,
-} from './types/message.types';
+import { CreateMessageInput, UpdateMessageInput } from './types/message.types';
 
 @Controller('messages')
 export class MessageController {

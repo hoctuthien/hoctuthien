@@ -56,7 +56,7 @@ export class TnAppService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   // Tìm giao dịch CREDIT có nội dung chứa shortCode và đủ số tiền, xảy ra sau fromDate
   async findTransactionByCode(
@@ -77,15 +77,22 @@ export class TnAppService {
     let rawResponse: string | undefined;
 
     try {
-      const response: AxiosResponse<TNTransactionPayload> = await firstValueFrom(
-        this.httpService.get<TNTransactionPayload>(url, {
-          headers: { 'Content-Type': 'application/json' },
-        }),
-      );
+      const response: AxiosResponse<TNTransactionPayload> =
+        await firstValueFrom(
+          this.httpService.get<TNTransactionPayload>(url, {
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        );
 
       if (response.status !== 200) {
-        this.logger.warn(`[TnApp] HTTP ${response.status} cho tài khoản ${accountNo}`);
-        return { found: false, transaction: null, error: `HTTP ${response.status}` };
+        this.logger.warn(
+          `[TnApp] HTTP ${response.status} cho tài khoản ${accountNo}`,
+        );
+        return {
+          found: false,
+          transaction: null,
+          error: `HTTP ${response.status}`,
+        };
       }
 
       const data = response.data;
@@ -99,7 +106,9 @@ export class TnAppService {
       );
 
       if (match && parseVNTime(match.transactionTime) >= fromDate) {
-        this.logger.log(`[TnApp] Tìm thấy giao dịch khớp: ${match.id} — ${match.narrative}`);
+        this.logger.log(
+          `[TnApp] Tìm thấy giao dịch khớp: ${match.id} — ${match.narrative}`,
+        );
         return { found: true, transaction: match, rawResponse };
       }
 

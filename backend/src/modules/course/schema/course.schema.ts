@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CourseStatus } from '../enums/course-status.enum';
 
 export const courseSchema = z.object({
   id: z.string(),
@@ -11,14 +12,13 @@ export const courseSchema = z.object({
   durationMinutes: z.number().default(60),
   prerequisites: z.array(z.string()).default([]),
   metadata: z.record(z.string(), z.any()).default({}),
-  status: z.string().max(50).default('active'),
+  status: z.nativeEnum(CourseStatus).default(CourseStatus.DRAFT),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable().optional(),
 });
 
 export const createCourseSchema = z.object({
-  mentorId: z.string(),
   title: z.string().min(1).max(255),
   description: z.string().optional(),
   thumbnailUrl: z.string().max(500).optional(),
@@ -26,9 +26,15 @@ export const createCourseSchema = z.object({
   durationMinutes: z.number().optional(),
   prerequisites: z.array(z.string()).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
-  status: z.string().optional(),
+  status: z.nativeEnum(CourseStatus).optional(),
+  categoryIds: z.array(z.string()).optional(),
 });
 
-export const updateCourseSchema = createCourseSchema.partial().extend({
-  approvedBy: z.string().optional(),
+// Schema cho Mentor cập nhật khóa học - không cho phép tự set approvedBy
+export const updateCourseSchema = createCourseSchema.partial();
+
+// Schema riêng chỉ dành cho ADMIN duyệt khóa học
+export const approveCourseSchema = z.object({
+  approvedBy: z.string(),
+  status: z.nativeEnum(CourseStatus),
 });

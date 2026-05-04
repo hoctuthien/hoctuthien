@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { cn } from "@/core/utils/cn";
 import { Providers } from "./providers";
+import { DeviceInitializer } from "@/shared/components/DeviceInitializer";
 import "./global.css";
 
 const montserrat = Montserrat({

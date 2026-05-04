@@ -1,8 +1,4 @@
-import {
-  CreateUserInput,
-  UpdateUserInput,
-  User,
-} from '../types/user.types';
+import { CreateUserInput, UpdateUserInput, User } from '../types/user.types';
 
 export interface IUserService {
   findAll(): Promise<User[]>;

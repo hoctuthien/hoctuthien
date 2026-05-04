@@ -8,7 +8,7 @@ import {
   IsDateString,
 } from 'class-validator';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 
 export class LoginDto {
   @IsEmail({}, { message: AUTH_MESSAGES.INVALID_EMAIL })
@@ -20,16 +20,13 @@ export class LoginDto {
   @MinLength(6, { message: AUTH_MESSAGES.INVALID_PASSWORD })
   password!: string;
 
-  @IsString()
-  @IsOptional() // Để là Optional để Server có thể tự điền nếu Client gửi thiếu
-  deviceId?: string;
+
 }
 
 export class GoogleTokenDto {
   @IsEmail()
   @IsOptional()
   email?: string;
-
 
   @IsString()
   @IsNotEmpty()
@@ -61,7 +58,5 @@ export class RegisterDto {
   @IsOptional()
   gender?: string;
 
-  @IsString()
-  @IsOptional()
-  deviceId?: string;
+
 }

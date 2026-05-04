@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { In } from 'typeorm';
+import { In, DataSource } from 'typeorm';
 import { ErrorCode, ErrorMessage } from '../../../common/enums/error-code.enum';
 import { MentorAvailabilityStatus } from '../../../common/enums/mentor-availability-status.enum';
 import { APPLICATION_MESSAGES } from '../../../common/constants/message.constant';
@@ -17,11 +17,13 @@ import {
   CreateMentorAvailabilityInput,
   UpdateMentorAvailabilityInput,
 } from '../types/mentor-availability.types';
+import { MentorAvailabilityEntity } from '../entities/mentor-availability.entity';
 
 @Injectable()
 export class MentorAvailabilityService {
   constructor(
     private readonly mentorAvailabilityRepository: MentorAvailabilityRepository,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll() {
@@ -88,135 +90,154 @@ export class MentorAvailabilityService {
   }
 
   async update(id: string, payload: UpdateMentorAvailabilityInput) {
-    const current = await this.mentorAvailabilityRepository.findById(id);
+    return this.dataSource.transaction(async (manager) => {
+      const current = await manager.findOne(MentorAvailabilityEntity, {
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    if (!current) {
-      throw new NotFoundException('Mentor availability not found');
-    }
+      if (!current) {
+        throw new NotFoundException('Mentor availability not found');
+      }
 
-    const parsed = updateMentorAvailabilitySchema.parse(payload);
+      const parsed = updateMentorAvailabilitySchema.parse(payload);
 
-    if (
-      parsed.status === MentorAvailabilityStatus.IN_PROGRESS &&
-      current.status !== MentorAvailabilityStatus.PENDING
-    ) {
-      throw new BadRequestException(
-        'Only pending requests can be moved to in progress',
-      );
-    }
+      if (
+        parsed.status === MentorAvailabilityStatus.IN_PROGRESS &&
+        current.status !== MentorAvailabilityStatus.PENDING
+      ) {
+        throw new BadRequestException(
+          'Only pending requests can be moved to in progress',
+        );
+      }
 
-    if (
-      (parsed.status === MentorAvailabilityStatus.APPROVED ||
-        parsed.status === MentorAvailabilityStatus.REJECTED) &&
-      current.status !== MentorAvailabilityStatus.IN_PROGRESS
-    ) {
-      throw new BadRequestException(
-        'Only in progress requests can be approved or rejected',
-      );
-    }
+      if (
+        (parsed.status === MentorAvailabilityStatus.APPROVED ||
+          parsed.status === MentorAvailabilityStatus.REJECTED) &&
+        current.status !== MentorAvailabilityStatus.IN_PROGRESS
+      ) {
+        throw new BadRequestException(
+          'Only in progress requests can be approved or rejected',
+        );
+      }
 
-    const updated = await this.mentorAvailabilityRepository.updateById(
-      id,
-      parsed,
-    );
-    return mentorAvailabilitySchema.parse(updated);
+      Object.assign(current, parsed);
+      const updated = await manager.save(MentorAvailabilityEntity, current);
+      return mentorAvailabilitySchema.parse(updated);
+    });
   }
 
   async updateToInProgress(id: string, adminId: string) {
-    const current = await this.mentorAvailabilityRepository.findById(id);
+    return this.dataSource.transaction(async (manager) => {
+      const current = await manager.findOne(MentorAvailabilityEntity, {
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    if (!current) {
-      throw new NotFoundException('Mentor availability not found');
-    }
+      if (!current) {
+        throw new NotFoundException('Mentor availability not found');
+      }
 
-    if (current.status !== MentorAvailabilityStatus.PENDING) {
-      throw new BadRequestException(
-        'Only pending requests can be moved to in progress',
-      );
-    }
+      if (current.status !== MentorAvailabilityStatus.PENDING) {
+        throw new BadRequestException(
+          'Only pending requests can be moved to in progress',
+        );
+      }
 
-    const updated = await this.mentorAvailabilityRepository.updateById(id, {
-      status: MentorAvailabilityStatus.IN_PROGRESS,
-      approvedBy: adminId,
+      current.status = MentorAvailabilityStatus.IN_PROGRESS;
+      current.approvedBy = adminId;
+
+      const updated = await manager.save(MentorAvailabilityEntity, current);
+      return mentorAvailabilitySchema.parse(updated);
     });
-
-    return mentorAvailabilitySchema.parse(updated);
   }
 
   async approve(id: string, adminId: string, note: string) {
-    const current = await this.mentorAvailabilityRepository.findById(id);
+    return this.dataSource.transaction(async (manager) => {
+      const current = await manager.findOne(MentorAvailabilityEntity, {
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    if (!current) {
-      throw new NotFoundException('Mentor availability not found');
-    }
+      if (!current) {
+        throw new NotFoundException('Mentor availability not found');
+      }
 
-    if (current.status !== MentorAvailabilityStatus.IN_PROGRESS) {
-      throw new BadRequestException(
-        'Only in progress requests can be approved',
-      );
-    }
+      if (current.status !== MentorAvailabilityStatus.IN_PROGRESS) {
+        throw new BadRequestException(
+          'Only in progress requests can be approved',
+        );
+      }
 
-    if (current.approvedBy && current.approvedBy !== adminId) {
-      throw new BadRequestException(
-        'approved_by does not match the admin who started processing this request',
-      );
-    }
+      if (current.approvedBy && current.approvedBy !== adminId) {
+        throw new BadRequestException(
+          'approved_by does not match the admin who started processing this request',
+        );
+      }
 
-    const updated = await this.mentorAvailabilityRepository.updateById(id, {
-      status: MentorAvailabilityStatus.APPROVED,
-      note,
+      current.status = MentorAvailabilityStatus.APPROVED;
+      current.note = note;
+
+      const updated = await manager.save(MentorAvailabilityEntity, current);
+      return mentorAvailabilitySchema.parse(updated);
     });
-
-    return mentorAvailabilitySchema.parse(updated);
   }
 
   async reject(id: string, adminId: string, note: string) {
-    const current = await this.mentorAvailabilityRepository.findById(id);
+    return this.dataSource.transaction(async (manager) => {
+      const current = await manager.findOne(MentorAvailabilityEntity, {
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    if (!current) {
-      throw new NotFoundException('Mentor availability not found');
-    }
+      if (!current) {
+        throw new NotFoundException('Mentor availability not found');
+      }
 
-    if (current.status !== MentorAvailabilityStatus.IN_PROGRESS) {
-      throw new BadRequestException(
-        'Only in progress requests can be rejected',
-      );
-    }
+      if (current.status !== MentorAvailabilityStatus.IN_PROGRESS) {
+        throw new BadRequestException(
+          'Only in progress requests can be rejected',
+        );
+      }
 
-    if (current.approvedBy && current.approvedBy !== adminId) {
-      throw new BadRequestException(
-        'approved_by does not match the admin who started processing this request',
-      );
-    }
+      if (current.approvedBy && current.approvedBy !== adminId) {
+        throw new BadRequestException(
+          'approved_by does not match the admin who started processing this request',
+        );
+      }
 
-    const updated = await this.mentorAvailabilityRepository.updateById(id, {
-      status: MentorAvailabilityStatus.REJECTED,
-      note,
+      current.status = MentorAvailabilityStatus.REJECTED;
+      current.note = note;
+
+      const updated = await manager.save(MentorAvailabilityEntity, current);
+      return mentorAvailabilitySchema.parse(updated);
     });
-
-    return mentorAvailabilitySchema.parse(updated);
   }
 
   async cancel(id: string, menteeId: string) {
-    const current = await this.mentorAvailabilityRepository.findById(id);
+    return this.dataSource.transaction(async (manager) => {
+      const current = await manager.findOne(MentorAvailabilityEntity, {
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    if (!current) {
-      throw new NotFoundException('Mentor availability not found');
-    }
+      if (!current) {
+        throw new NotFoundException('Mentor availability not found');
+      }
 
-    if (current.mentorId !== menteeId) {
-      throw new BadRequestException('Only the owner can cancel this request');
-    }
+      if (current.mentorId !== menteeId) {
+        throw new BadRequestException('Only the owner can cancel this request');
+      }
 
-    if (current.status !== MentorAvailabilityStatus.PENDING) {
-      throw new BadRequestException('Only pending requests can be canceled');
-    }
+      if (current.status !== MentorAvailabilityStatus.PENDING) {
+        throw new BadRequestException('Only pending requests can be canceled');
+      }
 
-    const updated = await this.mentorAvailabilityRepository.updateById(id, {
-      status: MentorAvailabilityStatus.CANCEL,
+      current.status = MentorAvailabilityStatus.CANCEL;
+
+      const updated = await manager.save(MentorAvailabilityEntity, current);
+      return mentorAvailabilitySchema.parse(updated);
     });
-
-    return mentorAvailabilitySchema.parse(updated);
   }
 
   async remove(id: string) {

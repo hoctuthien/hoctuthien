@@ -29,6 +29,10 @@ export class MentorAvailabilityController {
     private readonly mentorAvailabilityService: MentorAvailabilityService,
   ) {}
 
+  /**
+   * @description Đăng ký/Tạo mới yêu cầu làm Mentor (Mentee gửi yêu cầu)
+   * @access Mentee (Role.MENTEE)
+   */
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTEE)
@@ -39,6 +43,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.create(mentorId, payload);
   }
 
+  /**
+   * @description Lấy danh sách tất cả các yêu cầu làm Mentor (Dành cho Admin duyệt)
+   * @access Admin (Role.ADMIN) - CẦN ADMIN
+   */
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -46,6 +54,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.findAll();
   }
 
+  /**
+   * @description Lấy danh sách các yêu cầu làm Mentor của bản thân
+   * @access Mentee (Role.MENTEE)
+   */
   @Get('me')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTEE)
@@ -53,6 +65,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.findByMentorId(mentorId);
   }
 
+  /**
+   * @description Lấy chi tiết một yêu cầu làm Mentor theo ID (Dành cho Admin)
+   * @access Admin (Role.ADMIN) - CẦN ADMIN
+   */
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -60,6 +76,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.findOne(id);
   }
 
+  /**
+   * @description Lấy chi tiết một yêu cầu làm Mentor của bản thân theo ID
+   * @access Mentee (Role.MENTEE)
+   */
   @Get('me/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTEE)
@@ -67,6 +87,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.findOneForMentor(id, mentorId);
   }
 
+  /**
+   * @description Cập nhật thông tin yêu cầu làm Mentor
+   * @access Chưa phân quyền (Cần xem xét bổ sung Guard)
+   */
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -75,6 +99,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.update(id, payload);
   }
 
+  /**
+   * @description Chuyển trạng thái yêu cầu sang Đang xử lý (In Progress)
+   * @access Admin (Role.ADMIN) - CẦN ADMIN
+   */
   @Patch(':id/in-progress')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -86,6 +114,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.updateToInProgress(id, adminId);
   }
 
+  /**
+   * @description Phê duyệt yêu cầu làm Mentor
+   * @access Admin (Role.ADMIN) - CẦN ADMIN
+   */
   @Patch(':id/approved')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -97,6 +129,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.approve(id, adminId, payload.note);
   }
 
+  /**
+   * @description Từ chối yêu cầu làm Mentor
+   * @access Admin (Role.ADMIN) - CẦN ADMIN
+   */
   @Patch(':id/rejected')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -108,6 +144,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.reject(id, adminId, payload.note);
   }
 
+  /**
+   * @description Hủy yêu cầu làm Mentor (Mentee tự hủy)
+   * @access Mentee (Role.MENTEE)
+   */
   @Patch(':id/cancel')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTEE)
@@ -119,6 +159,10 @@ export class MentorAvailabilityController {
     return this.mentorAvailabilityService.cancel(id, menteeId);
   }
 
+  /**
+   * @description Xóa yêu cầu làm Mentor
+   * @access Chưa phân quyền (Cần xem xét bổ sung Guard)
+   */
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.mentorAvailabilityService.remove(id);

@@ -6,5 +6,9 @@ import {
 } from '../schema/course-booking.schema';
 
 export type CourseBooking = z.infer<typeof courseBookingSchema>;
-export type CreateCourseBookingInput = z.infer<typeof createCourseBookingSchema>;
-export type UpdateCourseBookingInput = z.infer<typeof updateCourseBookingSchema>;
+export type CreateCourseBookingInput = z.infer<
+  typeof createCourseBookingSchema
+>;
+export type UpdateCourseBookingInput = z.infer<
+  typeof updateCourseBookingSchema
+>;

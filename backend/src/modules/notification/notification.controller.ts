@@ -8,7 +8,10 @@ import {
   Delete,
 } from '@nestjs/common';
 import { NotificationService } from './services/notification.service';
-import { CreateNotificationInput, UpdateNotificationInput } from './types/notification.types';
+import {
+  CreateNotificationInput,
+  UpdateNotificationInput,
+} from './types/notification.types';
 
 @Controller('notifications')
 export class NotificationController {
