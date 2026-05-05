@@ -1,1 +1,1 @@
-export * from './donationGateway';
+export * from './authGateway';
