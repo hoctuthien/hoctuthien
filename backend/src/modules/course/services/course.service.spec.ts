@@ -25,7 +25,8 @@ describe('CourseService', () => {
         return Promise.resolve(result);
       }),
       findOne: jest.fn(),
-      delete: jest.fn().mockResolvedValue({ affected: 1 }),
+      softDelete: jest.fn().mockResolvedValue({ affected: 1 }),
+      restore: jest.fn().mockResolvedValue({ affected: 1 }),
     };
 
     mockDataSource = {
@@ -112,22 +113,27 @@ describe('CourseService', () => {
         categoryIds: ['cat-3'],
       };
 
-      mockEntityManager.findOne.mockResolvedValue({
-        id: courseId,
-        title: 'Old Title',
-        mentorId: 'mentor-123',
-        price: 500000,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      mockEntityManager.findOne.mockImplementation((entity, options) => {
+        if (entity === CourseEntity) {
+          return Promise.resolve({
+            id: courseId,
+            title: 'Old Title',
+            mentorId: 'mentor-123',
+            price: 500000,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+        return Promise.resolve(null);
       });
 
-      const result = await service.update(courseId, payload as any);
+      const result = await service.update(courseId, payload as any, 'mentor-123');
 
       // Verify transaction
       expect(mockDataSource.transaction).toHaveBeenCalled();
 
       // Verify old categories were deleted
-      expect(mockEntityManager.delete).toHaveBeenCalledWith(CourseCategoryEntity, { courseId });
+      expect(mockEntityManager.softDelete).toHaveBeenCalledWith(CourseCategoryEntity, { courseId });
 
       // Verify course was updated
       expect(mockEntityManager.save).toHaveBeenCalledWith(CourseEntity, expect.objectContaining({
@@ -135,7 +141,7 @@ describe('CourseService', () => {
       }));
 
       // Verify new categories were saved
-      expect(mockEntityManager.save).toHaveBeenCalledWith(CourseCategoryEntity, expect.any(Array));
+      expect(mockEntityManager.save).toHaveBeenCalledWith(CourseCategoryEntity, expect.any(Object));
 
       expect(result.title).toBe('Updated Title');
     });
@@ -143,7 +149,7 @@ describe('CourseService', () => {
     it('should throw NotFoundException if course does not exist', async () => {
       mockEntityManager.findOne.mockResolvedValue(null);
 
-      await expect(service.update('invalid-id', {} as any))
+      await expect(service.update('invalid-id', {} as any, 'mentor-123'))
         .rejects.toThrow(NotFoundException);
     });
   });
