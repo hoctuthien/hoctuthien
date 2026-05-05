@@ -18,21 +18,37 @@ export const courseBookingSchema = z.object({
   deletedAt: z.date().nullable().optional(),
 });
 
+// menteeId lấy từ JWT, không cho client tự truyền
 export const createCourseBookingSchema = z.object({
   courseId: z.string(),
-  menteeId: z.string(),
-  paymentId: z.string().optional(),
-  meetingTime: z.date(),
+  meetingTime: z.coerce.date(),
   notesForMentor: z.string().optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
+});
+
+// MENTEE chỉ được cập nhật notes và cancel
+export const updateCourseBookingByMenteeSchema = z.object({
+  notesForMentor: z.string().optional(),
+  cancellationReason: z.string().optional(),
+  status: z.enum([BookingStatus.CANCELLED]).optional(),
+});
+
+// MENTOR/ADMIN được cập nhật đầy đủ hơn
+export const updateCourseBookingSchema = z.object({
+  meetingTime: z.coerce.date().optional(),
+  googleMeetUrl: z.string().max(500).optional(),
+  calendarEventId: z.string().max(255).optional(),
+  notesForMentor: z.string().optional(),
+  cancellationReason: z.string().optional(),
+  paymentId: z.string().optional(),
   metadata: z.record(z.string(), z.any()).optional(),
   status: z.nativeEnum(BookingStatus).optional(),
 });
 
-export const updateCourseBookingSchema = createCourseBookingSchema
-  .partial()
-  .extend({
-    googleMeetUrl: z.string().max(500).optional(),
-    calendarEventId: z.string().max(255).optional(),
-    cancellationReason: z.string().optional(),
-    paymentId: z.string().optional(),
-  });
+export const findCourseBookingsQuerySchema = z.object({
+  courseId: z.string().optional(),
+  menteeId: z.string().optional(),
+  status: z.nativeEnum(BookingStatus).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
