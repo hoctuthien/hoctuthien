@@ -14,10 +14,15 @@ import {
   loginSchema,
   type LoginFormData,
 } from "@/app/(auth)/login/login.schema";
+import { useUserStore } from "@/core/lib/store/userStore";
+import { useRouter } from "next/navigation";
+import { authGateway } from "@/core/gateway/authGateway";
 
 export function LoginForm() {
   const t = useTranslations("Auth");
   const tError = useTranslations("Error");
+  const router = useRouter();
+  const setUser = useUserStore((state) => state.setUser);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -44,11 +49,17 @@ export function LoginForm() {
     setGeneralError(null);
 
     try {
-      // TODO: replace with actual auth API call
-      console.log("Login data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-    } catch {
-      setGeneralError(tError("invalidCredentials"));
+      // call through gateway
+      const result = await authGateway.login({
+        email: data.email,
+        password: data.password,
+      });
+      
+      setUser(result.user);
+      router.push("/profile");
+      router.refresh();
+    } catch (error: any) {
+      setGeneralError(error.message || tError("invalidCredentials"));
     } finally {
       setIsSubmitting(false);
     }

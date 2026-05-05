@@ -29,6 +29,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Đăng ký tài khoản mới
+         * @description Tạo tài khoản người dùng mới. Sau khi đăng ký thành công, access_token và refresh_token sẽ được lưu vào Cookie (không trả về trong body).
+         */
         post: operations["AuthController_register"];
         delete?: never;
         options?: never;
@@ -45,6 +49,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Đăng nhập bằng Email/Password
+         * @description Xác thực người dùng. Sau khi thành công, access_token và refresh_token sẽ được lưu vào Cookie (không trả về trong body).
+         */
         post: operations["AuthController_login"];
         delete?: never;
         options?: never;
@@ -61,6 +69,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Làm mới Access Token
+         * @description Sử dụng refresh_token từ Cookie để lấy access_token mới. Tokens mới sẽ được cập nhật lại trong Cookie (không trả về trong body).
+         */
         post: operations["AuthController_refresh"];
         delete?: never;
         options?: never;
@@ -77,6 +89,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Đăng xuất
+         * @description Xóa tokens trong Cookie và vô hiệu hóa session trên server.
+         */
         post: operations["AuthController_logout"];
         delete?: never;
         options?: never;
@@ -91,6 +107,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Test kết nối Redis (Debug) */
         get: operations["AuthController_testRedis"];
         put?: never;
         post?: never;
@@ -107,6 +124,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Đăng nhập bằng Google
+         * @description Chuyển hướng người dùng đến trang xác thực của Google.
+         */
         get: operations["AuthController_googleAuth"];
         put?: never;
         post?: never;
@@ -123,6 +144,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Google OAuth Callback
+         * @description Endpoint nhận kết quả từ Google. Sau khi xác thực thành công, tokens sẽ được lưu vào Cookie.
+         */
         get: operations["AuthController_googleAuthRedirect"];
         put?: never;
         post?: never;
@@ -141,6 +166,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Đăng nhập Google bằng idToken
+         * @description Xác thực idToken từ Google Frontend. Sau khi thành công, tokens sẽ được lưu vào Cookie.
+         */
         post: operations["AuthController_googleTokenLogin"];
         delete?: never;
         options?: never;
@@ -401,8 +430,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy danh sách danh mục (có tìm kiếm & phân trang) */
         get: operations["CategoryController_findAll"];
         put?: never;
+        /** Tạo danh mục mới (chỉ ADMIN) */
         post: operations["CategoryController_create"];
         delete?: never;
         options?: never;
@@ -417,12 +448,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy chi tiết danh mục theo id */
         get: operations["CategoryController_findOne"];
         put?: never;
         post?: never;
+        /** Xóa mềm danh mục theo id (chỉ ADMIN) */
         delete: operations["CategoryController_remove"];
         options?: never;
         head?: never;
+        /** Cập nhật danh mục theo id (chỉ ADMIN) */
         patch: operations["CategoryController_update"];
         trace?: never;
     };
@@ -433,8 +467,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy danh sách khóa học */
         get: operations["CourseController_findAll"];
         put?: never;
+        /** Tạo khóa học mới */
         post: operations["CourseController_create"];
         delete?: never;
         options?: never;
@@ -449,13 +485,33 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy chi tiết khóa học theo id */
         get: operations["CourseController_findOne"];
         put?: never;
         post?: never;
+        /** Xóa khóa học theo id */
         delete: operations["CourseController_remove"];
         options?: never;
         head?: never;
+        /** Cập nhật khóa học theo id */
         patch: operations["CourseController_update"];
+        trace?: never;
+    };
+    "/api/v1/courses/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Duyệt / từ chối khóa học (chỉ ADMIN) */
+        patch: operations["CourseController_approve"];
         trace?: never;
     };
     "/api/v1/course-categories": {
@@ -465,8 +521,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy danh sách liên kết khóa học - danh mục */
         get: operations["CourseCategoryController_findAll"];
         put?: never;
+        /** Tạo liên kết khóa học và danh mục */
         post: operations["CourseCategoryController_create"];
         delete?: never;
         options?: never;
@@ -481,12 +539,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy chi tiết liên kết theo id */
         get: operations["CourseCategoryController_findOne"];
         put?: never;
         post?: never;
+        /** Xóa liên kết theo id */
         delete: operations["CourseCategoryController_remove"];
         options?: never;
         head?: never;
+        /** Cập nhật liên kết theo id */
         patch: operations["CourseCategoryController_update"];
         trace?: never;
     };
@@ -497,8 +558,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Lấy danh sách booking (phân quyền tự động theo role)
+         * @description - **MENTEE**: chỉ thấy booking của chính mình
+         *     - **MENTOR**: chỉ thấy booking thuộc các course của mình
+         *     - **ADMIN**: thấy tất cả, hỗ trợ filter đầy đủ
+         */
         get: operations["CourseBookingController_findAll"];
         put?: never;
+        /** Tạo booking khóa học mới (MENTEE) */
         post: operations["CourseBookingController_create"];
         delete?: never;
         options?: never;
@@ -513,13 +581,33 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy chi tiết booking theo id */
         get: operations["CourseBookingController_findOne"];
         put?: never;
         post?: never;
+        /** Xóa mềm booking (MENTEE xóa của mình / ADMIN xóa bất kỳ) */
         delete: operations["CourseBookingController_remove"];
         options?: never;
         head?: never;
+        /** MENTOR / ADMIN cập nhật booking (status, meet link, lịch...) */
         patch: operations["CourseBookingController_update"];
+        trace?: never;
+    };
+    "/api/v1/course-bookings/{id}/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** MENTEE cập nhật booking của mình (notes / huỷ) */
+        patch: operations["CourseBookingController_updateByMentee"];
         trace?: never;
     };
     "/api/v1/course-reviews": {
@@ -595,6 +683,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** @description Tạo một payment record và trả về QR VietQR để mentee chuyển khoản phí kích hoạt. Nếu đã có QR chưa hết hạn, hệ thống trả lại QR cũ thay vì tạo mới. */
         post: operations["PaymentController_generateActivationQr"];
         delete?: never;
         options?: never;
@@ -627,6 +716,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** @description User bấm "Tôi đã chuyển khoản" → backend query TN App API tìm giao dịch khớp → kích hoạt tài khoản. Nếu giao dịch chưa xuất hiện (activated: false), FE polling lại sau vài giây. */
         post: operations["PaymentController_verifyActivationPayment"];
         delete?: never;
         options?: never;
@@ -798,13 +888,209 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        RegisterDto: Record<string, never>;
-        LoginDto: Record<string, never>;
-        GoogleTokenDto: Record<string, never>;
+        RegisterDto: {
+            /**
+             * Format: email
+             * @example user@example.com
+             */
+            email: string;
+            /** @example password123 */
+            password: string;
+            /** @example Nguyen Van A */
+            name: string;
+            /** @example 0987654321 */
+            phone?: string;
+            /**
+             * @description Ngày sinh (YYYY-MM-DD)
+             * @example 2000-01-01
+             */
+            dayOfBirth?: string;
+            /**
+             * @example male
+             * @enum {string}
+             */
+            gender?: "male" | "female" | "other";
+        };
+        LoginDto: {
+            /**
+             * Format: email
+             * @description Email của người dùng
+             * @example user@example.com
+             */
+            email: string;
+            /**
+             * @description Mật khẩu người dùng
+             * @example password123
+             */
+            password: string;
+        };
+        GoogleTokenDto: {
+            /**
+             * Format: email
+             * @example user@example.com
+             */
+            email?: string;
+            /** @description idToken từ Google SDK ở Frontend */
+            token: string;
+        };
+        CreateUserDto: {
+            /** @example Nguyen Van A */
+            name: string;
+            /**
+             * Format: email
+             * @example a@gmail.com
+             */
+            email: string;
+            /** @example 123456 */
+            password?: string;
+            googleId?: string;
+            /** @example 0987654321 */
+            phone?: string;
+            /** @example https://example.com/avatar.jpg */
+            avatarUrl?: string;
+            /** @example 2000-01-01 */
+            dayOfBirth?: string;
+            /** @example male */
+            gender?: string;
+            /**
+             * @default mentee
+             * @enum {string}
+             */
+            role: "mentee" | "mentor" | "admin";
+            /**
+             * @default active
+             * @example active
+             */
+            status: string;
+        };
+        UpdateUserDto: {
+            /** @example Nguyen Van A */
+            name?: string;
+            /**
+             * Format: email
+             * @example a@gmail.com
+             */
+            email?: string;
+            /** @example 123456 */
+            password?: string;
+            googleId?: string;
+            /** @example 0987654321 */
+            phone?: string;
+            /** @example https://example.com/avatar.jpg */
+            avatarUrl?: string;
+            /** @example 2000-01-01 */
+            dayOfBirth?: string;
+            /** @example male */
+            gender?: string;
+            /**
+             * @default mentee
+             * @enum {string}
+             */
+            role: "mentee" | "mentor" | "admin";
+            /**
+             * @default active
+             * @example active
+             */
+            status: string;
+            isVerified?: boolean;
+            points?: number;
+            preferences?: Record<string, never>;
+            metadata?: Record<string, never>;
+            /** @example UTC */
+            timezone?: string;
+        };
         MentorAvailabilityEmptyActionDto: Record<string, never>;
-        MentorAvailabilityReviewDto: Record<string, never>;
+        MentorAvailabilityReviewDto: {
+            /** @example Đồng ý với yêu cầu này */
+            note: string;
+        };
+        CreateCourseDto: {
+            /** @example Khóa học lập trình NestJS */
+            title: string;
+            /** @example Học NestJS từ cơ bản đến nâng cao */
+            description?: string;
+            /** @example https://example.com/image.jpg */
+            thumbnailUrl?: string;
+            /** @example 500000 */
+            price: number;
+            /**
+             * @default 60
+             * @example 120
+             */
+            durationMinutes: number;
+            /**
+             * @example [
+             *       "Basic Javascript"
+             *     ]
+             */
+            prerequisites?: string[];
+            /**
+             * @example {
+             *       "level": "intermediate"
+             *     }
+             */
+            metadata?: Record<string, never>;
+            /**
+             * @default DRAFT
+             * @enum {string}
+             */
+            status: "DRAFT" | "PENDING" | "ACTIVE" | "INACTIVE";
+            /**
+             * @example [
+             *       "123",
+             *       "456"
+             *     ]
+             */
+            categoryIds?: string[];
+        };
+        UpdateCourseDto: {
+            /** @example Khóa học lập trình NestJS */
+            title?: string;
+            /** @example Học NestJS từ cơ bản đến nâng cao */
+            description?: string;
+            /** @example https://example.com/image.jpg */
+            thumbnailUrl?: string;
+            /** @example 500000 */
+            price?: number;
+            /**
+             * @default 60
+             * @example 120
+             */
+            durationMinutes: number;
+            /**
+             * @example [
+             *       "Basic Javascript"
+             *     ]
+             */
+            prerequisites?: string[];
+            /**
+             * @example {
+             *       "level": "intermediate"
+             *     }
+             */
+            metadata?: Record<string, never>;
+            /**
+             * @default DRAFT
+             * @enum {string}
+             */
+            status: "DRAFT" | "PENDING" | "ACTIVE" | "INACTIVE";
+            /**
+             * @example [
+             *       "123",
+             *       "456"
+             *     ]
+             */
+            categoryIds?: string[];
+            approvedBy?: string;
+        };
         GenerateActivationQrDto: Record<string, never>;
-        VerifyActivationPaymentDto: Record<string, never>;
+        VerifyActivationPaymentDto: {
+            /**
+             * @description ID của giao dịch thanh toán
+             * @example PAY123456
+             */
+            paymentId: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -827,16 +1113,16 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string;
+                };
             };
         };
     };
     AuthController_register: {
         parameters: {
             query?: never;
-            header: {
-                "x-device-id": string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -846,7 +1132,34 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Đăng ký thành công. Tokens được trả về và lưu trong Cookie. */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user?: {
+                            id?: string;
+                            email?: string;
+                            name?: string;
+                            /** @enum {string} */
+                            role?: "mentee" | "mentor" | "admin";
+                        };
+                        /** @example Đăng ký tài khoản thành công. */
+                        message?: string;
+                    };
+                };
+            };
+            /** @description Dữ liệu không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Email đã tồn tại */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -857,8 +1170,9 @@ export interface operations {
     AuthController_login: {
         parameters: {
             query?: never;
-            header: {
-                "x-device-id": string;
+            header?: {
+                /** @description ID của thiết bị (cũng có thể gửi qua Cookie: device_id) */
+                "x-device-id"?: string;
             };
             path?: never;
             cookie?: never;
@@ -869,7 +1183,27 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Đăng nhập thành công. Tokens được trả về và lưu trong Cookie. */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user?: {
+                            id?: string;
+                            email?: string;
+                            name?: string;
+                            /** @enum {string} */
+                            role?: "mentee" | "mentor" | "admin";
+                        };
+                        /** @example Đăng nhập thành công. */
+                        message?: string;
+                    };
+                };
+            };
+            /** @description Email hoặc mật khẩu không chính xác */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -880,15 +1214,34 @@ export interface operations {
     AuthController_refresh: {
         parameters: {
             query?: never;
-            header: {
-                "x-device-id": string;
+            header?: {
+                /** @description ID của thiết bị (cũng có thể gửi qua Cookie: device_id) */
+                "x-device-id"?: string;
             };
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Refresh thành công. Tokens mới được lưu vào Cookie. */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user?: {
+                            id?: string;
+                            email?: string;
+                            name?: string;
+                            /** @enum {string} */
+                            role?: "mentee" | "mentor" | "admin";
+                        };
+                    };
+                };
+            };
+            /** @description Refresh token không hợp lệ hoặc hết hạn */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -899,19 +1252,26 @@ export interface operations {
     AuthController_logout: {
         parameters: {
             query?: never;
-            header: {
-                "x-device-id": string;
+            header?: {
+                /** @description ID của thiết bị (cũng có thể gửi qua Cookie: device_id) */
+                "x-device-id"?: string;
             };
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Đăng xuất thành công. Cookies sẽ bị xóa. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        /** @example Đăng xuất thành công. */
+                        message?: string;
+                    };
+                };
             };
         };
     };
@@ -924,6 +1284,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Kết nối Redis thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -947,6 +1308,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Chuyển hướng sang Google */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     AuthController_googleAuthRedirect: {
@@ -958,19 +1326,32 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Đăng nhập Google thành công. Tokens lưu vào Cookie. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        message?: string;
+                        user?: {
+                            id?: string;
+                            email?: string;
+                            name?: string;
+                            /** @enum {string} */
+                            role?: "mentee" | "mentor" | "admin";
+                        };
+                    };
+                };
             };
         };
     };
     AuthController_googleTokenLogin: {
         parameters: {
             query?: never;
-            header: {
-                "x-device-id": string;
+            header?: {
+                /** @description ID của thiết bị (cũng có thể gửi qua Cookie: device_id) */
+                "x-device-id"?: string;
             };
             path?: never;
             cookie?: never;
@@ -981,7 +1362,26 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Đăng nhập thành công. Tokens lưu vào Cookie. */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message?: string;
+                        user?: {
+                            id?: string;
+                            email?: string;
+                            name?: string;
+                            /** @enum {string} */
+                            role?: "mentee" | "mentor" | "admin";
+                        };
+                    };
+                };
+            };
+            /** @description Google Token không hợp lệ */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1094,10 +1494,71 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example Lấy thông tin người dùng thành công. */
+                            message?: string;
+                            user?: {
+                                /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                                id?: string;
+                                /** @example Nguyen Van A */
+                                name?: string;
+                                /** @example a@gmail.com */
+                                email?: string;
+                                /** @example 0987654321 */
+                                phone?: string | null;
+                                /** @example https://example.com/avatar.jpg */
+                                avatarUrl?: string | null;
+                                /** @example 2000-01-01 */
+                                dayOfBirth?: string | null;
+                                /** @example male */
+                                gender?: string | null;
+                                /**
+                                 * @example mentee
+                                 * @enum {string}
+                                 */
+                                role?: "mentee" | "mentor" | "admin";
+                                /** @example 0 */
+                                points?: number;
+                                /** @example false */
+                                isVerified?: boolean;
+                                /** @example active */
+                                status?: string;
+                                /** @example UTC */
+                                timezone?: string;
+                                /** @example {} */
+                                preferences?: Record<string, never>;
+                                /**
+                                 * Format: date-time
+                                 * @example 2026-04-28T08:05:57.000Z
+                                 */
+                                createdAt?: string;
+                            };
+                        }[];
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                        /** @example null */
+                        error?: string | null;
+                    };
+                };
             };
             /** @description Chưa đăng nhập hoặc token không hợp lệ */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tài khoản đã bị khóa bởi quản trị viên */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy user */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1119,7 +1580,31 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            name?: string;
+                            email?: string;
+                            phone?: string | null;
+                            avatarUrl?: string | null;
+                            dayOfBirth?: string | null;
+                            gender?: string | null;
+                            timezone?: string;
+                            role?: string;
+                            points?: number;
+                            isVerified?: boolean;
+                            preferences?: Record<string, never>;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
         };
     };
@@ -1130,14 +1615,42 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUserDto"];
+            };
+        };
         responses: {
             /** @description Tạo user thành công */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            name?: string;
+                            email?: string;
+                            phone?: string | null;
+                            avatarUrl?: string | null;
+                            dayOfBirth?: string | null;
+                            gender?: string | null;
+                            timezone?: string;
+                            role?: string;
+                            points?: number;
+                            isVerified?: boolean;
+                            preferences?: Record<string, never>;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
             /** @description Dữ liệu đầu vào không hợp lệ */
             400: {
@@ -1165,7 +1678,31 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            name?: string;
+                            email?: string;
+                            phone?: string | null;
+                            avatarUrl?: string | null;
+                            dayOfBirth?: string | null;
+                            gender?: string | null;
+                            timezone?: string;
+                            role?: string;
+                            points?: number;
+                            isVerified?: boolean;
+                            preferences?: Record<string, never>;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
             /** @description Không tìm thấy user */
             404: {
@@ -1193,7 +1730,13 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: unknown[];
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
             /** @description Không tìm thấy user */
             404: {
@@ -1214,14 +1757,42 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserDto"];
+            };
+        };
         responses: {
             /** @description Cập nhật user thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            name?: string;
+                            email?: string;
+                            phone?: string | null;
+                            avatarUrl?: string | null;
+                            dayOfBirth?: string | null;
+                            gender?: string | null;
+                            timezone?: string;
+                            role?: string;
+                            points?: number;
+                            isVerified?: boolean;
+                            preferences?: Record<string, never>;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
             /** @description Dữ liệu đầu vào không hợp lệ */
             400: {
@@ -1551,18 +2122,61 @@ export interface operations {
     };
     CategoryController_findAll: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Tìm kiếm theo tên (partial match) */
+                name?: string;
+                /** @description Tìm kiếm theo slug (partial match) */
+                slug?: string;
+                /** @description Lọc theo trạng thái */
+                status?: string;
+                /** @description Trang hiện tại (mặc định: 1) */
+                page?: number;
+                /** @description Số bản ghi mỗi trang (mặc định: 20, tối đa: 100) */
+                limit?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy danh sách danh mục thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example Lập trình */
+                            name?: string;
+                            /** @example lap-trinh */
+                            slug?: string | null;
+                            /** @example https://example.com/icon.png */
+                            iconUrl?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /** @example active */
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        meta?: {
+                            /** @example 42 */
+                            total?: number;
+                            /** @example 1 */
+                            page?: number;
+                            /** @example 20 */
+                            limit?: number;
+                            /** @example 3 */
+                            totalPages?: number;
+                        };
+                    };
+                };
             };
         };
     };
@@ -1573,9 +2187,84 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @example Lập trình */
+                    name: string;
+                    /**
+                     * @description Nếu không truyền, hệ thống sẽ tự sinh từ name
+                     * @example lap-trinh
+                     */
+                    slug?: string;
+                    /** @example https://example.com/icon.png */
+                    iconUrl?: string | null;
+                    /**
+                     * @example {
+                     *       "color": "#ff0000"
+                     *     }
+                     */
+                    metadata?: Record<string, never>;
+                    /**
+                     * @default active
+                     * @example active
+                     */
+                    status?: string;
+                };
+            };
+        };
         responses: {
+            /** @description Tạo danh mục thành công */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example Lập trình */
+                            name?: string;
+                            /** @example lap-trinh */
+                            slug?: string | null;
+                            /** @example https://example.com/icon.png */
+                            iconUrl?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /** @example active */
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Dữ liệu đầu vào không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền ADMIN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Slug đã tồn tại */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1588,13 +2277,43 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của danh mục */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy chi tiết danh mục thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example Lập trình */
+                            name?: string;
+                            /** @example lap-trinh */
+                            slug?: string | null;
+                            /** @example https://example.com/icon.png */
+                            iconUrl?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /** @example active */
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Không tìm thấy danh mục */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1607,13 +2326,43 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của danh mục */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Xóa danh mục thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example {} */
+                        data?: Record<string, never>;
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền ADMIN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy danh mục */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1626,13 +2375,82 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của danh mục */
                 id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    slug?: string;
+                    iconUrl?: string | null;
+                    metadata?: Record<string, never>;
+                    /** @example active */
+                    status?: string;
+                };
+            };
+        };
         responses: {
+            /** @description Cập nhật danh mục thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example Lập trình */
+                            name?: string;
+                            /** @example lap-trinh */
+                            slug?: string | null;
+                            /** @example https://example.com/icon.png */
+                            iconUrl?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /** @example active */
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Dữ liệu đầu vào không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền ADMIN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy danh mục */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Slug đã tồn tại */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1649,11 +2467,29 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy danh sách khóa học thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            mentorId?: string;
+                            title?: string;
+                            description?: string | null;
+                            thumbnailUrl?: string | null;
+                            price?: number;
+                            durationMinutes?: number;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                        }[];
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
         };
     };
@@ -1664,9 +2500,49 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCourseDto"];
+            };
+        };
         responses: {
+            /** @description Tạo khóa học thành công */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            mentorId?: string;
+                            title?: string;
+                            description?: string | null;
+                            thumbnailUrl?: string | null;
+                            price?: number;
+                            durationMinutes?: number;
+                            prerequisites?: string[];
+                            metadata?: Record<string, never>;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Dữ liệu đầu vào không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập hoặc token không hợp lệ */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1679,13 +2555,44 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của khóa học */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy chi tiết khóa học thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            mentorId?: string;
+                            approvedBy?: string | null;
+                            title?: string;
+                            description?: string | null;
+                            thumbnailUrl?: string | null;
+                            price?: number;
+                            durationMinutes?: number;
+                            prerequisites?: string[];
+                            metadata?: Record<string, never>;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Không tìm thấy khóa học */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1698,13 +2605,29 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của khóa học */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Xóa khóa học thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example {} */
+                        data?: Record<string, never>;
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Không tìm thấy khóa học */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1717,13 +2640,103 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của khóa học */
                 id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCourseDto"];
+            };
+        };
         responses: {
+            /** @description Cập nhật khóa học thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            title?: string;
+                            status?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Dữ liệu đầu vào không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy khóa học */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseController_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của khóa học */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description Trạng thái mới của khóa học sau khi duyệt
+                     * @example ACTIVE
+                     * @enum {string}
+                     */
+                    status: "DRAFT" | "PENDING" | "ACTIVE" | "INACTIVE";
+                };
+            };
+        };
+        responses: {
+            /** @description Duyệt khóa học thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            status?: string;
+                            approvedBy?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Không có quyền duyệt khóa học */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy khóa học */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1740,11 +2753,23 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy danh sách thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            courseId?: string;
+                            categoryId?: string;
+                            status?: string;
+                        }[];
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
         };
     };
@@ -1755,13 +2780,41 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @example 123456789 */
+                    courseId: string;
+                    /** @example 987654321 */
+                    categoryId: string;
+                    /**
+                     * @default active
+                     * @example active
+                     */
+                    status?: string;
+                };
+            };
+        };
         responses: {
+            /** @description Tạo liên kết thành công */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            courseId?: string;
+                            categoryId?: string;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
         };
     };
@@ -1770,17 +2823,34 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của liên kết */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy chi tiết thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            courseId?: string;
+                            categoryId?: string;
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
             };
         };
     };
@@ -1789,12 +2859,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của liên kết */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Xóa thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1808,12 +2880,22 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của liên kết */
                 id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    courseId?: string;
+                    categoryId?: string;
+                    status?: string;
+                };
+            };
+        };
         responses: {
+            /** @description Cập nhật thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1824,14 +2906,80 @@ export interface operations {
     };
     CourseBookingController_findAll: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Lọc theo courseId (MENTOR/ADMIN) */
+                courseId?: string;
+                /** @description Lọc theo menteeId (ADMIN) */
+                menteeId?: string;
+                /** @description Lọc theo trạng thái */
+                status?: "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled";
+                /** @description Trang hiện tại (mặc định: 1) */
+                page?: number;
+                /** @description Số bản ghi/trang (mặc định: 20, tối đa: 100) */
+                limit?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy danh sách booking thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example 123456789 */
+                            courseId?: string;
+                            /** @example 987654321 */
+                            menteeId?: string;
+                            /** @example null */
+                            paymentId?: string | null;
+                            /**
+                             * Format: date-time
+                             * @example 2026-06-01T09:00:00.000Z
+                             */
+                            meetingTime?: string;
+                            /** @example https://meet.google.com/abc-defg-hij */
+                            googleMeetUrl?: string | null;
+                            /** @example null */
+                            calendarEventId?: string | null;
+                            /** @example Tôi muốn hỏi về NestJS Guards */
+                            notesForMentor?: string | null;
+                            /** @example null */
+                            cancellationReason?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /**
+                             * @example pending
+                             * @enum {string}
+                             */
+                            status?: "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled";
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        meta?: {
+                            /** @example 10 */
+                            total?: number;
+                            /** @example 1 */
+                            page?: number;
+                            /** @example 20 */
+                            limit?: number;
+                            /** @example 1 */
+                            totalPages?: number;
+                        };
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1846,9 +2994,90 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @example 123456789 */
+                    courseId: string;
+                    /**
+                     * Format: date-time
+                     * @description Thời gian buổi học mong muốn
+                     * @example 2026-06-01T09:00:00.000Z
+                     */
+                    meetingTime: string;
+                    /**
+                     * @description Ghi chú gửi cho mentor
+                     * @example Tôi muốn hỏi về NestJS Guards
+                     */
+                    notesForMentor?: string;
+                    /** @example {} */
+                    metadata?: Record<string, never>;
+                };
+            };
+        };
         responses: {
+            /** @description Tạo booking thành công */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example 123456789 */
+                            courseId?: string;
+                            /** @example 987654321 */
+                            menteeId?: string;
+                            /** @example null */
+                            paymentId?: string | null;
+                            /**
+                             * Format: date-time
+                             * @example 2026-06-01T09:00:00.000Z
+                             */
+                            meetingTime?: string;
+                            /** @example https://meet.google.com/abc-defg-hij */
+                            googleMeetUrl?: string | null;
+                            /** @example null */
+                            calendarEventId?: string | null;
+                            /** @example Tôi muốn hỏi về NestJS Guards */
+                            notesForMentor?: string | null;
+                            /** @example null */
+                            cancellationReason?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /**
+                             * @example pending
+                             * @enum {string}
+                             */
+                            status?: "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled";
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Dữ liệu đầu vào không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền MENTEE */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1861,13 +3090,75 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của booking */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy chi tiết booking thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example 123456789 */
+                            courseId?: string;
+                            /** @example 987654321 */
+                            menteeId?: string;
+                            /** @example null */
+                            paymentId?: string | null;
+                            /**
+                             * Format: date-time
+                             * @example 2026-06-01T09:00:00.000Z
+                             */
+                            meetingTime?: string;
+                            /** @example https://meet.google.com/abc-defg-hij */
+                            googleMeetUrl?: string | null;
+                            /** @example null */
+                            calendarEventId?: string | null;
+                            /** @example Tôi muốn hỏi về NestJS Guards */
+                            notesForMentor?: string | null;
+                            /** @example null */
+                            cancellationReason?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /**
+                             * @example pending
+                             * @enum {string}
+                             */
+                            status?: "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled";
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền xem booking này */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy booking */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1880,13 +3171,43 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của booking */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Xóa booking thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example {} */
+                        data?: Record<string, never>;
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền xóa booking này */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy booking */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1899,13 +3220,193 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của booking */
                 id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: date-time
+                     * @example 2026-06-01T10:00:00.000Z
+                     */
+                    meetingTime?: string;
+                    /** @example https://meet.google.com/abc-defg-hij */
+                    googleMeetUrl?: string;
+                    /** @example google-calendar-event-id */
+                    calendarEventId?: string;
+                    notesForMentor?: string;
+                    cancellationReason?: string;
+                    paymentId?: string;
+                    metadata?: Record<string, never>;
+                    /**
+                     * @example confirmed
+                     * @enum {string}
+                     */
+                    status?: "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled";
+                };
+            };
+        };
         responses: {
+            /** @description Cập nhật booking thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example 123456789 */
+                            courseId?: string;
+                            /** @example 987654321 */
+                            menteeId?: string;
+                            /** @example null */
+                            paymentId?: string | null;
+                            /**
+                             * Format: date-time
+                             * @example 2026-06-01T09:00:00.000Z
+                             */
+                            meetingTime?: string;
+                            /** @example https://meet.google.com/abc-defg-hij */
+                            googleMeetUrl?: string | null;
+                            /** @example null */
+                            calendarEventId?: string | null;
+                            /** @example Tôi muốn hỏi về NestJS Guards */
+                            notesForMentor?: string | null;
+                            /** @example null */
+                            cancellationReason?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /**
+                             * @example pending
+                             * @enum {string}
+                             */
+                            status?: "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled";
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền cập nhật booking này */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy booking */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseBookingController_updateByMentee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của booking */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @example Tôi cần hỏi thêm về Interceptor */
+                    notesForMentor?: string;
+                    /** @example Bận đột xuất */
+                    cancellationReason?: string;
+                    /**
+                     * @example cancelled
+                     * @enum {string}
+                     */
+                    status?: "cancelled";
+                };
+            };
+        };
+        responses: {
+            /** @description Cập nhật booking thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example 123456789 */
+                            courseId?: string;
+                            /** @example 987654321 */
+                            menteeId?: string;
+                            /** @example null */
+                            paymentId?: string | null;
+                            /**
+                             * Format: date-time
+                             * @example 2026-06-01T09:00:00.000Z
+                             */
+                            meetingTime?: string;
+                            /** @example https://meet.google.com/abc-defg-hij */
+                            googleMeetUrl?: string | null;
+                            /** @example null */
+                            calendarEventId?: string | null;
+                            /** @example Tôi muốn hỏi về NestJS Guards */
+                            notesForMentor?: string | null;
+                            /** @example null */
+                            cancellationReason?: string | null;
+                            /** @example {} */
+                            metadata?: Record<string, never>;
+                            /**
+                             * @example pending
+                             * @enum {string}
+                             */
+                            status?: "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled";
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        };
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền cập nhật booking này */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy booking */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2108,7 +3609,43 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Tạo mã QR kích hoạt thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            paymentId?: string;
+                            /** @example 10000 */
+                            amount?: number;
+                            /** @example KICHHOAT 42AXYZ */
+                            transactionCode?: string;
+                            /** @example https://img.vietqr.io/image/MB-... */
+                            qrUrl?: string;
+                            /**
+                             * Format: date-time
+                             * @example 2026-05-01T08:15:00.000Z
+                             */
+                            expiredAt?: string;
+                        }[];
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                        /** @example null */
+                        error?: string | null;
+                    };
+                };
+            };
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập hoặc token không hợp lệ */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2121,13 +3658,89 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của payment */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy chi tiết payment thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                            id?: string;
+                            /** @example 42 */
+                            userId?: string;
+                            /** @example 10000 */
+                            amount?: number;
+                            /** @example VND */
+                            currency?: string;
+                            /** @example activation */
+                            paymentMethod?: string | null;
+                            /** @example null */
+                            transactionId?: string | null;
+                            /** @example KICHHOAT 42AXYZ */
+                            description?: string | null;
+                            /**
+                             * Format: date-time
+                             * @example 2026-05-01T08:15:00.000Z
+                             */
+                            expiredAt?: string | null;
+                            /** @example https://img.vietqr.io/image/MB-... */
+                            vietqrQrDataUrl?: string | null;
+                            /**
+                             * @example {
+                             *       "transactionCode": "KICHHOAT 42AXYZ",
+                             *       "qrUrl": "https://img.vietqr.io/...",
+                             *       "generatedAt": "2026-05-01T07:00:00.000Z"
+                             *     }
+                             */
+                            vietqrPayload?: Record<string, never>;
+                            /** @example {} */
+                            paymentGatewayPayload?: Record<string, never>;
+                            /**
+                             * Format: date-time
+                             * @example null
+                             */
+                            paidAt?: string | null;
+                            /**
+                             * @example pending
+                             * @enum {string}
+                             */
+                            status?: "pending" | "success" | "failed" | "expired";
+                            /**
+                             * Format: date-time
+                             * @example 2026-05-01T07:00:00.000Z
+                             */
+                            createdAt?: string;
+                            /**
+                             * Format: date-time
+                             * @example 2026-05-01T07:00:00.000Z
+                             */
+                            updatedAt?: string;
+                        }[];
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                        /** @example null */
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập hoặc token không hợp lệ */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy thông tin thanh toán */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2148,7 +3761,69 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Kết quả xác minh — `activated: true` nếu thành công, `activated: false` nếu giao dịch chưa được tìm thấy (FE polling lại) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example true */
+                            activated?: boolean;
+                            /** @example Tài khoản đã được kích hoạt thành công! */
+                            message?: string;
+                        }[];
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                        /** @example null */
+                        error?: string | null;
+                    };
+                };
+            };
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập hoặc token không hợp lệ */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bạn không có quyền xác minh thanh toán này */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy thông tin thanh toán */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Lỗi nội bộ: không tìm thấy mã giao dịch trong payment */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không thể kết nối đến dịch vụ kiểm tra giao dịch (TN App), vui lòng thử lại sau */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2431,8 +4106,8 @@ export interface operations {
     };
     MessageController_findAll: {
         parameters: {
-            query: {
-                conversation_id: string;
+            query?: {
+                conversation_id?: string;
             };
             header?: never;
             path?: never;

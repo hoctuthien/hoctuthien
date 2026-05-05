@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { cn } from "@/core/utils/cn";
 import { Providers } from "./providers";
+import { AuthProvider } from "./auth-provider";
 import { DeviceInitializer } from "@/shared/components/DeviceInitializer";
 import "./global.css";
 
@@ -73,7 +74,9 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <NextIntlClientProvider messages={messages}>
-          <Providers>{children}</Providers>
+          <Providers>
+            <AuthProvider>{children}</AuthProvider>
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>
