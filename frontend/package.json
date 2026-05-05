@@ -16,7 +16,8 @@
     "validate": "npm run type-check && npm run lint && npm run build",
     "prepare": "husky",
     "storybook": "storybook dev -p 8000",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "gen:api": "npx openapi-typescript https://api.hoctuthien.com/api/docs-json -o ./src/core/types/api.generated.ts"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -66,6 +67,7 @@
     "eslint-plugin-storybook": "^10.3.3",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
+    "openapi-typescript": "^7.13.0",
     "playwright": "^1.58.2",
     "prettier": "^3.5.3",
     "storybook": "^10.3.3",
