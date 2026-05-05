@@ -7,6 +7,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { PaymentStatus } from '../entities/payment.entity';
+import { VerifyActivationPaymentDto } from '../dtos/payment.dto';
 
 export const ApiGenerateActivationQrDoc = () => {
   return applyDecorators(
@@ -170,18 +171,7 @@ export const ApiVerifyActivationPaymentDoc = () => {
         'User bấm "Tôi đã chuyển khoản" → backend query TN App API tìm giao dịch khớp → kích hoạt tài khoản. ' +
         'Nếu giao dịch chưa xuất hiện (activated: false), FE polling lại sau vài giây.',
     }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        required: ['paymentId'],
-        properties: {
-          paymentId: {
-            type: 'string',
-            example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
-          },
-        },
-      },
-    }),
+    ApiBody({ type: VerifyActivationPaymentDto }),
     ApiResponse({
       status: 200,
       description:

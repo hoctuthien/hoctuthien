@@ -7,6 +7,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { UserRole } from '../entities/user.entity';
+import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
 
 export const ApiGetMeDoc = () => {
   return applyDecorators(
@@ -69,24 +70,7 @@ export const ApiGetMeDoc = () => {
 export const ApiCreateUserDoc = () => {
   return applyDecorators(
     ApiOperation({ summary: 'Tạo user mới' }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        required: ['name', 'email'],
-        properties: {
-          name: { type: 'string', maxLength: 255, example: 'Nguyen Van A' },
-          email: { type: 'string', format: 'email', maxLength: 255, example: 'a@gmail.com' },
-          password: { type: 'string', minLength: 6, maxLength: 255, example: '123456' },
-          googleId: { type: 'string', maxLength: 255 },
-          phone: { type: 'string', maxLength: 50 },
-          avatarUrl: { type: 'string', maxLength: 500 },
-          dayOfBirth: { type: 'string' },
-          gender: { type: 'string', maxLength: 50 },
-          role: { type: 'string', enum: Object.values(UserRole), default: 'mentee' },
-          status: { type: 'string', maxLength: 50, default: 'active' },
-        },
-      },
-    }),
+    ApiBody({ type: CreateUserDto }),
     ApiResponse({
       status: 201,
       description: 'Tạo user thành công',
@@ -219,27 +203,7 @@ export const ApiUpdateUserDoc = () => {
       description: 'ID của user',
       example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
     }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', maxLength: 255 },
-          email: { type: 'string', format: 'email', maxLength: 255 },
-          googleId: { type: 'string', maxLength: 255 },
-          phone: { type: 'string', maxLength: 50 },
-          avatarUrl: { type: 'string', maxLength: 500 },
-          dayOfBirth: { type: 'string' },
-          gender: { type: 'string', maxLength: 50 },
-          role: { type: 'string', enum: Object.values(UserRole) },
-          status: { type: 'string', maxLength: 50 },
-          isVerified: { type: 'boolean' },
-          points: { type: 'number' },
-          preferences: { type: 'object' },
-          metadata: { type: 'object' },
-          timezone: { type: 'string' },
-        },
-      },
-    }),
+    ApiBody({ type: UpdateUserDto }),
     ApiResponse({
       status: 200,
       description: 'Cập nhật user thành công',

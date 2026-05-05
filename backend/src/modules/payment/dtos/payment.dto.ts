@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
@@ -19,6 +20,7 @@ export class GenerateActivationQrDto {}
  * Backend sẽ query TN App API để tìm giao dịch khớp.
  */
 export class VerifyActivationPaymentDto {
+  @ApiProperty({ example: 'PAY123456', description: 'ID của giao dịch thanh toán' })
   @IsString()
   @IsNotEmpty({ message: 'paymentId không được để trống.' })
   paymentId: string;

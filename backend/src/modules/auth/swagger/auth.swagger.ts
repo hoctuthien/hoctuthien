@@ -7,6 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { UserRole } from '../../user/entities/user.entity';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
+import { LoginDto, RegisterDto, GoogleTokenDto } from '../dtos/auth.dto';
 
 export const ApiRegisterDoc = () => {
   return applyDecorators(
@@ -14,20 +15,7 @@ export const ApiRegisterDoc = () => {
       summary: 'Đăng ký tài khoản mới',
       description: 'Tạo tài khoản người dùng mới. Sau khi đăng ký thành công, access_token và refresh_token sẽ được lưu vào Cookie (không trả về trong body).' 
     }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        required: ['email', 'password', 'name'],
-        properties: {
-          email: { type: 'string', format: 'email', example: 'user@example.com' },
-          password: { type: 'string', minLength: 6, example: 'password123' },
-          name: { type: 'string', example: 'Nguyen Van A' },
-          phone: { type: 'string', example: '0987654321', nullable: true },
-          dayOfBirth: { type: 'string', format: 'date', example: '2000-01-01', nullable: true },
-          gender: { type: 'string', example: 'male', nullable: true },
-        },
-      },
-    }),
+    ApiBody({ type: RegisterDto }),
     ApiResponse({
       status: 201,
       description: 'Đăng ký thành công. Tokens được trả về và lưu trong Cookie.',
@@ -63,16 +51,7 @@ export const ApiLoginDoc = () => {
       description: 'ID của thiết bị (cũng có thể gửi qua Cookie: device_id)',
       required: false,
     }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        required: ['email', 'password'],
-        properties: {
-          email: { type: 'string', format: 'email', example: 'user@example.com' },
-          password: { type: 'string', example: 'password123' },
-        },
-      },
-    }),
+    ApiBody({ type: LoginDto }),
     ApiResponse({
       status: 201,
       description: 'Đăng nhập thành công. Tokens được trả về và lưu trong Cookie.',
@@ -209,16 +188,7 @@ export const ApiGoogleTokenLoginDoc = () => {
       description: 'ID của thiết bị (cũng có thể gửi qua Cookie: device_id)',
       required: false,
     }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        required: ['token'],
-        properties: {
-          token: { type: 'string', description: 'idToken nhận được từ Google SDK ở Frontend' },
-          email: { type: 'string', nullable: true },
-        },
-      },
-    }),
+    ApiBody({ type: GoogleTokenDto }),
     ApiResponse({
       status: 201,
       description: 'Đăng nhập thành công. Tokens lưu vào Cookie.',
