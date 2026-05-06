@@ -6,14 +6,14 @@ import { CategoryEntity } from '../../category/entities/category.entity';
 @Entity({ name: 'course_categories' })
 @Unique(['courseId', 'categoryId'])
 export class CourseCategoryEntity extends BaseEntity {
-  @Column({ name: 'course_id', type: 'bigint' })
+  @Column({ name: 'course_id', type: 'uuid' })
   courseId: string;
 
   @ManyToOne(() => CourseEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'course_id' })
   course: CourseEntity;
 
-  @Column({ name: 'category_id', type: 'bigint' })
+  @Column({ name: 'category_id', type: 'uuid' })
   categoryId: string;
 
   @ManyToOne(() => CategoryEntity, { onDelete: 'CASCADE' })

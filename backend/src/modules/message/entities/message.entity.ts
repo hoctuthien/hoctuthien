@@ -5,14 +5,14 @@ import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity({ name: 'messages' })
 export class MessageEntity extends BaseEntity {
-  @Column({ name: 'conversation_id', type: 'bigint' })
+  @Column({ name: 'conversation_id', type: 'uuid' })
   conversationId: string;
 
   @ManyToOne(() => ConversationEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'conversation_id' })
   conversation: ConversationEntity;
 
-  @Column({ name: 'sender_id', type: 'bigint' })
+  @Column({ name: 'sender_id', type: 'uuid' })
   senderId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })

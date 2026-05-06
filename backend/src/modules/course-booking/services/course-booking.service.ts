@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CourseBookingRepository } from '../repositories/course-booking.repository';
 import {
@@ -111,11 +112,71 @@ export class CourseBookingService {
   // menteeId lấy từ JWT, không để client tự truyền
   async create(payload: CreateCourseBookingInput, menteeId: string) {
     const parsed = createCourseBookingSchema.parse(payload);
+
+    // Validate meeting time against course metadata
+    const course = await this.courseRepository.findById(parsed.courseId);
+    if (!course) throw new NotFoundException('Course not found');
+
+    this.validateMeetingTime(parsed.meetingTime, course.metadata);
+
     const created = await this.courseBookingRepository.createAndSave({
       ...parsed,
       menteeId,
     });
     return courseBookingSchema.parse(created);
+  }
+
+  private validateMeetingTime(meetingTime: Date, metadata: any) {
+    if (!metadata?.time) {
+      // Nếu không có config time trong metadata, coi như flexible hoàn toàn
+      return;
+    }
+
+    const dayOfWeek = meetingTime
+      .toLocaleDateString('en-US', { weekday: 'long' })
+      .toLowerCase();
+    const hours = meetingTime.getHours().toString().padStart(2, '0');
+    const minutes = meetingTime.getMinutes().toString().padStart(2, '0');
+    const timeStr = `${hours}:${minutes}`;
+
+    const slots = metadata.time[dayOfWeek];
+
+    if (!slots || !Array.isArray(slots) || slots.length === 0) {
+      throw new BadRequestException(
+        `Mentor không rảnh vào thứ ${dayOfWeek}. Vui lòng chọn ngày khác.`,
+      );
+    }
+
+    const isInRange = slots.some((range: string) =>
+      this.isTimeInRange(timeStr, range),
+    );
+
+    if (!isInRange) {
+      throw new BadRequestException(
+        `Thời gian ${timeStr} không nằm trong khung giờ rảnh của Mentor vào ${dayOfWeek} (${slots.join(
+          ', ',
+        )}).`,
+      );
+    }
+  }
+
+  private isTimeInRange(time: string, range: string): boolean {
+    try {
+      const [start, end] = range.split('-');
+      if (!start || !end) return false;
+
+      const [timeH, timeM] = time.split(':').map(Number);
+      const [startH, startM] = start.trim().split(':').map(Number);
+      const [endH, endM] = end.trim().split(':').map(Number);
+
+      const timeVal = timeH * 60 + timeM;
+      const startVal = startH * 60 + startM;
+      const endVal = endH * 60 + endM;
+
+      return timeVal >= startVal && timeVal <= endVal;
+    } catch (e) {
+      return false;
+    }
   }
 
   // MENTEE chỉ được cập nhật notes/cancel
