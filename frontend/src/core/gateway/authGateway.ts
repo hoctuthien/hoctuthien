@@ -9,20 +9,20 @@ export const authGateway = {
    * Đăng nhập thông qua BFF
    */
   async login(payload: LoginRequest): Promise<{ user: UserProfile }> {
-    return httpClient.post<{ user: UserProfile }>('/auth/login', payload);
+    return httpClient.post<{ user: UserProfile }>('/v1/auths/login', payload);
   },
 
   /**
    * Lấy thông tin user hiện tại
    */
   async getMe(): Promise<{ user: UserProfile | null }> {
-    return httpClient.get<{ user: UserProfile | null }>('/auth/me');
+    return httpClient.get<{ user: UserProfile | null }>('/v1/users/me');
   },
 
   /**
    * Đăng xuất
    */
   async logout(): Promise<void> {
-    return httpClient.post('/auth/logout');
+    return httpClient.post('/v1/auths/logout');
   },
 };

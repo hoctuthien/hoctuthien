@@ -14,20 +14,30 @@ import {
   loginSchema,
   type LoginFormData,
 } from "@/app/(auth)/login/login.schema";
-import { useUserStore } from "@/core/lib/store/userStore";
-import { useRouter } from "next/navigation";
-import { authGateway } from "@/core/gateway/authGateway";
+import { signIn } from "next-auth/react";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export function LoginForm() {
   const t = useTranslations("Auth");
   const tError = useTranslations("Error");
   const router = useRouter();
-  const setUser = useUserStore((state) => state.setUser);
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get("error");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (errorParam === "CredentialsSignin") {
+      setGeneralError(tError("invalidCredentials"));
+    } else if (errorParam) {
+      setGeneralError(tError("unknownError") || "An error occurred during sign in.");
+    }
+  }, [errorParam, tError]);
 
   const {
     register,
@@ -49,17 +59,24 @@ export function LoginForm() {
     setGeneralError(null);
 
     try {
-      // call through gateway
-      const result = await authGateway.login({
+      console.log("[LoginForm] Submitting login...");
+      const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
+        redirect: false,
       });
-      
-      setUser(result.user);
-      router.push("/profile");
-      router.refresh();
+
+      console.log("[LoginForm] SignIn Result:", result);
+
+      if (!result || result.error) {
+        setGeneralError(tError("invalidCredentials"));
+      } else if (result.ok) {
+        router.push("/profile");
+        router.refresh();
+      }
     } catch (error: any) {
-      setGeneralError(error.message || tError("invalidCredentials"));
+      console.error("[LoginForm] Submit Error:", error);
+      setGeneralError(tError("invalidCredentials"));
     } finally {
       setIsSubmitting(false);
     }
@@ -68,8 +85,9 @@ export function LoginForm() {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      // TODO: replace with actual Google OAuth flow
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await signIn("google", { callbackUrl: "/profile" });
+    } catch (error) {
+      console.error("Google login failed:", error);
     } finally {
       setIsGoogleLoading(false);
     }
@@ -96,6 +114,7 @@ export function LoginForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
+        method="POST"
         noValidate
         className="flex flex-col gap-5"
       >
