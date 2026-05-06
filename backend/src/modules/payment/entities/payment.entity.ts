@@ -11,7 +11,7 @@ export { PaymentStatus };
 
 @Entity({ name: 'payments' })
 export class PaymentEntity extends BaseEntity {
-  @Column({ name: 'user_id', type: 'bigint' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })

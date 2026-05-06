@@ -41,7 +41,15 @@ export class CourseDto {
   @IsOptional()
   prerequisites?: string[];
 
-  @ApiProperty({ example: { level: 'intermediate' }, required: false })
+  @ApiProperty({
+    example: {
+      time: {
+        monday: ['09:00-11:00', '14:00-16:00'],
+        wednesday: ['19:00-21:00'],
+      },
+    },
+    required: false,
+  })
   @IsOptional()
   metadata?: any;
 
