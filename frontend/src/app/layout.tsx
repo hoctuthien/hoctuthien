@@ -68,7 +68,7 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
         className={cn(montserrat.variable, "font-sans antialiased")}
         suppressHydrationWarning

@@ -15,13 +15,13 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig: NextConfig = {
   output: "standalone",
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL;
-    if (!backendUrl) return [];
+    const backendUrl = (process.env.BACKEND_URL || 'http://localhost:5050').replace(/\/$/, '');
     
     return [
       {
-        source: '/api/:path*',
-        destination: `${process.env.BACKEND_URL || 'http://localhost:3001'}/api/:path*`,
+        // Chuyển hướng các request API sang backend, TRỪ các endpoint của NextAuth (/api/auth/*)
+        source: '/api/((?!auth).*)',
+        destination: `${backendUrl}/api/:1*`,
       },
     ];
   },
