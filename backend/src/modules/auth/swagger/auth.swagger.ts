@@ -12,8 +12,7 @@ import { LoginDto, RegisterDto, GoogleTokenDto } from '../dtos/auth.dto';
 export const ApiRegisterDoc = () => {
   return applyDecorators(
     ApiOperation({ 
-      summary: 'Đăng ký tài khoản mới',
-      description: 'Tạo tài khoản người dùng mới. Sau khi đăng ký thành công, access_token và refresh_token sẽ được lưu vào Cookie (không trả về trong body).' 
+      description: 'Tạo tài khoản người dùng mới. Sau khi đăng ký thành công, access_token và refresh_token sẽ được trả về trong response body.' 
     }),
     ApiBody({ type: RegisterDto }),
     ApiResponse({
@@ -31,6 +30,8 @@ export const ApiRegisterDoc = () => {
               role: { type: 'string', enum: Object.values(UserRole) },
             },
           },
+          access_token: { type: 'string' },
+          refresh_token: { type: 'string' },
           message: { type: 'string', example: AUTH_MESSAGES.REGISTER_SUCCESS },
         },
       },
@@ -43,8 +44,7 @@ export const ApiRegisterDoc = () => {
 export const ApiLoginDoc = () => {
   return applyDecorators(
     ApiOperation({ 
-      summary: 'Đăng nhập bằng Email/Password',
-      description: 'Xác thực người dùng. Sau khi thành công, access_token và refresh_token sẽ được lưu vào Cookie (không trả về trong body).' 
+      description: 'Xác thực người dùng. Sau khi thành công, access_token và refresh_token sẽ được trả về trong response body.' 
     }),
     ApiHeader({
       name: 'x-device-id',
@@ -67,6 +67,8 @@ export const ApiLoginDoc = () => {
               role: { type: 'string', enum: Object.values(UserRole) },
             },
           },
+          access_token: { type: 'string' },
+          refresh_token: { type: 'string' },
           message: { type: 'string', example: AUTH_MESSAGES.LOGIN_SUCCESS },
         },
       },
@@ -78,8 +80,7 @@ export const ApiLoginDoc = () => {
 export const ApiRefreshTokensDoc = () => {
   return applyDecorators(
     ApiOperation({ 
-      summary: 'Làm mới Access Token',
-      description: 'Sử dụng refresh_token từ Cookie để lấy access_token mới. Tokens mới sẽ được cập nhật lại trong Cookie (không trả về trong body).' 
+      description: 'Sử dụng refresh_token để lấy access_token mới. Tokens mới sẽ được trả về trong response body.' 
     }),
     ApiHeader({
       name: 'x-device-id',
@@ -101,6 +102,8 @@ export const ApiRefreshTokensDoc = () => {
               role: { type: 'string', enum: Object.values(UserRole) },
             },
           },
+          access_token: { type: 'string' },
+          refresh_token: { type: 'string' },
         },
       },
     }),
@@ -152,8 +155,7 @@ export const ApiGoogleAuthDoc = () => {
 export const ApiGoogleAuthCallbackDoc = () => {
   return applyDecorators(
     ApiOperation({ 
-      summary: 'Google OAuth Callback',
-      description: 'Endpoint nhận kết quả từ Google. Sau khi xác thực thành công, tokens sẽ được lưu vào Cookie.' 
+      description: 'Endpoint nhận kết quả từ Google. Sau khi xác thực thành công, tokens sẽ được trả về trong response body.' 
     }),
     ApiResponse({
       status: 200,
@@ -171,6 +173,8 @@ export const ApiGoogleAuthCallbackDoc = () => {
               role: { type: 'string', enum: Object.values(UserRole) },
             },
           },
+          access_token: { type: 'string' },
+          refresh_token: { type: 'string' },
         },
       },
     }),
@@ -180,8 +184,7 @@ export const ApiGoogleAuthCallbackDoc = () => {
 export const ApiGoogleTokenLoginDoc = () => {
   return applyDecorators(
     ApiOperation({ 
-      summary: 'Đăng nhập Google bằng idToken',
-      description: 'Xác thực idToken từ Google Frontend. Sau khi thành công, tokens sẽ được lưu vào Cookie.' 
+      description: 'Xác thực idToken từ Google Frontend. Sau khi thành công, tokens sẽ được trả về trong response body.' 
     }),
     ApiHeader({
       name: 'x-device-id',
@@ -205,6 +208,8 @@ export const ApiGoogleTokenLoginDoc = () => {
               role: { type: 'string', enum: Object.values(UserRole) },
             },
           },
+          access_token: { type: 'string' },
+          refresh_token: { type: 'string' },
         },
       },
     }),

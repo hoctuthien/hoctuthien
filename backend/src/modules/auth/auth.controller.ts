@@ -15,8 +15,6 @@ import { Request, Response } from 'express';
 import { AuthService } from './services/auth.service';
 import { LoginDto, GoogleTokenDto, RegisterDto } from './dtos/auth.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { SetCookie } from 'src/common/decorators/set-cookie.decorator';
-import { SetCookieInterceptor } from 'src/common/interceptors/set-cookie.interceptor';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { ApiTags } from '@nestjs/swagger';
 import {
@@ -38,19 +36,7 @@ export class AuthController {
   @Public()
   @Post('register')
   @ApiRegisterDoc()
-  @UseInterceptors(SetCookieInterceptor)
-  @SetCookie([
-    {
-      name: 'access_token',
-      field: 'access_token',
-      options: { maxAge: 15 * 60 * 1000 },
-    },
-    {
-      name: 'refresh_token',
-      field: 'refresh_token',
-      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
-    },
-  ])
+  @ApiRegisterDoc()
   async register(
     @Body() registerDto: RegisterDto,
     @Ip() ip: string,
@@ -66,19 +52,7 @@ export class AuthController {
   @Public()
   @Post('login')
   @ApiLoginDoc()
-  @UseInterceptors(SetCookieInterceptor)
-  @SetCookie([
-    {
-      name: 'access_token',
-      field: 'access_token',
-      options: { maxAge: 15 * 60 * 1000 },
-    },
-    {
-      name: 'refresh_token',
-      field: 'refresh_token',
-      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
-    },
-  ])
+  @ApiLoginDoc()
   async login(
     @Body() loginDto: LoginDto,
     @Ip() ip: string,
@@ -94,19 +68,7 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @ApiRefreshTokensDoc()
-  @UseInterceptors(SetCookieInterceptor)
-  @SetCookie([
-    {
-      name: 'access_token',
-      field: 'access_token',
-      options: { maxAge: 15 * 60 * 1000 },
-    },
-    {
-      name: 'refresh_token',
-      field: 'refresh_token',
-      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
-    },
-  ])
+  @ApiRefreshTokensDoc()
   async refresh(@Req() req: Request) {
     const refreshToken = req.cookies['refresh_token'];
     const deviceId = req.cookies['device_id'] || req.headers['x-device-id'];
@@ -154,19 +116,7 @@ export class AuthController {
   @Get('google/callback')
   @ApiGoogleAuthCallbackDoc()
   @UseGuards(GoogleAuthGuard)
-  @UseInterceptors(SetCookieInterceptor)
-  @SetCookie([
-    {
-      name: 'access_token',
-      field: 'access_token',
-      options: { maxAge: 15 * 60 * 1000 },
-    },
-    {
-      name: 'refresh_token',
-      field: 'refresh_token',
-      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
-    },
-  ])
+  @ApiGoogleAuthCallbackDoc()
   async googleAuthRedirect(@Req() req: any) {
     const deviceId = req.cookies['device_id'] || req.headers['x-device-id'];
     return this.authService.validateGoogleUser(req.user, deviceId as string);
@@ -175,19 +125,7 @@ export class AuthController {
   @Public()
   @Post('google/token')
   @ApiGoogleTokenLoginDoc()
-  @UseInterceptors(SetCookieInterceptor)
-  @SetCookie([
-    {
-      name: 'access_token',
-      field: 'access_token',
-      options: { maxAge: 15 * 60 * 1000 },
-    },
-    {
-      name: 'refresh_token',
-      field: 'refresh_token',
-      options: { maxAge: 7 * 24 * 60 * 60 * 1000 },
-    },
-  ])
+  @ApiGoogleTokenLoginDoc()
   async googleTokenLogin(
     @Body() googleTokenDto: GoogleTokenDto,
     @Req() req: Request,
