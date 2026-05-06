@@ -35,27 +35,31 @@ const request = async <T>(
     const isAuthPath = path === '/auth/login' || path === '/auth/refresh';
     if (error.status === 401 && !isAuthPath) {
       if (!isRefreshing) {
-        console.log('[HTTPClient] Access Token expired, attempting refresh...');
+        console.log('[HTTPClient] Access Token expired, initiating refresh...');
         isRefreshing = true;
         try {
           await client.post('/auth/refresh');
-          console.log('[HTTPClient] Refresh success, retrying original request:', path);
+          console.log('[HTTPClient] Refresh success, retrying initiating request:', path);
           isRefreshing = false;
           onRefreshed();
+          
+          // Retry chính request này và trả về kết quả ngay lập tức
+          return request<T>(method, path, ...args);
         } catch (refreshError) {
           console.error('[HTTPClient] Refresh failed, redirecting to login');
           isRefreshing = false;
           window.location.href = '/login';
           throw refreshError;
         }
-      }
-
-      // Đợi refresh xong rồi retry
-      return new Promise((resolve) => {
-        subscribeTokenRefresh(() => {
-          resolve(request<T>(method, path, ...args));
+      } else {
+        // Nếu đang có request khác refresh rồi, thì đứng vào hàng đợi
+        console.log('[HTTPClient] Refresh in progress, queuing request:', path);
+        return new Promise((resolve) => {
+          subscribeTokenRefresh(() => {
+            resolve(request<T>(method, path, ...args));
+          });
         });
-      });
+      }
     }
     throw error;
   }
