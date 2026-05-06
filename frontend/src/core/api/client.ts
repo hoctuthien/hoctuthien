@@ -31,17 +31,20 @@ const request = async <T>(
     const response = await fn(path, ...args);
     return response.data;
   } catch (error: any) {
-    // Nếu lỗi 401 và không phải đang ở các trang auth
-    if (error.status === 401 && !path.includes('/auth/')) {
+    // Nếu lỗi 401 và không phải là API login/refresh
+    const isAuthPath = path === '/auth/login' || path === '/auth/refresh';
+    if (error.status === 401 && !isAuthPath) {
       if (!isRefreshing) {
+        console.log('[HTTPClient] Access Token expired, attempting refresh...');
         isRefreshing = true;
         try {
           await client.post('/auth/refresh');
+          console.log('[HTTPClient] Refresh success, retrying original request:', path);
           isRefreshing = false;
           onRefreshed();
         } catch (refreshError) {
+          console.error('[HTTPClient] Refresh failed, redirecting to login');
           isRefreshing = false;
-          // Nếu refresh cũng lỗi thì logout luôn hoặc redirect sang login
           window.location.href = '/login';
           throw refreshError;
         }
