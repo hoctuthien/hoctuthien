@@ -24,39 +24,47 @@ const onRefreshed = () => {
 const request = async <T>(
   method: 'get' | 'post' | 'patch' | 'delete',
   path: string,
-  ...args: any[]
+  dataOrOptions?: any,
+  options?: any,
+  _retryCount = 0 // Thêm biến đếm retry nội bộ
 ): Promise<T> => {
   try {
     const fn = (client as any)[method];
+    // Sắp xếp lại đối số vì post/patch có thêm data
+    const args = ['post', 'patch'].includes(method) ? [dataOrOptions, options] : [dataOrOptions];
     const response = await fn(path, ...args);
     return response.data;
   } catch (error: any) {
-    // Nếu lỗi 401 và không phải là API login/refresh
     const isAuthPath = path === '/auth/login' || path === '/auth/refresh';
-    if (error.status === 401 && !isAuthPath) {
+    
+    // Nếu lỗi 401 và chưa quá số lần retry cho phép
+    if (error.status === 401 && !isAuthPath && _retryCount < 1) {
       if (!isRefreshing) {
         console.log('[HTTPClient] Access Token expired, initiating refresh...');
         isRefreshing = true;
         try {
           await client.post('/auth/refresh');
-          console.log('[HTTPClient] Refresh success, retrying initiating request:', path);
+          console.log('[HTTPClient] Refresh success, retrying original request:', path);
           isRefreshing = false;
           onRefreshed();
           
-          // Retry chính request này và trả về kết quả ngay lập tức
-          return request<T>(method, path, ...args);
+          // Retry với _retryCount = 1 để không lặp vô tận
+          return request<T>(method, path, dataOrOptions, options, 1);
         } catch (refreshError) {
           console.error('[HTTPClient] Refresh failed, redirecting to login');
           isRefreshing = false;
-          window.location.href = '/login';
+          
+          // Tránh vòng lặp redirect nếu đang ở trang login rồi
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
           throw refreshError;
         }
       } else {
-        // Nếu đang có request khác refresh rồi, thì đứng vào hàng đợi
         console.log('[HTTPClient] Refresh in progress, queuing request:', path);
         return new Promise((resolve) => {
           subscribeTokenRefresh(() => {
-            resolve(request<T>(method, path, ...args));
+            resolve(request<T>(method, path, dataOrOptions, options, 1));
           });
         });
       }
