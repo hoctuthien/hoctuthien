@@ -11,7 +11,7 @@ export class UserSessionEntity extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @Column({ name: 'refresh_token', type: 'varchar', length: 255 })
+  @Column({ name: 'refresh_token', type: 'text' })
   refreshToken: string;
 
   @Column({ name: 'device_name', type: 'varchar', length: 255, nullable: true })
