@@ -75,8 +75,9 @@ export function RegisterForm() {
     } catch (error: any) {
       console.error("[RegisterForm] Submit Error:", error);
       // Hiển thị lỗi từ API nếu có
-      if (error?.response?.data?.message) {
-        setGeneralError(error.response.data.message);
+      const apiErrorMessage = error?.data?.error?.message || (error?.message !== 'API Request failed' ? error?.message : null);
+      if (apiErrorMessage) {
+        setGeneralError(apiErrorMessage);
       } else {
         setGeneralError(tError("default") || "Registration failed. Please try again.");
       }
