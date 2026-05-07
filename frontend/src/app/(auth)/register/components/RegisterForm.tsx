@@ -90,8 +90,9 @@ export function RegisterForm() {
     if (provider === "google") setIsGoogleLoading(true);
 
     try {
-      // TODO: replace with actual OAuth flow
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await signIn(provider, { callbackUrl: "/profile" });
+    } catch (error) {
+      console.error(`${provider} login failed:`, error);
     } finally {
       if (provider === "google") setIsGoogleLoading(false);
     }
