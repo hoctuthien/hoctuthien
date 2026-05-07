@@ -17,13 +17,14 @@ const nextConfig: NextConfig = {
   async rewrites() {
     const backendUrl = (process.env.BACKEND_URL || 'http://localhost:5050').replace(/\/$/, '');
     
-    return [
-      {
-        // Chuyển hướng các request API sang backend, TRỪ các endpoint của NextAuth (/api/auth/*)
-        source: '/api/((?!auth).*)',
-        destination: `${backendUrl}/api/:1*`,
-      },
-    ];
+    return {
+      fallback: [
+        {
+          source: '/api/:path*',
+          destination: `${backendUrl}/api/:path*`,
+        },
+      ],
+    };
   },
 };
 

@@ -2,9 +2,17 @@ import { httpClient } from '../api/client';
 import type { operations } from '../types/api.generated';
 
 type LoginRequest = operations['AuthController_login']['requestBody']['content']['application/json'];
+type RegisterRequest = operations['AuthController_register']['requestBody']['content']['application/json'];
 type UserProfile = NonNullable<operations['AuthController_login']['responses'][201]['content']['application/json']['user']>;
 
 export const authGateway = {
+  /**
+   * Đăng ký tài khoản
+   */
+  async register(payload: RegisterRequest): Promise<{ user: UserProfile }> {
+    return httpClient.post<{ user: UserProfile }>('/v1/auths/register', payload);
+  },
+
   /**
    * Đăng nhập thông qua BFF
    */
