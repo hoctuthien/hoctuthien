@@ -46,7 +46,7 @@ export const HeroSection = () => {
 
           {/* Right Image */}
           <div className="flex-1 relative">
-            <div className="relative w-full aspect-[4/3] lg:aspect-square">
+            <div className="relative w-full aspect-[4/3] lg:aspect-square min-h-[300px] lg:min-h-0">
               {/* Background Decoration */}
               <div className="absolute -top-10 -right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
               <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-secondary/5 rounded-full blur-3xl" />
@@ -65,7 +65,7 @@ export const HeroSection = () => {
               <Card 
                 variant="glass" 
                 padding="sm" 
-                className="absolute bottom-4 left-4 md:bottom-10 md:left-auto md:-right-12 flex items-center gap-4 animate-bounce-slow z-20"
+                className="hidden md:flex absolute bottom-10 -left-12 items-center gap-4 animate-bounce-slow z-20"
               >
                 <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-white">
                   <Icon name="CheckCircle" size={24} />

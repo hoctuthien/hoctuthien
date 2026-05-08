@@ -49,17 +49,14 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-6">
+            <Link href="/" className="flex items-center mb-6">
               <Image
-                src="/images/avatar_browser.png"
-                alt="Logo"
-                width={40}
-                height={40}
-                className="rounded-full"
+                src="/images/logo.png"
+                alt="Học Từ Thiện"
+                width={180}
+                height={50}
+                className="h-16 w-auto object-contain"
               />
-              <span className="font-bold text-2xl text-primary tracking-tight">
-                {t('brandName')}
-              </span>
             </Link>
             <p className="text-text-muted max-w-sm mb-8 leading-relaxed">
               {tHome('brandDescription')}

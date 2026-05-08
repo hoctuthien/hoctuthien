@@ -22,17 +22,14 @@ export const Header = () => {
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-outline-variant">
       <div className="container-custom h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center group">
           <Image
-            src="/images/avatar_browser.png"
-            alt="Logo"
-            width={40}
-            height={40}
-            className="rounded-full shadow-sm group-hover:scale-110 transition-transform"
+            src="/images/logo.png"
+            alt="Học Từ Thiện"
+            width={160}
+            height={45}
+            className="h-16 w-auto object-contain transition-transform group-hover:scale-105"
           />
-          <span className="font-bold text-xl text-primary tracking-tight">
-            {t('brandName')}
-          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -54,7 +51,7 @@ export const Header = () => {
             <Icon name="Search" size={20} />
           </button>
           
-          <Link href="/register" className="hidden sm:block">
+          <Link href="/register" className="hidden md:block">
             <Button
               label={t('getStarted')}
               variant="primary"

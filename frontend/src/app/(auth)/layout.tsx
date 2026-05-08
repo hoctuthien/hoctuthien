@@ -26,18 +26,15 @@ export default function AuthLayout({
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-3 w-fit group transition-all active:scale-95 no-underline"
+              className="flex items-center group transition-all active:scale-95 no-underline"
             >
               <Image
-                src="/images/avatar_link.png"
-                alt={tCommon("brandName")}
-                width={56}
-                height={56}
-                className="object-contain rounded-full shadow-lg border border-white/10 transition-all"
+                src="/images/logo.png"
+                alt="Học Từ Thiện"
+                width={160}
+                height={80}
+                className="h-10 w-auto object-contain transition-all"
               />
-              <span className="text-white font-bold text-2xl tracking-tight group-hover:text-primary transition-colors no-underline">
-                {tCommon("brandName")}
-              </span>
             </Link>
 
             {/* Home Button (Desktop - Internal) */}
@@ -88,18 +85,15 @@ export default function AuthLayout({
         <div className="lg:hidden w-full p-4 flex items-center justify-between bg-[#F8FAFC]/80 backdrop-blur-md z-30 border-b border-slate-100/50">
           <Link
             href="/"
-            className="flex items-center gap-2 group active:scale-95 transition-all no-underline"
+            className="flex items-center group active:scale-95 transition-all no-underline"
           >
             <Image
-              src="/images/avatar_browser.png"
-              alt={tCommon("brandName")}
-              width={32}
-              height={32}
-              className="object-contain rounded-full shadow-sm"
+              src="/images/logo.png"
+              alt="Học Từ Thiện"
+              width={140}
+              height={40}
+              className="h-8 w-auto object-contain"
             />
-            <span className="text-slate-900 font-bold text-lg tracking-tight group-hover:text-primary transition-colors">
-              {tCommon("brandName")}
-            </span>
           </Link>
           <Link
             href="/"
