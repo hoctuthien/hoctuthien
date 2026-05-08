@@ -91,7 +91,12 @@ export class UserController {
     @User('id') requestingUserId: string,
     @User('role') requestingUserRole: string,
   ) {
-    return this.userService.update(id, payload, requestingUserId, requestingUserRole);
+    return this.userService.update(
+      id,
+      payload,
+      requestingUserId,
+      requestingUserRole,
+    );
   }
 
   @Delete(':id')

@@ -16,7 +16,10 @@ describe('Auth Registration (E2E)', () => {
     app = moduleFixture.createNestApplication();
     const config = app.get(ConfigService);
     console.log('DEBUG: DATABASE_URL in test:', config.get('DATABASE_URL'));
-    console.log('DEBUG: DB_SYNCHRONIZE in test:', config.get('database.synchronize'));
+    console.log(
+      'DEBUG: DB_SYNCHRONIZE in test:',
+      config.get('database.synchronize'),
+    );
 
     app.use(cookieParser()); // Apply cookie-parser
     app.setGlobalPrefix('api/v1'); // Manually apply prefix in E2E
@@ -53,7 +56,9 @@ describe('Auth Registration (E2E)', () => {
       } else if (response.status === 409) {
         console.log(`Account already exists: ${account.email}`);
       } else {
-        console.error(`Failed to register ${account.email}. Status: ${response.status}`);
+        console.error(
+          `Failed to register ${account.email}. Status: ${response.status}`,
+        );
         console.error('Response Body:', JSON.stringify(response.body, null, 2));
         throw new Error(`Registration failed with status ${response.status}`);
       }

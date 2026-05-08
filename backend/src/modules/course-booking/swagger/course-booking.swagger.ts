@@ -14,13 +14,29 @@ const bookingProperties = {
   courseId: { type: 'string', example: '123456789' },
   menteeId: { type: 'string', example: '987654321' },
   paymentId: { type: 'string', nullable: true, example: null },
-  meetingTime: { type: 'string', format: 'date-time', example: '2026-06-01T09:00:00.000Z' },
-  googleMeetUrl: { type: 'string', nullable: true, example: 'https://meet.google.com/abc-defg-hij' },
+  meetingTime: {
+    type: 'string',
+    format: 'date-time',
+    example: '2026-06-01T09:00:00.000Z',
+  },
+  googleMeetUrl: {
+    type: 'string',
+    nullable: true,
+    example: 'https://meet.google.com/abc-defg-hij',
+  },
   calendarEventId: { type: 'string', nullable: true, example: null },
-  notesForMentor: { type: 'string', nullable: true, example: 'Tôi muốn hỏi về NestJS Guards' },
+  notesForMentor: {
+    type: 'string',
+    nullable: true,
+    example: 'Tôi muốn hỏi về NestJS Guards',
+  },
   cancellationReason: { type: 'string', nullable: true, example: null },
   metadata: { type: 'object', example: {} },
-  status: { type: 'string', enum: Object.values(BookingStatus), example: BookingStatus.PENDING },
+  status: {
+    type: 'string',
+    enum: Object.values(BookingStatus),
+    example: BookingStatus.PENDING,
+  },
   createdAt: { type: 'string', format: 'date-time' },
   updatedAt: { type: 'string', format: 'date-time' },
 };
@@ -78,11 +94,40 @@ export const ApiFindAllCourseBookingsDoc = () => {
         '- **MENTOR**: chỉ thấy booking thuộc các course của mình\n' +
         '- **ADMIN**: thấy tất cả, hỗ trợ filter đầy đủ',
     }),
-    ApiQuery({ name: 'courseId', required: false, type: String, description: 'Lọc theo courseId (MENTOR/ADMIN)', example: '123' }),
-    ApiQuery({ name: 'menteeId', required: false, type: String, description: 'Lọc theo menteeId (ADMIN)', example: '456' }),
-    ApiQuery({ name: 'status', required: false, enum: BookingStatus, description: 'Lọc theo trạng thái' }),
-    ApiQuery({ name: 'page', required: false, type: Number, description: 'Trang hiện tại (mặc định: 1)', example: 1 }),
-    ApiQuery({ name: 'limit', required: false, type: Number, description: 'Số bản ghi/trang (mặc định: 20, tối đa: 100)', example: 20 }),
+    ApiQuery({
+      name: 'courseId',
+      required: false,
+      type: String,
+      description: 'Lọc theo courseId (MENTOR/ADMIN)',
+      example: '123',
+    }),
+    ApiQuery({
+      name: 'menteeId',
+      required: false,
+      type: String,
+      description: 'Lọc theo menteeId (ADMIN)',
+      example: '456',
+    }),
+    ApiQuery({
+      name: 'status',
+      required: false,
+      enum: BookingStatus,
+      description: 'Lọc theo trạng thái',
+    }),
+    ApiQuery({
+      name: 'page',
+      required: false,
+      type: Number,
+      description: 'Trang hiện tại (mặc định: 1)',
+      example: 1,
+    }),
+    ApiQuery({
+      name: 'limit',
+      required: false,
+      type: Number,
+      description: 'Số bản ghi/trang (mặc định: 20, tối đa: 100)',
+      example: 20,
+    }),
     ApiResponse({
       status: 200,
       description: 'Lấy danh sách booking thành công',
@@ -113,7 +158,11 @@ export const ApiFindOneCourseBookingDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
     ApiOperation({ summary: 'Lấy chi tiết booking theo id' }),
-    ApiParam({ name: 'id', description: 'ID của booking', example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc' }),
+    ApiParam({
+      name: 'id',
+      description: 'ID của booking',
+      example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
+    }),
     ApiResponse({
       status: 200,
       description: 'Lấy chi tiết booking thành công',
@@ -136,14 +185,25 @@ export const ApiUpdateCourseBookingByMenteeDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
     ApiOperation({ summary: 'MENTEE cập nhật booking của mình (notes / huỷ)' }),
-    ApiParam({ name: 'id', description: 'ID của booking', example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc' }),
+    ApiParam({
+      name: 'id',
+      description: 'ID của booking',
+      example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
+    }),
     ApiBody({
       schema: {
         type: 'object',
         properties: {
-          notesForMentor: { type: 'string', example: 'Tôi cần hỏi thêm về Interceptor' },
+          notesForMentor: {
+            type: 'string',
+            example: 'Tôi cần hỏi thêm về Interceptor',
+          },
           cancellationReason: { type: 'string', example: 'Bận đột xuất' },
-          status: { type: 'string', enum: [BookingStatus.CANCELLED], example: BookingStatus.CANCELLED },
+          status: {
+            type: 'string',
+            enum: [BookingStatus.CANCELLED],
+            example: BookingStatus.CANCELLED,
+          },
         },
       },
     }),
@@ -160,7 +220,10 @@ export const ApiUpdateCourseBookingByMenteeDoc = () => {
       },
     }),
     ApiResponse({ status: 401, description: 'Chưa đăng nhập' }),
-    ApiResponse({ status: 403, description: 'Không có quyền cập nhật booking này' }),
+    ApiResponse({
+      status: 403,
+      description: 'Không có quyền cập nhật booking này',
+    }),
     ApiResponse({ status: 404, description: 'Không tìm thấy booking' }),
   );
 };
@@ -168,20 +231,40 @@ export const ApiUpdateCourseBookingByMenteeDoc = () => {
 export const ApiUpdateCourseBookingDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ summary: 'MENTOR / ADMIN cập nhật booking (status, meet link, lịch...)' }),
-    ApiParam({ name: 'id', description: 'ID của booking', example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc' }),
+    ApiOperation({
+      summary: 'MENTOR / ADMIN cập nhật booking (status, meet link, lịch...)',
+    }),
+    ApiParam({
+      name: 'id',
+      description: 'ID của booking',
+      example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
+    }),
     ApiBody({
       schema: {
         type: 'object',
         properties: {
-          meetingTime: { type: 'string', format: 'date-time', example: '2026-06-01T10:00:00.000Z' },
-          googleMeetUrl: { type: 'string', example: 'https://meet.google.com/abc-defg-hij' },
-          calendarEventId: { type: 'string', example: 'google-calendar-event-id' },
+          meetingTime: {
+            type: 'string',
+            format: 'date-time',
+            example: '2026-06-01T10:00:00.000Z',
+          },
+          googleMeetUrl: {
+            type: 'string',
+            example: 'https://meet.google.com/abc-defg-hij',
+          },
+          calendarEventId: {
+            type: 'string',
+            example: 'google-calendar-event-id',
+          },
           notesForMentor: { type: 'string' },
           cancellationReason: { type: 'string' },
           paymentId: { type: 'string' },
           metadata: { type: 'object' },
-          status: { type: 'string', enum: Object.values(BookingStatus), example: BookingStatus.CONFIRMED },
+          status: {
+            type: 'string',
+            enum: Object.values(BookingStatus),
+            example: BookingStatus.CONFIRMED,
+          },
         },
       },
     }),
@@ -198,7 +281,10 @@ export const ApiUpdateCourseBookingDoc = () => {
       },
     }),
     ApiResponse({ status: 401, description: 'Chưa đăng nhập' }),
-    ApiResponse({ status: 403, description: 'Không có quyền cập nhật booking này' }),
+    ApiResponse({
+      status: 403,
+      description: 'Không có quyền cập nhật booking này',
+    }),
     ApiResponse({ status: 404, description: 'Không tìm thấy booking' }),
   );
 };
@@ -206,8 +292,14 @@ export const ApiUpdateCourseBookingDoc = () => {
 export const ApiRemoveCourseBookingDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ summary: 'Xóa mềm booking (MENTEE xóa của mình / ADMIN xóa bất kỳ)' }),
-    ApiParam({ name: 'id', description: 'ID của booking', example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc' }),
+    ApiOperation({
+      summary: 'Xóa mềm booking (MENTEE xóa của mình / ADMIN xóa bất kỳ)',
+    }),
+    ApiParam({
+      name: 'id',
+      description: 'ID của booking',
+      example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
+    }),
     ApiResponse({
       status: 200,
       description: 'Xóa booking thành công',

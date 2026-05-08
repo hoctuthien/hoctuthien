@@ -24,24 +24,50 @@ export const ApiGetMeDoc = () => {
             items: {
               type: 'object',
               properties: {
-                message: { type: 'string', example: 'Lấy thông tin người dùng thành công.' },
+                message: {
+                  type: 'string',
+                  example: 'Lấy thông tin người dùng thành công.',
+                },
                 user: {
                   type: 'object',
                   properties: {
-                    id: { type: 'string', example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc' },
+                    id: {
+                      type: 'string',
+                      example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
+                    },
                     name: { type: 'string', example: 'Nguyen Van A' },
                     email: { type: 'string', example: 'a@gmail.com' },
-                    phone: { type: 'string', nullable: true, example: '0987654321' },
-                    avatarUrl: { type: 'string', nullable: true, example: 'https://example.com/avatar.jpg' },
-                    dayOfBirth: { type: 'string', nullable: true, example: '2000-01-01' },
+                    phone: {
+                      type: 'string',
+                      nullable: true,
+                      example: '0987654321',
+                    },
+                    avatarUrl: {
+                      type: 'string',
+                      nullable: true,
+                      example: 'https://example.com/avatar.jpg',
+                    },
+                    dayOfBirth: {
+                      type: 'string',
+                      nullable: true,
+                      example: '2000-01-01',
+                    },
                     gender: { type: 'string', nullable: true, example: 'male' },
-                    role: { type: 'string', enum: Object.values(UserRole), example: 'mentee' },
+                    role: {
+                      type: 'string',
+                      enum: Object.values(UserRole),
+                      example: 'mentee',
+                    },
                     points: { type: 'number', example: 0 },
                     isVerified: { type: 'boolean', example: false },
                     status: { type: 'string', example: 'active' },
                     timezone: { type: 'string', example: 'UTC' },
                     preferences: { type: 'object', example: {} },
-                    createdAt: { type: 'string', format: 'date-time', example: '2026-04-28T08:05:57.000Z' },
+                    createdAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      example: '2026-04-28T08:05:57.000Z',
+                    },
                   },
                 },
               },

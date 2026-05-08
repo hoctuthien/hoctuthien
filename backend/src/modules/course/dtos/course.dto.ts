@@ -16,7 +16,10 @@ export class CourseDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Học NestJS từ cơ bản đến nâng cao', required: false })
+  @ApiProperty({
+    example: 'Học NestJS từ cơ bản đến nâng cao',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   description?: string;

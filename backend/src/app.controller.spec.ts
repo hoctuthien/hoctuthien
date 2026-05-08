@@ -16,7 +16,9 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Hoc Tu Thien API is running..."', () => {
-      expect(appController.getHello()).toContain('Hoc Tu Thien API is running...');
+      expect(appController.getHello()).toContain(
+        'Hoc Tu Thien API is running...',
+      );
     });
   });
 });

@@ -21,8 +21,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "hygen": "hygen",
     "gen:module": "node scripts/gen-module.js",
-    "seed:categories": "ts-node scripts/seed-categories.ts"
+    "seed:categories": "ts-node scripts/seed-categories.ts",
+    "seed:admin": "ts-node scripts/seed-admin.ts"
   },
+
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",

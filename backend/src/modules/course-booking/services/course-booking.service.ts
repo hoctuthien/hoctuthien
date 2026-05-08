@@ -74,12 +74,14 @@ export class CourseBookingService {
     if (menteeId) where['menteeId'] = menteeId;
     if (status) where['status'] = status;
 
-    const [items, total] = await this.courseBookingRepository.findManyWithCount({
-      where,
-      order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const [items, total] = await this.courseBookingRepository.findManyWithCount(
+      {
+        where,
+        order: { createdAt: 'DESC' },
+        skip: (page - 1) * limit,
+        take: limit,
+      },
+    );
 
     return {
       data: items.map((item) => courseBookingSchema.parse(item)),
@@ -95,7 +97,10 @@ export class CourseBookingService {
     const item = await this.courseBookingRepository.findById(id);
     if (!item) throw new NotFoundException('Course booking not found');
 
-    if (requestingUserRole === Role.MENTEE && item.menteeId !== requestingUserId) {
+    if (
+      requestingUserRole === Role.MENTEE &&
+      item.menteeId !== requestingUserId
+    ) {
       throw new ForbiddenException('Bạn không có quyền xem booking này.');
     }
 
@@ -209,7 +214,9 @@ export class CourseBookingService {
     if (requestingUserRole === Role.MENTOR) {
       const course = await this.courseRepository.findById(item.courseId);
       if (!course || course.mentorId !== requestingUserId) {
-        throw new ForbiddenException('Bạn không có quyền cập nhật booking này.');
+        throw new ForbiddenException(
+          'Bạn không có quyền cập nhật booking này.',
+        );
       }
     }
 

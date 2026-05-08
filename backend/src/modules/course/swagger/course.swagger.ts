@@ -43,7 +43,10 @@ export const ApiCreateCourseDoc = () => {
       },
     }),
     ApiResponse({ status: 400, description: 'Dữ liệu đầu vào không hợp lệ' }),
-    ApiResponse({ status: 401, description: 'Chưa đăng nhập hoặc token không hợp lệ' }),
+    ApiResponse({
+      status: 401,
+      description: 'Chưa đăng nhập hoặc token không hợp lệ',
+    }),
   );
 };
 

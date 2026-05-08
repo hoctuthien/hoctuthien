@@ -7,37 +7,58 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MentorProfileService } from './services/mentor-profile.service';
 import {
-  CreateMentorProfileInput,
-  UpdateMentorProfileInput,
-} from './types/mentor-profile.types';
+  CreateMentorProfileDto,
+  UpdateMentorProfileDto,
+} from './dtos/mentor-profile.dto';
+import {
+  ApiCreateMentorProfileDoc,
+  ApiFindAllMentorProfilesDoc,
+  ApiFindOneMentorProfileDoc,
+  ApiFindMentorProfileByUserIdDoc,
+  ApiUpdateMentorProfileDoc,
+  ApiRemoveMentorProfileDoc,
+} from './swagger/mentor-profile.swagger';
 
+@ApiTags('Mentor Profiles')
 @Controller('mentor-profiles')
 export class MentorProfileController {
   constructor(private readonly mentorProfileService: MentorProfileService) {}
 
   @Post()
-  create(@Body() payload: CreateMentorProfileInput) {
+  @ApiCreateMentorProfileDoc()
+  create(@Body() payload: CreateMentorProfileDto) {
     return this.mentorProfileService.create(payload);
   }
 
   @Get()
+  @ApiFindAllMentorProfilesDoc()
   findAll() {
     return this.mentorProfileService.findAll();
   }
 
+  @Get('user/:userId')
+  @ApiFindMentorProfileByUserIdDoc()
+  findByUserId(@Param('userId') userId: string) {
+    return this.mentorProfileService.findByUserId(userId);
+  }
+
   @Get(':id')
+  @ApiFindOneMentorProfileDoc()
   findOne(@Param('id') id: string) {
     return this.mentorProfileService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateMentorProfileInput) {
+  @ApiUpdateMentorProfileDoc()
+  update(@Param('id') id: string, @Body() payload: UpdateMentorProfileDto) {
     return this.mentorProfileService.update(id, payload);
   }
 
   @Delete(':id')
+  @ApiRemoveMentorProfileDoc()
   remove(@Param('id') id: string) {
     return this.mentorProfileService.remove(id);
   }

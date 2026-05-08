@@ -18,7 +18,8 @@ const categoryProperties = {
     example: 'https://example.com/icon.png',
   },
   metadata: { type: 'object', example: {} },
-  status: { type: 'string', example: 'active' },
+  status: { type: 'string', example: 'ACTIVE' },
+
   createdAt: { type: 'string', format: 'date-time' },
   updatedAt: { type: 'string', format: 'date-time' },
 };
@@ -48,8 +49,8 @@ export const ApiCreateCategoryDoc = () => {
           metadata: { type: 'object', example: { color: '#ff0000' } },
           status: {
             type: 'string',
-            example: 'active',
-            default: 'active',
+            example: 'ACTIVE',
+            default: 'ACTIVE',
           },
         },
       },
@@ -59,7 +60,9 @@ export const ApiCreateCategoryDoc = () => {
       description: 'Tạo danh mục thành công',
       schema: {
         type: 'object',
-        properties: { data: { type: 'object', properties: categoryProperties } },
+        properties: {
+          data: { type: 'object', properties: categoryProperties },
+        },
       },
     }),
     ApiResponse({ status: 400, description: 'Dữ liệu đầu vào không hợp lệ' }),
@@ -71,7 +74,9 @@ export const ApiCreateCategoryDoc = () => {
 
 export const ApiFindAllCategoriesDoc = () => {
   return applyDecorators(
-    ApiOperation({ summary: 'Lấy danh sách danh mục (có tìm kiếm & phân trang)' }),
+    ApiOperation({
+      summary: 'Lấy danh sách danh mục (có tìm kiếm & phân trang)',
+    }),
     ApiQuery({
       name: 'name',
       required: false,
@@ -91,7 +96,7 @@ export const ApiFindAllCategoriesDoc = () => {
       required: false,
       type: String,
       description: 'Lọc theo trạng thái',
-      example: 'active',
+      example: 'ACTIVE',
     }),
     ApiQuery({
       name: 'page',
@@ -145,7 +150,9 @@ export const ApiFindOneCategoryDoc = () => {
       description: 'Lấy chi tiết danh mục thành công',
       schema: {
         type: 'object',
-        properties: { data: { type: 'object', properties: categoryProperties } },
+        properties: {
+          data: { type: 'object', properties: categoryProperties },
+        },
       },
     }),
     ApiResponse({ status: 404, description: 'Không tìm thấy danh mục' }),
@@ -169,7 +176,8 @@ export const ApiUpdateCategoryDoc = () => {
           slug: { type: 'string', maxLength: 255 },
           iconUrl: { type: 'string', maxLength: 500, nullable: true },
           metadata: { type: 'object' },
-          status: { type: 'string', example: 'active' },
+          status: { type: 'string', example: 'ACTIVE' },
+
         },
       },
     }),
@@ -178,7 +186,9 @@ export const ApiUpdateCategoryDoc = () => {
       description: 'Cập nhật danh mục thành công',
       schema: {
         type: 'object',
-        properties: { data: { type: 'object', properties: categoryProperties } },
+        properties: {
+          data: { type: 'object', properties: categoryProperties },
+        },
       },
     }),
     ApiResponse({ status: 400, description: 'Dữ liệu đầu vào không hợp lệ' }),

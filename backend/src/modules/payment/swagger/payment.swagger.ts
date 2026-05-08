@@ -211,8 +211,7 @@ export const ApiVerifyActivationPaymentDoc = () => {
     }),
     ApiResponse({
       status: 422,
-      description:
-        'Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại',
+      description: 'Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại',
     }),
     ApiResponse({
       status: 500,

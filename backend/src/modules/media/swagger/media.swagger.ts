@@ -42,7 +42,10 @@ export const ApiUploadMediaDoc = () => {
                     filename: { type: 'string', example: 'image.png' },
                     path: { type: 'string', example: 'image.png' },
                     size: { type: 'number', example: 55733 },
-                    url: { type: 'string', example: 'https://cloud.hoctuthien.com/t/image.png' },
+                    url: {
+                      type: 'string',
+                      example: 'https://cloud.hoctuthien.com/t/image.png',
+                    },
                   },
                 },
               },
@@ -53,7 +56,10 @@ export const ApiUploadMediaDoc = () => {
         },
       },
     }),
-    ApiResponse({ status: 400, description: 'File không đúng định dạng hoặc quá kích thước' }),
+    ApiResponse({
+      status: 400,
+      description: 'File không đúng định dạng hoặc quá kích thước',
+    }),
     ApiResponse({ status: 401, description: 'Chưa đăng nhập' }),
   );
 };

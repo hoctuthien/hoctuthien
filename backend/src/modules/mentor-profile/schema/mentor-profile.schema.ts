@@ -14,7 +14,7 @@ export const mentorProfileSchema = z.object({
   isApproved: z.boolean().default(false),
   approvedBy: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.any()).default({}),
-  status: z.string().max(50).default('active'),
+  status: z.string().max(50).default('PENDING'),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable().optional(),

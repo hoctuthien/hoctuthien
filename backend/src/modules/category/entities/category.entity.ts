@@ -23,4 +23,3 @@ export class CategoryEntity extends BaseEntity {
   })
   status: string;
 }
-

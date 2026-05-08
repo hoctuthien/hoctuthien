@@ -77,10 +77,7 @@ export class AuthController {
 
   @Post('logout')
   @ApiLogoutDoc()
-  async logout(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const accessToken = req.cookies['access_token'];
     const refreshToken = req.cookies['refresh_token'];
     const deviceId = req.cookies['device_id'] || req.headers['x-device-id'];

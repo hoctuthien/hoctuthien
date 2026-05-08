@@ -1,23 +1,20 @@
 import { applyDecorators } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiOperation,
-  ApiResponse,
-  ApiHeader,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
 import { UserRole } from '../../user/entities/user.entity';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { LoginDto, RegisterDto, GoogleTokenDto } from '../dtos/auth.dto';
 
 export const ApiRegisterDoc = () => {
   return applyDecorators(
-    ApiOperation({ 
-      description: 'Tạo tài khoản người dùng mới. Sau khi đăng ký thành công, access_token và refresh_token sẽ được trả về trong response body.' 
+    ApiOperation({
+      description:
+        'Tạo tài khoản người dùng mới. Sau khi đăng ký thành công, access_token và refresh_token sẽ được trả về trong response body.',
     }),
     ApiBody({ type: RegisterDto }),
     ApiResponse({
       status: 201,
-      description: 'Đăng ký thành công. Tokens được trả về và lưu trong Cookie.',
+      description:
+        'Đăng ký thành công. Tokens được trả về và lưu trong Cookie.',
       schema: {
         type: 'object',
         properties: {
@@ -43,8 +40,9 @@ export const ApiRegisterDoc = () => {
 
 export const ApiLoginDoc = () => {
   return applyDecorators(
-    ApiOperation({ 
-      description: 'Xác thực người dùng. Sau khi thành công, access_token và refresh_token sẽ được trả về trong response body.' 
+    ApiOperation({
+      description:
+        'Xác thực người dùng. Sau khi thành công, access_token và refresh_token sẽ được trả về trong response body.',
     }),
     ApiHeader({
       name: 'x-device-id',
@@ -54,7 +52,8 @@ export const ApiLoginDoc = () => {
     ApiBody({ type: LoginDto }),
     ApiResponse({
       status: 201,
-      description: 'Đăng nhập thành công. Tokens được trả về và lưu trong Cookie.',
+      description:
+        'Đăng nhập thành công. Tokens được trả về và lưu trong Cookie.',
       schema: {
         type: 'object',
         properties: {
@@ -73,14 +72,18 @@ export const ApiLoginDoc = () => {
         },
       },
     }),
-    ApiResponse({ status: 401, description: 'Email hoặc mật khẩu không chính xác' }),
+    ApiResponse({
+      status: 401,
+      description: 'Email hoặc mật khẩu không chính xác',
+    }),
   );
 };
 
 export const ApiRefreshTokensDoc = () => {
   return applyDecorators(
-    ApiOperation({ 
-      description: 'Sử dụng refresh_token để lấy access_token mới. Tokens mới sẽ được trả về trong response body.' 
+    ApiOperation({
+      description:
+        'Sử dụng refresh_token để lấy access_token mới. Tokens mới sẽ được trả về trong response body.',
     }),
     ApiHeader({
       name: 'x-device-id',
@@ -107,15 +110,19 @@ export const ApiRefreshTokensDoc = () => {
         },
       },
     }),
-    ApiResponse({ status: 401, description: 'Refresh token không hợp lệ hoặc hết hạn' }),
+    ApiResponse({
+      status: 401,
+      description: 'Refresh token không hợp lệ hoặc hết hạn',
+    }),
   );
 };
 
 export const ApiLogoutDoc = () => {
   return applyDecorators(
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Đăng xuất',
-      description: 'Xóa tokens trong Cookie và vô hiệu hóa session trên server.' 
+      description:
+        'Xóa tokens trong Cookie và vô hiệu hóa session trên server.',
     }),
     ApiHeader({
       name: 'x-device-id',
@@ -144,9 +151,9 @@ export const ApiTestRedisDoc = () => {
 
 export const ApiGoogleAuthDoc = () => {
   return applyDecorators(
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Đăng nhập bằng Google',
-      description: 'Chuyển hướng người dùng đến trang xác thực của Google.' 
+      description: 'Chuyển hướng người dùng đến trang xác thực của Google.',
     }),
     ApiResponse({ status: 302, description: 'Chuyển hướng sang Google' }),
   );
@@ -154,8 +161,9 @@ export const ApiGoogleAuthDoc = () => {
 
 export const ApiGoogleAuthCallbackDoc = () => {
   return applyDecorators(
-    ApiOperation({ 
-      description: 'Endpoint nhận kết quả từ Google. Sau khi xác thực thành công, tokens sẽ được trả về trong response body.' 
+    ApiOperation({
+      description:
+        'Endpoint nhận kết quả từ Google. Sau khi xác thực thành công, tokens sẽ được trả về trong response body.',
     }),
     ApiResponse({
       status: 200,
@@ -183,8 +191,9 @@ export const ApiGoogleAuthCallbackDoc = () => {
 
 export const ApiGoogleTokenLoginDoc = () => {
   return applyDecorators(
-    ApiOperation({ 
-      description: 'Xác thực idToken từ Google Frontend. Sau khi thành công, tokens sẽ được trả về trong response body.' 
+    ApiOperation({
+      description:
+        'Xác thực idToken từ Google Frontend. Sau khi thành công, tokens sẽ được trả về trong response body.',
     }),
     ApiHeader({
       name: 'x-device-id',

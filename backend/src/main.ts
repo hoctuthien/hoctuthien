@@ -75,7 +75,9 @@ async function bootstrap() {
 
   const port = config.get('port') || 5050;
   await app.listen(port);
-  console.log(`🚀 Application is running on: http://localhost:${port}/${prefix}`);
+  console.log(
+    `🚀 Application is running on: http://localhost:${port}/${prefix}`,
+  );
   console.log(`👨‍ quản trị hệ thống tại: http://localhost:${port}/admin`);
 }
 bootstrap();

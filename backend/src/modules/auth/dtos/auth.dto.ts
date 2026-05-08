@@ -10,12 +10,19 @@ import {
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 
 export class LoginDto {
-  @ApiProperty({ example: 'user@example.com', description: 'Email của người dùng' })
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'Email của người dùng',
+  })
   @IsEmail({}, { message: AUTH_MESSAGES.INVALID_EMAIL })
   @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_EMAIL })
   email!: string;
 
-  @ApiProperty({ example: 'password123', minLength: 6, description: 'Mật khẩu người dùng' })
+  @ApiProperty({
+    example: 'password123',
+    minLength: 6,
+    description: 'Mật khẩu người dùng',
+  })
   @IsString()
   @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_PASSWORD })
   @MinLength(6, { message: AUTH_MESSAGES.INVALID_PASSWORD })
@@ -56,12 +63,20 @@ export class RegisterDto {
   @IsOptional()
   phone?: string;
 
-  @ApiProperty({ example: '2000-01-01', required: false, description: 'Ngày sinh (YYYY-MM-DD)' })
+  @ApiProperty({
+    example: '2000-01-01',
+    required: false,
+    description: 'Ngày sinh (YYYY-MM-DD)',
+  })
   @IsDateString()
   @IsOptional()
   dayOfBirth?: string;
 
-  @ApiProperty({ example: 'male', required: false, enum: ['male', 'female', 'other'] })
+  @ApiProperty({
+    example: 'male',
+    required: false,
+    enum: ['male', 'female', 'other'],
+  })
   @IsString()
   @IsOptional()
   gender?: string;

@@ -15,9 +15,14 @@ describe('CourseService', () => {
     mockEntityManager = {
       create: jest.fn().mockImplementation((entity, data) => {
         if (Array.isArray(data)) {
-          return data.map(item => ({ ...item, id: 'mock-id' }));
+          return data.map((item) => ({ ...item, id: 'mock-id' }));
         }
-        return { ...data, id: 'mock-id', createdAt: new Date(), updatedAt: new Date() };
+        return {
+          ...data,
+          id: 'mock-id',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
       }),
       save: jest.fn().mockImplementation((entityOrData, data) => {
         // Handle both (entity, data) and (data) signatures
@@ -69,21 +74,33 @@ describe('CourseService', () => {
       expect(mockDataSource.transaction).toHaveBeenCalled();
 
       // Verify course was created with correct data
-      expect(mockEntityManager.create).toHaveBeenCalledWith(CourseEntity, expect.objectContaining({
-        title: payload.title,
-        price: payload.price,
-        mentorId,
-      }));
+      expect(mockEntityManager.create).toHaveBeenCalledWith(
+        CourseEntity,
+        expect.objectContaining({
+          title: payload.title,
+          price: payload.price,
+          mentorId,
+        }),
+      );
 
       // Verify categories were created
-      expect(mockEntityManager.create).toHaveBeenCalledWith(CourseCategoryEntity, expect.objectContaining({
-        courseId: 'mock-id',
-        categoryId: 'cat-1',
-      }));
+      expect(mockEntityManager.create).toHaveBeenCalledWith(
+        CourseCategoryEntity,
+        expect.objectContaining({
+          courseId: 'mock-id',
+          categoryId: 'cat-1',
+        }),
+      );
 
       // Verify both course and categories were saved
-      expect(mockEntityManager.save).toHaveBeenCalledWith(CourseEntity, expect.any(Object));
-      expect(mockEntityManager.save).toHaveBeenCalledWith(CourseCategoryEntity, expect.any(Array));
+      expect(mockEntityManager.save).toHaveBeenCalledWith(
+        CourseEntity,
+        expect.any(Object),
+      );
+      expect(mockEntityManager.save).toHaveBeenCalledWith(
+        CourseCategoryEntity,
+        expect.any(Array),
+      );
 
       expect(result).toBeDefined();
       expect(result.title).toBe(payload.title);
@@ -101,7 +118,10 @@ describe('CourseService', () => {
 
       // Should only save course, not categories
       expect(mockEntityManager.save).toHaveBeenCalledTimes(1);
-      expect(mockEntityManager.save).toHaveBeenCalledWith(CourseEntity, expect.any(Object));
+      expect(mockEntityManager.save).toHaveBeenCalledWith(
+        CourseEntity,
+        expect.any(Object),
+      );
     });
   });
 
@@ -127,21 +147,34 @@ describe('CourseService', () => {
         return Promise.resolve(null);
       });
 
-      const result = await service.update(courseId, payload as any, 'mentor-123');
+      const result = await service.update(
+        courseId,
+        payload as any,
+        'mentor-123',
+      );
 
       // Verify transaction
       expect(mockDataSource.transaction).toHaveBeenCalled();
 
       // Verify old categories were deleted
-      expect(mockEntityManager.softDelete).toHaveBeenCalledWith(CourseCategoryEntity, { courseId });
+      expect(mockEntityManager.softDelete).toHaveBeenCalledWith(
+        CourseCategoryEntity,
+        { courseId },
+      );
 
       // Verify course was updated
-      expect(mockEntityManager.save).toHaveBeenCalledWith(CourseEntity, expect.objectContaining({
-        title: 'Updated Title',
-      }));
+      expect(mockEntityManager.save).toHaveBeenCalledWith(
+        CourseEntity,
+        expect.objectContaining({
+          title: 'Updated Title',
+        }),
+      );
 
       // Verify new categories were saved
-      expect(mockEntityManager.save).toHaveBeenCalledWith(CourseCategoryEntity, expect.any(Object));
+      expect(mockEntityManager.save).toHaveBeenCalledWith(
+        CourseCategoryEntity,
+        expect.any(Object),
+      );
 
       expect(result.title).toBe('Updated Title');
     });
@@ -149,8 +182,9 @@ describe('CourseService', () => {
     it('should throw NotFoundException if course does not exist', async () => {
       mockEntityManager.findOne.mockResolvedValue(null);
 
-      await expect(service.update('invalid-id', {} as any, 'mentor-123'))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.update('invalid-id', {} as any, 'mentor-123'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

@@ -78,7 +78,9 @@ export class CategoryService {
 
     // Kiểm tra slug trùng nếu đổi slug
     if (parsed.slug) {
-      const existing = await this.categoryRepository.findOne({ slug: parsed.slug });
+      const existing = await this.categoryRepository.findOne({
+        slug: parsed.slug,
+      });
       if (existing && existing.id !== id) {
         throw new ConflictException(
           `Slug "${parsed.slug}" đã tồn tại. Vui lòng chọn slug khác.`,

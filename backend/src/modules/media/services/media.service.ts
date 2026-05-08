@@ -29,12 +29,16 @@ export class MediaService {
         contentType: file.mimetype,
       });
 
-      const response = await axios.post(`${this.openinaryUrl}/api/upload`, formData, {
-        headers: {
-          ...formData.getHeaders(),
-          'Authorization': `Bearer ${this.apiKey}`,
+      const response = await axios.post(
+        `${this.openinaryUrl}/api/upload`,
+        formData,
+        {
+          headers: {
+            ...formData.getHeaders(),
+            Authorization: `Bearer ${this.apiKey}`,
+          },
         },
-      });
+      );
 
       // Xử lý để trả về URL tuyệt đối giúp Frontend/Database dễ sử dụng
       if (response.data.success && Array.isArray(response.data.files)) {
@@ -47,12 +51,15 @@ export class MediaService {
       return response.data;
     } catch (error: any) {
       const status = error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
-      const message = error.response?.data?.message || error.message || 'Lỗi khi upload ảnh lên Openinary';
-      
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        'Lỗi khi upload ảnh lên Openinary';
+
       console.error('Openinary Upload Error:', {
         status,
         message,
-        data: error.response?.data
+        data: error.response?.data,
       });
 
       throw new HttpException(message, status);

@@ -68,10 +68,10 @@ describe('UserService', () => {
 
   describe('findOne', () => {
     it('should return a user if found', async () => {
-      const mockUser = { 
-        id: '1', 
-        email: 'test@example.com', 
-        name: 'Test', 
+      const mockUser = {
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test',
         role: UserRole.MENTEE,
         createdAt: new Date(),
         updatedAt: new Date(),
