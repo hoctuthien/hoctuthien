@@ -28,7 +28,7 @@ export const Header = () => {
             alt="Học Từ Thiện"
             width={160}
             height={45}
-            className="h-16 w-auto object-contain transition-transform group-hover:scale-105"
+            className="h-16 w-auto object-contain transition-transform"
           />
         </Link>
 
