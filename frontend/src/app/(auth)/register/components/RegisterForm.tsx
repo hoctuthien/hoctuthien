@@ -15,13 +15,14 @@ import {
   type RegisterFormData,
 } from "@/app/(auth)/register/register.schema";
 import { authGateway } from "@/core/gateway/authGateway";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 export function RegisterForm() {
   const t = useTranslations("Auth");
   const tError = useTranslations("Error");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -65,11 +66,13 @@ export function RegisterForm() {
         redirect: false,
       });
 
+      const callbackUrl = searchParams.get("callbackUrl") || "/";
+
       if (!result || result.error) {
         // Fallback: chuyển hướng đến trang đăng nhập nếu auto-login thất bại
         router.push("/login?registered=true");
       } else if (result.ok) {
-        router.push("/profile");
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (error: any) {
@@ -89,8 +92,10 @@ export function RegisterForm() {
   const handleSocialSignIn = async (provider: "google" | "github") => {
     if (provider === "google") setIsGoogleLoading(true);
 
+    const callbackUrl = searchParams.get("callbackUrl") || "/";
+
     try {
-      await signIn(provider, { callbackUrl: "/profile" });
+      await signIn(provider, { callbackUrl });
     } catch (error) {
       console.error(`${provider} login failed:`, error);
     } finally {

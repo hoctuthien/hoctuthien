@@ -7,7 +7,7 @@ import { Button, Select } from '@ui';
 import { HiAcademicCap } from 'react-icons/hi2';
 
 const meta: Meta<typeof Modal> = {
-  title: 'Shared/Modal',
+  title: 'Shared/Components/Modal',
   component: Modal,
   tags: ['autodocs'],
   parameters: {

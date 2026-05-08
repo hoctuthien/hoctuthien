@@ -30,7 +30,7 @@ export default auth((req) => {
   }
 
   if (isAuthRoute && isLoggedIn) {
-    return NextResponse.redirect(new URL("/profile", nextUrl));
+    return NextResponse.redirect(new URL("/", nextUrl));
   }
 
   return NextResponse.next();

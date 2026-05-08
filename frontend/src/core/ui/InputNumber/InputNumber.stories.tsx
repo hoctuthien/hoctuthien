@@ -5,7 +5,7 @@ import { InputNumber, InputNumberBorderless } from "./InputNumber";
 
 
 const meta = {
-  title: "Shared/InputNumber",
+  title: "Core/UI/InputNumber",
   component: InputNumber,
   parameters: {
     layout: "centered",
@@ -167,7 +167,7 @@ export const AllStates: Story = {
 
 
 const borderlessMeta = {
-  title: "Shared/InputNumber/Borderless",
+  title: "Core/UI/InputNumber",
   component: InputNumberBorderless,
   parameters: {
     layout: "centered",

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { DateTimePicker } from "./DateTimePicker";
 
 const meta: Meta<typeof DateTimePicker> = {
-  title: "Shared/DateTimePicker",
+  title: "Shared/Components/DateTimePicker",
   component: DateTimePicker,
   parameters: {
     layout: "centered",
