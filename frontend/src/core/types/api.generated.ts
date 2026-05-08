@@ -29,10 +29,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Đăng ký tài khoản mới
-         * @description Tạo tài khoản người dùng mới. Sau khi đăng ký thành công, access_token và refresh_token sẽ được lưu vào Cookie (không trả về trong body).
-         */
+        /** @description Tạo tài khoản người dùng mới. Sau khi đăng ký thành công, access_token và refresh_token sẽ được trả về trong response body. */
         post: operations["AuthController_register"];
         delete?: never;
         options?: never;
@@ -49,10 +46,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Đăng nhập bằng Email/Password
-         * @description Xác thực người dùng. Sau khi thành công, access_token và refresh_token sẽ được lưu vào Cookie (không trả về trong body).
-         */
+        /** @description Xác thực người dùng. Sau khi thành công, access_token và refresh_token sẽ được trả về trong response body. */
         post: operations["AuthController_login"];
         delete?: never;
         options?: never;
@@ -69,10 +63,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Làm mới Access Token
-         * @description Sử dụng refresh_token từ Cookie để lấy access_token mới. Tokens mới sẽ được cập nhật lại trong Cookie (không trả về trong body).
-         */
+        /** @description Sử dụng refresh_token để lấy access_token mới. Tokens mới sẽ được trả về trong response body. */
         post: operations["AuthController_refresh"];
         delete?: never;
         options?: never;
@@ -144,10 +135,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Google OAuth Callback
-         * @description Endpoint nhận kết quả từ Google. Sau khi xác thực thành công, tokens sẽ được lưu vào Cookie.
-         */
+        /** @description Endpoint nhận kết quả từ Google. Sau khi xác thực thành công, tokens sẽ được trả về trong response body. */
         get: operations["AuthController_googleAuthRedirect"];
         put?: never;
         post?: never;
@@ -166,10 +154,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Đăng nhập Google bằng idToken
-         * @description Xác thực idToken từ Google Frontend. Sau khi thành công, tokens sẽ được lưu vào Cookie.
-         */
+        /** @description Xác thực idToken từ Google Frontend. Sau khi thành công, tokens sẽ được trả về trong response body. */
         post: operations["AuthController_googleTokenLogin"];
         delete?: never;
         options?: never;
@@ -884,6 +869,23 @@ export interface paths {
         patch: operations["NotificationController_update"];
         trace?: never;
     };
+    "/api/v1/media/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload hình ảnh lên hệ thống (Openinary) */
+        post: operations["MediaController_uploadFile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1026,7 +1028,15 @@ export interface components {
             prerequisites?: string[];
             /**
              * @example {
-             *       "level": "intermediate"
+             *       "time": {
+             *         "monday": [
+             *           "09:00-11:00",
+             *           "14:00-16:00"
+             *         ],
+             *         "wednesday": [
+             *           "19:00-21:00"
+             *         ]
+             *       }
              *     }
              */
             metadata?: Record<string, never>;
@@ -1065,7 +1075,15 @@ export interface components {
             prerequisites?: string[];
             /**
              * @example {
-             *       "level": "intermediate"
+             *       "time": {
+             *         "monday": [
+             *           "09:00-11:00",
+             *           "14:00-16:00"
+             *         ],
+             *         "wednesday": [
+             *           "19:00-21:00"
+             *         ]
+             *       }
              *     }
              */
             metadata?: Record<string, never>;
@@ -1132,7 +1150,11 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Đăng ký thành công. Tokens được trả về và lưu trong Cookie. */
+            /**
+             * @description Đăng ký thành công. Tokens được trả về và lưu trong Cookie.
+             *
+             *     Đăng ký thành công. Tokens được trả về và lưu trong Cookie.
+             */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1146,19 +1168,29 @@ export interface operations {
                             /** @enum {string} */
                             role?: "mentee" | "mentor" | "admin";
                         };
+                        access_token?: string;
+                        refresh_token?: string;
                         /** @example Đăng ký tài khoản thành công. */
                         message?: string;
                     };
                 };
             };
-            /** @description Dữ liệu không hợp lệ */
+            /**
+             * @description Dữ liệu không hợp lệ
+             *
+             *     Dữ liệu không hợp lệ
+             */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Email đã tồn tại */
+            /**
+             * @description Email đã tồn tại
+             *
+             *     Email đã tồn tại
+             */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -1183,7 +1215,11 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Đăng nhập thành công. Tokens được trả về và lưu trong Cookie. */
+            /**
+             * @description Đăng nhập thành công. Tokens được trả về và lưu trong Cookie.
+             *
+             *     Đăng nhập thành công. Tokens được trả về và lưu trong Cookie.
+             */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1197,12 +1233,18 @@ export interface operations {
                             /** @enum {string} */
                             role?: "mentee" | "mentor" | "admin";
                         };
+                        access_token?: string;
+                        refresh_token?: string;
                         /** @example Đăng nhập thành công. */
                         message?: string;
                     };
                 };
             };
-            /** @description Email hoặc mật khẩu không chính xác */
+            /**
+             * @description Email hoặc mật khẩu không chính xác
+             *
+             *     Email hoặc mật khẩu không chính xác
+             */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1223,7 +1265,11 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Refresh thành công. Tokens mới được lưu vào Cookie. */
+            /**
+             * @description Refresh thành công. Tokens mới được lưu vào Cookie.
+             *
+             *     Refresh thành công. Tokens mới được lưu vào Cookie.
+             */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1237,10 +1283,16 @@ export interface operations {
                             /** @enum {string} */
                             role?: "mentee" | "mentor" | "admin";
                         };
+                        access_token?: string;
+                        refresh_token?: string;
                     };
                 };
             };
-            /** @description Refresh token không hợp lệ hoặc hết hạn */
+            /**
+             * @description Refresh token không hợp lệ hoặc hết hạn
+             *
+             *     Refresh token không hợp lệ hoặc hết hạn
+             */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1326,7 +1378,11 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Đăng nhập Google thành công. Tokens lưu vào Cookie. */
+            /**
+             * @description Đăng nhập Google thành công. Tokens lưu vào Cookie.
+             *
+             *     Đăng nhập Google thành công. Tokens lưu vào Cookie.
+             */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1341,6 +1397,8 @@ export interface operations {
                             /** @enum {string} */
                             role?: "mentee" | "mentor" | "admin";
                         };
+                        access_token?: string;
+                        refresh_token?: string;
                     };
                 };
             };
@@ -1362,7 +1420,11 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Đăng nhập thành công. Tokens lưu vào Cookie. */
+            /**
+             * @description Đăng nhập thành công. Tokens lưu vào Cookie.
+             *
+             *     Đăng nhập thành công. Tokens lưu vào Cookie.
+             */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1377,10 +1439,16 @@ export interface operations {
                             /** @enum {string} */
                             role?: "mentee" | "mentor" | "admin";
                         };
+                        access_token?: string;
+                        refresh_token?: string;
                     };
                 };
             };
-            /** @description Google Token không hợp lệ */
+            /**
+             * @description Google Token không hợp lệ
+             *
+             *     Google Token không hợp lệ
+             */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4281,6 +4349,69 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MediaController_uploadFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description File hình ảnh cần upload (jpg, png, webp, avif)
+                     */
+                    file?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Upload thành công */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example true */
+                            success?: boolean;
+                            files?: {
+                                /** @example image.png */
+                                filename?: string;
+                                /** @example image.png */
+                                path?: string;
+                                /** @example 55733 */
+                                size?: number;
+                                /** @example https://cloud.hoctuthien.com/t/image.png */
+                                url?: string;
+                            }[];
+                        };
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                        /** @example null */
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description File không đúng định dạng hoặc quá kích thước */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

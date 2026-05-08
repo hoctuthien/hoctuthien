@@ -4,7 +4,7 @@ import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity({ name: 'mentor_profiles' })
 export class MentorProfileEntity extends BaseEntity {
-  @Column({ name: 'user_id', type: 'bigint', unique: true })
+  @Column({ name: 'user_id', type: 'uuid', unique: true })
   userId: string;
 
   @OneToOne(() => UserEntity, { onDelete: 'CASCADE' })
@@ -49,7 +49,7 @@ export class MentorProfileEntity extends BaseEntity {
   @Column({ name: 'is_approved', type: 'boolean', default: false })
   isApproved: boolean;
 
-  @Column({ name: 'approved_by', type: 'bigint', nullable: true })
+  @Column({ name: 'approved_by', type: 'uuid', nullable: true })
   approvedBy: string | null;
 
   @ManyToOne(() => UserEntity, { onDelete: 'SET NULL' })

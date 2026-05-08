@@ -18,7 +18,7 @@
     "storybook": "storybook dev -p 8000",
     "build-storybook": "storybook build",
     "gen:api": "npx openapi-typescript https://api.hoctuthien.com/api/docs-json -o ./src/core/types/api.generated.ts",
-    "gen:api:local": "npx openapi-typescript http://localhost:5050/api/docs-json -o ./src/core/types/api.generated.ts"
+    "gen:api:local": "npx openapi-typescript http://beta-api.hoctuthien.com/api/docs-json -o ./src/core/types/api.generated.ts"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -38,6 +38,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.8.0",
     "next": "16.2.1",
+    "next-auth": "^5.0.0-beta.31",
     "next-intl": "^4.11.0",
     "radix-ui": "^1.4.3",
     "react": "19.2.4",

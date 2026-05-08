@@ -14,10 +14,14 @@ import {
   registerSchema,
   type RegisterFormData,
 } from "@/app/(auth)/register/register.schema";
+import { authGateway } from "@/core/gateway/authGateway";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export function RegisterForm() {
   const t = useTranslations("Auth");
   const tError = useTranslations("Error");
+  const router = useRouter();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -34,6 +38,7 @@ export function RegisterForm() {
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -46,11 +51,36 @@ export function RegisterForm() {
     setGeneralError(null);
 
     try {
-      // TODO: replace with actual register API call
-      console.log("Register data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-    } catch {
-      setGeneralError(tError("default"));
+      // Gọi API đăng ký
+      await authGateway.register({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+
+      // Đăng nhập tự động sau khi đăng ký thành công
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (!result || result.error) {
+        // Fallback: chuyển hướng đến trang đăng nhập nếu auto-login thất bại
+        router.push("/login?registered=true");
+      } else if (result.ok) {
+        router.push("/profile");
+        router.refresh();
+      }
+    } catch (error: any) {
+      console.error("[RegisterForm] Submit Error:", error);
+      // Hiển thị lỗi từ API nếu có
+      const apiErrorMessage = error?.data?.error?.message || (error?.message !== 'API Request failed' ? error?.message : null);
+      if (apiErrorMessage) {
+        setGeneralError(apiErrorMessage);
+      } else {
+        setGeneralError(tError("default") || "Registration failed. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -60,8 +90,9 @@ export function RegisterForm() {
     if (provider === "google") setIsGoogleLoading(true);
 
     try {
-      // TODO: replace with actual OAuth flow
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await signIn(provider, { callbackUrl: "/profile" });
+    } catch (error) {
+      console.error(`${provider} login failed:`, error);
     } finally {
       if (provider === "google") setIsGoogleLoading(false);
     }
@@ -83,6 +114,22 @@ export function RegisterForm() {
         noValidate
         className="flex flex-col gap-4"
       >
+        <Input
+          id="register-name"
+          label={t("fullName") || "Full Name"}
+          type="text"
+          placeholder="Nguyen Van A"
+          error={errors.name?.message}
+          autoComplete="name"
+          containerClassName="gap-1.5"
+          {...register("name")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              setFocus("email");
+            }
+          }}
+        />
         <Input
           id="register-email"
           label={t("emailAddress")}

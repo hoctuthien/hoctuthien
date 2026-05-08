@@ -15,15 +15,16 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig: NextConfig = {
   output: "standalone",
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL;
-    if (!backendUrl) return [];
+    const backendUrl = (process.env.BACKEND_URL || 'http://localhost:5050').replace(/\/$/, '');
     
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.BACKEND_URL || 'http://localhost:3001'}/api/:path*`,
-      },
-    ];
+    return {
+      fallback: [
+        {
+          source: '/api/:path*',
+          destination: `${backendUrl}/api/:path*`,
+        },
+      ],
+    };
   },
 };
 
