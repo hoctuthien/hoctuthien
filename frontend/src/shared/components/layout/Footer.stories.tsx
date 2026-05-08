@@ -24,7 +24,7 @@ const messages = {
 };
 
 const meta = {
-  title: "Layout/Footer",
+  title: "Shared/Layout/Footer",
   component: Footer,
   parameters: {
     layout: "fullscreen",

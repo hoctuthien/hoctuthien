@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { VerticalReorder, HorizontalSort } from "./SortManagement";
 
 const meta = {
-  title: "Shared/SortManagement",
+  title: "Shared/Components/SortManagement",
   component: VerticalReorder,
   parameters: {
     layout: "centered",

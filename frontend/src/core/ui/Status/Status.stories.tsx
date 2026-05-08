@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Status } from "./Status";
 
 const meta = {
-  title: "Shared/Status",
+  title: "Core/UI/Status",
   component: Status,
   parameters: {
     layout: "centered",

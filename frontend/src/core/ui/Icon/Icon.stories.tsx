@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Icon } from "./index";
 
 const meta = {
-  title: "Core/Icon",
+  title: "Core/UI/Icon",
   component: Icon,
   parameters: {
     layout: "centered",

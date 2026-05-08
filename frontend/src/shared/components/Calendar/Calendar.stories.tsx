@@ -4,7 +4,7 @@ import { Calendar } from "./Calendar";
 import { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta: Meta<typeof Calendar> = {
-  title: "Shared/Calendar",
+  title: "Shared/Components/Calendar",
   component: Calendar,
   parameters: {
     layout: "centered",

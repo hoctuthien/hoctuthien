@@ -9,7 +9,7 @@ import {
 } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/List",
+  title: "Shared/Components/List",
   component: List,
   parameters: {
     layout: "fullscreen",
@@ -39,14 +39,14 @@ export const Basic: Story = {
         items={[
           {
             id: "1",
-            title: "Advanced Pedagogy 101",
-            subtitle: "42 Students Enrolled",
+            title: "Shared/Components/List",
+            subtitle: "Shared/Components/List",
             icon: <LuGraduationCap size={22} />,
           },
           {
             id: "2",
-            title: "Curriculum Development",
-            subtitle: "12 Modules Completed",
+            title: "Shared/Components/List",
+            subtitle: "Shared/Components/List",
             icon: <LuBookOpen size={22} />,
           },
         ]}
@@ -63,15 +63,15 @@ export const WithActions: Story = {
         items={[
           {
             id: "3",
-            title: "Marcus Sterling",
-            subtitle: "Senior Design Mentor",
+            title: "Shared/Components/List",
+            subtitle: "Shared/Components/List",
             avatar: "https://xsgames.co/randomusers/assets/avatars/male/40.jpg",
             actions: <ActionButtons />,
           },
           {
             id: "4",
-            title: "Elena Rodriguez",
-            subtitle: "Product Strategy Lead",
+            title: "Shared/Components/List",
+            subtitle: "Shared/Components/List",
             avatar:
               "https://xsgames.co/randomusers/assets/avatars/female/24.jpg",
             actions: <ActionButtons />,

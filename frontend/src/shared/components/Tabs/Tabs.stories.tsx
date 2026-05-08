@@ -4,7 +4,7 @@ import { Tabs } from "./Tabs";
 import { LuUser, LuSettings, LuBell, LuFileText, LuImage, LuStickyNote } from 'react-icons/lu';
 
 const meta = {
-  title: "Shared/Tabs",
+  title: "Shared/Components/Tabs",
   component: Tabs,
   parameters: {
     layout: "centered",

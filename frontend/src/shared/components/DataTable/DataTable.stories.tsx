@@ -12,7 +12,7 @@ interface MockData {
 }
 
 const meta = {
-  title: "Shared/DataTable",
+  title: "Shared/Components/DataTable",
   component: DataTable,
   parameters: {
     layout: "fullscreen",

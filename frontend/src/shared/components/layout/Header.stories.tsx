@@ -13,7 +13,7 @@ const messages = {
 };
 
 const meta = {
-  title: "Layout/Header",
+  title: "Shared/Layout/Header",
   component: Header,
   parameters: {
     layout: "fullscreen",

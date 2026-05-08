@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { MentorCard } from "./MentorCard";
 
 const meta = {
-  title: "Shared/MentorCard",
+  title: "Shared/Components/MentorCard",
   component: MentorCard,
   parameters: {
     layout: "fullscreen",
@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     name: "Marcus Sterling",
-    title: "Principal Architect",
+    title: "Shared/Components/MentorCard",
     description: "Helping senior designers bridge the gap between UI excellence and business strategy through structured growth frameworks.",
     avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/72.jpg",
   },

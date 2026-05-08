@@ -10,7 +10,7 @@ import {
 import { User, LogOut, ArrowUpCircle, Calendar } from "lucide-react";
 
 const meta: Meta<typeof Dropdown> = {
-  title: "Shared/Dropdown",
+  title: "Core/UI/Dropdown",
   component: Dropdown,
   tags: ["autodocs"],
 };
