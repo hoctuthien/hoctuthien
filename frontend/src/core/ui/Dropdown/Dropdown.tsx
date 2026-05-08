@@ -49,6 +49,7 @@ interface DropdownTriggerProps {
   variant?: "primary" | "secondary" | "text";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
+  hideIcon?: boolean;
   className?: string;
 }
 
@@ -57,6 +58,7 @@ export const DropdownTrigger: React.FC<DropdownTriggerProps> = ({
   variant = "primary",
   size = "md",
   disabled = false,
+  hideIcon = false,
   className,
 }) => {
   const { isOpen, setIsOpen } = useDropdown();
@@ -96,16 +98,18 @@ export const DropdownTrigger: React.FC<DropdownTriggerProps> = ({
       className={cn(baseStyles, variants[variant], sizes[size], className)}
     >
       {children}
-      <ChevronDown
-        size={variant === "text" ? 18 : 16}
-        className={cn(
-          "transition-all duration-300", 
-          isOpen && "rotate-180",
-          variant === "primary" && "!text-white",
-          variant === "secondary" && "!text-[#2D89FF]",
-          variant === "text" && "!text-[#2D89FF] group-hover:text-[#1C75E5]"
-        )}
-      />
+      {!hideIcon && (
+        <ChevronDown
+          size={variant === "text" ? 18 : 16}
+          className={cn(
+            "transition-all duration-300", 
+            isOpen && "rotate-180",
+            variant === "primary" && "!text-white",
+            variant === "secondary" && "!text-[#2D89FF]",
+            variant === "text" && "!text-[#2D89FF] group-hover:text-[#1C75E5]"
+          )}
+        />
+      )}
     </button>
   );
 };

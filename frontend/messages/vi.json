@@ -30,7 +30,10 @@
     "cookies": "Cookies",
     "copyright": "© 2026 Hoc Tu Thien. All rights reserved.",
     "tryAgain": "Thử lại",
-    "loading": "Đang tải..."
+    "loading": "Đang tải...",
+    "profile": "Trang cá nhân",
+    "myCourses": "Khóa học của tôi",
+    "signOut": "Đăng xuất"
   },
 
   "Homepage": {

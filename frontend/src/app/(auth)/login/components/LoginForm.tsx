@@ -66,12 +66,10 @@ export function LoginForm() {
         redirect: false,
       });
 
-      console.log("[LoginForm] SignIn Result:", result);
-
       if (!result || result.error) {
         setGeneralError(tError("invalidCredentials"));
       } else if (result.ok) {
-        router.push("/profile");
+        router.push("/");
         router.refresh();
       }
     } catch (error: any) {
@@ -85,7 +83,7 @@ export function LoginForm() {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      await signIn("google", { callbackUrl: "/profile" });
+      await signIn("google", { callbackUrl: "/" });
     } catch (error) {
       console.error("Google login failed:", error);
     } finally {

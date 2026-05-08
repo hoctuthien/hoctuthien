@@ -14,6 +14,18 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "xsgames.co",
+      },
+    ],
+  },
   async rewrites() {
     const backendUrl = (process.env.BACKEND_URL || 'http://localhost:5050').replace(/\/$/, '');
     
