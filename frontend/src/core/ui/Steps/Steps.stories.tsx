@@ -9,7 +9,7 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Steps>;
+} as Meta<typeof Steps>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -22,7 +22,7 @@ const meta = {
       description: "CSS classes bổ sung",
     },
   },
-} satisfies Meta<typeof Icon>;
+} as Meta<typeof Icon>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

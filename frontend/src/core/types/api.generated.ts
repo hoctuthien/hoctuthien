@@ -255,9 +255,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy danh sách hồ sơ mentor */
         get: operations["MentorProfileController_findAll"];
         put?: never;
+        /**
+         * Tạo hồ sơ mentor mới
+         * @description Lưu ý: Hồ sơ này thường được tạo tự động khi đơn đăng ký (MentorAvailability) được phê duyệt.
+         */
         post: operations["MentorProfileController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mentor-profiles/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lấy hồ sơ mentor theo userId */
+        get: operations["MentorProfileController_findByUserId"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -271,12 +293,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy chi tiết hồ sơ mentor theo id */
         get: operations["MentorProfileController_findOne"];
         put?: never;
         post?: never;
+        /** Xóa hồ sơ mentor (soft delete) */
         delete: operations["MentorProfileController_remove"];
         options?: never;
         head?: never;
+        /**
+         * Cập nhật hồ sơ mentor
+         * @description Cập nhật các thông tin chuyên môn, bio, kỹ năng của mentor.
+         */
         patch: operations["MentorProfileController_update"];
         trace?: never;
     };
@@ -287,8 +315,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Lấy danh sách tất cả các đơn đăng ký (Admin)
+         * @description Dành cho Admin để xem và quản lý tất cả các đơn đăng ký trong hệ thống.
+         */
         get: operations["MentorAvailabilityController_findAll"];
         put?: never;
+        /**
+         * Gửi đơn đăng ký làm Mentor
+         * @description Mentee gửi đơn đăng ký với đầy đủ thông tin chuyên môn và bằng cấp.
+         */
         post: operations["MentorAvailabilityController_create"];
         delete?: never;
         options?: never;
@@ -303,6 +339,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Lấy danh sách đơn đăng ký của bản thân
+         * @description Người dùng xem lại lịch sử các đơn đăng ký làm mentor của mình.
+         */
         get: operations["MentorAvailabilityController_findMyMentorAvailabilities"];
         put?: never;
         post?: never;
@@ -319,6 +359,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lấy chi tiết một đơn đăng ký (Admin) */
         get: operations["MentorAvailabilityController_findOneAdmin"];
         put?: never;
         post?: never;
@@ -357,6 +398,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Admin tiếp nhận đơn (Chuyển sang In Progress)
+         * @description Đánh dấu đơn đang được Admin xử lý.
+         */
         patch: operations["MentorAvailabilityController_updateToInProgress"];
         trace?: never;
     };
@@ -373,6 +418,13 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Phê duyệt đơn đăng ký làm Mentor
+         * @description Khi phê duyệt:
+         *     1. Đơn chuyển sang APPROVED.
+         *     2. Role của User đổi thành MENTOR.
+         *     3. Mentor Profile được tự động tạo/cập nhật và đặt trạng thái ACTIVE.
+         */
         patch: operations["MentorAvailabilityController_approve"];
         trace?: never;
     };
@@ -389,6 +441,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /** Từ chối đơn đăng ký làm Mentor */
         patch: operations["MentorAvailabilityController_reject"];
         trace?: never;
     };
@@ -405,6 +458,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /** Người dùng hủy đơn đăng ký */
         patch: operations["MentorAvailabilityController_cancel"];
         trace?: never;
     };
@@ -1000,6 +1054,155 @@ export interface components {
             metadata?: Record<string, never>;
             /** @example UTC */
             timezone?: string;
+        };
+        CreateMentorProfileDto: {
+            /**
+             * Format: uuid
+             * @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc
+             */
+            userId: string;
+            /** @example Senior Software Engineer */
+            jobTitle?: string;
+            /** @example Google */
+            company?: string;
+            /** @example Experienced mentor in NestJS and TypeORM */
+            bio?: string;
+            /** @example https://linkedin.com/in/username */
+            linkedinUrl?: string;
+            /** @example 10 */
+            yearsOfExperience?: number;
+            /**
+             * @example [
+             *       "NestJS",
+             *       "TypeScript",
+             *       "PostgreSQL"
+             *     ]
+             */
+            skills?: string[];
+            /**
+             * @example {
+             *       "website": "https://example.com"
+             *     }
+             */
+            metadata?: Record<string, never>;
+            /**
+             * @default PENDING
+             * @enum {string}
+             */
+            status: "ACTIVE" | "INACTIVE" | "PENDING" | "REJECTED";
+        };
+        UpdateMentorProfileDto: {
+            /**
+             * Format: uuid
+             * @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc
+             */
+            userId?: string;
+            /** @example Senior Software Engineer */
+            jobTitle?: string;
+            /** @example Google */
+            company?: string;
+            /** @example Experienced mentor in NestJS and TypeORM */
+            bio?: string;
+            /** @example https://linkedin.com/in/username */
+            linkedinUrl?: string;
+            /** @example 10 */
+            yearsOfExperience?: number;
+            /**
+             * @example [
+             *       "NestJS",
+             *       "TypeScript",
+             *       "PostgreSQL"
+             *     ]
+             */
+            skills?: string[];
+            /**
+             * @example {
+             *       "website": "https://example.com"
+             *     }
+             */
+            metadata?: Record<string, never>;
+            /**
+             * @default PENDING
+             * @enum {string}
+             */
+            status: "ACTIVE" | "INACTIVE" | "PENDING" | "REJECTED";
+            /** @example false */
+            isApproved?: boolean;
+            /**
+             * Format: uuid
+             * @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc
+             */
+            approvedBy?: string;
+        };
+        CertificateDto: {
+            /** @example IELTS 8.0 */
+            name: string;
+            /** @example British Council */
+            issuedBy?: string;
+            /** @example https://example.com/cert.jpg */
+            imageUrl: string;
+        };
+        DegreeDto: {
+            /** @example Bachelor of Computer Science */
+            name: string;
+            /** @example University of Oxford */
+            university?: string;
+            /** @example https://example.com/degree.jpg */
+            imageUrl: string;
+        };
+        MentorAvailabilityMetadataDto: {
+            certificates: components["schemas"]["CertificateDto"][];
+            degrees: components["schemas"]["DegreeDto"][];
+        };
+        CreateMentorAvailabilityDto: {
+            /** @example Senior Software Engineer */
+            jobTitle?: string;
+            /** @example Tech Solutions Inc. */
+            company?: string;
+            /** @example I have 10 years of experience... */
+            bio?: string;
+            /** @example https://linkedin.com/in/username */
+            linkedinUrl?: string;
+            /** @example 10 */
+            yearsOfExperience?: number;
+            /**
+             * @example [
+             *       "TypeScript",
+             *       "NestJS"
+             *     ]
+             */
+            skills?: string[];
+            metadata: components["schemas"]["MentorAvailabilityMetadataDto"];
+            /** @example Please review my application */
+            note?: string;
+        };
+        UpdateMentorAvailabilityDto: {
+            /** @example Senior Software Engineer */
+            jobTitle?: string;
+            /** @example Tech Solutions Inc. */
+            company?: string;
+            /** @example I have 10 years of experience... */
+            bio?: string;
+            /** @example https://linkedin.com/in/username */
+            linkedinUrl?: string;
+            /** @example 10 */
+            yearsOfExperience?: number;
+            /**
+             * @example [
+             *       "TypeScript",
+             *       "NestJS"
+             *     ]
+             */
+            skills?: string[];
+            metadata?: components["schemas"]["MentorAvailabilityMetadataDto"];
+            /** @example Please review my application */
+            note?: string;
+            /** @enum {string} */
+            status?: "PENDING" | "IN_PROGRESS" | "APPROVED" | "REJECTED" | "CANCEL";
+            /** @example admin-uuid */
+            approvedBy?: string;
+            /** @example true */
+            isActive?: boolean;
         };
         MentorAvailabilityEmptyActionDto: Record<string, never>;
         MentorAvailabilityReviewDto: {
@@ -1887,6 +2090,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy danh sách thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1902,9 +2106,49 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMentorProfileDto"];
+            };
+        };
+        responses: {
+            /** @description Tạo hồ sơ thành công */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Dữ liệu không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorProfileController_findByUserId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của user */
+                userId: string;
+            };
+            cookie?: never;
+        };
         requestBody?: never;
         responses: {
-            201: {
+            /** @description Lấy hồ sơ thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy hồ sơ */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1917,13 +2161,22 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của hồ sơ mentor */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy chi tiết thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy hồ sơ */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1936,13 +2189,22 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của hồ sơ mentor */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Xóa thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy hồ sơ */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1955,13 +2217,26 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của hồ sơ mentor */
                 id: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMentorProfileDto"];
+            };
+        };
         responses: {
+            /** @description Cập nhật thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy hồ sơ */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1978,6 +2253,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy danh sách thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1993,9 +2269,21 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMentorAvailabilityDto"];
+            };
+        };
         responses: {
+            /** @description Gửi đơn thành công */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Dữ liệu không hợp lệ hoặc đã có đơn đang chờ */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2012,6 +2300,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy danh sách thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2025,13 +2314,22 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của đơn đăng ký */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Lấy chi tiết thành công */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy đơn */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2067,7 +2365,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMentorAvailabilityDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -2101,6 +2403,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của đơn đăng ký */
                 id: string;
             };
             cookie?: never;
@@ -2111,6 +2414,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Cập nhật thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2124,6 +2428,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của đơn đăng ký */
                 id: string;
             };
             cookie?: never;
@@ -2134,6 +2439,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Phê duyệt thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2147,6 +2453,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của đơn đăng ký */
                 id: string;
             };
             cookie?: never;
@@ -2157,6 +2464,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Từ chối thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2170,6 +2478,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID của đơn đăng ký */
                 id: string;
             };
             cookie?: never;
@@ -2180,6 +2489,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Hủy đơn thành công */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2226,7 +2536,7 @@ export interface operations {
                             iconUrl?: string | null;
                             /** @example {} */
                             metadata?: Record<string, never>;
-                            /** @example active */
+                            /** @example ACTIVE */
                             status?: string;
                             /** Format: date-time */
                             createdAt?: string;
@@ -2274,8 +2584,8 @@ export interface operations {
                      */
                     metadata?: Record<string, never>;
                     /**
-                     * @default active
-                     * @example active
+                     * @default ACTIVE
+                     * @example ACTIVE
                      */
                     status?: string;
                 };
@@ -2300,7 +2610,7 @@ export interface operations {
                             iconUrl?: string | null;
                             /** @example {} */
                             metadata?: Record<string, never>;
-                            /** @example active */
+                            /** @example ACTIVE */
                             status?: string;
                             /** Format: date-time */
                             createdAt?: string;
@@ -2370,7 +2680,7 @@ export interface operations {
                             iconUrl?: string | null;
                             /** @example {} */
                             metadata?: Record<string, never>;
-                            /** @example active */
+                            /** @example ACTIVE */
                             status?: string;
                             /** Format: date-time */
                             createdAt?: string;
@@ -2455,7 +2765,7 @@ export interface operations {
                     slug?: string;
                     iconUrl?: string | null;
                     metadata?: Record<string, never>;
-                    /** @example active */
+                    /** @example ACTIVE */
                     status?: string;
                 };
             };
@@ -2479,7 +2789,7 @@ export interface operations {
                             iconUrl?: string | null;
                             /** @example {} */
                             metadata?: Record<string, never>;
-                            /** @example active */
+                            /** @example ACTIVE */
                             status?: string;
                             /** Format: date-time */
                             createdAt?: string;

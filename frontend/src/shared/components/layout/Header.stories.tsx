@@ -25,7 +25,7 @@ const meta = {
       </NextIntlClientProvider>
     ),
   ],
-} satisfies Meta<typeof Header>;
+} as Meta<typeof Header>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -48,7 +48,7 @@ const meta = {
     },
   },
   args: { onChange: fn() },
-} satisfies Meta<typeof InputNumber>;
+} as Meta<typeof InputNumber>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -203,7 +203,7 @@ const borderlessMeta = {
     },
   },
   args: { onChange: fn() },
-} satisfies Meta<typeof InputNumberBorderless>;
+} as Meta<typeof InputNumberBorderless>;
 
 export const Borderless_CircleIcons: Story = {
   name: "Borderless — Circle Icons",

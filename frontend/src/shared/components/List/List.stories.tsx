@@ -15,7 +15,7 @@ const meta = {
     layout: "fullscreen",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof List>;
+} as Meta<typeof List>;
 
 export default meta;
 type Story = StoryObj<typeof List>;

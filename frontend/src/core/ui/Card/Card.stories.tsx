@@ -18,7 +18,7 @@ const meta = {
       options: ["none", "sm", "md", "lg"],
     },
   },
-} satisfies Meta<typeof Card>;
+} as Meta<typeof Card>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

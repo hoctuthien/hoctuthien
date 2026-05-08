@@ -9,7 +9,7 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Accordion>;
+} as Meta<typeof Accordion>;
 
 export default meta;
 type Story = StoryObj<typeof Accordion>;

@@ -20,7 +20,7 @@ const meta = {
     label: { control: "text" },
   },
   args: { onChange: fn() },
-} satisfies Meta<typeof Radio>;
+} as Meta<typeof Radio>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

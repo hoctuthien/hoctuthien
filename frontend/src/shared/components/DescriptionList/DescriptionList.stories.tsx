@@ -10,7 +10,7 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof DescriptionList>;
+} as Meta<typeof DescriptionList>;
 
 export default meta;
 type Story = StoryObj<typeof DescriptionList>;
