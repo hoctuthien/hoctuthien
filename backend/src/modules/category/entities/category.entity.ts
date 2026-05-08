@@ -1,5 +1,6 @@
 import { Column, Entity } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
+import { CategoryStatus } from '../enums/category-status.enum';
 
 @Entity({ name: 'categories' })
 export class CategoryEntity extends BaseEntity {
@@ -15,6 +16,11 @@ export class CategoryEntity extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata: Record<string, any>;
 
-  @Column({ type: 'varchar', length: 50, default: 'active' })
+  @Column({
+    type: 'varchar',
+    length: 50,
+    default: CategoryStatus.ACTIVE,
+  })
   status: string;
 }
+

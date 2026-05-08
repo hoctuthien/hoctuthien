@@ -6,7 +6,7 @@ export const categorySchema = z.object({
   slug: z.string().max(255).nullable().optional(),
   iconUrl: z.string().max(500).nullable().optional(),
   metadata: z.record(z.string(), z.any()).default({}),
-  status: z.string().max(50).default('active'),
+  status: z.string().max(50).default('ACTIVE'),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable().optional(),
