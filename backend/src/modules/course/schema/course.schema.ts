@@ -20,14 +20,15 @@ export const courseSchema = z.object({
 
 export const createCourseSchema = z.object({
   title: z.string().min(1).max(255),
-  description: z.string().optional(),
-  thumbnailUrl: z.string().max(500).optional(),
-  price: z.number(),
-  durationMinutes: z.number().optional(),
-  prerequisites: z.array(z.string()).optional(),
+  price: z.number().min(0),
+  durationMinutes: z.number().min(15).optional(),
+
+  // Logic Lịch Dạy (Slot) được bổ sung:
+  startTime: z.string().datetime(), // Bắt FE phải gửi giờ bắt đầu slot
+  isRecurring: z.boolean().optional().default(false),
+  repeatCount: z.number().optional(),
   metadata: z.record(z.string(), z.any()).optional(),
   status: z.nativeEnum(CourseStatus).optional(),
-  categoryIds: z.array(z.string()).optional(),
 });
 
 // Schema cho Mentor cập nhật khóa học - không cho phép tự set approvedBy
@@ -38,3 +39,8 @@ export const approveCourseSchema = z.object({
   approvedBy: z.string(),
   status: z.nativeEnum(CourseStatus),
 });
+
+export type CreateCourseInput = z.infer<typeof createCourseSchema>;
+export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
+export type ApproveCourseInput = z.infer<typeof approveCourseSchema>;
+export type Course = z.infer<typeof courseSchema>;
