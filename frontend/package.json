@@ -18,7 +18,8 @@
     "storybook": "storybook dev -p 8000",
     "build-storybook": "storybook build",
     "gen:api": "npx openapi-typescript https://api.hoctuthien.com/api/docs-json -o ./src/core/types/api.generated.ts",
-    "gen:api:local": "npx openapi-typescript http://beta-api.hoctuthien.com/api/docs-json -o ./src/core/types/api.generated.ts"
+    "gen:api:local": "npx openapi-typescript http://beta-api.hoctuthien.com/api/docs-json -o ./src/core/types/api.generated.ts",
+    "gen:route": "node scripts/gen-route.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -65,10 +66,13 @@
     "@types/react-dom": "^19",
     "@vitest/browser-playwright": "^4.1.1",
     "@vitest/coverage-v8": "^4.1.1",
+    "chalk": "^5.6.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "eslint-plugin-storybook": "^10.3.3",
+    "figures": "^6.1.0",
     "husky": "^9.1.7",
+    "inquirer": "^12.11.1",
     "lint-staged": "^15.5.1",
     "openapi-typescript": "^7.13.0",
     "playwright": "^1.58.2",
