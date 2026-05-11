@@ -43,4 +43,3 @@ export const approveCourseSchema = z.object({
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
 export type ApproveCourseInput = z.infer<typeof approveCourseSchema>;
-export type Course = z.infer<typeof courseSchema>;
