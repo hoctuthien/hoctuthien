@@ -9,7 +9,7 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof VerticalReorder>;
+} as Meta<typeof VerticalReorder>;
 
 export default meta;
 

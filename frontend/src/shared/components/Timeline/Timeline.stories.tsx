@@ -11,7 +11,7 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Timeline>;
+} as Meta<typeof Timeline>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

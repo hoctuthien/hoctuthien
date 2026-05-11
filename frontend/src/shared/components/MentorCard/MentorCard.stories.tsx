@@ -8,7 +8,7 @@ const meta = {
     layout: "fullscreen",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof MentorCard>;
+} as Meta<typeof MentorCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -36,7 +36,7 @@ const meta = {
       </NextIntlClientProvider>
     ),
   ],
-} satisfies Meta<typeof Footer>;
+} as Meta<typeof Footer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

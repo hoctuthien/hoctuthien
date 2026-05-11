@@ -10,7 +10,7 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Badge>;
+} as Meta<typeof Badge>;
 
 export default meta;
 type Story = StoryObj<typeof Badge>;

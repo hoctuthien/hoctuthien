@@ -8,7 +8,7 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof CircularProgress>;
+} as Meta<typeof CircularProgress>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
