@@ -3,26 +3,31 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { mentorRegisterSchema, MentorRegisterValues } from "./mentor-register.schema";
-import { Button, Steps, Icon } from "@/core/ui";
+import { getMentorRegisterSchema, MentorRegisterValues } from "./mentor-register.schema";
+import { Button, Icon } from "@/core/ui";
 import { cn } from "@/core/utils/cn";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { mentorGateway } from "@/core/gateway";
+import { useTranslations } from "next-intl";
 
 const Step1ProfessionalDetails = dynamic(() => import("./components").then(mod => mod.Step1ProfessionalDetails));
 const Step2ExpertiseBio = dynamic(() => import("./components").then(mod => mod.Step2ExpertiseBio));
-
-const STEPS = [
-  { title: "Professional Details", icon: "Briefcase" },
-  { title: "Expertise & Bio", icon: "Award" },
-];
+const Step3Credentials = dynamic(() => import("./components").then(mod => mod.Step3Credentials));
 
 export default function MentorRegisterClient() {
+  const t = useTranslations("MentorRegister");
   const [currentStep, setCurrentStep] = useState(0);
   const router = useRouter();
 
+  const STEPS = [
+    { title: t("stepTitle1"), icon: "Briefcase" },
+    { title: t("stepTitle2"), icon: "Award" },
+    { title: t("stepTitle3"), icon: "FileText" },
+  ];
+
   const form = useForm<MentorRegisterValues>({
-    resolver: zodResolver(mentorRegisterSchema),
+    resolver: zodResolver(getMentorRegisterSchema(t)),
     defaultValues: {
       jobTitle: "",
       company: "",
@@ -42,12 +47,13 @@ export default function MentorRegisterClient() {
   const onSubmit = async (data: MentorRegisterValues) => {
     try {
       console.log("Submitting Mentor Application:", data);
-      // TODO: Call authGateway.createMentorAvailability(data)
-      // For now, just simulate success
-      alert("Application submitted successfully! Redirecting to dashboard...");
-      router.push("/dashboard");
-    } catch (error) {
+      await mentorGateway.createMentorAvailability(data);
+      alert(t("successMessage"));
+      router.push("/");
+    } catch (error: any) {
       console.error("Failed to submit application:", error);
+      const errorMessage = error?.response?.data?.error?.message || t("errorMessage");
+      alert(errorMessage);
     }
   };
 
@@ -55,6 +61,8 @@ export default function MentorRegisterClient() {
     let fieldsToValidate: any[] = [];
     if (currentStep === 0) {
       fieldsToValidate = ["jobTitle", "company", "yearsOfExperience", "linkedinUrl"];
+    } else if (currentStep === 1) {
+      fieldsToValidate = ["skills", "bio", "note"];
     }
 
     const isValid = await form.trigger(fieldsToValidate);
@@ -75,13 +83,13 @@ export default function MentorRegisterClient() {
         <div className="lg:col-span-5 flex flex-col gap-8">
           <div className="flex flex-col gap-4">
             <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider w-fit">
-              Step {currentStep + 1} of {STEPS.length}
+              {t("step", { current: currentStep + 1, total: STEPS.length })}
             </span>
             <h1 className="text-4xl lg:text-5xl font-bold text-[#181C20] leading-tight font-[Plus Jakarta Sans]">
-              Shape the future of <span className="text-primary">Global Talent.</span>
+              {t("title")} <span className="text-primary">{t("titleHighlight")}</span>
             </h1>
             <p className="text-lg text-[#727785] font-[Plus Jakarta Sans]">
-              Join our curated circle of excellence. Share your expertise, mentor emerging leaders, and expand your own professional legacy.
+              {t("subtitle")}
             </p>
           </div>
 
@@ -91,8 +99,8 @@ export default function MentorRegisterClient() {
                 <Icon name="ShieldCheck" className="text-primary" size={20} />
               </div>
               <div>
-                <h3 className="font-bold text-[#181C20]">Identity Verification</h3>
-                <p className="text-sm text-[#727785]">We ensure all mentors meet our prestige standards.</p>
+                <h3 className="font-bold text-[#181C20]">{t("identityTitle")}</h3>
+                <p className="text-sm text-[#727785]">{t("identityDesc")}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -100,8 +108,8 @@ export default function MentorRegisterClient() {
                 <Icon name="Globe" className="text-primary" size={20} />
               </div>
               <div>
-                <h3 className="font-bold text-[#181C20]">Global Network</h3>
-                <p className="text-sm text-[#727785]">Connect with mentees from over 40 countries.</p>
+                <h3 className="font-bold text-[#181C20]">{t("networkTitle")}</h3>
+                <p className="text-sm text-[#727785]">{t("networkDesc")}</p>
               </div>
             </div>
           </div>
@@ -114,7 +122,7 @@ export default function MentorRegisterClient() {
                 className="object-cover w-full h-full"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
-                <p className="text-white font-medium italic">"The best way to learn is to teach, and the best way to live is to give."</p>
+                <p className="text-white font-medium italic">{t("quote")}</p>
               </div>
             </div>
           </div>
@@ -159,6 +167,10 @@ export default function MentorRegisterClient() {
                 <Step2ExpertiseBio form={form} />
               )}
 
+              {currentStep === 2 && (
+                <Step3Credentials form={form} />
+              )}
+
               <div className="flex items-center justify-between pt-8 border-t border-slate-100">
                 <button
                   type="button"
@@ -166,16 +178,17 @@ export default function MentorRegisterClient() {
                   className="flex items-center gap-2 text-slate-500 font-semibold hover:text-primary transition-colors px-4 py-2"
                 >
                   <Icon name="ArrowLeft" size={20} />
-                  {currentStep === 0 ? "Cancel" : "Go Back"}
+                  {currentStep === 0 ? t("cancel") : t("goBack")}
                 </button>
 
                 {currentStep < STEPS.length - 1 ? (
                   <Button 
+                    key="next-btn"
                     type="button" 
                     onClick={nextStep}
                     label={
                       <div className="flex items-center">
-                        Continue to Step 2
+                        {t("nextStep")}
                         <Icon name="ArrowRight" className="ml-2" size={20} />
                       </div>
                     }
@@ -183,10 +196,11 @@ export default function MentorRegisterClient() {
                   />
                 ) : (
                   <Button 
+                    key="submit-btn"
                     type="submit"
                     label={
                       <div className="flex items-center">
-                        Complete Profile
+                        {t("completeProfile")}
                         <Icon name="Check" className="ml-2" size={20} />
                       </div>
                     }
@@ -203,3 +217,4 @@ export default function MentorRegisterClient() {
     </div>
   );
 }
+
