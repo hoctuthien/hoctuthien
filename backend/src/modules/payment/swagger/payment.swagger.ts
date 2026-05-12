@@ -167,8 +167,9 @@ export const ApiVerifyActivationPaymentDoc = () => {
     ApiBearerAuth(),
     ApiOperation({
       description:
-        'User bấm "Tôi đã chuyển khoản" → backend query TN App API tìm giao dịch khớp → kích hoạt tài khoản. ' +
-        'Nếu giao dịch chưa xuất hiện (activated: false), FE polling lại sau vài giây.',
+        'Kiểm tra trạng thái thanh toán kích hoạt. ' +
+        'API chỉ đọc trạng thái từ DB — Cron Job ngầm tự động đối soát với TN App mỗi phút. ' +
+        'Nếu `activated: false`, FE polling lại sau 5–10 giây.',
     }),
     ApiBody({
       schema: {
@@ -223,15 +224,6 @@ export const ApiVerifyActivationPaymentDoc = () => {
       status: 422,
       description:
         'Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại',
-    }),
-    ApiResponse({
-      status: 500,
-      description: 'Lỗi nội bộ: không tìm thấy mã giao dịch trong payment',
-    }),
-    ApiResponse({
-      status: 503,
-      description:
-        'Không thể kết nối đến dịch vụ kiểm tra giao dịch (TN App), vui lòng thử lại sau',
     }),
   );
 };

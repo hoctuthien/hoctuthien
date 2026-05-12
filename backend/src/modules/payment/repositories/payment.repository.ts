@@ -44,4 +44,15 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
     );
     return result.affected ?? 0;
   }
+
+  // Lấy tất cả payment PENDING chưa hết hạn — cron job dùng để đối soát hàng loạt
+  async findAllPendingActive(): Promise<PaymentEntity[]> {
+    return this.repo.find({
+      where: {
+        paymentMethod: PaymentType.ACTIVATION,
+        status: PaymentStatus.PENDING,
+      },
+      order: { createdAt: 'ASC' },
+    });
+  }
 }

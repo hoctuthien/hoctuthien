@@ -1,8 +1,10 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { UserRepository } from '../repositories/user.repository';
 import {
   createUserSchema,
@@ -11,9 +13,15 @@ import {
 } from '../schema/user.schema';
 import { CreateUserInput, UpdateUserInput } from '../types/user.types';
 import * as bcrypt from 'bcrypt';
+import {
+  PAYMENT_SUCCESS_EVENT,
+  PaymentSuccessPayload,
+} from '../../payment/events/payment.events';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(private readonly userRepository: UserRepository) {}
 
   async findAll() {
@@ -82,5 +90,32 @@ export class UserService {
     if (!user)
       throw new NotFoundException('Không tìm thấy thông tin người dùng.');
     await this.userRepository.updateById(id, { isVerified: true });
+  }
+
+  /**
+   * Lắng nghe event payment.success do PaymentVerificationService phát ra.
+   *
+   * Đây là điểm tich hợp duy nhất giữa Payment domain và User domain.
+   * PaymentVerificationService không cần biết về UserService hay UserEntity.
+   */
+  @OnEvent(PAYMENT_SUCCESS_EVENT, { async: true })
+  async handlePaymentSuccess(payload: PaymentSuccessPayload): Promise<void> {
+    this.logger.log(
+      `[Event] Nhận payment.success: paymentId=${payload.paymentId}, userId=${payload.userId}`,
+    );
+
+    try {
+      await this.activateMentee(payload.userId);
+      this.logger.log(
+        `[Event] Kích hoạt thành công tài khoản Mentee: userId=${payload.userId}`,
+      );
+    } catch (error) {
+      // Ghi log lỗi nhưng KHÔNG re-throw — tránh crash event loop của các listener khác
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `[Event] Kích hoạt thất bại cho userId=${payload.userId}: ${message}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
   }
 }

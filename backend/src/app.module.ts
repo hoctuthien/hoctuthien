@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import envConfig from './config/env.config';
 import { validateEnv } from './config/validation';
 import { DatabaseModule } from './infrastructure/database/database.module';
@@ -32,6 +34,8 @@ import { AppService } from './app.service';
       load: [envConfig],
       validate: validateEnv,
     }),
+    ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     RedisModule,
     AuthModule,
