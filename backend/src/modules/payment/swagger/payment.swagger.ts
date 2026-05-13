@@ -7,6 +7,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { PaymentStatus } from '../entities/payment.entity';
+import { VerifyActivationPaymentDto } from '../dtos/payment.dto';
 
 export const ApiGenerateActivationQrDoc = () => {
   return applyDecorators(
@@ -171,18 +172,7 @@ export const ApiVerifyActivationPaymentDoc = () => {
         'API chỉ đọc trạng thái từ DB — Cron Job ngầm tự động đối soát với TN App mỗi phút. ' +
         'Nếu `activated: false`, FE polling lại sau 5–10 giây.',
     }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        required: ['paymentId'],
-        properties: {
-          paymentId: {
-            type: 'string',
-            example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
-          },
-        },
-      },
-    }),
+    ApiBody({ type: VerifyActivationPaymentDto }),
     ApiResponse({
       status: 200,
       description:
@@ -222,8 +212,7 @@ export const ApiVerifyActivationPaymentDoc = () => {
     }),
     ApiResponse({
       status: 422,
-      description:
-        'Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại',
+      description: 'Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại',
     }),
   );
 };

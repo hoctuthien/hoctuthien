@@ -18,6 +18,9 @@ import {
   UpdateMentorAvailabilityInput,
 } from '../types/mentor-availability.types';
 import { MentorAvailabilityEntity } from '../entities/mentor-availability.entity';
+import { UserEntity, UserRole } from '../../user/entities/user.entity';
+import { MentorProfileEntity } from '../../mentor-profile/entities/mentor-profile.entity';
+import { MentorProfileStatus } from '../../mentor-profile/enums/mentor-profile-status.enum';
 
 @Injectable()
 export class MentorAvailabilityService {
@@ -175,13 +178,48 @@ export class MentorAvailabilityService {
         );
       }
 
+      // 1. Update Mentor Availability Status
       current.status = MentorAvailabilityStatus.APPROVED;
       current.note = note;
-
       const updated = await manager.save(MentorAvailabilityEntity, current);
+
+      // 2. Update User Role to MENTOR
+      const user = await manager.findOne(UserEntity, {
+        where: { id: current.mentorId },
+      });
+      if (user) {
+        user.role = UserRole.MENTOR;
+        await manager.save(UserEntity, user);
+      }
+
+      // 3. Create or Update Mentor Profile
+      let profile = await manager.findOne(MentorProfileEntity, {
+        where: { userId: current.mentorId },
+      });
+
+      if (!profile) {
+        profile = manager.create(MentorProfileEntity, {
+          userId: current.mentorId,
+          status: MentorProfileStatus.ACTIVE,
+        });
+      }
+
+      profile.jobTitle = current.jobTitle;
+      profile.company = current.company;
+      profile.bio = current.bio;
+      profile.linkedinUrl = current.linkedinUrl;
+      profile.yearsOfExperience = current.yearsOfExperience;
+      profile.skills = current.skills;
+      profile.isApproved = true;
+      profile.approvedBy = adminId;
+      profile.status = MentorProfileStatus.ACTIVE;
+
+      await manager.save(MentorProfileEntity, profile);
+
       return mentorAvailabilitySchema.parse(updated);
     });
   }
+
 
   async reject(id: string, adminId: string, note: string) {
     return this.dataSource.transaction(async (manager) => {

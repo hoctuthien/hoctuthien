@@ -5,21 +5,21 @@ import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity({ name: 'user_reviews' })
 export class UserReviewEntity extends BaseEntity {
-  @Column({ name: 'course_booking_id', type: 'bigint' })
+  @Column({ name: 'course_booking_id', type: 'uuid' })
   courseBookingId: string;
 
   @ManyToOne(() => CourseBookingEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'course_booking_id' })
   courseBooking: CourseBookingEntity;
 
-  @Column({ name: 'reviewer_id', type: 'bigint' })
+  @Column({ name: 'reviewer_id', type: 'uuid' })
   reviewerId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'reviewer_id' })
   reviewer: UserEntity;
 
-  @Column({ name: 'reviewed_id', type: 'bigint' })
+  @Column({ name: 'reviewed_id', type: 'uuid' })
   reviewedId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })

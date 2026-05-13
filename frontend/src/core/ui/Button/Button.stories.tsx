@@ -4,7 +4,7 @@ import { Button } from "./Button";
 import { LuArrowRight, LuSend, LuTrash2 } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/Button",
+  title: "Core/UI/Button",
   component: Button,
   parameters: {
     layout: "centered",
@@ -45,7 +45,7 @@ const meta = {
     },
   },
   args: { onClick: fn() },
-} satisfies Meta<typeof Button>;
+} as Meta<typeof Button>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -3,7 +3,7 @@ import { DatePicker } from "./DatePicker";
 import { DateRangePicker } from "./DateRangePicker";
 
 const meta: Meta<typeof DatePicker> = {
-  title: "Shared/DatePicker",
+  title: "Shared/Components/DatePicker",
   component: DatePicker,
   parameters: {
     layout: "centered",

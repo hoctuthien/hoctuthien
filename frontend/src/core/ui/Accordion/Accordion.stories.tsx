@@ -3,13 +3,13 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Accordion } from "./Accordion";
 
 const meta = {
-  title: "Shared/Accordion",
+  title: "Core/UI/Accordion",
   component: Accordion,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Accordion>;
+} as Meta<typeof Accordion>;
 
 export default meta;
 type Story = StoryObj<typeof Accordion>;

@@ -1,4 +1,4 @@
-import { MESSAGES } from '@nestjs/core/constants';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
@@ -8,59 +8,76 @@ import {
   IsDateString,
 } from 'class-validator';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
-import { v4 as uuidv4 } from 'uuid';
 
 export class LoginDto {
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'Email của người dùng',
+  })
   @IsEmail({}, { message: AUTH_MESSAGES.INVALID_EMAIL })
   @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_EMAIL })
   email!: string;
 
+  @ApiProperty({
+    example: 'password123',
+    minLength: 6,
+    description: 'Mật khẩu người dùng',
+  })
   @IsString()
   @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_PASSWORD })
   @MinLength(6, { message: AUTH_MESSAGES.INVALID_PASSWORD })
   password!: string;
-
-  @IsString()
-  @IsOptional() // Để là Optional để Server có thể tự điền nếu Client gửi thiếu
-  deviceId?: string;
 }
 
 export class GoogleTokenDto {
+  @ApiProperty({ example: 'user@example.com', required: false })
   @IsEmail()
   @IsOptional()
   email?: string;
 
+  @ApiProperty({ description: 'idToken từ Google SDK ở Frontend' })
   @IsString()
   @IsNotEmpty()
-  token: string; // idToken từ Frontend
+  token: string;
 }
+
 export class RegisterDto {
+  @ApiProperty({ example: 'user@example.com' })
   @IsEmail({}, { message: AUTH_MESSAGES.INVALID_EMAIL })
   @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_EMAIL })
   email!: string;
 
+  @ApiProperty({ example: 'password123', minLength: 6 })
   @IsString()
   @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_PASSWORD })
   @MinLength(6, { message: AUTH_MESSAGES.INVALID_PASSWORD })
   password!: string;
 
+  @ApiProperty({ example: 'Nguyen Van A' })
   @IsString()
   @IsNotEmpty({ message: 'Tên không được để trống' })
   name!: string;
 
+  @ApiProperty({ example: '0987654321', required: false })
   @IsString()
   @IsOptional()
   phone?: string;
 
+  @ApiProperty({
+    example: '2000-01-01',
+    required: false,
+    description: 'Ngày sinh (YYYY-MM-DD)',
+  })
   @IsDateString()
   @IsOptional()
   dayOfBirth?: string;
 
+  @ApiProperty({
+    example: 'male',
+    required: false,
+    enum: ['male', 'female', 'other'],
+  })
   @IsString()
   @IsOptional()
   gender?: string;
-
-  @IsString()
-  @IsOptional()
-  deviceId?: string;
 }

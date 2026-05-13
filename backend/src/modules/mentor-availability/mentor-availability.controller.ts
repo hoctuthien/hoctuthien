@@ -8,11 +8,12 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MentorAvailabilityService } from './services/mentor-availability.service';
 import {
-  CreateMentorAvailabilityInput,
-  UpdateMentorAvailabilityInput,
-} from './types/mentor-availability.types';
+  CreateMentorAvailabilityDto,
+  UpdateMentorAvailabilityDto,
+} from './dtos/mentor-availability.dto';
 import {
   MentorAvailabilityEmptyActionDto,
   MentorAvailabilityReviewDto,
@@ -22,9 +23,21 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { User } from '../../common/decorators/user.decorator';
+import {
+  ApiCreateMentorAvailabilityDoc,
+  ApiFindAllMentorAvailabilitiesDoc,
+  ApiFindMyMentorAvailabilitiesDoc,
+  ApiFindOneMentorAvailabilityDoc,
+  ApiUpdateToInProgressDoc,
+  ApiApproveMentorAvailabilityDoc,
+  ApiRejectMentorAvailabilityDoc,
+  ApiCancelMentorAvailabilityDoc,
+} from './swagger/mentor-availability.swagger';
 
+@ApiTags('Mentor Availabilities (Applications)')
 @Controller('mentor-availabilities')
 export class MentorAvailabilityController {
+
   constructor(
     private readonly mentorAvailabilityService: MentorAvailabilityService,
   ) {}
@@ -36,8 +49,9 @@ export class MentorAvailabilityController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTEE)
+  @ApiCreateMentorAvailabilityDoc()
   create(
-    @Body() payload: CreateMentorAvailabilityInput,
+    @Body() payload: CreateMentorAvailabilityDto,
     @User('id') mentorId: string,
   ) {
     return this.mentorAvailabilityService.create(mentorId, payload);
@@ -50,6 +64,7 @@ export class MentorAvailabilityController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiFindAllMentorAvailabilitiesDoc()
   findAll() {
     return this.mentorAvailabilityService.findAll();
   }
@@ -61,6 +76,7 @@ export class MentorAvailabilityController {
   @Get('me')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTEE)
+  @ApiFindMyMentorAvailabilitiesDoc()
   findMyMentorAvailabilities(@User('id') mentorId: string) {
     return this.mentorAvailabilityService.findByMentorId(mentorId);
   }
@@ -72,6 +88,7 @@ export class MentorAvailabilityController {
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiFindOneMentorAvailabilityDoc()
   findOneAdmin(@Param('id') id: string) {
     return this.mentorAvailabilityService.findOne(id);
   }
@@ -94,7 +111,7 @@ export class MentorAvailabilityController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() payload: UpdateMentorAvailabilityInput,
+    @Body() payload: UpdateMentorAvailabilityDto,
   ) {
     return this.mentorAvailabilityService.update(id, payload);
   }
@@ -106,6 +123,7 @@ export class MentorAvailabilityController {
   @Patch(':id/in-progress')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiUpdateToInProgressDoc()
   updateToInProgress(
     @Param('id') id: string,
     @Body() _payload: MentorAvailabilityEmptyActionDto,
@@ -121,6 +139,7 @@ export class MentorAvailabilityController {
   @Patch(':id/approved')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiApproveMentorAvailabilityDoc()
   approve(
     @Param('id') id: string,
     @Body() payload: MentorAvailabilityReviewDto,
@@ -136,6 +155,7 @@ export class MentorAvailabilityController {
   @Patch(':id/rejected')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiRejectMentorAvailabilityDoc()
   reject(
     @Param('id') id: string,
     @Body() payload: MentorAvailabilityReviewDto,
@@ -151,6 +171,7 @@ export class MentorAvailabilityController {
   @Patch(':id/cancel')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTEE)
+  @ApiCancelMentorAvailabilityDoc()
   cancel(
     @Param('id') id: string,
     @Body() _payload: MentorAvailabilityEmptyActionDto,

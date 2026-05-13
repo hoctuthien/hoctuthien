@@ -3,7 +3,7 @@ import { fn } from "storybook/test";
 import { Checkbox } from "./Checkbox";
 
 const meta = {
-  title: "Shared/Checkbox",
+  title: "Core/UI/Selection/Checkbox",
   component: Checkbox,
   parameters: {
     layout: "centered",
@@ -33,7 +33,7 @@ const meta = {
     },
   },
   args: { onChange: fn() },
-} satisfies Meta<typeof Checkbox>;
+} as Meta<typeof Checkbox>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

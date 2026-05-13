@@ -21,8 +21,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "hygen": "hygen",
     "gen:module": "node scripts/gen-module.js",
-    "seed:categories": "ts-node scripts/seed-categories.ts"
+    "seed:categories": "ts-node scripts/seed-categories.ts",
+    "seed:admin": "ts-node scripts/seed-admin.ts"
   },
+
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",
@@ -42,6 +44,7 @@
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
     "express-xss-sanitizer": "^2.0.2",
     "google-auth-library": "^10.6.2",
     "helmet": "^8.1.0",
@@ -65,13 +68,16 @@
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
+    "@types/express-http-proxy": "^1.6.7",
     "@types/express-xss-sanitizer": "^2.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
     "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.20.0",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
     "concurrently": "^9.1.2",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

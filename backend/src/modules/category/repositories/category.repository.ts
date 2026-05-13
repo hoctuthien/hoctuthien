@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { BaseRepository } from '../../../common/repositories/base.repository';
 import { CategoryEntity } from '../entities/category.entity';
 
@@ -11,5 +11,11 @@ export class CategoryRepository extends BaseRepository<CategoryEntity> {
     repo: Repository<CategoryEntity>,
   ) {
     super(repo);
+  }
+
+  async findManyWithCount(
+    options?: FindManyOptions<CategoryEntity>,
+  ): Promise<[CategoryEntity[], number]> {
+    return this.repo.findAndCount(options);
   }
 }

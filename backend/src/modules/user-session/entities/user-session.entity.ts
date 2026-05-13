@@ -4,14 +4,14 @@ import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity({ name: 'user_sessions' })
 export class UserSessionEntity extends BaseEntity {
-  @Column({ name: 'user_id', type: 'bigint' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @Column({ name: 'refresh_token', type: 'varchar', length: 255 })
+  @Column({ name: 'refresh_token', type: 'text' })
   refreshToken: string;
 
   @Column({ name: 'device_name', type: 'varchar', length: 255, nullable: true })

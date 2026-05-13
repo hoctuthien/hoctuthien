@@ -23,6 +23,7 @@ import { SystemConfigModule } from './modules/system-config/system-config.module
 import { ConversationModule } from './modules/conversation/conversation.module';
 import { MessageModule } from './modules/message/message.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { MediaModule } from './modules/media/media.module';
 import { TraceIdMiddleware } from './common/middlewares/trace-id.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -55,6 +56,7 @@ import { AppService } from './app.service';
     ConversationModule,
     MessageModule,
     NotificationModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

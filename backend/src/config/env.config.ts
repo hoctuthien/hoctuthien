@@ -23,4 +23,8 @@ export default () => ({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackUrl: process.env.GOOGLE_CALLBACK_URL,
   },
+  openinary: {
+    url: process.env.OPENINARY_URL,
+    apiKey: process.env.OPENINARY_API_KEY,
+  },
 });

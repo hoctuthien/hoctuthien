@@ -7,6 +7,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { UserRole } from '../entities/user.entity';
+import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
 
 export const ApiGetMeDoc = () => {
   return applyDecorators(
@@ -23,24 +24,50 @@ export const ApiGetMeDoc = () => {
             items: {
               type: 'object',
               properties: {
-                message: { type: 'string', example: 'Lấy thông tin người dùng thành công.' },
+                message: {
+                  type: 'string',
+                  example: 'Lấy thông tin người dùng thành công.',
+                },
                 user: {
                   type: 'object',
                   properties: {
-                    id: { type: 'string', example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc' },
+                    id: {
+                      type: 'string',
+                      example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
+                    },
                     name: { type: 'string', example: 'Nguyen Van A' },
                     email: { type: 'string', example: 'a@gmail.com' },
-                    phone: { type: 'string', nullable: true, example: '0987654321' },
-                    avatarUrl: { type: 'string', nullable: true, example: 'https://example.com/avatar.jpg' },
-                    dayOfBirth: { type: 'string', nullable: true, example: '2000-01-01' },
+                    phone: {
+                      type: 'string',
+                      nullable: true,
+                      example: '0987654321',
+                    },
+                    avatarUrl: {
+                      type: 'string',
+                      nullable: true,
+                      example: 'https://example.com/avatar.jpg',
+                    },
+                    dayOfBirth: {
+                      type: 'string',
+                      nullable: true,
+                      example: '2000-01-01',
+                    },
                     gender: { type: 'string', nullable: true, example: 'male' },
-                    role: { type: 'string', enum: Object.values(UserRole), example: 'mentee' },
+                    role: {
+                      type: 'string',
+                      enum: Object.values(UserRole),
+                      example: 'mentee',
+                    },
                     points: { type: 'number', example: 0 },
                     isVerified: { type: 'boolean', example: false },
                     status: { type: 'string', example: 'active' },
                     timezone: { type: 'string', example: 'UTC' },
                     preferences: { type: 'object', example: {} },
-                    createdAt: { type: 'string', format: 'date-time', example: '2026-04-28T08:05:57.000Z' },
+                    createdAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      example: '2026-04-28T08:05:57.000Z',
+                    },
                   },
                 },
               },
@@ -55,30 +82,21 @@ export const ApiGetMeDoc = () => {
       status: 401,
       description: 'Chưa đăng nhập hoặc token không hợp lệ',
     }),
+    ApiResponse({
+      status: 403,
+      description: 'Tài khoản đã bị khóa bởi quản trị viên',
+    }),
+    ApiResponse({
+      status: 404,
+      description: 'Không tìm thấy user',
+    }),
   );
 };
 
 export const ApiCreateUserDoc = () => {
   return applyDecorators(
     ApiOperation({ summary: 'Tạo user mới' }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        required: ['name', 'email'],
-        properties: {
-          name: { type: 'string', maxLength: 255, example: 'Nguyen Van A' },
-          email: { type: 'string', format: 'email', maxLength: 255, example: 'a@gmail.com' },
-          password: { type: 'string', minLength: 6, maxLength: 255, example: '123456' },
-          googleId: { type: 'string', maxLength: 255, nullable: true },
-          phone: { type: 'string', maxLength: 50, nullable: true },
-          avatarUrl: { type: 'string', maxLength: 500, nullable: true },
-          dayOfBirth: { type: 'string', nullable: true },
-          gender: { type: 'string', maxLength: 50, nullable: true },
-          role: { type: 'string', enum: Object.values(UserRole), default: 'mentee' },
-          status: { type: 'string', maxLength: 50, default: 'active' },
-        },
-      },
-    }),
+    ApiBody({ type: CreateUserDto }),
     ApiResponse({
       status: 201,
       description: 'Tạo user thành công',
@@ -211,27 +229,7 @@ export const ApiUpdateUserDoc = () => {
       description: 'ID của user',
       example: '9a7d8e3f-1a2b-4c5d-9e0f-123456789abc',
     }),
-    ApiBody({
-      schema: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', maxLength: 255 },
-          email: { type: 'string', format: 'email', maxLength: 255 },
-          googleId: { type: 'string', maxLength: 255, nullable: true },
-          phone: { type: 'string', maxLength: 50, nullable: true },
-          avatarUrl: { type: 'string', maxLength: 500, nullable: true },
-          dayOfBirth: { type: 'string', nullable: true },
-          gender: { type: 'string', maxLength: 50, nullable: true },
-          role: { type: 'string', enum: Object.values(UserRole) },
-          status: { type: 'string', maxLength: 50 },
-          isVerified: { type: 'boolean' },
-          points: { type: 'number' },
-          preferences: { type: 'object' },
-          metadata: { type: 'object' },
-          timezone: { type: 'string' },
-        },
-      },
-    }),
+    ApiBody({ type: UpdateUserDto }),
     ApiResponse({
       status: 200,
       description: 'Cập nhật user thành công',

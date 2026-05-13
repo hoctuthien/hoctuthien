@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Status } from "./Status";
 
 const meta = {
-  title: "Shared/Status",
+  title: "Core/UI/Status",
   component: Status,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Status>;
+} as Meta<typeof Status>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

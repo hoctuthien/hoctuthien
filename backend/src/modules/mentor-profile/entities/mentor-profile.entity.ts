@@ -1,10 +1,11 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserEntity } from '../../user/entities/user.entity';
+import { MentorProfileStatus } from '../enums/mentor-profile-status.enum';
 
 @Entity({ name: 'mentor_profiles' })
 export class MentorProfileEntity extends BaseEntity {
-  @Column({ name: 'user_id', type: 'bigint', unique: true })
+  @Column({ name: 'user_id', type: 'uuid', unique: true })
   userId: string;
 
   @OneToOne(() => UserEntity, { onDelete: 'CASCADE' })
@@ -49,7 +50,7 @@ export class MentorProfileEntity extends BaseEntity {
   @Column({ name: 'is_approved', type: 'boolean', default: false })
   isApproved: boolean;
 
-  @Column({ name: 'approved_by', type: 'bigint', nullable: true })
+  @Column({ name: 'approved_by', type: 'uuid', nullable: true })
   approvedBy: string | null;
 
   @ManyToOne(() => UserEntity, { onDelete: 'SET NULL' })
@@ -59,6 +60,10 @@ export class MentorProfileEntity extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata: Record<string, any>;
 
-  @Column({ type: 'varchar', length: 50, default: 'active' })
+  @Column({
+    type: 'varchar',
+    length: 50,
+    default: MentorProfileStatus.PENDING,
+  })
   status: string;
 }

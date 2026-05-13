@@ -10,8 +10,10 @@ import {
   createUserSchema,
   updateUserSchema,
   userSchema,
+  publicUserSchema,
 } from '../schema/user.schema';
 import { CreateUserInput, UpdateUserInput } from '../types/user.types';
+import { Role } from '../../../common/enums/role.enum';
 import * as bcrypt from 'bcrypt';
 import {
   PAYMENT_SUCCESS_EVENT,
@@ -26,14 +28,14 @@ export class UserService {
 
   async findAll() {
     const users = await this.userRepository.findMany();
-    return users.map((user) => userSchema.parse(user));
+    return users.map((user) => publicUserSchema.parse(user));
   }
 
   async findOne(id: string) {
     const user = await this.userRepository.findById(id);
     if (!user)
       throw new NotFoundException('Không tìm thấy thông tin người dùng.');
-    return userSchema.parse(user);
+    return publicUserSchema.parse(user);
   }
 
   async getMe(id: string) {
@@ -49,11 +51,12 @@ export class UserService {
       );
     }
 
-    return userSchema.parse(user);
+    return publicUserSchema.parse(user);
   }
 
   async findByEmail(email: string) {
     const user = await this.userRepository.findByEmail(email);
+    // Trả về full schema (bao gồm passwordHash) vì chỉ dùng nội bộ cho auth
     return user ? userSchema.parse(user) : null;
   }
 
@@ -68,13 +71,34 @@ export class UserService {
     }
 
     const created = await this.userRepository.createAndSave(userData);
-    return userSchema.parse(created);
+    return publicUserSchema.parse(created);
   }
 
-  async update(id: string, payload: UpdateUserInput) {
+  async update(
+    id: string,
+    payload: UpdateUserInput,
+    requestingUserId: string,
+    requestingUserRole: string,
+  ) {
+    // Chỉ ADMIN hoặc chính user đó mới được cập nhật
+    if (requestingUserRole !== Role.ADMIN && requestingUserId !== id) {
+      throw new ForbiddenException(
+        'Bạn không có quyền cập nhật thông tin của người dùng khác.',
+      );
+    }
+
     const parsed = updateUserSchema.parse(payload);
+
+    // Người dùng thông thường không được tự đổi role, points, isVerified
+    if (requestingUserRole !== Role.ADMIN) {
+      delete (parsed as any).role;
+      delete (parsed as any).points;
+      delete (parsed as any).isVerified;
+      delete (parsed as any).status;
+    }
+
     const updated = await this.userRepository.updateById(id, parsed);
-    return userSchema.parse(updated);
+    return publicUserSchema.parse(updated);
   }
 
   async remove(id: string) {

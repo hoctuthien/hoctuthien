@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { UserRole } from '../entities/user.entity';
 
+// Schema nội bộ - bao gồm passwordHash, dùng trong service để xử lý logic
 export const userSchema = z.object({
   id: z.string(),
   googleId: z.string().max(255).nullable().optional(),
@@ -21,6 +22,12 @@ export const userSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable().optional(),
+});
+
+// Schema public - loại bỏ passwordHash và metadata nhạy cảm, dùng khi trả về response API
+export const publicUserSchema = userSchema.omit({
+  passwordHash: true,
+  metadata: true,
 });
 
 export const createUserSchema = z.object({
