@@ -19,7 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        "w-[340px] h-screen bg-background flex flex-col transition-all duration-300",
+        "w-[280px] h-screen bg-[#F8F9FB] flex flex-col transition-all duration-300",
         "border-r border-surface-variant",
         className
       )}
