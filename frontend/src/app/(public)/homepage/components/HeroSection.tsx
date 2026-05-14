@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { Button } from '@/core/ui/Button';
 import { Card } from '@/core/ui/Card';
 import { Icon } from '@/core/ui/Icon';
@@ -35,12 +36,14 @@ export const HeroSection = () => {
                 size="lg"
                 className="w-full sm:w-auto px-10 rounded-full shadow-lg hover:shadow-primary/30"
               />
-              <Button
-                label={tCommon('learnMore')}
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto px-10 rounded-full bg-white"
-              />
+              <Link href="/mentor/register" className="w-full sm:w-auto">
+                <Button
+                  label={t('becomeMentorButton')}
+                  variant="outline"
+                  size="lg"
+                  className="w-full px-10 rounded-full bg-white border-primary text-primary hover:bg-primary/5"
+                />
+              </Link>
             </div>
           </div>
 

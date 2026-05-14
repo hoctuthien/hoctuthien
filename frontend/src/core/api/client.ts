@@ -1,3 +1,4 @@
+import { getSession } from 'next-auth/react';
 import { createHttpClient } from './base';
 
 /**
@@ -17,7 +18,25 @@ const request = async <T>(
 ): Promise<T> => {
   try {
     const fn = (client as any)[method];
-    const args = ['post', 'patch'].includes(method) ? [dataOrOptions, options] : [dataOrOptions];
+    
+    // Lấy token từ NextAuth session thay vì cookie thủ công
+    let token = null;
+    if (typeof window !== 'undefined') {
+      const session = await getSession();
+      token = (session as any)?.accessToken;
+    }
+
+    const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+
+    const mergedOptions = {
+      ...options,
+      headers: {
+        ...options?.headers,
+        ...authHeaders,
+      },
+    };
+
+    const args = ['post', 'patch'].includes(method) ? [dataOrOptions, mergedOptions] : [mergedOptions];
     const response = await fn(path, ...args);
     return response.data;
   } catch (error: any) {

@@ -755,7 +755,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description User bấm "Tôi đã chuyển khoản" → backend query TN App API tìm giao dịch khớp → kích hoạt tài khoản. Nếu giao dịch chưa xuất hiện (activated: false), FE polling lại sau vài giây. */
+        /** @description Kiểm tra trạng thái thanh toán kích hoạt. API chỉ đọc trạng thái từ DB — Cron Job ngầm tự động đối soát với TN App mỗi phút. Nếu `activated: false`, FE polling lại sau 5–10 giây. */
         post: operations["PaymentController_verifyActivationPayment"];
         delete?: never;
         options?: never;
@@ -4188,20 +4188,6 @@ export interface operations {
             };
             /** @description Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại */
             422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Lỗi nội bộ: không tìm thấy mã giao dịch trong payment */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Không thể kết nối đến dịch vụ kiểm tra giao dịch (TN App), vui lòng thử lại sau */
-            503: {
                 headers: {
                     [name: string]: unknown;
                 };
