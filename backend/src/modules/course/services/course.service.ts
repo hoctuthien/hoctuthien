@@ -26,115 +26,97 @@ export class CourseService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll() {
-    const courses = await this.courseRepository.findMany();
-    return courses.map((course) => courseSchema.parse(course));
+  // async findAll() {
+  //   const courses = await this.courseRepository.findMany();
+  //   return courses.map((course) => courseSchema.parse(course));
+  // }
+
+  // async findOne(id: string) {
+  //   const course = await this.courseRepository.findById(id);
+  //   if (!course) throw new NotFoundException('Course not found');
+  //   return courseSchema.parse(course);
+  // }
+
+  create(payload: CreateCourseInput, mentorId: string) {
+    // 1. Tính toán thời gian kết thúc của slot mới
+    // 2. Kiểm tra xem Mentor có lịch nào bị trùng không
+    // Logic: Một lịch bị trùng nếu (Bắt đầu mới < Kết thúc cũ) VÀ (Kết thúc mới > Bắt đầu cũ)
+    // Truy cập vào trường startTime bên trong cột metadata (JSONB)
+    // 3. Nếu không trùng thì tiến hành lưu khóa học mới vào database
   }
 
-  async findOne(id: string) {
-    const course = await this.courseRepository.findById(id);
-    if (!course) throw new NotFoundException('Course not found');
-    return courseSchema.parse(course);
-  }
+  // async update(id: string, payload: UpdateCourseInput, mentorId: string) {
+  //   const { categoryIds, ...courseData } = updateCourseSchema.parse(payload);
 
-  async create(payload: CreateCourseInput, mentorId: string) {
-    const { categoryIds, ...courseData } = createCourseSchema.parse(payload);
+  //   return this.dataSource.transaction(async (manager) => {
+  //     // 1. Update Course - kiểm tra ownership
+  //     const course = await manager.findOne(CourseEntity, { where: { id } });
+  //     if (!course) throw new NotFoundException('Course not found');
 
-    return this.dataSource.transaction(async (manager) => {
-      // 1. Create Course
-      const course = manager.create(CourseEntity, {
-        ...courseData,
-        mentorId,
-      });
-      const savedCourse = await manager.save(CourseEntity, course);
+  //     if (course.mentorId !== mentorId) {
+  //       throw new ForbiddenException(
+  //         'Bạn không có quyền cập nhật khóa học của người khác.',
+  //       );
+  //     }
 
-      // 2. Create Course Category associations if provided
-      if (categoryIds && categoryIds.length > 0) {
-        const courseCategories = categoryIds.map((categoryId) =>
-          manager.create(CourseCategoryEntity, {
-            courseId: savedCourse.id,
-            categoryId,
-          }),
-        );
-        await manager.save(CourseCategoryEntity, courseCategories);
-      }
+  //     Object.assign(course, courseData);
+  //     const updatedCourse = await manager.save(CourseEntity, course);
 
-      return courseSchema.parse(savedCourse);
-    });
-  }
+  //     // 2. Update Course Category associations if provided
+  //     if (categoryIds) {
+  //       // Soft delete tất cả liên kết cũ
+  //       await manager.softDelete(CourseCategoryEntity, { courseId: id });
 
-  async update(id: string, payload: UpdateCourseInput, mentorId: string) {
-    const { categoryIds, ...courseData } = updateCourseSchema.parse(payload);
+  //       // Tạo mới hoặc restore nếu liên kết đã từng tồn tại (soft-deleted)
+  //       if (categoryIds.length > 0) {
+  //         for (const categoryId of categoryIds) {
+  //           const existing = await manager.findOne(CourseCategoryEntity, {
+  //             where: { courseId: id, categoryId },
+  //             withDeleted: true,
+  //           });
 
-    return this.dataSource.transaction(async (manager) => {
-      // 1. Update Course - kiểm tra ownership
-      const course = await manager.findOne(CourseEntity, { where: { id } });
-      if (!course) throw new NotFoundException('Course not found');
+  //           if (existing) {
+  //             // Restore record đã soft-delete thay vì insert mới (tránh unique constraint)
+  //             await manager.restore(CourseCategoryEntity, existing.id);
+  //           } else {
+  //             const link = manager.create(CourseCategoryEntity, {
+  //               courseId: id,
+  //               categoryId,
+  //             });
+  //             await manager.save(CourseCategoryEntity, link);
+  //           }
+  //         }
+  //       }
+  //     }
 
-      if (course.mentorId !== mentorId) {
-        throw new ForbiddenException(
-          'Bạn không có quyền cập nhật khóa học của người khác.',
-        );
-      }
+  //     return courseSchema.parse(updatedCourse);
+  //   });
+  // }
 
-      Object.assign(course, courseData);
-      const updatedCourse = await manager.save(CourseEntity, course);
+  // async approve(id: string, payload: ApproveCourseInput) {
+  //   const parsed = approveCourseSchema.parse(payload);
 
-      // 2. Update Course Category associations if provided
-      if (categoryIds) {
-        // Soft delete tất cả liên kết cũ
-        await manager.softDelete(CourseCategoryEntity, { courseId: id });
+  //   const course = await this.courseRepository.findById(id);
+  //   if (!course) throw new NotFoundException('Course not found');
 
-        // Tạo mới hoặc restore nếu liên kết đã từng tồn tại (soft-deleted)
-        if (categoryIds.length > 0) {
-          for (const categoryId of categoryIds) {
-            const existing = await manager.findOne(CourseCategoryEntity, {
-              where: { courseId: id, categoryId },
-              withDeleted: true,
-            });
+  //   const updated = await this.courseRepository.updateById(id, {
+  //     approvedBy: parsed.approvedBy,
+  //     status: parsed.status,
+  //   });
 
-            if (existing) {
-              // Restore record đã soft-delete thay vì insert mới (tránh unique constraint)
-              await manager.restore(CourseCategoryEntity, existing.id);
-            } else {
-              const link = manager.create(CourseCategoryEntity, {
-                courseId: id,
-                categoryId,
-              });
-              await manager.save(CourseCategoryEntity, link);
-            }
-          }
-        }
-      }
+  //   return courseSchema.parse(updated);
+  // }
 
-      return courseSchema.parse(updatedCourse);
-    });
-  }
+  // async remove(id: string, mentorId: string) {
+  //   const course = await this.courseRepository.findById(id);
+  //   if (!course) throw new NotFoundException('Course not found');
 
-  async approve(id: string, payload: ApproveCourseInput) {
-    const parsed = approveCourseSchema.parse(payload);
+  //   if (course.mentorId !== mentorId) {
+  //     throw new ForbiddenException(
+  //       'Bạn không có quyền xóa khóa học của người khác.',
+  //     );
+  //   }
 
-    const course = await this.courseRepository.findById(id);
-    if (!course) throw new NotFoundException('Course not found');
-
-    const updated = await this.courseRepository.updateById(id, {
-      approvedBy: parsed.approvedBy,
-      status: parsed.status,
-    });
-
-    return courseSchema.parse(updated);
-  }
-
-  async remove(id: string, mentorId: string) {
-    const course = await this.courseRepository.findById(id);
-    if (!course) throw new NotFoundException('Course not found');
-
-    if (course.mentorId !== mentorId) {
-      throw new ForbiddenException(
-        'Bạn không có quyền xóa khóa học của người khác.',
-      );
-    }
-
-    await this.courseRepository.softDeleteById(id);
-  }
+  //   await this.courseRepository.softDeleteById(id);
+  // }
 }

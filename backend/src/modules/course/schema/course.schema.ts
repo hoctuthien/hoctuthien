@@ -29,6 +29,7 @@ export const createCourseSchema = z.object({
   repeatCount: z.number().optional(),
   metadata: z.record(z.string(), z.any()).optional(),
   status: z.nativeEnum(CourseStatus).optional(),
+  categoryIds: z.array(z.string()).optional(),
 });
 
 // Schema cho Mentor cập nhật khóa học - không cho phép tự set approvedBy

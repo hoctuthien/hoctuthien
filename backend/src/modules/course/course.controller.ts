@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { CourseService } from './services/course.service';
 import {
@@ -22,12 +23,15 @@ import { User } from '../../common/decorators/user.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import {
   ApiCreateCourseDoc,
-  ApiFindAllCoursesDoc,
-  ApiFindOneCourseDoc,
-  ApiRemoveCourseDoc,
-  ApiUpdateCourseDoc,
-  ApiApproveCourseDoc,
+  // ApiFindAllCoursesDoc,
+  // ApiFindOneCourseDoc,
+  // ApiRemoveCourseDoc,
+  // ApiUpdateCourseDoc,
+  // ApiApproveCourseDoc,
 } from './swagger/course.swagger';
+import { create } from 'node_modules/axios/index.cjs';
+import { createCourseSchema } from './schema/course.schema';
+import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
 @ApiTags('courses')
 @Controller('courses')
@@ -38,53 +42,57 @@ export class CourseController {
   @ApiCreateCourseDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTOR)
-  create(@Body() payload: CreateCourseInput, @User('id') mentorId: string) {
-    return this.courseService.create(payload, mentorId);
-  }
-
-  @Get()
-  @ApiFindAllCoursesDoc()
-  @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.courseService.findAll();
-  }
-
-  @Get(':id')
-  @ApiFindOneCourseDoc()
-  @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.courseService.findOne(id);
-  }
-
-  @Patch(':id')
-  @ApiUpdateCourseDoc()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.MENTOR)
-  update(
-    @Param('id') id: string,
-    @Body() payload: UpdateCourseInput,
+  @UsePipes(new ZodValidationPipe(createCourseSchema))
+  async create(
+    @Body() payload: CreateCourseInput,
     @User('id') mentorId: string,
   ) {
-    return this.courseService.update(id, payload, mentorId);
+    return await this.courseService.create(payload, mentorId);
   }
 
-  @Patch(':id/approve')
-  @ApiApproveCourseDoc()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  approve(
-    @Param('id') id: string,
-    @Body() payload: ApproveCourseInput,
-    @User('id') adminId: string,
-  ) {
-    return this.courseService.approve(id, { ...payload, approvedBy: adminId });
-  }
+  // @Get()
+  // @ApiFindAllCoursesDoc()
+  // @UseGuards(JwtAuthGuard)
+  // findAll() {
+  //   return this.courseService.findAll();
+  // }
 
-  @Delete(':id')
-  @ApiRemoveCourseDoc()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.MENTOR)
-  remove(@Param('id') id: string, @User('id') mentorId: string) {
-    return this.courseService.remove(id, mentorId);
-  }
+  // @Get(':id')
+  // @ApiFindOneCourseDoc()
+  // @UseGuards(JwtAuthGuard)
+  // findOne(@Param('id') id: string) {
+  //   return this.courseService.findOne(id);
+  // }
+
+  // @Patch(':id')
+  // @ApiUpdateCourseDoc()
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.MENTOR)
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() payload: UpdateCourseInput,
+  //   @User('id') mentorId: string,
+  // ) {
+  //   return this.courseService.update(id, payload, mentorId);
+  // }
+
+  // @Patch(':id/approve')
+  // @ApiApproveCourseDoc()
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.ADMIN)
+  // approve(
+  //   @Param('id') id: string,
+  //   @Body() payload: ApproveCourseInput,
+  //   @User('id') adminId: string,
+  // ) {
+  //   return this.courseService.approve(id, { ...payload, approvedBy: adminId });
+  // }
+
+  // @Delete(':id')
+  // @ApiRemoveCourseDoc()
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.MENTOR)
+  // remove(@Param('id') id: string, @User('id') mentorId: string) {
+  //   return this.courseService.remove(id, mentorId);
+  // }
 }
