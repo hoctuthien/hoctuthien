@@ -170,8 +170,11 @@
     "goBack": "Quay lại",
     "nextStep": "Tiếp theo",
     "completeProfile": "Hoàn tất hồ sơ",
+    "successTitle": "Chúc mừng!",
     "successMessage": "Đơn đăng ký của bạn đã được gửi thành công! Vui lòng chờ quản trị viên phê duyệt.",
     "errorMessage": "Đã có lỗi xảy ra, vui lòng thử lại sau.",
+    "backToHome": "Về trang chủ",
+    "close": "Đóng",
 
     "jobTitle": "Chức danh công việc",
     "jobTitlePlaceholder": "VD: Senior Software Engineer",

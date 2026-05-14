@@ -4,12 +4,14 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getMentorRegisterSchema, MentorRegisterValues } from "./mentor-register.schema";
-import { Button, Icon } from "@/core/ui";
+import { Button, Icon, Toast } from "@/core/ui";
 import { cn } from "@/core/utils/cn";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { mentorGateway } from "@/core/gateway";
 import { useTranslations } from "next-intl";
+import { ConfirmModal, Modal } from "@/shared/components";
+import { HiCheckCircle, HiXCircle } from "react-icons/hi2";
 
 const Step1ProfessionalDetails = dynamic(() => import("./components").then(mod => mod.Step1ProfessionalDetails));
 const Step2ExpertiseBio = dynamic(() => import("./components").then(mod => mod.Step2ExpertiseBio));
@@ -18,6 +20,9 @@ const Step3Credentials = dynamic(() => import("./components").then(mod => mod.St
 export default function MentorRegisterClient() {
   const t = useTranslations("MentorRegister");
   const [currentStep, setCurrentStep] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
   const STEPS = [
@@ -48,12 +53,13 @@ export default function MentorRegisterClient() {
     try {
       console.log("Submitting Mentor Application:", data);
       await mentorGateway.createMentorAvailability(data);
-      alert(t("successMessage"));
-      router.push("/");
+      setShowSuccessModal(true);
     } catch (error: any) {
       console.error("Failed to submit application:", error);
-      const errorMessage = error?.response?.data?.error?.message || t("errorMessage");
-      alert(errorMessage);
+      const msg = error?.response?.data?.error?.message || t("errorMessage");
+      setErrorMessage(msg);
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 5000);
     }
   };
 
@@ -214,6 +220,70 @@ export default function MentorRegisterClient() {
         </div>
 
       </div>
+
+      {/* Success Modal */}
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          router.push("/");
+        }}
+        showCloseButton={false}
+        containerClassName="max-w-[500px]"
+      >
+        <div className="relative p-10 flex flex-col items-center text-center overflow-hidden">
+          {/* Decorative Background Elements */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10" />
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-green-500/5 rounded-full blur-2xl -z-10" />
+
+          {/* Animated Success Icon */}
+          <div className="relative mb-8">
+            <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping duration-[2000ms]" />
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-xl shadow-green-200 ring-8 ring-green-50">
+              <HiCheckCircle className="text-white" size={48} />
+            </div>
+          </div>
+
+          {/* Text Content */}
+          <h3 className="mb-4 text-4xl font-black tracking-tight text-[#181C20] bg-clip-text text-transparent bg-gradient-to-r from-[#181C20] to-[#414754]">
+            {t("successTitle") || "Chúc mừng!"}
+          </h3>
+          
+          <p className="mb-10 text-lg text-[#727785] leading-relaxed max-w-[340px]">
+            {t("successMessage")}
+          </p>
+
+          {/* Action Button */}
+          <Button
+            label={t("backToHome") || "Về trang chủ"}
+            fullWidth
+            onClick={() => {
+              setShowSuccessModal(false);
+              router.push("/");
+            }}
+            className="h-[60px] rounded-2xl text-lg font-bold shadow-2xl shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            iconRight={<Icon name="ArrowRight" size={20} />}
+          />
+          
+          <button 
+            onClick={() => setShowSuccessModal(false)}
+            className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            {t("close") || "Đóng"}
+          </button>
+        </div>
+      </Modal>
+
+      {/* Error Toast */}
+      {showErrorToast && (
+        <div className="fixed bottom-10 right-10 z-[100] animate-in slide-in-from-right-10 duration-500">
+          <Toast
+            message={errorMessage}
+            icon={<HiXCircle className="text-red-500" size={20} />}
+            onClose={() => setShowErrorToast(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }
