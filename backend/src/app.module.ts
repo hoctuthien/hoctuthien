@@ -24,6 +24,8 @@ import { ConversationModule } from './modules/conversation/conversation.module';
 import { MessageModule } from './modules/message/message.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { MediaModule } from './modules/media/media.module';
+import { PostModule } from './modules/post/post.module';
+import { TagModule } from './modules/tag/tag.module';
 import { TraceIdMiddleware } from './common/middlewares/trace-id.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -57,6 +59,8 @@ import { AppService } from './app.service';
     MessageModule,
     NotificationModule,
     MediaModule,
+    PostModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],
