@@ -50,7 +50,7 @@ export default function AdminPostsPage() {
           <Button 
             label="Create New Post" 
             variant="primary" 
-            icon={<Icon name="Plus" size={18} />}
+            iconLeft={<Icon name="Plus" size={18} />}
             className="!rounded-xl shadow-lg shadow-primary/20"
           />
         </Link>
@@ -67,8 +67,8 @@ export default function AdminPostsPage() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <Button label="Filter" variant="secondary" icon={<Icon name="Filter" size={16} />} className="!py-2 !px-4 !rounded-lg text-xs" />
-            <Button label="Export" variant="secondary" icon={<Icon name="Download" size={16} />} className="!py-2 !px-4 !rounded-lg text-xs" />
+            <Button label="Filter" variant="secondary" iconLeft={<Icon name="Filter" size={16} />} className="!py-2 !px-4 !rounded-lg text-xs" />
+            <Button label="Export" variant="secondary" iconLeft={<Icon name="Download" size={16} />} className="!py-2 !px-4 !rounded-lg text-xs" />
           </div>
         </div>
 
@@ -113,19 +113,20 @@ export default function AdminPostsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <Badge 
-                      label={post.status.toUpperCase()} 
                       variant={post.status === 'published' ? 'success' : 'warning'} 
                       className="!rounded-lg !px-3 !py-1 text-[10px]"
-                    />
+                    >
+                      {post.status.toUpperCase()}
+                    </Badge>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {post.createdAt}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" icon={<Icon name="Pencil" size={16} />} className="!p-2 text-slate-400 hover:text-primary" />
-                      <Button variant="ghost" icon={<Icon name="Trash2" size={16} />} className="!p-2 text-slate-400 hover:text-red-500" />
-                      <Button variant="ghost" icon={<Icon name="MoreVertical" size={16} />} className="!p-2 text-slate-400" />
+                      <Button variant="text" label={<Icon name="Pencil" size={16} />} className="!p-2 text-slate-400 hover:text-primary" />
+                      <Button variant="text" label={<Icon name="Trash2" size={16} />} className="!p-2 text-slate-400 hover:text-red-500" />
+                      <Button variant="text" label={<Icon name="MoreVertical" size={16} />} className="!p-2 text-slate-400" />
                     </div>
                   </td>
                 </tr>
@@ -137,9 +138,9 @@ export default function AdminPostsPage() {
         <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30">
           <p className="text-xs text-slate-500">Showing 1 to 3 of 3 entries</p>
           <div className="flex items-center gap-1">
-            <Button variant="secondary" icon={<Icon name="ChevronLeft" size={14} />} className="!p-2 !rounded-lg" disabled />
+            <Button variant="secondary" label={<Icon name="ChevronLeft" size={14} />} className="!p-2 !rounded-lg" disabled />
             <button className="w-8 h-8 rounded-lg bg-primary text-white text-xs font-bold shadow-md shadow-primary/20">1</button>
-            <Button variant="secondary" icon={<Icon name="ChevronRight" size={14} />} className="!p-2 !rounded-lg" disabled />
+            <Button variant="secondary" label={<Icon name="ChevronRight" size={14} />} className="!p-2 !rounded-lg" disabled />
           </div>
         </div>
       </div>

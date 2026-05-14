@@ -27,7 +27,7 @@ export default function AdminMediaPage() {
         <Button 
           label="Upload New" 
           variant="primary" 
-          icon={<Icon name="Upload" size={18} />}
+          iconLeft={<Icon name="Upload" size={18} />}
           className="!rounded-xl shadow-lg shadow-primary/20"
         />
       </div>
@@ -130,13 +130,12 @@ export default function AdminMediaPage() {
                     <Button 
                       label="Copy Link" 
                       variant="secondary" 
-                      icon={<Icon name="Copy" size={14} />}
+                      iconLeft={<Icon name="Copy" size={14} />}
                       className="flex-1 !py-2.5 !text-xs !rounded-xl"
                     />
                     <Button 
-                      label="Delete" 
-                      variant="ghost" 
-                      icon={<Icon name="Trash2" size={14} />}
+                      label={<Icon name="Trash2" size={14} />} 
+                      variant="text" 
                       className="!p-2.5 !text-red-500 hover:bg-red-50 !rounded-xl"
                     />
                   </div>

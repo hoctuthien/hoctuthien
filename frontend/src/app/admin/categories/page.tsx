@@ -117,8 +117,8 @@ export default function AdminCategoriesPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" icon={<Icon name="Pencil" size={16} />} className="!p-2 text-slate-400 hover:text-primary" />
-                          <Button variant="ghost" icon={<Icon name="Trash2" size={16} />} className="!p-2 text-slate-400 hover:text-red-500" />
+                          <Button variant="text" label={<Icon name="Pencil" size={16} />} className="!p-2 text-slate-400 hover:text-primary" />
+                          <Button variant="text" label={<Icon name="Trash2" size={16} />} className="!p-2 text-slate-400 hover:text-red-500" />
                         </div>
                       </td>
                     </tr>
