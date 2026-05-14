@@ -6,8 +6,13 @@ export default auth((req) => {
   const isLoggedIn = !!session;
   
   // 1. Định nghĩa các nhóm route
-  const isProtectedRoute = nextUrl.pathname.startsWith("/profile") || nextUrl.pathname.startsWith("/dashboard");
+  const isProtectedRoute = 
+    nextUrl.pathname.startsWith("/profile") || 
+    nextUrl.pathname.startsWith("/dashboard") || 
+    nextUrl.pathname.startsWith("/admin");
+    
   const isAuthRoute = nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/register");
+  const isAdminRoute = nextUrl.pathname.startsWith("/admin");
 
   // 2. Xử lý lỗi Refresh Token: Đá về trang login và xóa sạch session
   if (session?.error === "RefreshAccessTokenError") {
@@ -29,8 +34,13 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", nextUrl));
   }
 
-  if (isAuthRoute && isLoggedIn) {
+  if (isAdminRoute && session?.user?.role !== "admin") {
     return NextResponse.redirect(new URL("/", nextUrl));
+  }
+
+  if (isAuthRoute && isLoggedIn) {
+    const redirectUrl = session?.user?.role === "admin" ? "/admin/dashboard" : "/";
+    return NextResponse.redirect(new URL(redirectUrl, nextUrl));
   }
 
   return NextResponse.next();

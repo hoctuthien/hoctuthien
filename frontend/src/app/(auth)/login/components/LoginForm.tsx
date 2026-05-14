@@ -69,7 +69,12 @@ export function LoginForm() {
       if (!result || result.error) {
         setGeneralError(tError("invalidCredentials"));
       } else if (result.ok) {
-        router.push("/");
+        // Lấy session mới nhất để check role
+        const res = await fetch("/api/auth/session");
+        const session = await res.json();
+        
+        const redirectUrl = session?.user?.role === "admin" ? "/admin/dashboard" : "/";
+        router.push(redirectUrl);
         router.refresh();
       }
     } catch (error: any) {
@@ -83,7 +88,8 @@ export function LoginForm() {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      await signIn("google", { callbackUrl: "/" });
+      // Với Google, chúng ta để Middleware xử lý redirect dựa trên role ở trang callback
+      await signIn("google", { callbackUrl: "/admin/dashboard" });
     } catch (error) {
       console.error("Google login failed:", error);
     } finally {

@@ -12,5 +12,6 @@ export * from './Selection';
 export * from './Skeleton';
 export * from './Status';
 export * from './Steps';
+export * from './Card';
 export * from './Feedback';
 

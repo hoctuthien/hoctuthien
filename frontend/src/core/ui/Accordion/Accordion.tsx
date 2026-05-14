@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 import { cn } from '@/core/utils/cn';

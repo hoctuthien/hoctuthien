@@ -231,5 +231,51 @@
       "degreeNameRequired": "Tên bằng cấp là bắt buộc",
       "degreeImageRequired": "Ảnh bằng cấp là bắt buộc"
     }
+  },
+  "Admin": {
+    "dashboard": {
+      "title": "Tổng quan hệ thống",
+      "subtitle": "Chào mừng trở lại! Đây là những gì đang diễn ra trên nền tảng hôm nay.",
+      "totalUsers": "Người dùng",
+      "pendingMentors": "Đơn chờ duyệt",
+      "activeCourses": "Khóa học",
+      "totalDonations": "Tổng quyên góp",
+      "analytics": "Phân tích tăng trưởng",
+      "recentActivities": "Hoạt động gần đây"
+    },
+    "mentors": {
+      "title": "Quản lý Mentor",
+      "subtitle": "Xem xét và quản lý các đơn đăng ký trở thành cố vấn từ các chuyên gia.",
+      "tableTitle": "Danh sách đơn đăng ký",
+      "applicant": "Ứng viên",
+      "professional": "Chuyên môn",
+      "appliedDate": "Ngày đăng ký",
+      "status": "Trạng thái",
+      "filter": "Bộ lọc",
+      "export": "Xuất file",
+      "viewDetails": "Xem chi tiết",
+      "approve": "Phê duyệt",
+      "reject": "Từ chối"
+    },
+    "sidebar": {
+      "main": "Chính",
+      "content": "Nội dung",
+      "system": "Hệ thống",
+      "dashboard": "Bảng điều khiển",
+      "users": "Người dùng",
+      "mentors": "Cố vấn",
+      "courses": "Khóa học",
+      "categories": "Danh mục",
+      "settings": "Cài đặt",
+      "logs": "Nhật ký hệ thống"
+    },
+    "header": {
+      "admin": "Admin",
+      "dashboard": "Bảng điều khiển",
+      "mentors": "Cố vấn",
+      "profile": "Hồ sơ của tôi",
+      "settings": "Cài đặt hệ thống",
+      "signOut": "Đăng xuất"
+    }
   }
 }

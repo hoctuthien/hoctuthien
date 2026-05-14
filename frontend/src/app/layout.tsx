@@ -59,6 +59,8 @@ export const metadata: Metadata = {
  *   3. NextIntlClientProvider → truyền messages xuống Client Components
  *   4. Providers → QueryClientProvider (React Query)
  */
+import { auth } from "@/auth";
+
 export default async function RootLayout({
   children,
 }: {
@@ -66,6 +68,7 @@ export default async function RootLayout({
 }) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const session = await auth();
 
   return (
     <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning>
@@ -75,7 +78,7 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <Providers>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider session={session}>{children}</AuthProvider>
           </Providers>
         </NextIntlClientProvider>
       </body>
