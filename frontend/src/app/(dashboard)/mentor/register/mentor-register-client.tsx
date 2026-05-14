@@ -135,8 +135,8 @@ export default function MentorRegisterClient() {
         </div>
 
         {/* Right Side: Form */}
-        <div className="lg:col-span-7 h-fit">
-          <div className="bg-white rounded-[24px] md:rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-50 p-6 md:p-8 lg:p-12 h-fit">
+        <div className="lg:col-span-7 h-full">
+          <div className="bg-white rounded-[24px] md:rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-50 p-6 md:p-8 lg:p-12 min-h-[600px] lg:min-h-[720px] flex flex-col transition-all duration-500">
             
             {/* Horizontal Steps Header */}
             <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
@@ -164,20 +164,22 @@ export default function MentorRegisterClient() {
               ))}
             </div>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {currentStep === 0 && (
-                <Step1ProfessionalDetails form={form} />
-              )}
-              
-              {currentStep === 1 && (
-                <Step2ExpertiseBio form={form} />
-              )}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col">
+              <div className="flex-1">
+                {currentStep === 0 && (
+                  <Step1ProfessionalDetails form={form} />
+                )}
+                
+                {currentStep === 1 && (
+                  <Step2ExpertiseBio form={form} />
+                )}
 
-              {currentStep === 2 && (
-                <Step3Credentials form={form} />
-              )}
+                {currentStep === 2 && (
+                  <Step3Credentials form={form} />
+                )}
+              </div>
 
-              <div className="flex items-center justify-between pt-8 border-t border-slate-100">
+              <div className="flex items-center justify-between pt-8 border-t border-slate-100 mt-10">
                 <button
                   type="button"
                   onClick={currentStep === 0 ? () => router.back() : prevStep}
