@@ -82,8 +82,8 @@ export default function MentorRegisterClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F9FB] pt-10 pb-20 px-4">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+    <div className="min-h-screen bg-[#F7F9FB] flex items-center justify-center py-10 md:py-20 px-4">
+      <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center lg:items-start">
         
         {/* Left Side: Info & Progress */}
         <div className="lg:col-span-5 flex flex-col gap-8">
@@ -135,30 +135,30 @@ export default function MentorRegisterClient() {
         </div>
 
         {/* Right Side: Form */}
-        <div className="lg:col-span-7">
-          <div className="bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-50 p-8 lg:p-12">
+        <div className="lg:col-span-7 h-fit">
+          <div className="bg-white rounded-[24px] md:rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-50 p-6 md:p-8 lg:p-12 h-fit">
             
             {/* Horizontal Steps Header */}
-            <div className="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
               {STEPS.map((step, idx) => (
                 <React.Fragment key={idx}>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3 flex-1 px-1">
                     <div className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all duration-300",
+                      "w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all duration-300 flex-shrink-0",
                       currentStep === idx ? "bg-primary text-white shadow-lg shadow-primary/20" : 
                       currentStep > idx ? "bg-green-500 text-white" : "bg-slate-100 text-slate-400"
                     )}>
-                      {currentStep > idx ? <Icon name="Check" size={16} /> : idx + 1}
+                      {currentStep > idx ? <Icon name="Check" size={14} /> : idx + 1}
                     </div>
                     <span className={cn(
-                      "text-sm font-semibold transition-colors",
+                      "text-[10px] sm:text-sm font-semibold transition-colors text-center sm:text-left leading-tight line-clamp-2 sm:line-clamp-none",
                       currentStep === idx ? "text-primary" : "text-slate-400"
                     )}>
                       {step.title}
                     </span>
                   </div>
                   {idx < STEPS.length - 1 && (
-                    <div className="h-[2px] w-8 bg-slate-100 mx-2" />
+                    <div className="hidden md:block h-[2px] w-4 lg:w-8 bg-slate-100 mx-1 flex-shrink-0" />
                   )}
                 </React.Fragment>
               ))}
