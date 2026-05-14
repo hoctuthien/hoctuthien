@@ -33,9 +33,8 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw {
+        ...errorData,
         status: response.status,
-        message: errorData.message || 'API Request failed',
-        data: errorData,
       };
     }
 

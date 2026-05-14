@@ -56,7 +56,7 @@ export default function MentorRegisterClient() {
       setShowSuccessModal(true);
     } catch (error: any) {
       console.error("Failed to submit application:", error);
-      const msg = error?.response?.data?.error?.message || t("errorMessage");
+      const msg = error.error?.details?.message || error.error?.message || t("errorMessage");
       setErrorMessage(msg);
       setShowErrorToast(true);
       setTimeout(() => setShowErrorToast(false), 5000);
