@@ -26,8 +26,15 @@ export async function uploadFileAction(formData: FormData, folder?: string) {
   });
 
   if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to upload file");
+    const errorText = await res.text();
+    let errorJson = {};
+    try {
+      errorJson = JSON.parse(errorText);
+    } catch (e) {}
+    
+    console.error("Upload failed with status:", res.status, errorText);
+    const backendMessage = (errorJson as any)?.error?.message || (errorJson as any)?.message;
+    throw new Error(backendMessage || `Failed to upload file (Status ${res.status})`);
   }
 
   const result = await res.json();

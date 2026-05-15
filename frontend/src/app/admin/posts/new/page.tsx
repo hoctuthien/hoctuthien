@@ -12,6 +12,7 @@ import {
   createCategoryAction,
   createTagAction,
 } from "../actions/posts";
+import { uploadFileAction } from "../actions/upload";
 import { useRouter } from "next/navigation";
 
 const BlockEditor = dynamic(() => import("../components/BlockEditor"), {
@@ -25,7 +26,10 @@ export default function AdminEditorPage() {
   const [content, setContent] = useState<any[]>([]);
   const [categoryId, setCategoryId] = useState("");
   const [summary, setSummary] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Data from Backend
   const [categories, setCategories] = useState<any[]>([]);
@@ -90,6 +94,25 @@ export default function AdminEditorPage() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingImage(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      const url = await uploadFileAction(formData, "posts/thumbnails");
+      setThumbnail(url);
+    } catch (error: any) {
+      console.error("Failed to upload image:", error);
+      alert(error.message || "Failed to upload image. Please check format or size.");
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const handleSave = async (newStatus: string) => {
     if (!title) {
       alert("Please enter a title");
@@ -103,6 +126,7 @@ export default function AdminEditorPage() {
         status: newStatus,
         content,
         summary: summary || null,
+        metadata: { thumbnail: thumbnail || null },
       };
       if (categoryId) payload.categoryId = categoryId;
 
@@ -250,9 +274,37 @@ export default function AdminEditorPage() {
                 {/* Featured Image */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-700">Featured Image</label>
-                  <div className="aspect-video rounded-xl bg-slate-200 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 group cursor-pointer hover:bg-slate-100 transition-colors shadow-sm">
-                    <Icon name="Upload" size={24} className="text-slate-400 group-hover:text-primary transition-colors" />
-                    <span className="text-[10px] font-bold text-slate-400 group-hover:text-primary uppercase tracking-wider">Set Image</span>
+                  <input 
+                    type="file" 
+                    accept="image/png, image/jpeg, image/webp, image/avif" 
+                    className="hidden" 
+                    ref={fileInputRef}
+                    onChange={handleImageUpload} 
+                  />
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 group cursor-pointer transition-all shadow-sm overflow-hidden relative ${
+                      thumbnail 
+                        ? 'border-primary/30 bg-slate-50' 
+                        : 'border-slate-300 bg-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {thumbnail ? (
+                      <>
+                        <img src={thumbnail} alt="Featured" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                          <Icon name="Upload" size={24} className="mb-2" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Change Image</span>
+                        </div>
+                      </>
+                    ) : isUploadingImage ? (
+                      <span className="text-xs font-bold text-slate-500">Uploading...</span>
+                    ) : (
+                      <>
+                        <Icon name="Upload" size={24} className="text-slate-400 group-hover:text-primary transition-colors" />
+                        <span className="text-[10px] font-bold text-slate-400 group-hover:text-primary uppercase tracking-wider">Set Image</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
