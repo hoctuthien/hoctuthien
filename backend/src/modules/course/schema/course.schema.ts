@@ -24,9 +24,6 @@ export const createCourseSchema = z.object({
   durationMinutes: z.number().min(15).optional(),
 
   // Logic Lịch Dạy (Slot) được bổ sung:
-  startTime: z.string().datetime(), // Bắt FE phải gửi giờ bắt đầu slot
-  isRecurring: z.boolean().optional().default(false),
-  repeatCount: z.number().optional(),
   metadata: z.record(z.string(), z.any()).optional(),
   status: z.nativeEnum(CourseStatus).optional(),
   categoryIds: z.array(z.string()).optional(),

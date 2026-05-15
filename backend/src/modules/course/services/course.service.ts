@@ -2,14 +2,9 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CourseRepository } from '../repositories/course.repository';
-import {
-  createCourseSchema,
-  updateCourseSchema,
-  approveCourseSchema,
-  courseSchema,
-} from '../schema/course.schema';
 import {
   CreateCourseInput,
   UpdateCourseInput,
@@ -18,6 +13,15 @@ import {
 import { DataSource } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { CourseCategoryEntity } from '../../course-category/entities/course-category.entity';
+import { MentorProfileEntity } from '../../mentor-profile/entities/mentor-profile.entity';
+import { SystemConfigEntity } from '../../system-config/entities/system-config.entity';
+import { CourseStatus } from '../enums/course-status.enum';
+import { COURSE_MESSAGES } from '../../../common/constants/message.constant';
+import {
+  approveCourseSchema,
+  courseSchema,
+  updateCourseSchema,
+} from '../schema/course.schema';
 
 @Injectable()
 export class CourseService {
@@ -26,97 +30,166 @@ export class CourseService {
     private readonly dataSource: DataSource,
   ) {}
 
-  // async findAll() {
-  //   const courses = await this.courseRepository.findMany();
-  //   return courses.map((course) => courseSchema.parse(course));
-  // }
-
-  // async findOne(id: string) {
-  //   const course = await this.courseRepository.findById(id);
-  //   if (!course) throw new NotFoundException('Course not found');
-  //   return courseSchema.parse(course);
-  // }
-
-  create(payload: CreateCourseInput, mentorId: string) {
-    // 1. Tính toán thời gian kết thúc của slot mới
-    // 2. Kiểm tra xem Mentor có lịch nào bị trùng không
-    // Logic: Một lịch bị trùng nếu (Bắt đầu mới < Kết thúc cũ) VÀ (Kết thúc mới > Bắt đầu cũ)
-    // Truy cập vào trường startTime bên trong cột metadata (JSONB)
-    // 3. Nếu không trùng thì tiến hành lưu khóa học mới vào database
+  async findAll() {
+    const courses = await this.courseRepository.findMany();
+    return courses.map((course) => courseSchema.parse(course));
   }
 
-  // async update(id: string, payload: UpdateCourseInput, mentorId: string) {
-  //   const { categoryIds, ...courseData } = updateCourseSchema.parse(payload);
+  async findOne(id: string) {
+    const course = await this.courseRepository.findById(id);
+    if (!course) throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
+    return courseSchema.parse(course);
+  }
 
-  //   return this.dataSource.transaction(async (manager) => {
-  //     // 1. Update Course - kiểm tra ownership
-  //     const course = await manager.findOne(CourseEntity, { where: { id } });
-  //     if (!course) throw new NotFoundException('Course not found');
+  async create(payload: CreateCourseInput, mentorId: string) {
+    const { durationMinutes, categoryIds, ...courseData } = payload;
+    const duration = durationMinutes || 60;
 
-  //     if (course.mentorId !== mentorId) {
-  //       throw new ForbiddenException(
-  //         'Bạn không có quyền cập nhật khóa học của người khác.',
-  //       );
-  //     }
+    return this.dataSource.transaction(async (manager) => {
+      // 1. Kiểm tra Mentor đã có profile approved chưa
+      const mentorProfile = await manager.findOne(MentorProfileEntity, {
+        where: { userId: mentorId },
+      });
 
-  //     Object.assign(course, courseData);
-  //     const updatedCourse = await manager.save(CourseEntity, course);
+      if (!mentorProfile || !mentorProfile.isApproved) {
+        throw new ForbiddenException(COURSE_MESSAGES.INVALID_MENTOR_PROFILE);
+      }
 
-  //     // 2. Update Course Category associations if provided
-  //     if (categoryIds) {
-  //       // Soft delete tất cả liên kết cũ
-  //       await manager.softDelete(CourseCategoryEntity, { courseId: id });
+      // 2. Validate duration_minutes trong system_config whitelist
+      const config = await manager.findOne(SystemConfigEntity, {
+        where: { configKey: 'course_duration_whitelist' },
+      });
+      if (config && Array.isArray(config.configValue)) {
+        if (!config.configValue.includes(duration)) {
+          throw new BadRequestException(COURSE_MESSAGES.INVALID_DURATION);
+        }
+      }
 
-  //       // Tạo mới hoặc restore nếu liên kết đã từng tồn tại (soft-deleted)
-  //       if (categoryIds.length > 0) {
-  //         for (const categoryId of categoryIds) {
-  //           const existing = await manager.findOne(CourseCategoryEntity, {
-  //             where: { courseId: id, categoryId },
-  //             withDeleted: true,
-  //           });
+      // 3. Tạo khóa học (status mặc định = ACTIVE)
+      const newCourse = manager.create(CourseEntity, {
+        ...courseData,
+        durationMinutes: duration,
+        mentorId,
+        status: CourseStatus.ACTIVE,
+      });
 
-  //           if (existing) {
-  //             // Restore record đã soft-delete thay vì insert mới (tránh unique constraint)
-  //             await manager.restore(CourseCategoryEntity, existing.id);
-  //           } else {
-  //             const link = manager.create(CourseCategoryEntity, {
-  //               courseId: id,
-  //               categoryId,
-  //             });
-  //             await manager.save(CourseCategoryEntity, link);
-  //           }
-  //         }
-  //       }
-  //     }
+      const savedCourse = await manager.save(CourseEntity, newCourse);
 
-  //     return courseSchema.parse(updatedCourse);
-  //   });
-  // }
+      // 4. Tạo mapping categories nếu có
+      if (categoryIds && categoryIds.length > 0) {
+        const categoryLinks = categoryIds.map((categoryId) =>
+          manager.create(CourseCategoryEntity, {
+            courseId: savedCourse.id,
+            categoryId,
+          }),
+        );
+        await manager.save(CourseCategoryEntity, categoryLinks);
+      }
 
-  // async approve(id: string, payload: ApproveCourseInput) {
-  //   const parsed = approveCourseSchema.parse(payload);
+      return courseSchema.parse(savedCourse);
+    });
+  }
 
-  //   const course = await this.courseRepository.findById(id);
-  //   if (!course) throw new NotFoundException('Course not found');
+  async update(id: string, payload: UpdateCourseInput, mentorId: string) {
+    const { categoryIds, durationMinutes, ...courseData } =
+      updateCourseSchema.parse(payload);
 
-  //   const updated = await this.courseRepository.updateById(id, {
-  //     approvedBy: parsed.approvedBy,
-  //     status: parsed.status,
-  //   });
+    return this.dataSource.transaction(async (manager) => {
+      const course = await manager.findOne(CourseEntity, { where: { id } });
+      if (!course)
+        throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
 
-  //   return courseSchema.parse(updated);
-  // }
+      if (course.mentorId !== mentorId) {
+        throw new ForbiddenException(COURSE_MESSAGES.UNAUTHORIZED_UPDATE);
+      }
 
-  // async remove(id: string, mentorId: string) {
-  //   const course = await this.courseRepository.findById(id);
-  //   if (!course) throw new NotFoundException('Course not found');
+      if (durationMinutes !== undefined) {
+        const config = await manager.findOne(SystemConfigEntity, {
+          where: { configKey: 'course_duration_whitelist' },
+        });
+        if (config && Array.isArray(config.configValue)) {
+          if (!config.configValue.includes(durationMinutes)) {
+            throw new BadRequestException(COURSE_MESSAGES.INVALID_DURATION);
+          }
+        }
+        course.durationMinutes = durationMinutes;
+      }
 
-  //   if (course.mentorId !== mentorId) {
-  //     throw new ForbiddenException(
-  //       'Bạn không có quyền xóa khóa học của người khác.',
-  //     );
-  //   }
+      Object.assign(course, courseData);
+      const updatedCourse = await manager.save(CourseEntity, course);
 
-  //   await this.courseRepository.softDeleteById(id);
-  // }
+      if (categoryIds) {
+        await manager.softDelete(CourseCategoryEntity, { courseId: id });
+
+        if (categoryIds.length > 0) {
+          for (const categoryId of categoryIds) {
+            const existing = await manager.findOne(CourseCategoryEntity, {
+              where: { courseId: id, categoryId },
+              withDeleted: true,
+            });
+
+            if (existing) {
+              await manager.restore(CourseCategoryEntity, existing.id);
+            } else {
+              const link = manager.create(CourseCategoryEntity, {
+                courseId: id,
+                categoryId,
+              });
+              await manager.save(CourseCategoryEntity, link);
+            }
+          }
+        }
+      }
+
+      return courseSchema.parse(updatedCourse);
+    });
+  }
+
+  async updateStatus(
+    id: string,
+    mentorId: string,
+    status: CourseStatus.ACTIVE | CourseStatus.INACTIVE,
+  ) {
+    const course = await this.courseRepository.findById(id);
+    if (!course) throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
+
+    if (course.mentorId !== mentorId) {
+      throw new ForbiddenException(COURSE_MESSAGES.UNAUTHORIZED_UPDATE);
+    }
+
+    if (
+      course.status !== CourseStatus.ACTIVE &&
+      course.status !== CourseStatus.INACTIVE
+    ) {
+      throw new BadRequestException(COURSE_MESSAGES.INVALID_STATUS_TOGGLE);
+    }
+
+    const updated = await this.courseRepository.updateById(id, { status });
+    return courseSchema.parse(updated);
+  }
+
+  async approve(id: string, payload: ApproveCourseInput) {
+    const parsed = approveCourseSchema.parse(payload);
+
+    const course = await this.courseRepository.findById(id);
+    if (!course) throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
+
+    const updated = await this.courseRepository.updateById(id, {
+      approvedBy: parsed.approvedBy,
+      status: parsed.status,
+    });
+
+    return courseSchema.parse(updated);
+  }
+
+  async remove(id: string, mentorId: string) {
+    const course = await this.courseRepository.findById(id);
+    if (!course) throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
+
+    if (course.mentorId !== mentorId) {
+      throw new ForbiddenException(COURSE_MESSAGES.UNAUTHORIZED_UPDATE);
+    }
+
+    await this.courseRepository.softDeleteById(id);
+  }
 }

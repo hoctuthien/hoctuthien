@@ -20,6 +20,10 @@ export const COURSE_MESSAGES = {
   BOOKING_FAILED: 'Đăng ký khóa học thất bại.',
   UNBOOKING_SUCCESS: 'Hủy đăng ký khóa học thành công.',
   UNBOOKING_FAILED: 'Hủy đăng ký khóa học thất bại.',
+  INVALID_MENTOR_PROFILE: 'Mentor chưa có hồ sơ hợp lệ hoặc chưa được duyệt.',
+  INVALID_DURATION: 'Thời lượng phút không hợp lệ so với cấu hình hệ thống.',
+  UNAUTHORIZED_UPDATE: 'Bạn không có quyền cập nhật khóa học của người khác.',
+  INVALID_STATUS_TOGGLE: 'Chỉ có thể bật/tắt khóa học ở trạng thái active hoặc inactive.',
 };
 
 export const APPLICATION_MESSAGES = {

@@ -25,12 +25,11 @@ import {
   ApiCreateCourseDoc,
   // ApiFindAllCoursesDoc,
   // ApiFindOneCourseDoc,
-  // ApiRemoveCourseDoc,
-  // ApiUpdateCourseDoc,
+  ApiRemoveCourseDoc,
+  ApiUpdateCourseDoc,
   // ApiApproveCourseDoc,
 } from './swagger/course.swagger';
-import { create } from 'node_modules/axios/index.cjs';
-import { createCourseSchema } from './schema/course.schema';
+import { createCourseSchema, updateCourseSchema } from './schema/course.schema';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
 @ApiTags('courses')
@@ -64,17 +63,29 @@ export class CourseController {
   //   return this.courseService.findOne(id);
   // }
 
-  // @Patch(':id')
-  // @ApiUpdateCourseDoc()
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.MENTOR)
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() payload: UpdateCourseInput,
-  //   @User('id') mentorId: string,
-  // ) {
-  //   return this.courseService.update(id, payload, mentorId);
-  // }
+  @Patch(':id')
+  @ApiUpdateCourseDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTOR)
+  @UsePipes(new ZodValidationPipe(updateCourseSchema))
+  update(
+    @Param('id') id: string,
+    @Body() payload: UpdateCourseInput,
+    @User('id') mentorId: string,
+  ) {
+    return this.courseService.update(id, payload, mentorId);
+  }
+
+  @Patch(':id/status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTOR)
+  updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: any,
+    @User('id') mentorId: string,
+  ) {
+    return this.courseService.updateStatus(id, mentorId, status);
+  }
 
   // @Patch(':id/approve')
   // @ApiApproveCourseDoc()
@@ -88,11 +99,11 @@ export class CourseController {
   //   return this.courseService.approve(id, { ...payload, approvedBy: adminId });
   // }
 
-  // @Delete(':id')
-  // @ApiRemoveCourseDoc()
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.MENTOR)
-  // remove(@Param('id') id: string, @User('id') mentorId: string) {
-  //   return this.courseService.remove(id, mentorId);
-  // }
+  @Delete(':id')
+  @ApiRemoveCourseDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTOR)
+  remove(@Param('id') id: string, @User('id') mentorId: string) {
+    return this.courseService.remove(id, mentorId);
+  }
 }
