@@ -5,34 +5,37 @@ import { Button, Icon, Badge } from "@/core/ui";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MantineProvider } from "@mantine/core";
-import { 
-  createPostAction, 
-  getCategoriesAction, 
+import {
+  getPostAction,
+  updatePostAction,
+  getCategoriesAction,
   getTagsAction,
   createCategoryAction,
   createTagAction,
-} from "../actions/posts";
-import { useRouter } from "next/navigation";
+} from "../../actions/posts";
+import { useRouter, useParams } from "next/navigation";
 
-const BlockEditor = dynamic(() => import("../components/BlockEditor"), {
+const BlockEditor = dynamic(() => import("../../components/BlockEditor"), {
   ssr: false,
 });
 
-export default function AdminEditorPage() {
+export default function AdminEditPostPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState("draft");
-  const [content, setContent] = useState<any[]>([]);
+  const [content, setContent] = useState<any>(null);
   const [categoryId, setCategoryId] = useState("");
   const [summary, setSummary] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
-  // Data from Backend
   const [categories, setCategories] = useState<any[]>([]);
   const [tags, setTags] = useState<any[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
-  // Inline creation
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newTagName, setNewTagName] = useState("");
   const [isCreatingCat, setIsCreatingCat] = useState(false);
@@ -41,20 +44,38 @@ export default function AdminEditorPage() {
   const [showNewTagInput, setShowNewTagInput] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const [cats, tgs] = await Promise.all([
-        getCategoriesAction(),
-        getTagsAction(),
-      ]);
-      setCategories(cats);
-      setTags(tgs);
+    const fetchAll = async () => {
+      try {
+        const [post, cats, tgs] = await Promise.all([
+          getPostAction(id),
+          getCategoriesAction(),
+          getTagsAction(),
+        ]);
+
+        setTitle(post.title || "");
+        setStatus(post.status || "draft");
+        setContent(post.content);
+        setCategoryId(post.categoryId || "");
+        setSummary(post.summary || "");
+
+        if (post.postTags && Array.isArray(post.postTags)) {
+          setSelectedTagIds(post.postTags.map((pt: any) => pt.tagId || pt.tag?.id));
+        }
+
+        setCategories(cats);
+        setTags(tgs);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setIsFetching(false);
+      }
     };
-    fetchData();
-  }, []);
+    fetchAll();
+  }, [id]);
 
   const toggleTag = (tagId: string) => {
     setSelectedTagIds((prev) =>
-      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+      prev.includes(tagId) ? prev.filter((tid) => tid !== tagId) : [...prev, tagId]
     );
   };
 
@@ -106,15 +127,26 @@ export default function AdminEditorPage() {
       };
       if (categoryId) payload.categoryId = categoryId;
 
-      await createPostAction(payload);
+      await updatePostAction(id, payload);
       router.push("/admin/posts");
     } catch (error) {
-      console.error("Failed to save post:", error);
-      alert("Error saving post");
+      console.error("Failed to update post:", error);
+      alert("Error updating post");
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isFetching) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <span className="text-sm text-slate-400">Loading post...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <MantineProvider>
@@ -131,13 +163,13 @@ export default function AdminEditorPage() {
               <Icon name="ChevronRight" size={12} />
               <span className="text-slate-900 truncate max-w-[200px]">{title || "Untitled Post"}</span>
             </div>
-            <Badge variant="warning" className="!text-[9px] !px-2 !py-0.5 ml-2">
+            <Badge variant={status === 'published' ? 'success' : 'warning'} className="!text-[9px] !px-2 !py-0.5 ml-2">
               {status.toUpperCase()}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
             <Button label="Save Draft" variant="secondary" className="!px-4 !py-2 !rounded-xl !text-xs" loading={isLoading} onClick={() => handleSave("draft")} />
-            <Button label="Publish" variant="primary" className="!px-6 !py-2 !rounded-xl !text-xs shadow-lg shadow-primary/20" loading={isLoading} onClick={() => handleSave("published")} />
+            <Button label={status === 'published' ? 'Update' : 'Publish'} variant="primary" className="!px-6 !py-2 !rounded-xl !text-xs shadow-lg shadow-primary/20" loading={isLoading} onClick={() => handleSave("published")} />
           </div>
         </div>
 
@@ -154,7 +186,10 @@ export default function AdminEditorPage() {
                 style={{ height: 'auto' }}
               />
               <div className="min-h-[500px]">
-                <BlockEditor onChange={(blocks) => setContent(blocks)} />
+                <BlockEditor
+                  initialContent={content}
+                  onChange={(blocks) => setContent(blocks)}
+                />
               </div>
             </div>
           </div>
