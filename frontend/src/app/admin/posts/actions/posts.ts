@@ -29,13 +29,17 @@ function extractOne(json: any): any {
 }
 
 /**
- * Helper: Lấy access_token từ session và tạo Cookie header
- * Backend sử dụng cookie-based auth (đọc từ cookie 'access_token')
+ * Helper: Lấy access_token từ session và tạo headers
+ * Gửi cả Cookie và Authorization: Bearer để tương thích với mọi version của backend JwtStrategy
  */
-async function getAuthCookie(): Promise<string | null> {
+async function getAuthHeaders(): Promise<Record<string, string>> {
   const session = await auth();
   const token = (session as any)?.accessToken;
-  return token ? `access_token=${token}` : null;
+  if (!token) return {};
+  return {
+    Cookie: `access_token=${token}`,
+    Authorization: `Bearer ${token}`,
+  };
 }
 
 // ═══════════════════════════════════════════════
@@ -47,9 +51,7 @@ async function getAuthCookie(): Promise<string | null> {
  */
 export async function getPostsAction(): Promise<any[]> {
   try {
-    const cookie = await getAuthCookie();
-    const headers: Record<string, string> = {};
-    if (cookie) headers["Cookie"] = cookie;
+    const headers = await getAuthHeaders();
 
     const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts`, {
       cache: "no-store",
@@ -68,9 +70,7 @@ export async function getPostsAction(): Promise<any[]> {
  * Lấy chi tiết một bài viết → trả về single post object
  */
 export async function getPostAction(id: string): Promise<any> {
-  const cookie = await getAuthCookie();
-  const headers: Record<string, string> = {};
-  if (cookie) headers["Cookie"] = cookie;
+  const headers = await getAuthHeaders();
 
   const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts/${id}`, {
     cache: "no-store",
@@ -85,15 +85,15 @@ export async function getPostAction(id: string): Promise<any> {
  * Tạo bài viết mới → trả về post object
  */
 export async function createPostAction(data: any): Promise<any> {
-  const cookie = await getAuthCookie();
-  if (!cookie) throw new Error("Unauthorized");
+  const headers = await getAuthHeaders();
+  if (Object.keys(headers).length === 0) throw new Error("Unauthorized");
 
   const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
-      Cookie: cookie,
+      ...headers,
     },
   });
 
@@ -109,15 +109,15 @@ export async function createPostAction(data: any): Promise<any> {
  * Cập nhật bài viết → trả về updated post
  */
 export async function updatePostAction(id: string, data: any): Promise<any> {
-  const cookie = await getAuthCookie();
-  if (!cookie) throw new Error("Unauthorized");
+  const headers = await getAuthHeaders();
+  if (Object.keys(headers).length === 0) throw new Error("Unauthorized");
 
   const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
-      Cookie: cookie,
+      ...headers,
     },
   });
 
@@ -133,14 +133,12 @@ export async function updatePostAction(id: string, data: any): Promise<any> {
  * Xóa bài viết
  */
 export async function deletePostAction(id: string): Promise<boolean> {
-  const cookie = await getAuthCookie();
-  if (!cookie) throw new Error("Unauthorized");
+  const headers = await getAuthHeaders();
+  if (Object.keys(headers).length === 0) throw new Error("Unauthorized");
 
   const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts/${id}`, {
     method: "DELETE",
-    headers: {
-      Cookie: cookie,
-    },
+    headers,
   });
 
   if (!res.ok) {
@@ -160,9 +158,7 @@ export async function deletePostAction(id: string): Promise<boolean> {
  */
 export async function getCategoriesAction(): Promise<any[]> {
   try {
-    const cookie = await getAuthCookie();
-    const headers: Record<string, string> = {};
-    if (cookie) headers["Cookie"] = cookie;
+    const headers = await getAuthHeaders();
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
@@ -187,17 +183,29 @@ export async function getCategoriesAction(): Promise<any[]> {
  * Tạo Category mới → trả về category object
  */
 export async function createCategoryAction(name: string): Promise<any> {
-  const cookie = await getAuthCookie();
-  if (!cookie) throw new Error("Unauthorized");
+  const headers = await getAuthHeaders();
+  if (Object.keys(headers).length === 0) throw new Error("Unauthorized");
+
+  const slug = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "") + "-" + Date.now();
 
   const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/categories`, {
     method: "POST",
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, slug }),
     headers: {
       "Content-Type": "application/json",
-      Cookie: cookie,
+      ...headers,
     },
   });
+
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
@@ -216,9 +224,7 @@ export async function createCategoryAction(name: string): Promise<any> {
  */
 export async function getTagsAction(): Promise<any[]> {
   try {
-    const cookie = await getAuthCookie();
-    const headers: Record<string, string> = {};
-    if (cookie) headers["Cookie"] = cookie;
+    const headers = await getAuthHeaders();
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
@@ -243,17 +249,29 @@ export async function getTagsAction(): Promise<any[]> {
  * Tạo Tag mới → trả về tag object
  */
 export async function createTagAction(name: string): Promise<any> {
-  const cookie = await getAuthCookie();
-  if (!cookie) throw new Error("Unauthorized");
+  const headers = await getAuthHeaders();
+  if (Object.keys(headers).length === 0) throw new Error("Unauthorized");
+
+  const slug = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "") + "-" + Date.now();
 
   const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/tags`, {
     method: "POST",
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, slug }),
     headers: {
       "Content-Type": "application/json",
-      Cookie: cookie,
+      ...headers,
     },
   });
+
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));

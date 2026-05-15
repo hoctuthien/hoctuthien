@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiTags('tags')
 @Controller('tags')
@@ -28,11 +29,13 @@ export class TagController {
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.tagService.findAll();
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.tagService.findOne(id);
   }

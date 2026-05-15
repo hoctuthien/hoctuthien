@@ -21,6 +21,7 @@ export async function uploadFileAction(formData: FormData, folder?: string) {
     body: formData,
     headers: {
       Cookie: `access_token=${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
