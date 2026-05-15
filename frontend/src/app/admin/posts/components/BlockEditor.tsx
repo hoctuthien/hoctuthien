@@ -5,13 +5,15 @@ import "@blocknote/core/fonts/inter.css";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
+import { uploadFileAction } from "../actions/upload";
 
 interface BlockEditorProps {
   initialContent?: string;
   onChange?: (blocks: any[]) => void;
+  folder?: string;
 }
 
-export default function BlockEditor({ initialContent, onChange }: BlockEditorProps) {
+export default function BlockEditor({ initialContent, onChange, folder = "HTT" }: BlockEditorProps) {
   // Parsing initial content if provided
   const initialBlocks: PartialBlock[] | undefined = initialContent 
     ? JSON.parse(initialContent) 
@@ -19,6 +21,13 @@ export default function BlockEditor({ initialContent, onChange }: BlockEditorPro
 
   const editor: BlockNoteEditor = useCreateBlockNote({
     initialContent: initialBlocks,
+    uploadFile: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const url = await uploadFileAction(formData, folder);
+      return url;
+    },
   });
 
   return (
