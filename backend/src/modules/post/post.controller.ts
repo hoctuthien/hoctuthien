@@ -15,6 +15,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { User } from '../../common/decorators/user.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiTags('posts')
 @Controller('posts')
@@ -29,11 +30,13 @@ export class PostController {
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.postService.findAll();
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.postService.findOne(id);
   }

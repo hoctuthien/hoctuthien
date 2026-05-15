@@ -20,7 +20,7 @@ export async function uploadFileAction(formData: FormData, folder?: string) {
     method: "POST",
     body: formData,
     headers: {
-      Authorization: `Bearer ${token}`,
+      Cookie: `access_token=${token}`,
     },
   });
 
