@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
+import { User } from '../../common/decorators/user.decorator';
 
 @ApiTags('posts')
 @Controller('posts')
@@ -23,8 +24,8 @@ export class PostController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  create(@Body() payload: any) {
-    return this.postService.create(payload);
+  create(@Body() payload: any, @User('id') userId: string) {
+    return this.postService.create(payload, userId);
   }
 
   @Get()

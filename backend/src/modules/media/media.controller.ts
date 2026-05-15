@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Body,
   UseInterceptors,
   UploadedFile,
   UseGuards,
@@ -35,7 +36,8 @@ export class MediaController {
       }),
     )
     file: any,
+    @Body('folder') folder?: string,
   ) {
-    return this.mediaService.uploadImage(file);
+    return this.mediaService.uploadImage(file, folder);
   }
 }

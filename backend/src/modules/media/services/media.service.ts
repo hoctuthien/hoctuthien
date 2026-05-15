@@ -13,7 +13,7 @@ export class MediaService {
     this.apiKey = this.configService.get<string>('openinary.apiKey');
   }
 
-  async uploadImage(file: any) {
+  async uploadImage(file: any, folder?: string) {
     if (!this.openinaryUrl || !this.apiKey) {
       throw new HttpException(
         'Cấu hình Openinary thiếu URL hoặc API Key. Vui lòng kiểm tra file .env',
@@ -28,6 +28,11 @@ export class MediaService {
         filename: file.originalname,
         contentType: file.mimetype,
       });
+
+      // Nếu FE truyền folder, dùng folder đó, nếu không sẽ lưu ở gốc
+      if (folder) {
+        formData.append('folder', folder);
+      }
 
       const response = await axios.post(
         `${this.openinaryUrl}/api/upload`,
