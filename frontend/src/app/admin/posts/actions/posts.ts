@@ -48,12 +48,19 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 /**
  * Lấy danh sách bài viết → trả về any[]
+ * Hỗ trợ các tham số lọc: categoryId, tagId, search
  */
-export async function getPostsAction(): Promise<any[]> {
+export async function getPostsAction(query?: { categoryId?: string, tagId?: string, search?: string }): Promise<any[]> {
   try {
     const headers = await getAuthHeaders();
+    
+    // Xây dựng URL với query parameters
+    const url = new URL(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts`);
+    if (query?.categoryId) url.searchParams.append("categoryId", query.categoryId);
+    if (query?.tagId) url.searchParams.append("tagId", query.tagId);
+    if (query?.search) url.searchParams.append("search", query.search);
 
-    const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts`, {
+    const res = await fetch(url.toString(), {
       cache: "no-store",
       headers,
     });

@@ -1,16 +1,31 @@
 import React from "react";
 import { Button, Icon, Badge } from "@/core/ui";
 import Link from "next/link";
-import { getPostsAction } from "./actions/posts";
+import { getPostsAction, getCategoriesAction, getTagsAction } from "./actions/posts";
 import { DeletePostButton } from "./components/DeletePostButton";
+import { PostFilter } from "./components/PostFilter";
 
-export default async function AdminPostsPage() {
+export default async function AdminPostsPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ categoryId?: string; tagId?: string; search?: string }> 
+}) {
+  const params = await searchParams;
   let posts: any[] = [];
+  let categories: any[] = [];
+  let tags: any[] = [];
+
   try {
-    const response = await getPostsAction();
-    posts = response;
+    const [postsRes, catsRes, tagsRes] = await Promise.all([
+      getPostsAction(params),
+      getCategoriesAction(),
+      getTagsAction()
+    ]);
+    posts = postsRes;
+    categories = catsRes;
+    tags = tagsRes;
   } catch (error) {
-    console.error("Error fetching posts:", error);
+    console.error("Error fetching admin posts data:", error);
   }
 
   return (
@@ -32,20 +47,7 @@ export default async function AdminPostsPage() {
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-4 items-center">
-        <div className="relative flex-1 group">
-          <Icon name="Search" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" size={18} />
-          <input 
-            type="text" 
-            placeholder="Search posts by title..." 
-            className="w-full pl-12 pr-4 py-3 bg-slate-50 border-transparent focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-xl transition-all outline-none text-sm"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <Button label="Filter" variant="secondary" iconLeft={<Icon name="Filter" size={16} />} className="!py-2 !px-4 !rounded-lg text-xs" />
-          <Button label="Export" variant="secondary" iconLeft={<Icon name="Download" size={16} />} className="!py-2 !px-4 !rounded-lg text-xs" />
-        </div>
-      </div>
+      <PostFilter categories={categories} tags={tags} />
 
       {/* Posts Table */}
       <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
@@ -73,8 +75,8 @@ export default async function AdminPostsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200">
-                          {post.coverImage ? (
-                            <img src={post.coverImage.url} alt="" className="w-full h-full object-cover" />
+                          {(post.metadata?.thumbnail || post.coverImage?.url) ? (
+                            <img src={post.metadata?.thumbnail || post.coverImage?.url} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-300">
                               <Icon name="Image" size={20} />

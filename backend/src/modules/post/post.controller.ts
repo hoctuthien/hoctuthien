@@ -18,6 +18,8 @@ import { User } from '../../common/decorators/user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { FindAllPostsDto } from './dto/find-all-posts.dto';
+import { Query } from '@nestjs/common';
 
 @ApiTags('posts')
 @Controller('posts')
@@ -39,8 +41,8 @@ export class PostController {
   @Public()
   @ApiOperation({ summary: 'Lấy danh sách tất cả bài viết' })
   @ApiResponse({ status: 200, description: 'Trả về danh sách bài viết.' })
-  findAll() {
-    return this.postService.findAll();
+  findAll(@Query() query: FindAllPostsDto) {
+    return this.postService.findAll(query);
   }
 
   @Get(':id')

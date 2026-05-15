@@ -3,6 +3,7 @@ import { PostRepository } from '../repositories/post.repository';
 import { PostEntity } from '../entities/post.entity';
 import { DeepPartial } from 'typeorm';
 import { PostStatus } from '../enums/post-status.enum';
+import { FindAllPostsDto } from '../dto/find-all-posts.dto';
 
 @Injectable()
 export class PostService {
@@ -60,11 +61,50 @@ export class PostService {
     });
   }
 
-  async findAll(): Promise<PostEntity[]> {
-    return this.postRepository.findMany({
-      relations: ['author', 'category', 'coverImage', 'postTags', 'postTags.tag'],
-      order: { createdAt: 'DESC' },
-    });
+  async findAll(query?: FindAllPostsDto): Promise<PostEntity[]> {
+    const qb = this.postRepository.createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.category', 'category')
+      .leftJoinAndSelect('post.coverImage', 'coverImage')
+      .leftJoinAndSelect('post.postTags', 'postTags')
+      .leftJoinAndSelect('postTags.tag', 'tag')
+      .orderBy('post.createdAt', 'DESC');
+
+    if (query?.categoryId) {
+      qb.andWhere('post.categoryId = :categoryId', { categoryId: query.categoryId });
+    }
+    
+    if (query?.categorySlug) {
+      qb.andWhere('category.slug = :categorySlug', { categorySlug: query.categorySlug });
+    }
+
+    if (query?.tagId || query?.tagSlug) {
+      // Sử dụng subquery để tìm các bài viết có tag tương ứng
+      qb.andWhere((qbSub) => {
+        const subQuery = qbSub.subQuery()
+          .select('pt.post_id')
+          .from('post_tags', 'pt')
+          .innerJoin('tags', 't', 't.id = pt.tag_id');
+        
+        if (query.tagId) {
+          subQuery.where('t.id = :tagId', { tagId: query.tagId });
+        } else if (query.tagSlug) {
+          subQuery.where('t.slug = :tagSlug', { tagSlug: query.tagSlug });
+        }
+        
+        return 'post.id IN ' + subQuery.getQuery();
+      });
+      
+      // Đặt parameter cho subquery vì subQuery.where không tự động bind vào qb chính trong một số trường hợp
+      if (query.tagId) qb.setParameter('tagId', query.tagId);
+      if (query.tagSlug) qb.setParameter('tagSlug', query.tagSlug);
+    }
+
+    if (query?.search) {
+      qb.andWhere('post.title ILIKE :search', { search: `%${query.search}%` });
+    }
+
+    return qb.getMany();
   }
 
   async findOne(id: string): Promise<PostEntity> {
