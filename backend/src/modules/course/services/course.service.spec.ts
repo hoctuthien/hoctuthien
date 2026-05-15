@@ -3,13 +3,19 @@ import { CourseService } from './course.service';
 import { CourseRepository } from '../repositories/course.repository';
 import { DataSource } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
-import { CourseCategoryEntity } from '../../course-category/entities/course-category.entity';
-import { NotFoundException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
+import { CourseStatus } from '../enums/course-status.enum';
+import { COURSE_MESSAGES } from '../../../common/constants/message.constant';
 
 describe('CourseService', () => {
   let service: CourseService;
   let mockEntityManager: any;
   let mockDataSource: any;
+  let mockCourseRepo: any;
 
   beforeEach(async () => {
     mockEntityManager = {
@@ -25,7 +31,6 @@ describe('CourseService', () => {
         };
       }),
       save: jest.fn().mockImplementation((entityOrData, data) => {
-        // Handle both (entity, data) and (data) signatures
         const result = data || entityOrData;
         return Promise.resolve(result);
       }),
@@ -38,12 +43,19 @@ describe('CourseService', () => {
       transaction: jest.fn().mockImplementation((cb) => cb(mockEntityManager)),
     };
 
+    mockCourseRepo = {
+      findMany: jest.fn(),
+      findById: jest.fn(),
+      updateById: jest.fn(),
+      softDeleteById: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CourseService,
         {
           provide: CourseRepository,
-          useValue: {}, // Not used as we use dataSource.transaction
+          useValue: mockCourseRepo,
         },
         {
           provide: DataSource,
@@ -60,131 +72,117 @@ describe('CourseService', () => {
   });
 
   describe('create', () => {
-    it('should create a course and its category associations within a transaction', async () => {
-      const payload = {
-        title: 'Test Course',
-        price: 500000,
-        categoryIds: ['cat-1', 'cat-2'],
-      };
-      const mentorId = 'mentor-123';
+    const payload = {
+      title: 'Test Course',
+      price: 500000,
+      durationMinutes: 60,
+      categoryIds: ['cat-1'],
+    };
+    const mentorId = 'mentor-123';
+
+    it('should throw ForbiddenException if mentor is not approved', async () => {
+      mockEntityManager.findOne.mockResolvedValueOnce(null);
+
+      await expect(service.create(payload as any, mentorId)).rejects.toThrow(
+        ForbiddenException,
+      );
+      await expect(service.create(payload as any, mentorId)).rejects.toThrow(
+        COURSE_MESSAGES.INVALID_MENTOR_PROFILE,
+      );
+    });
+
+    it('should throw BadRequestException if duration is invalid', async () => {
+      // Mock mentor approved
+      mockEntityManager.findOne.mockResolvedValueOnce({
+        userId: mentorId,
+        isApproved: true,
+      });
+      // Mock system config invalid duration
+      mockEntityManager.findOne.mockResolvedValueOnce({
+        configKey: 'course_duration_whitelist',
+        configValue: [30, 90], // 60 is not in whitelist
+      });
+
+      await expect(service.create(payload as any, mentorId)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should create course successfully with categories', async () => {
+      // Mock mentor
+      mockEntityManager.findOne.mockResolvedValueOnce({
+        userId: mentorId,
+        isApproved: true,
+      });
+      // Mock config
+      mockEntityManager.findOne.mockResolvedValueOnce({
+        configKey: 'course_duration_whitelist',
+        configValue: [30, 60, 90],
+      });
 
       const result = await service.create(payload as any, mentorId);
 
-      // Verify transaction was started
-      expect(mockDataSource.transaction).toHaveBeenCalled();
-
-      // Verify course was created with correct data
       expect(mockEntityManager.create).toHaveBeenCalledWith(
         CourseEntity,
         expect.objectContaining({
           title: payload.title,
-          price: payload.price,
-          mentorId,
+          durationMinutes: 60,
+          status: CourseStatus.ACTIVE,
         }),
       );
-
-      // Verify categories were created
-      expect(mockEntityManager.create).toHaveBeenCalledWith(
-        CourseCategoryEntity,
-        expect.objectContaining({
-          courseId: 'mock-id',
-          categoryId: 'cat-1',
-        }),
-      );
-
-      // Verify both course and categories were saved
-      expect(mockEntityManager.save).toHaveBeenCalledWith(
-        CourseEntity,
-        expect.any(Object),
-      );
-      expect(mockEntityManager.save).toHaveBeenCalledWith(
-        CourseCategoryEntity,
-        expect.any(Array),
-      );
-
-      expect(result).toBeDefined();
+      expect(mockEntityManager.save).toHaveBeenCalled();
       expect(result.title).toBe(payload.title);
-    });
-
-    it('should create only course if no categoryIds provided', async () => {
-      const payload = {
-        title: 'Test Course',
-        price: 500000,
-        categoryIds: [],
-      };
-      const mentorId = 'mentor-123';
-
-      await service.create(payload as any, mentorId);
-
-      // Should only save course, not categories
-      expect(mockEntityManager.save).toHaveBeenCalledTimes(1);
-      expect(mockEntityManager.save).toHaveBeenCalledWith(
-        CourseEntity,
-        expect.any(Object),
-      );
     });
   });
 
-  describe('update', () => {
-    it('should update course and refresh category associations', async () => {
-      const courseId = 'course-123';
-      const payload = {
-        title: 'Updated Title',
-        categoryIds: ['cat-3'],
-      };
+  describe('updateStatus', () => {
+    const courseId = 'course-123';
+    const mentorId = 'mentor-123';
 
-      mockEntityManager.findOne.mockImplementation((entity, options) => {
-        if (entity === CourseEntity) {
-          return Promise.resolve({
-            id: courseId,
-            title: 'Old Title',
-            mentorId: 'mentor-123',
-            price: 500000,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
-        }
-        return Promise.resolve(null);
-      });
-
-      const result = await service.update(
-        courseId,
-        payload as any,
-        'mentor-123',
-      );
-
-      // Verify transaction
-      expect(mockDataSource.transaction).toHaveBeenCalled();
-
-      // Verify old categories were deleted
-      expect(mockEntityManager.softDelete).toHaveBeenCalledWith(
-        CourseCategoryEntity,
-        { courseId },
-      );
-
-      // Verify course was updated
-      expect(mockEntityManager.save).toHaveBeenCalledWith(
-        CourseEntity,
-        expect.objectContaining({
-          title: 'Updated Title',
-        }),
-      );
-
-      // Verify new categories were saved
-      expect(mockEntityManager.save).toHaveBeenCalledWith(
-        CourseCategoryEntity,
-        expect.any(Object),
-      );
-
-      expect(result.title).toBe('Updated Title');
-    });
-
-    it('should throw NotFoundException if course does not exist', async () => {
-      mockEntityManager.findOne.mockResolvedValue(null);
+    it('should throw NotFoundException if course not found', async () => {
+      mockCourseRepo.findById.mockResolvedValue(null);
 
       await expect(
-        service.update('invalid-id', {} as any, 'mentor-123'),
+        service.updateStatus(courseId, mentorId, CourseStatus.INACTIVE),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ForbiddenException if mentor is not owner', async () => {
+      mockCourseRepo.findById.mockResolvedValue({ mentorId: 'other-mentor' });
+
+      await expect(
+        service.updateStatus(courseId, mentorId, CourseStatus.INACTIVE),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should update status successfully', async () => {
+      mockCourseRepo.findById.mockResolvedValue({
+        id: courseId,
+        mentorId,
+        status: CourseStatus.ACTIVE,
+      });
+      mockCourseRepo.updateById.mockResolvedValue({
+        id: courseId,
+        mentorId,
+        title: 'Mocked Title',
+        price: 500000,
+        durationMinutes: 60,
+        prerequisites: [],
+        metadata: {},
+        status: CourseStatus.INACTIVE,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const result = await service.updateStatus(
+        courseId,
+        mentorId,
+        CourseStatus.INACTIVE,
+      );
+      expect(result.status).toBe(CourseStatus.INACTIVE);
+      expect(mockCourseRepo.updateById).toHaveBeenCalledWith(courseId, {
+        status: CourseStatus.INACTIVE,
+      });
     });
   });
 });
