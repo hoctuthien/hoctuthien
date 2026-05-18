@@ -21,6 +21,19 @@ export function PostFilter({ categories, tags }: PostFilterProps) {
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
+    const currentSearch = searchParams.get("search") || "";
+    const currentCategoryId = searchParams.get("categoryId") || "";
+    const currentTagId = searchParams.get("tagId") || "";
+
+    // Nếu giá trị nhập vào trùng khớp với giá trị hiện tại trên URL, KHÔNG được gọi router.push để tránh lặp vô hạn
+    if (
+      debouncedSearch === currentSearch &&
+      categoryId === currentCategoryId &&
+      tagId === currentTagId
+    ) {
+      return;
+    }
+
     const params = new URLSearchParams(searchParams.toString());
     
     if (debouncedSearch) {
