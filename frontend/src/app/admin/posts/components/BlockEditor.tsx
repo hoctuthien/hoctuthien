@@ -12,9 +12,10 @@ interface BlockEditorProps {
   initialContent?: any;
   onChange?: (blocks: any[]) => void;
   folder?: string;
+  editable?: boolean;
 }
 
-export default function BlockEditor({ initialContent, onChange, folder = "HTT" }: BlockEditorProps) {
+export default function BlockEditor({ initialContent, onChange, folder = "HTT", editable = true }: BlockEditorProps) {
   // Parsing initial content if provided (it could be a string or a JSON object)
   const initialBlocks: PartialBlock[] | undefined = React.useMemo(() => {
     if (!initialContent) return undefined;
@@ -52,6 +53,7 @@ export default function BlockEditor({ initialContent, onChange, folder = "HTT" }
             onChange(editor.document);
           }
         }}
+        editable={editable}
         theme="light"
       />
     </div>

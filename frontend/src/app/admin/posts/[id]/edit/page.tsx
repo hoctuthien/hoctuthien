@@ -37,6 +37,7 @@ export default function AdminEditPostPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   // Media Selector Modal States
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
@@ -224,30 +225,84 @@ export default function AdminEditPostPage() {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
+            <Button 
+              label={isPreviewMode ? "Edit Post" : "Preview"} 
+              variant="secondary" 
+              iconLeft={<Icon name={isPreviewMode ? "Pencil" : "Eye"} size={14} />}
+              className="!px-4 !py-2 !rounded-xl !text-xs !bg-slate-50 hover:!bg-slate-100 !text-slate-700 font-bold border border-slate-200 shadow-sm"
+              onClick={() => setIsPreviewMode(!isPreviewMode)}
+            />
             <Button label="Save Draft" variant="secondary" className="!px-4 !py-2 !rounded-xl !text-xs" loading={isLoading} onClick={() => handleSave("draft")} />
             <Button label={status === 'published' ? 'Update' : 'Publish'} variant="primary" className="!px-6 !py-2 !rounded-xl !text-xs shadow-lg shadow-primary/20" loading={isLoading} onClick={() => handleSave("published")} />
           </div>
         </div>
 
         <div className="flex-1 flex overflow-hidden">
-          {/* Editor */}
+          {/* Editor / Preview */}
           <div className="flex-1 overflow-y-auto px-6 py-12 custom-scrollbar">
-            <div className="max-w-3xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-700">
-              <textarea
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Post Title..."
-                rows={1}
-                className="w-full text-5xl font-black text-slate-900 placeholder:text-slate-200 focus:outline-none resize-none leading-tight tracking-tight"
-                style={{ height: 'auto' }}
-              />
-              <div className="min-h-[500px]">
-                <BlockEditor
-                  initialContent={content}
-                  onChange={(blocks) => setContent(blocks)}
-                />
+            {isPreviewMode ? (
+              <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500 pb-16">
+                {/* Article Category & Date */}
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="px-3 py-1 bg-primary/10 text-primary font-extrabold rounded-full uppercase tracking-wider">
+                    {categories.find(c => c.id === categoryId)?.name || "Uncategorized"}
+                  </span>
+                  <span className="text-slate-400 font-medium">•</span>
+                  <span className="text-slate-400 font-medium">
+                    {new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                  {title || "Untitled Post"}
+                </h1>
+
+                {/* Author Widget */}
+                <div className="flex items-center gap-3 py-4 border-y border-slate-100">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                    AD
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">Administrator</p>
+                    <p className="text-[10px] text-slate-400 font-medium">Tác giả bài viết</p>
+                  </div>
+                </div>
+
+                {/* Featured Cover Image */}
+                {thumbnail && (
+                  <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-100 shadow-md">
+                    <img src={thumbnail} alt="Featured Cover" className="w-full h-full object-cover" />
+                  </div>
+                )}
+
+                {/* Body Content (Read-Only Editor) */}
+                <div className="prose prose-slate max-w-none">
+                  <BlockEditor
+                    initialContent={content}
+                    onChange={() => {}}
+                    editable={false}
+                  />
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="max-w-3xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-700">
+                <textarea
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Post Title..."
+                  rows={1}
+                  className="w-full text-5xl font-black text-slate-900 placeholder:text-slate-200 focus:outline-none resize-none leading-tight tracking-tight"
+                  style={{ height: 'auto' }}
+                />
+                <div className="min-h-[500px]">
+                  <BlockEditor
+                    initialContent={content}
+                    onChange={(blocks) => setContent(blocks)}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
