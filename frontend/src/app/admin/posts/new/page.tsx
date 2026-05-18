@@ -13,6 +13,7 @@ import {
   createTagAction,
 } from "../actions/posts";
 import { uploadFileAction } from "../actions/upload";
+import { getMediaAction } from "../../media/actions/media";
 import { useRouter } from "next/navigation";
 
 const BlockEditor = dynamic(() => import("../components/BlockEditor"), {
@@ -30,6 +31,34 @@ export default function AdminEditorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Media Selector Modal States
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+  const [modalMediaList, setModalMediaList] = useState<any[]>([]);
+  const [isModalLoading, setIsModalLoading] = useState(false);
+  const [modalSearchQuery, setModalSearchQuery] = useState("");
+
+  const loadModalMedia = async () => {
+    try {
+      setIsModalLoading(true);
+      const data = await getMediaAction("HTT");
+      setModalMediaList(data || []);
+    } catch (error) {
+      console.error("Failed to load modal media:", error);
+    } finally {
+      setIsModalLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isMediaModalOpen) {
+      loadModalMedia();
+    }
+  }, [isMediaModalOpen]);
+
+  const filteredModalMedia = modalMediaList.filter((img) =>
+    img.filename?.toLowerCase().includes(modalSearchQuery.toLowerCase())
+  );
 
   // Data from Backend
   const [categories, setCategories] = useState<any[]>([]);
@@ -102,7 +131,7 @@ export default function AdminEditorPage() {
       setIsUploadingImage(true);
       const formData = new FormData();
       formData.append("file", file);
-      const url = await uploadFileAction(formData, "posts/thumbnails");
+      const url = await uploadFileAction(formData, "HTT");
       setThumbnail(url);
     } catch (error: any) {
       console.error("Failed to upload image:", error);
@@ -273,7 +302,17 @@ export default function AdminEditorPage() {
 
                 {/* Featured Image */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-700">Featured Image</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700">Featured Image</label>
+                    {thumbnail && (
+                      <button
+                        onClick={() => setThumbnail("")}
+                        className="text-[10px] text-red-500 hover:text-red-700 font-semibold"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
                   <input 
                     type="file" 
                     accept="image/png, image/jpeg, image/webp, image/avif" 
@@ -282,28 +321,50 @@ export default function AdminEditorPage() {
                     onChange={handleImageUpload} 
                   />
                   <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 group cursor-pointer transition-all shadow-sm overflow-hidden relative ${
+                    className={`aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 group transition-all shadow-sm overflow-hidden relative ${
                       thumbnail 
                         ? 'border-primary/30 bg-slate-50' 
-                        : 'border-slate-300 bg-slate-200 hover:bg-slate-100'
+                        : 'border-slate-300 bg-slate-100'
                     }`}
                   >
                     {thumbnail ? (
                       <>
                         <img src={thumbnail} alt="Featured" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
-                          <Icon name="Upload" size={24} className="mb-2" />
-                          <span className="text-[10px] font-bold uppercase tracking-wider">Change Image</span>
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-3 py-1.5 bg-white text-slate-800 rounded-lg text-xs font-bold hover:bg-slate-50 shadow-md flex items-center gap-1.5"
+                          >
+                            <Icon name="Upload" size={14} /> Upload
+                          </button>
+                          <button
+                            onClick={() => setIsMediaModalOpen(true)}
+                            className="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary/90 shadow-md flex items-center gap-1.5"
+                          >
+                            <Icon name="Image" size={14} /> Library
+                          </button>
                         </div>
                       </>
                     ) : isUploadingImage ? (
                       <span className="text-xs font-bold text-slate-500">Uploading...</span>
                     ) : (
-                      <>
-                        <Icon name="Upload" size={24} className="text-slate-400 group-hover:text-primary transition-colors" />
-                        <span className="text-[10px] font-bold text-slate-400 group-hover:text-primary uppercase tracking-wider">Set Image</span>
-                      </>
+                      <div className="flex flex-col items-center gap-3 p-4">
+                        <Icon name="Image" size={24} className="text-slate-400" />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-50 shadow-sm flex items-center gap-1.5"
+                          >
+                            <Icon name="Upload" size={14} /> Upload New
+                          </button>
+                          <button
+                            onClick={() => setIsMediaModalOpen(true)}
+                            className="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary/90 shadow-md flex items-center gap-1.5"
+                          >
+                            <Icon name="Image" size={14} /> From Library
+                          </button>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -328,6 +389,87 @@ export default function AdminEditorPage() {
           </div>
         </div>
       </div>
+
+      {/* Media Library Selector Modal */}
+      {isMediaModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Icon name="Image" className="text-primary" size={20} />
+                  Thư viện Media
+                </h3>
+                <p className="text-[11px] text-slate-500">Chọn một hình ảnh từ thư viện của bạn để làm ảnh bìa bài viết</p>
+              </div>
+              <button
+                onClick={() => setIsMediaModalOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <Icon name="X" size={18} />
+              </button>
+            </div>
+
+            {/* Search and Filters */}
+            <div className="p-4 border-b border-slate-100 flex items-center gap-3">
+              <div className="relative flex-1">
+                <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm hình ảnh theo tên..."
+                  value={modalSearchQuery}
+                  onChange={(e) => setModalSearchQuery(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+                />
+              </div>
+              <button
+                onClick={loadModalMedia}
+                className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors"
+                title="Tải lại thư viện"
+              >
+                <Icon name="RefreshCw" size={16} className={isModalLoading ? "animate-spin" : ""} />
+              </button>
+            </div>
+
+            {/* Grid of Images */}
+            <div className="flex-1 overflow-y-auto p-6 min-h-[300px]">
+              {isModalLoading ? (
+                <div className="h-full flex flex-col items-center justify-center gap-3 min-h-[300px]">
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-xs text-slate-500 font-semibold">Đang tải thư viện ảnh...</span>
+                </div>
+              ) : filteredModalMedia.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-8 min-h-[300px] gap-3">
+                  <Icon name="Image" size={48} className="text-slate-300" />
+                  <div>
+                    <p className="text-xs font-semibold text-slate-700">Thư viện trống hoặc không khớp từ khóa</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Hãy upload ảnh mới trong thư mục HTT</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {filteredModalMedia.map((img) => (
+                    <div
+                      key={img.id}
+                      onClick={() => {
+                        setThumbnail(img.url);
+                        setIsMediaModalOpen(false);
+                      }}
+                      className="group aspect-video rounded-xl border border-slate-200 bg-slate-50 overflow-hidden relative cursor-pointer hover:border-primary hover:shadow-md transition-all"
+                    >
+                      <img src={img.url} alt={img.filename} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                        <span className="text-[9px] text-white font-semibold truncate w-full">{img.filename}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </MantineProvider>
   );
 }
