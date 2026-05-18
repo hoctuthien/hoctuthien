@@ -189,6 +189,46 @@ export async function getCategoriesAction(): Promise<any[]> {
 }
 
 /**
+ * Lấy danh sách Categories có phân trang
+ */
+export async function getCategoriesPaginatedAction(
+  page = 1,
+  limit = 10,
+  search?: string,
+): Promise<{ data: any[]; meta: any }> {
+  try {
+    const headers = await getAuthHeaders();
+    let url = `${BACKEND_URL.replace(/\/$/, "")}/api/v1/categories?page=${page}&limit=${limit}`;
+    if (search) {
+      url += `&name=${encodeURIComponent(search)}`;
+    }
+
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers,
+    });
+
+    if (!res.ok) return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
+    const result = await res.json();
+    
+    // NestJS ResponseTransformInterceptor wraps under result.data[0]
+    const inner = result.data?.[0];
+    if (inner && Array.isArray(inner.data) && inner.meta) {
+      console.log("\x1b[36m[getCategoriesPaginatedAction] Server Response:\x1b[0m", JSON.stringify(inner, null, 2));
+      return {
+        data: inner.data,
+        meta: inner.meta,
+      };
+    }
+
+    return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
+  } catch (error) {
+    console.error("Failed to fetch paginated categories:", error);
+    return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
+  }
+}
+
+/**
  * Tạo Category mới → trả về category object
  */
 export async function createCategoryAction(name: string, slug?: string, description?: string): Promise<any> {

@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, Icon, Badge } from "@/core/ui";
+import { Button, Icon } from "@/core/ui";
 import { cn } from "@/core/utils/cn";
 import {
-  getCategoriesAction,
+  getCategoriesPaginatedAction,
   createCategoryAction,
   updateCategoryAction,
   deleteCategoryAction,
 } from "../posts/actions/posts";
+import { useDebounce } from "@/shared/hooks/useDebounce";
 
 function generateSlug(text: string): string {
   return text
@@ -27,6 +28,17 @@ export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(5); // Default to 5 items per page for clear pagination testing
+  const [meta, setMeta] = useState({
+    total: 0,
+    page: 1,
+    limit: 5,
+    totalPages: 0,
+  });
 
   // Form states
   const [name, setName] = useState("");
@@ -39,8 +51,9 @@ export default function AdminCategoriesPage() {
   const fetchCategories = async () => {
     try {
       setIsLoading(true);
-      const data = await getCategoriesAction();
-      setCategories(data || []);
+      const res = await getCategoriesPaginatedAction(currentPage, limit, debouncedSearch);
+      setCategories(res.data || []);
+      setMeta(res.meta || { total: 0, page: currentPage, limit, totalPages: 0 });
     } catch (error) {
       console.error("Failed to load categories:", error);
     } finally {
@@ -48,9 +61,15 @@ export default function AdminCategoriesPage() {
     }
   };
 
+  // Trigger fetch when dependencies change
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [currentPage, limit, debouncedSearch]);
+
+  // Reset page to 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -109,15 +128,17 @@ export default function AdminCategoriesPage() {
     try {
       await deleteCategoryAction(id);
       alert("Category deleted successfully!");
-      await fetchCategories();
+      
+      // If we deleted the last item on the last page, go to previous page
+      if (categories.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        await fetchCategories();
+      }
     } catch (error: any) {
       alert(error.message || "Failed to delete category");
     }
   };
-
-  const filteredCategories = categories.filter((cat) =>
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -196,7 +217,7 @@ export default function AdminCategoriesPage() {
 
         {/* Right Column: Table */}
         <div className="lg:col-span-8">
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col h-full">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="relative w-64">
                 <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -208,9 +229,25 @@ export default function AdminCategoriesPage() {
                   className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
                 />
               </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">Rows per page:</span>
+                <select
+                  value={limit}
+                  onChange={(e) => {
+                    setLimit(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary/10"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="flex-1 overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50">
@@ -228,14 +265,14 @@ export default function AdminCategoriesPage() {
                         Loading categories...
                       </td>
                     </tr>
-                  ) : filteredCategories.length === 0 ? (
+                  ) : categories.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
                         No categories found.
                       </td>
                     </tr>
                   ) : (
-                    filteredCategories.map((cat) => (
+                    categories.map((cat) => (
                       <tr key={cat.id} className="hover:bg-slate-50/50 transition-colors group">
                         <td className="px-6 py-4">
                           <span className="font-bold text-slate-900 group-hover:text-primary transition-colors">{cat.name}</span>
@@ -269,8 +306,48 @@ export default function AdminCategoriesPage() {
               </table>
             </div>
             
+            {/* Pagination Controls */}
             <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30 text-xs text-slate-500">
-              <p>{filteredCategories.length} categories in total</p>
+              <p>
+                Showing {categories.length > 0 ? (currentPage - 1) * limit + 1 : 0} to{" "}
+                {Math.min(currentPage * limit, meta.total)} of {meta.total} categories
+              </p>
+              
+              {meta.totalPages > 1 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1 || isLoading}
+                    className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 disabled:opacity-50 hover:bg-slate-50 transition-colors disabled:cursor-not-allowed"
+                  >
+                    <Icon name="ChevronLeft" size={16} />
+                  </button>
+                  
+                  {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNumber) => (
+                    <button
+                      key={pageNumber}
+                      onClick={() => setCurrentPage(pageNumber)}
+                      disabled={isLoading}
+                      className={cn(
+                        "w-8 h-8 rounded-lg border text-xs font-semibold transition-all",
+                        currentPage === pageNumber
+                          ? "bg-primary border-primary text-white shadow-md shadow-primary/10"
+                          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                      )}
+                    >
+                      {pageNumber}
+                    </button>
+                  ))}
+                  
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, meta.totalPages))}
+                    disabled={currentPage === meta.totalPages || isLoading}
+                    className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 disabled:opacity-50 hover:bg-slate-50 transition-colors disabled:cursor-not-allowed"
+                  >
+                    <Icon name="ChevronRight" size={16} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
