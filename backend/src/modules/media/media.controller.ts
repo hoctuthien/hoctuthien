@@ -1,6 +1,9 @@
 import {
   Controller,
   Post,
+  Get,
+  Delete,
+  Param,
   Body,
   UseInterceptors,
   UploadedFile,
@@ -12,8 +15,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './services/media.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ApiUploadMediaDoc } from './swagger/media.swagger';
+import { User } from '../../common/decorators/user.decorator';
 
 @ApiTags('media')
 @Controller('media')
@@ -23,6 +27,7 @@ export class MediaController {
   @Post('upload')
   @ApiUploadMediaDoc()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile(
@@ -36,8 +41,27 @@ export class MediaController {
       }),
     )
     file: any,
-    @Body('folder') folder?: string,
+    @Body('folder') folder: string,
+    @User('id') uploaderId: string,
   ) {
-    return this.mediaService.uploadImage(file, folder);
+    return this.mediaService.uploadImage(file, folder, uploaderId);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Lấy danh sách tất cả file media trong thư viện' })
+  @ApiResponse({ status: 200, description: 'Danh sách các file media' })
+  async findAll() {
+    return this.mediaService.findAll();
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Xóa tệp tin media khỏi thư viện' })
+  @ApiResponse({ status: 200, description: 'Xóa thành công' })
+  async remove(@Param('id') id: string) {
+    return this.mediaService.remove(id);
   }
 }

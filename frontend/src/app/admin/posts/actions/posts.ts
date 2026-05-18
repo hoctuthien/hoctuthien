@@ -189,11 +189,11 @@ export async function getCategoriesAction(): Promise<any[]> {
 /**
  * Tạo Category mới → trả về category object
  */
-export async function createCategoryAction(name: string): Promise<any> {
+export async function createCategoryAction(name: string, slug?: string, description?: string): Promise<any> {
   const headers = await getAuthHeaders();
   if (Object.keys(headers).length === 0) throw new Error("Unauthorized");
 
-  const slug = name
+  const finalSlug = slug || name
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -204,15 +204,19 @@ export async function createCategoryAction(name: string): Promise<any> {
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "") + "-" + Date.now();
 
+  const payload: any = { name, slug: finalSlug };
+  if (description) {
+    payload.metadata = { description };
+  }
+
   const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/categories`, {
     method: "POST",
-    body: JSON.stringify({ name, slug }),
+    body: JSON.stringify(payload),
     headers: {
       "Content-Type": "application/json",
       ...headers,
     },
   });
-
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
@@ -220,6 +224,61 @@ export async function createCategoryAction(name: string): Promise<any> {
   }
 
   return extractOne(await res.json());
+}
+
+/**
+ * Cập nhật Category
+ */
+export async function updateCategoryAction(
+  id: string,
+  name: string,
+  slug?: string,
+  description?: string,
+): Promise<any> {
+  const headers = await getAuthHeaders();
+  if (Object.keys(headers).length === 0) throw new Error("Unauthorized");
+
+  const payload: any = { name };
+  if (slug) payload.slug = slug;
+  if (description) {
+    payload.metadata = { description };
+  }
+
+  const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/categories/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || "Failed to update category");
+  }
+
+  return extractOne(await res.json());
+}
+
+/**
+ * Xóa Category
+ */
+export async function deleteCategoryAction(id: string): Promise<any> {
+  const headers = await getAuthHeaders();
+  if (Object.keys(headers).length === 0) throw new Error("Unauthorized");
+
+  const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/categories/${id}`, {
+    method: "DELETE",
+    headers,
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || "Failed to delete category");
+  }
+
+  return { success: true };
 }
 
 // ═══════════════════════════════════════════════

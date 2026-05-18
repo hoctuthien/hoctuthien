@@ -1,21 +1,118 @@
 "use client";
 
-import React, { useState } from "react";
-import { Button, Icon, Badge, Input } from "@/core/ui";
+import React, { useState, useEffect, useRef } from "react";
+import { Button, Icon } from "@/core/ui";
 import { cn } from "@/core/utils/cn";
+import { getMediaAction, deleteMediaAction } from "./actions/media";
+import { uploadFileAction } from "../posts/actions/upload";
 
-const mockImages = [
-  { id: "1", url: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&auto=format&fit=crop&q=60", name: "ui-trends.jpg", size: "1.2 MB", type: "image/jpeg", date: "2026-05-14" },
-  { id: "2", url: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=800&auto=format&fit=crop&q=60", name: "backend-dev.jpg", size: "850 KB", type: "image/jpeg", date: "2026-05-12" },
-  { id: "3", url: "https://images.unsplash.com/photo-1522071823991-b99c223a7097?w=800&auto=format&fit=crop&q=60", name: "mentorship.jpg", size: "2.1 MB", type: "image/jpeg", date: "2026-05-10" },
-  { id: "4", url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&auto=format&fit=crop&q=60", name: "coding-workshop.jpg", size: "1.5 MB", type: "image/jpeg", date: "2026-05-08" },
-  { id: "5", url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=60", name: "setup.jpg", size: "3.4 MB", type: "image/jpeg", date: "2026-05-05" },
-  { id: "6", url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60", name: "code-review.jpg", size: "1.1 MB", type: "image/jpeg", date: "2026-05-01" },
-];
+function formatBytes(bytes: number, decimals = 2) {
+  if (!bytes) return "0 Bytes";
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
 
 export default function AdminMediaPage() {
-  const [selectedId, setSelectedId] = useState<string | null>("1");
-  const selectedImage = mockImages.find(img => img.id === selectedId);
+  const [mediaList, setMediaList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("all");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const fetchMedia = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getMediaAction();
+      setMediaList(data || []);
+      if (data && data.length > 0) {
+        setSelectedId(data[0].id);
+      } else {
+        setSelectedId(null);
+      }
+    } catch (error) {
+      console.error("Failed to load media list:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMedia();
+  }, []);
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setIsUploading(true);
+      await uploadFileAction(formData, "media-library");
+      alert("Tải lên ảnh thành công!");
+      await fetchMedia();
+    } catch (error: any) {
+      alert(error.message || "Tải lên ảnh thất bại");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDeleteClick = async (id: string, filename: string) => {
+    if (!confirm(`Bạn có chắc chắn muốn xóa ảnh "${filename}" khỏi thư viện?`)) return;
+
+    try {
+      await deleteMediaAction(id);
+      alert("Xóa ảnh thành công!");
+      await fetchMedia();
+    } catch (error: any) {
+      alert(error.message || "Xóa ảnh thất bại");
+    }
+  };
+
+  const selectedImage = mediaList.find((img) => img.id === selectedId);
+
+  // Filters
+  const filteredMedia = mediaList.filter((img) => {
+    const matchesSearch = img.filename?.toLowerCase().includes(searchQuery.toLowerCase());
+    if (selectedMonth === "all") return matchesSearch;
+    
+    // Simple filter by month (e.g. "2026-05")
+    const uploadDate = img.createdAt ? new Date(img.createdAt).toISOString() : "";
+    return matchesSearch && uploadDate.includes(selectedMonth);
+  });
+
+  // Extract months for filter dropdown
+  const uniqueMonths = Array.from(
+    new Set(
+      mediaList
+        .filter((img) => img.createdAt)
+        .map((img) => {
+          const date = new Date(img.createdAt);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          return `${year}-${month}`;
+        })
+    )
+  ).sort().reverse();
+
+  const handleCopyLink = (url: string) => {
+    navigator.clipboard.writeText(url);
+    alert("Đã sao chép liên kết vào bộ nhớ tạm!");
+  };
 
   return (
     <div className="h-full flex flex-col gap-6 animate-in fade-in duration-500">
@@ -24,12 +121,23 @@ export default function AdminMediaPage() {
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Media Library</h1>
           <p className="text-slate-500 mt-1">Manage your images and assets.</p>
         </div>
-        <Button 
-          label="Upload New" 
-          variant="primary" 
-          iconLeft={<Icon name="Upload" size={18} />}
-          className="!rounded-xl shadow-lg shadow-primary/20"
-        />
+        <div className="flex gap-2">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            className="hidden" 
+            accept="image/*"
+          />
+          <Button 
+            onClick={handleUploadClick}
+            disabled={isUploading}
+            label={isUploading ? "Uploading..." : "Upload New"} 
+            variant="primary" 
+            iconLeft={<Icon name="Upload" size={18} />}
+            className="!rounded-xl shadow-lg shadow-primary/20"
+          />
+        </div>
       </div>
 
       <div className="flex-1 flex gap-8 min-h-0">
@@ -40,39 +148,63 @@ export default function AdminMediaPage() {
               <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search media..." 
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
               />
             </div>
-            <select className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
-              <option>All Dates</option>
-              <option>May 2026</option>
-              <option>April 2026</option>
+            <select 
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/10"
+            >
+              <option value="all">All Dates</option>
+              {uniqueMonths.map((m: any) => {
+                const [year, month] = m.split("-");
+                return (
+                  <option key={m} value={m}>
+                    Tháng {month}/{year}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 pb-8">
-            {mockImages.map((img) => (
-              <div 
-                key={img.id}
-                onClick={() => setSelectedId(img.id)}
-                className={cn(
-                  "aspect-square rounded-2xl overflow-hidden cursor-pointer border-4 transition-all duration-200 group relative",
-                  selectedId === img.id ? "border-primary ring-4 ring-primary/10" : "border-white hover:border-slate-100 shadow-sm"
-                )}
-              >
-                <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                  <p className="text-white text-[10px] truncate font-medium">{img.name}</p>
-                </div>
-                {selectedId === img.id && (
-                  <div className="absolute top-2 right-2 bg-primary text-white p-1 rounded-full shadow-lg scale-in-center">
-                    <Icon name="Check" size={12} strokeWidth={4} />
+          {isLoading ? (
+            <div className="py-24 text-center text-slate-400">
+              <Icon name="Loader2" size={32} className="animate-spin mx-auto mb-2 text-slate-300" />
+              Loading media library...
+            </div>
+          ) : filteredMedia.length === 0 ? (
+            <div className="py-24 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">
+              <Icon name="Image" size={48} className="mx-auto mb-2 text-slate-300" />
+              Thư viện trống. Hãy bắt đầu tải lên ảnh!
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 pb-8">
+              {filteredMedia.map((img) => (
+                <div 
+                  key={img.id}
+                  onClick={() => setSelectedId(img.id)}
+                  className={cn(
+                    "aspect-square rounded-2xl overflow-hidden cursor-pointer border-4 transition-all duration-200 group relative",
+                    selectedId === img.id ? "border-primary ring-4 ring-primary/10" : "border-white hover:border-slate-100 shadow-sm"
+                  )}
+                >
+                  <img src={img.url} alt={img.filename} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                    <p className="text-white text-[10px] truncate font-medium">{img.filename}</p>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  {selectedId === img.id && (
+                    <div className="absolute top-2 right-2 bg-primary text-white p-1 rounded-full shadow-lg scale-in-center">
+                      <Icon name="Check" size={12} strokeWidth={4} />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Details Sidebar */}
@@ -81,8 +213,8 @@ export default function AdminMediaPage() {
             {selectedImage ? (
               <div className="animate-in slide-in-from-right duration-300">
                 <div className="p-1">
-                  <div className="aspect-[4/3] rounded-t-xl overflow-hidden bg-slate-100">
-                    <img src={selectedImage.url} alt={selectedImage.name} className="w-full h-full object-contain" />
+                  <div className="aspect-[4/3] rounded-t-xl overflow-hidden bg-slate-100 relative group flex items-center justify-center">
+                    <img src={selectedImage.url} alt={selectedImage.filename} className="w-full h-full object-contain" />
                   </div>
                 </div>
                 <div className="p-6 space-y-6">
@@ -91,49 +223,35 @@ export default function AdminMediaPage() {
                     <div className="space-y-2 mt-4">
                       <div className="flex justify-between text-xs">
                         <span className="text-slate-500 font-medium">Filename:</span>
-                        <span className="text-slate-900 font-bold truncate ml-4">{selectedImage.name}</span>
+                        <span className="text-slate-900 font-bold truncate ml-4" title={selectedImage.filename}>{selectedImage.filename}</span>
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-slate-500 font-medium">Size:</span>
-                        <span className="text-slate-900 font-bold">{selectedImage.size}</span>
+                        <span className="text-slate-900 font-bold">{formatBytes(selectedImage.size)}</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-slate-500 font-medium">Dimensions:</span>
-                        <span className="text-slate-900 font-bold">1920 x 1080</span>
+                        <span className="text-slate-500 font-medium">Mime Type:</span>
+                        <span className="text-slate-900 font-bold">{selectedImage.mimeType || "image/jpeg"}</span>
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-slate-500 font-medium">Uploaded on:</span>
-                        <span className="text-slate-900 font-bold">{selectedImage.date}</span>
+                        <span className="text-slate-900 font-bold">
+                          {selectedImage.createdAt ? new Date(selectedImage.createdAt).toLocaleDateString("vi-VN") : "-"}
+                        </span>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Alt Text</label>
-                      <input 
-                        type="text" 
-                        defaultValue={selectedImage.name.split('.')[0]}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/10"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Caption</label>
-                      <textarea 
-                        rows={2}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 resize-none"
-                      />
                     </div>
                   </div>
 
                   <div className="pt-4 flex gap-2 border-t border-slate-100">
                     <Button 
+                      onClick={() => handleCopyLink(selectedImage.url)}
                       label="Copy Link" 
                       variant="secondary" 
                       iconLeft={<Icon name="Copy" size={14} />}
                       className="flex-1 !py-2.5 !text-xs !rounded-xl"
                     />
                     <Button 
+                      onClick={() => handleDeleteClick(selectedImage.id, selectedImage.filename)}
                       label={<Icon name="Trash2" size={14} />} 
                       variant="text" 
                       className="!p-2.5 !text-red-500 hover:bg-red-50 !rounded-xl"

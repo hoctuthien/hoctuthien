@@ -1,19 +1,26 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import axios from 'axios';
 import FormData from 'form-data';
+import { MediaEntity } from '../entities/media.entity';
 
 @Injectable()
 export class MediaService {
   private readonly openinaryUrl: string;
   private readonly apiKey: string;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @InjectRepository(MediaEntity)
+    private mediaRepository: Repository<MediaEntity>,
+  ) {
     this.openinaryUrl = this.configService.get<string>('openinary.url');
     this.apiKey = this.configService.get<string>('openinary.apiKey');
   }
 
-  async uploadImage(file: any, folder?: string) {
+  async uploadImage(file: any, folder?: string, uploaderId?: string) {
     if (!this.openinaryUrl || !this.apiKey) {
       throw new HttpException(
         'Cấu hình Openinary thiếu URL hoặc API Key. Vui lòng kiểm tra file .env',
@@ -51,6 +58,24 @@ export class MediaService {
           ...f,
           url: `${this.openinaryUrl}${f.url}`,
         }));
+
+        // Lưu thông tin ảnh vào database
+        for (const fileObj of response.data.files) {
+          const media = this.mediaRepository.create({
+            url: fileObj.url,
+            filename: fileObj.name || file.originalname,
+            mimeType: fileObj.type || file.mimetype,
+            size: fileObj.size || file.size,
+            uploaderId: uploaderId || null,
+            metadata: {
+              folder: folder || '',
+              openinaryPath: fileObj.url.replace(this.openinaryUrl, ''),
+            },
+          });
+          await this.mediaRepository.save(media);
+          // Gán id từ DB vào fileObj để FE nhận diện được id
+          fileObj.id = media.id;
+        }
       }
 
       return response.data;
@@ -69,5 +94,20 @@ export class MediaService {
 
       throw new HttpException(message, status);
     }
+  }
+
+  async findAll() {
+    return this.mediaRepository.find({
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async remove(id: string) {
+    const media = await this.mediaRepository.findOne({ where: { id } });
+    if (!media) {
+      throw new HttpException('Không tìm thấy tệp tin media', HttpStatus.NOT_FOUND);
+    }
+    await this.mediaRepository.remove(media);
+    return { success: true };
   }
 }
