@@ -27,7 +27,9 @@ export async function getMediaAction(): Promise<any[]> {
     if (!res.ok) return [];
     const result = await res.json();
     // NestJS ResponseTransformInterceptor wraps data as { data: [...] }
-    return result.data || [];
+    const data = result.data || [];
+    console.log("\x1b[35m[getMediaAction] Server Response Data:\x1b[0m", JSON.stringify(data, null, 2));
+    return data;
   } catch (error) {
     console.error("Failed to fetch media library:", error);
     return [];

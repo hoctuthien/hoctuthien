@@ -179,7 +179,9 @@ export async function getCategoriesAction(): Promise<any[]> {
     clearTimeout(timeout);
 
     if (!res.ok) return [];
-    return extractList(await res.json());
+    const data = extractList(await res.json());
+    console.log("\x1b[36m[getCategoriesAction] Server Response Data:\x1b[0m", JSON.stringify(data, null, 2));
+    return data;
   } catch (error) {
     console.error("Failed to fetch categories:", error);
     return [];
