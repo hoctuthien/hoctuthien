@@ -96,7 +96,14 @@ export class MediaService {
     }
   }
 
-  async findAll() {
+  async findAll(folder?: string) {
+    if (folder) {
+      return this.mediaRepository
+        .createQueryBuilder('media')
+        .where("media.metadata->>'folder' = :folder", { folder })
+        .orderBy('media.createdAt', 'DESC')
+        .getMany();
+    }
     return this.mediaRepository.find({
       order: { createdAt: 'DESC' },
     });

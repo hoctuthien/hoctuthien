@@ -14,12 +14,17 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   };
 }
 
-export async function getMediaAction(): Promise<any[]> {
+export async function getMediaAction(folder?: string): Promise<any[]> {
   try {
     const headers = await getAuthHeaders();
     if (Object.keys(headers).length === 0) return [];
 
-    const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/media`, {
+    let url = `${BACKEND_URL.replace(/\/$/, "")}/api/v1/media`;
+    if (folder) {
+      url += `?folder=${encodeURIComponent(folder)}`;
+    }
+
+    const res = await fetch(url, {
       cache: "no-store",
       headers,
     });

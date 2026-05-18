@@ -11,6 +11,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './services/media.service';
@@ -52,8 +53,8 @@ export class MediaController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Lấy danh sách tất cả file media trong thư viện' })
   @ApiResponse({ status: 200, description: 'Danh sách các file media' })
-  async findAll() {
-    return this.mediaService.findAll();
+  async findAll(@Query('folder') folder?: string) {
+    return this.mediaService.findAll(folder);
   }
 
   @Delete(':id')

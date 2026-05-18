@@ -28,7 +28,7 @@ export default function AdminMediaPage() {
   const fetchMedia = async () => {
     try {
       setIsLoading(true);
-      const data = await getMediaAction();
+      const data = await getMediaAction("HTT");
       setMediaList(data || []);
       if (data && data.length > 0) {
         setSelectedId(data[0].id);
@@ -60,7 +60,7 @@ export default function AdminMediaPage() {
 
     try {
       setIsUploading(true);
-      await uploadFileAction(formData, "media-library");
+      await uploadFileAction(formData, "HTT");
       alert("Tải lên ảnh thành công!");
       await fetchMedia();
     } catch (error: any) {
