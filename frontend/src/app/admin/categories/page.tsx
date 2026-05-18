@@ -323,21 +323,52 @@ export default function AdminCategoriesPage() {
                     <Icon name="ChevronLeft" size={16} />
                   </button>
                   
-                  {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNumber) => (
-                    <button
-                      key={pageNumber}
-                      onClick={() => setCurrentPage(pageNumber)}
-                      disabled={isLoading}
-                      className={cn(
-                        "w-8 h-8 rounded-lg border text-xs font-semibold transition-all",
-                        currentPage === pageNumber
-                          ? "bg-primary border-primary text-white shadow-md shadow-primary/10"
-                          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                      )}
-                    >
-                      {pageNumber}
-                    </button>
-                  ))}
+                  {(() => {
+                    const pages: (number | string)[] = [];
+                    const totalPages = meta.totalPages;
+                    
+                    if (totalPages <= 5) {
+                      for (let i = 1; i <= totalPages; i++) pages.push(i);
+                    } else {
+                      pages.push(1);
+                      if (currentPage > 3) pages.push("...");
+                      
+                      const start = Math.max(2, currentPage - 1);
+                      const end = Math.min(totalPages - 1, currentPage + 1);
+                      
+                      for (let i = start; i <= end; i++) pages.push(i);
+                      
+                      if (currentPage < totalPages - 2) pages.push("...");
+                      pages.push(totalPages);
+                    }
+
+                    return pages.map((pageVal, index) => {
+                      if (pageVal === "...") {
+                        return (
+                          <span key={`dots-${index}`} className="px-2 text-slate-400 font-semibold select-none">
+                            ...
+                          </span>
+                        );
+                      }
+                      
+                      const pageNumber = pageVal as number;
+                      return (
+                        <button
+                          key={pageNumber}
+                          onClick={() => setCurrentPage(pageNumber)}
+                          disabled={isLoading}
+                          className={cn(
+                            "w-8 h-8 rounded-lg border text-xs font-semibold transition-all",
+                            currentPage === pageNumber
+                              ? "bg-primary border-primary text-white shadow-md shadow-primary/10"
+                              : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                          )}
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    });
+                  })()}
                   
                   <button
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, meta.totalPages))}
