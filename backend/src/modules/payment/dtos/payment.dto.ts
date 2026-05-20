@@ -1,11 +1,5 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  Min,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * DTO tạo QR kích hoạt tài khoản Mentee.
@@ -19,7 +13,12 @@ export class GenerateActivationQrDto {}
  * Backend sẽ query TN App API để tìm giao dịch khớp.
  */
 export class VerifyActivationPaymentDto {
+  @ApiProperty({
+    description: 'ID của payment record (lấy từ response của generate-qr)',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
   @IsString()
   @IsNotEmpty({ message: 'paymentId không được để trống.' })
   paymentId: string;
 }
+

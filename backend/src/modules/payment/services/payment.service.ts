@@ -1,23 +1,34 @@
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   ServiceUnavailableException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import type { Redis } from 'ioredis';
+import { DataSource } from 'typeorm';
+import { REDIS_CLIENT } from '../../redis/redis.module';
 import { PaymentRepository } from '../repositories/payment.repository';
 import { PaymentEntity, PaymentType } from '../entities/payment.entity';
 import { PaymentStatus } from '../../../common/enums/database.enum';
 import { SystemConfigService } from '../../system-config/services/system-config.service';
 import { VietqrService } from './vietqr.service';
 import { TnAppService } from './tn-app.service';
-import { DataSource } from 'typeorm';
-import { UserEntity } from '../../user/entities/user.entity';
 import { ErrorCode, ErrorMessage } from '../../../common/enums/error-code.enum';
+import { PAYMENT_LOCK_PREFIX } from './payment-verification.service';
+import {
+  PAYMENT_SUCCESS_EVENT,
+  PaymentSuccessPayload,
+} from '../events/payment.events';
 
 const ACTIVATION_FEE_CONFIG_KEY = 'activation_fee';
-const ACTIVATION_FEE_DEFAULT = 10_000;
+const ACTIVATION_FEE_DEFAULT = 5_000;
+
+// Lock TTL: 20 giây — đồng bộ với PaymentVerificationService
+const LOCK_TTL_MS = 20_000;
 
 @Injectable()
 export class PaymentService {
@@ -29,7 +40,9 @@ export class PaymentService {
     private readonly vietqrService: VietqrService,
     private readonly tnAppService: TnAppService,
     private readonly dataSource: DataSource,
-  ) {}
+    private readonly eventEmitter: EventEmitter2,
+    @Inject(REDIS_CLIENT) private readonly redis: Redis,
+  ) { }
 
   async findOne(id: string): Promise<PaymentEntity> {
     return this.paymentRepository.findByIdOrFail(
@@ -119,7 +132,16 @@ export class PaymentService {
     };
   }
 
-  // User bấm "Tôi đã chuyển khoản" → query TN App API kiểm tra giao dịch → kích hoạt tài khoản
+  /**
+   * User bấm "Tôi đã chuyển khoản" → Active-Fetch với Redis Lock.
+   *
+   * Flow:
+   * 1. Check idempotency (đã SUCCESS → return true)
+   * 2. Check expiry (hết hạn → throw 422)
+   * 3. Acquire Redis Lock cho paymentId
+   *    - Lock acquired → gọi TN App → update DB → emit event
+   *    - Lock NOT acquired (cron đang xử lý) → đọc DB status → return
+   */
   async verifyActivationPayment(
     userId: string,
     paymentId: string,
@@ -157,54 +179,113 @@ export class PaymentService {
       );
     }
 
-    const result = await this.tnAppService.findTransactionByCode(
-      transactionCode,
-      payment.createdAt,
-      Number(payment.amount),
+    // ── Acquire Redis Distributed Lock ──
+    const lockKey = `${PAYMENT_LOCK_PREFIX}${paymentId}`;
+    const lockAcquired = await this.redis.set(
+      lockKey,
+      'api',
+      'PX',
+      LOCK_TTL_MS,
+      'NX',
     );
 
-    if (result.error) {
-      this.logger.error(
-        `TN App API lỗi cho payment ${paymentId}: ${result.error}`,
+    if (!lockAcquired) {
+      // Lock bị chiếm (Cron đang xử lý) → đọc lại DB xem cron đã update chưa
+      this.logger.debug(
+        `[Verify] Lock bị chiếm cho payment ${paymentId}. Đọc DB status.`,
       );
-      throw new ServiceUnavailableException(
-        ErrorMessage[ErrorCode.PAYMENT_VERIFY_SERVICE_UNAVAILABLE],
+      const freshPayment = await this.paymentRepository.findByIdOrFail(
+        paymentId,
+        ErrorMessage[ErrorCode.PAYMENT_NOT_FOUND],
       );
-    }
-
-    if (!result.found || !result.transaction) {
+      if (freshPayment.status === PaymentStatus.SUCCESS) {
+        return {
+          activated: true,
+          message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_SUCCESS],
+        };
+      }
       return {
         activated: false,
-        message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_NOT_FOUND],
+        message:
+          'Hệ thống đang xử lý giao dịch của bạn. Vui lòng thử lại sau vài giây.',
       };
     }
 
-    // Cập nhật payment + kích hoạt user trong 1 transaction — all or nothing
-    const tx = result.transaction;
-    await this.dataSource.transaction(async (manager) => {
-      await manager.update(
-        PaymentEntity,
-        { id: paymentId },
-        {
-          status: PaymentStatus.SUCCESS,
-          transactionId: tx.id,
-          paidAt: new Date(tx.transactionTime + '+07:00'),
-          vietqrPayload: {
-            ...payment.vietqrPayload,
-            ...(result.rawResponse ? { rawResponse: result.rawResponse } : {}),
-          } as Record<string, any>,
-        },
+    // ── Lock acquired — gọi TN App trực tiếp ──
+    try {
+      // Double-check sau khi có lock (phòng trường hợp cron vừa xử lý xong trước khi ta lấy lock)
+      const freshPayment = await this.paymentRepository.findByIdOrFail(
+        paymentId,
+        ErrorMessage[ErrorCode.PAYMENT_NOT_FOUND],
       );
-      await manager.update(UserEntity, { id: userId }, { isVerified: true });
-    });
+      if (freshPayment.status === PaymentStatus.SUCCESS) {
+        return {
+          activated: true,
+          message: 'Tài khoản đã được kích hoạt trước đó.',
+        };
+      }
 
-    this.logger.log(
-      `[Verify] Payment ${paymentId} SUCCESS. User ${userId} đã được kích hoạt.`,
-    );
+      const result = await this.tnAppService.findTransactionByCode(
+        transactionCode,
+        payment.createdAt,
+        Number(payment.amount),
+      );
 
-    return {
-      activated: true,
-      message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_SUCCESS],
-    };
+      if (result.error) {
+        this.logger.error(
+          `TN App API lỗi cho payment ${paymentId}: ${result.error}`,
+        );
+        throw new ServiceUnavailableException(
+          ErrorMessage[ErrorCode.PAYMENT_VERIFY_SERVICE_UNAVAILABLE],
+        );
+      }
+
+      if (!result.found || !result.transaction) {
+        return {
+          activated: false,
+          message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_NOT_FOUND],
+        };
+      }
+
+      // Cập nhật payment thành SUCCESS trong DB transaction
+      const tx = result.transaction;
+      await this.dataSource.transaction(async (manager) => {
+        await manager.update(
+          PaymentEntity,
+          { id: paymentId },
+          {
+            status: PaymentStatus.SUCCESS,
+            transactionId: tx.id,
+            paidAt: new Date(tx.transactionTime + '+07:00'),
+            vietqrPayload: {
+              ...payment.vietqrPayload,
+              ...(result.rawResponse
+                ? { rawResponse: result.rawResponse }
+                : {}),
+            } as Record<string, any>,
+          },
+        );
+      });
+
+      this.logger.log(
+        `[Verify] Payment ${paymentId} SUCCESS. User ${userId} đang được kích hoạt qua event.`,
+      );
+
+      // Emit event — UserModule listener sẽ kích hoạt user
+      this.eventEmitter.emit(PAYMENT_SUCCESS_EVENT, {
+        paymentId,
+        transactionId: tx.id,
+        userId,
+      } satisfies PaymentSuccessPayload);
+
+      return {
+        activated: true,
+        message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_SUCCESS],
+      };
+    } finally {
+      // ── Luôn release lock dù thành công hay thất bại ──
+      await this.redis.del(lockKey).catch(() => { });
+    }
   }
 }
+
