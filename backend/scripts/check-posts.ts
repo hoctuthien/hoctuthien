@@ -13,12 +13,10 @@ async function run() {
 
   await dataSource.initialize();
   
-  const posts = await dataSource.query(`SELECT id, title, slug, status FROM posts`);
+  const posts = await dataSource.query(`SELECT id, title, slug, status, summary, metadata FROM posts`);
   
   console.log(`Found ${posts.length} posts:`);
-  posts.forEach((p: any) => {
-    console.log(`- ID: ${p.id}, Slug: ${p.slug}, Title: ${p.title}, Status: ${p.status}`);
-  });
+  console.log(JSON.stringify(posts, null, 2));
   
   await dataSource.destroy();
 }
