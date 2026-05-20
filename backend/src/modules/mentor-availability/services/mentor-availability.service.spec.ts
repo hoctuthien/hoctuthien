@@ -65,6 +65,22 @@ describe('MentorAvailabilityService - Mentor Application Flow', () => {
         bio: 'I want to help others.',
         skills: ['NestJS', 'React'],
         yearsOfExperience: 5,
+        metadata: {
+          certificates: [
+            {
+              name: 'NestJS Certified',
+              issuedBy: 'NestJS',
+              imageUrl: 'https://example.com/cert.png',
+            },
+          ],
+          degrees: [
+            {
+              name: 'Bachelor of Computer Science',
+              university: 'HUST',
+              imageUrl: 'https://example.com/degree.png',
+            },
+          ],
+        },
       };
 
       (repository.findOne as jest.Mock).mockResolvedValue(null); // Không có đơn nào đang chờ
@@ -86,6 +102,8 @@ describe('MentorAvailabilityService - Mentor Application Flow', () => {
         id: applicationId,
         mentorId: menteeId,
         status: MentorAvailabilityStatus.PENDING,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       (manager.findOne as jest.Mock).mockResolvedValueOnce(pendingApp); // Tìm đơn PENDING
