@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const title = `${post.title} | Học Từ Thiện`;
     
     // Dynamic description generation from post summary or content body
-    let description = post.summary;
+    let description = post.summary || post.metadata?.summary;
     if (!description && post.content) {
       description = extractTextFromBlockNote(post.content);
     }
@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 
     // Process cover / thumbnail URL to ensure it is properly encoded (no space characters)
-    let imageUrl = post.metadata?.thumbnail || post.coverImage?.url;
+    let imageUrl = post.metadata?.image || post.metadata?.thumbnail || post.coverImage?.url;
     const appUrl = process.env.AUTH_URL || "https://beta-app.hoctuthien.com";
     
     if (imageUrl) {
@@ -94,6 +94,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       metadataBase: new URL(appUrl),
       alternates: {
         canonical: `/posts/${post.slug}`,
+      },
+      other: {
+        image: imageUrl,
+        summary: description,
       },
       openGraph: {
         title,

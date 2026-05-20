@@ -156,7 +156,11 @@ export default function AdminEditorPage() {
         status: newStatus,
         content,
         summary: summary || null,
-        metadata: { thumbnail: thumbnail || null },
+        metadata: {
+          thumbnail: thumbnail || null,
+          image: thumbnail || null,
+          summary: summary || null,
+        },
       };
       if (categoryId) payload.categoryId = categoryId;
 
