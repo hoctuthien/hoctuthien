@@ -6,6 +6,7 @@ import { PaymentController } from './payment.controller';
 import { PaymentService } from './services/payment.service';
 import { VietqrService } from './services/vietqr.service';
 import { TnAppService } from './services/tn-app.service';
+import { PaymentVerificationService } from './services/payment-verification.service';
 import { PaymentEntity } from './entities/payment.entity';
 import { PaymentRepository } from './repositories/payment.repository';
 import { vietqrConfig } from '../../config/vietqr.config';
@@ -21,7 +22,13 @@ import { SystemConfigModule } from '../system-config/system-config.module';
     SystemConfigModule,
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, PaymentRepository, VietqrService, TnAppService],
+  providers: [
+    PaymentService,
+    PaymentRepository,
+    VietqrService,
+    TnAppService,
+    PaymentVerificationService, // Cron job nằm ở đây
+  ],
   exports: [PaymentService, PaymentRepository, VietqrService, TnAppService],
 })
 export class PaymentModule {}

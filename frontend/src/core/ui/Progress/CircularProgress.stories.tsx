@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { CircularProgress } from "./CircularProgress";
 
 const meta = {
-  title: "Shared/CircularProgress",
+  title: "Core/UI/Progress/CircularProgress",
   component: CircularProgress,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof CircularProgress>;
+} as Meta<typeof CircularProgress>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

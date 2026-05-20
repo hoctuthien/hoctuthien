@@ -1,0 +1,56 @@
+import React from "react";
+import { Button, Icon } from "@/core/ui";
+import Link from "next/link";
+import { getPostsAction, getCategoriesAction, getTagsAction } from "./actions/posts";
+import { PostFilter } from "./components/PostFilter";
+import { PostsTable } from "./components/PostsTable";
+
+export default async function AdminPostsPage({ 
+  searchParams 
+ }: { 
+  searchParams: Promise<{ categoryId?: string; tagId?: string; search?: string }> 
+}) {
+  const params = await searchParams;
+  let posts: any[] = [];
+  let categories: any[] = [];
+  let tags: any[] = [];
+
+  try {
+    const [postsRes, catsRes, tagsRes] = await Promise.all([
+      getPostsAction(params),
+      getCategoriesAction(),
+      getTagsAction()
+    ]);
+    posts = postsRes;
+    categories = catsRes;
+    tags = tagsRes;
+  } catch (error) {
+    console.error("Error fetching admin posts data:", error);
+  }
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Post Management</h1>
+          <p className="text-slate-500 text-sm mt-1">Create, edit and manage your blog content.</p>
+        </div>
+        <Link href="/admin/posts/new">
+          <Button 
+            label="Create New Post" 
+            variant="primary" 
+            iconLeft={<Icon name="Plus" size={18} />}
+            className="!rounded-xl shadow-lg shadow-primary/20"
+          />
+        </Link>
+      </div>
+
+      {/* Filters & Search */}
+      <PostFilter categories={categories} tags={tags} />
+
+      {/* Posts Table */}
+      <PostsTable posts={posts} categories={categories} tags={tags} />
+    </div>
+  );
+}

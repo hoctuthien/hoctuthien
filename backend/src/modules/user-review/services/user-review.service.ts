@@ -16,7 +16,7 @@ export class UserReviewService {
 
   async findAll() {
     const items = await this.userReviewRepository.findMany();
-    return items.map(item => userReviewSchema.parse(item));
+    return items.map((item) => userReviewSchema.parse(item));
   }
 
   async findOne(id: string) {

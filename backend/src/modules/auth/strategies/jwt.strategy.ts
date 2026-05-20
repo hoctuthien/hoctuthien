@@ -21,13 +21,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
       },
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('jwt.accessSecret') || process.env.JWT_ACCESS_SECRET,
+      secretOrKey:
+        configService.get<string>('jwt.accessSecret') ||
+        process.env.JWT_ACCESS_SECRET,
       passReqToCallback: true,
     });
   }
 
   async validate(req: Request, payload: any) {
-    const token = req.cookies['access_token'] || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+    const token =
+      req.cookies['access_token'] ||
+      ExtractJwt.fromAuthHeaderAsBearerToken()(req);
 
     // Kiểm tra xem token có nằm trong blacklist của Redis không
     const isBlacklisted = await this.redis.get(`blacklist:${token}`);
@@ -35,11 +39,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Token đã bị vô hiệu hóa (logout)');
     }
 
-    return { 
-      id: payload.sub, 
-      email: payload.email, 
-      role: payload.role, 
-      deviceId: payload.deviceId 
+    return {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      deviceId: payload.deviceId,
     };
   }
 }

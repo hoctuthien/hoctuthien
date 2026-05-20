@@ -9,13 +9,13 @@ import {
 } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/Breadcrumb",
+  title: "Shared/Components/Breadcrumb",
   component: Breadcrumb,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Breadcrumb>;
+} as Meta<typeof Breadcrumb>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

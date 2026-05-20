@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
@@ -12,15 +13,18 @@ import { Type } from 'class-transformer';
  * Không có thuộc tính nào — amount lấy từ SystemConfig,
  * userId lấy từ JWT Token qua @User('id') ở Controller.
  */
-export class GenerateActivationQrDto { }
+export class GenerateActivationQrDto {}
 
 /**
  * DTO xác minh thanh toán kích hoạt — user bấm "Tôi đã chuyển khoản".
  * Backend sẽ query TN App API để tìm giao dịch khớp.
  */
 export class VerifyActivationPaymentDto {
+  @ApiProperty({
+    example: 'PAY123456',
+    description: 'ID của giao dịch thanh toán',
+  })
   @IsString()
   @IsNotEmpty({ message: 'paymentId không được để trống.' })
   paymentId: string;
 }
-

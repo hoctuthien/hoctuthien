@@ -1,7 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserSessionRepository } from '../repositories/user-session.repository';
-import { createUserSessionSchema, updateUserSessionSchema, userSessionSchema } from '../schema/user-session.schema';
-import { CreateUserSessionInput, UpdateUserSessionInput } from '../types/user-session.types';
+import {
+  createUserSessionSchema,
+  updateUserSessionSchema,
+  userSessionSchema,
+} from '../schema/user-session.schema';
+import {
+  CreateUserSessionInput,
+  UpdateUserSessionInput,
+} from '../types/user-session.types';
 
 @Injectable()
 export class UserSessionService {
@@ -9,7 +16,7 @@ export class UserSessionService {
 
   async findAll() {
     const items = await this.userSessionRepository.findMany();
-    return items.map(item => userSessionSchema.parse(item));
+    return items.map((item) => userSessionSchema.parse(item));
   }
 
   async findOne(id: string) {

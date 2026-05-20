@@ -6,36 +6,104 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CourseBookingService } from './services/course-booking.service';
-import { CreateCourseBookingInput, UpdateCourseBookingInput } from './types/course-booking.types';
+import {
+  CreateCourseBookingInput,
+  UpdateCourseBookingInput,
+  UpdateCourseBookingByMenteeInput,
+  FindCourseBookingsQuery,
+} from './types/course-booking.types';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { Role } from '../../common/enums/role.enum';
+import { User } from '../../common/decorators/user.decorator';
+import {
+  ApiCreateCourseBookingDoc,
+  ApiFindAllCourseBookingsDoc,
+  ApiFindOneCourseBookingDoc,
+  ApiUpdateCourseBookingByMenteeDoc,
+  ApiUpdateCourseBookingDoc,
+  ApiRemoveCourseBookingDoc,
+} from './swagger/course-booking.swagger';
 
+@ApiTags('course-bookings')
 @Controller('course-bookings')
 export class CourseBookingController {
   constructor(private readonly courseBookingService: CourseBookingService) {}
 
   @Post()
-  create(@Body() payload: CreateCourseBookingInput) {
-    return this.courseBookingService.create(payload);
+  @ApiCreateCourseBookingDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  create(
+    @Body() payload: CreateCourseBookingInput,
+    @User('id') menteeId: string,
+  ) {
+    return this.courseBookingService.create(payload, menteeId);
   }
 
   @Get()
-  findAll() {
-    return this.courseBookingService.findAll();
+  @ApiFindAllCourseBookingsDoc()
+  @UseGuards(JwtAuthGuard)
+  findAll(
+    @Query() query: FindCourseBookingsQuery,
+    @User('id') userId: string,
+    @User('role') userRole: string,
+  ) {
+    return this.courseBookingService.findAll(query, userId, userRole);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.courseBookingService.findOne(id);
+  @ApiFindOneCourseBookingDoc()
+  @UseGuards(JwtAuthGuard)
+  findOne(
+    @Param('id') id: string,
+    @User('id') userId: string,
+    @User('role') userRole: string,
+  ) {
+    return this.courseBookingService.findOne(id, userId, userRole);
   }
 
+  // MENTEE tự cập nhật booking của mình (notes / huỷ)
+  @Patch(':id/me')
+  @ApiUpdateCourseBookingByMenteeDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  updateByMentee(
+    @Param('id') id: string,
+    @Body() payload: UpdateCourseBookingByMenteeInput,
+    @User('id') menteeId: string,
+  ) {
+    return this.courseBookingService.updateByMentee(id, payload, menteeId);
+  }
+
+  // MENTOR / ADMIN cập nhật đầy đủ (status, meet link, lịch...)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateCourseBookingInput) {
-    return this.courseBookingService.update(id, payload);
+  @ApiUpdateCourseBookingDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MENTOR, Role.ADMIN)
+  update(
+    @Param('id') id: string,
+    @Body() payload: UpdateCourseBookingInput,
+    @User('id') userId: string,
+    @User('role') userRole: string,
+  ) {
+    return this.courseBookingService.update(id, payload, userId, userRole);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.courseBookingService.remove(id);
+  @ApiRemoveCourseBookingDoc()
+  @UseGuards(JwtAuthGuard)
+  remove(
+    @Param('id') id: string,
+    @User('id') userId: string,
+    @User('role') userRole: string,
+  ) {
+    return this.courseBookingService.remove(id, userId, userRole);
   }
 }

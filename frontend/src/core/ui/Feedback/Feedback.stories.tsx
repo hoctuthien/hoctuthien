@@ -4,7 +4,7 @@ import { Banner, Notification, InlineMessage, Toast } from './index';
 import { IoCloudOffline, IoSend, IoCopy, IoFlash } from 'react-icons/io5';
 
 const meta: Meta = {
-  title: 'Shared/Feedback',
+  title: 'Core/UI/Feedback',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',

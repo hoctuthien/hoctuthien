@@ -14,14 +14,14 @@ export enum BookingStatus {
 
 @Entity({ name: 'course_bookings' })
 export class CourseBookingEntity extends BaseEntity {
-  @Column({ name: 'course_id', type: 'bigint' })
+  @Column({ name: 'course_id', type: 'uuid' })
   courseId: string;
 
   @ManyToOne(() => CourseEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'course_id' })
   course: CourseEntity;
 
-  @Column({ name: 'mentee_id', type: 'bigint' })
+  @Column({ name: 'mentee_id', type: 'uuid' })
   menteeId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
@@ -31,10 +31,20 @@ export class CourseBookingEntity extends BaseEntity {
   @Column({ name: 'meeting_time', type: 'timestamp with time zone' })
   meetingTime: Date;
 
-  @Column({ name: 'google_meet_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'google_meet_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   googleMeetUrl: string | null;
 
-  @Column({ name: 'calendar_event_id', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'calendar_event_id',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   calendarEventId: string | null;
 
   @Column({ name: 'notes_for_mentor', type: 'text', nullable: true })
@@ -43,7 +53,7 @@ export class CourseBookingEntity extends BaseEntity {
   @Column({ name: 'cancellation_reason', type: 'text', nullable: true })
   cancellationReason: string | null;
 
-  @Column({ name: 'payment_id', type: 'bigint', nullable: true })
+  @Column({ name: 'payment_id', type: 'uuid', nullable: true })
   paymentId: string | null;
 
   @OneToOne(() => PaymentEntity, { onDelete: 'SET NULL' })

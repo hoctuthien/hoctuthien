@@ -1,29 +1,41 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { UserRepository } from '../repositories/user.repository';
 import {
   createUserSchema,
   updateUserSchema,
   userSchema,
+  publicUserSchema,
 } from '../schema/user.schema';
-import {
-  CreateUserInput,
-  UpdateUserInput,
-} from '../types/user.types';
+import { CreateUserInput, UpdateUserInput } from '../types/user.types';
+import { Role } from '../../../common/enums/role.enum';
 import * as bcrypt from 'bcrypt';
+import {
+  PAYMENT_SUCCESS_EVENT,
+  PaymentSuccessPayload,
+} from '../../payment/events/payment.events';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(private readonly userRepository: UserRepository) {}
 
   async findAll() {
     const users = await this.userRepository.findMany();
-    return users.map(user => userSchema.parse(user));
+    return users.map((user) => publicUserSchema.parse(user));
   }
 
   async findOne(id: string) {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new NotFoundException('Không tìm thấy thông tin người dùng.');
-    return userSchema.parse(user);
+    if (!user)
+      throw new NotFoundException('Không tìm thấy thông tin người dùng.');
+    return publicUserSchema.parse(user);
   }
 
   async getMe(id: string) {
@@ -34,14 +46,17 @@ export class UserService {
     }
 
     if (user.status !== 'active') {
-      throw new ForbiddenException('Tài khoản của bạn đã bị khóa bởi quản trị viên.');
+      throw new ForbiddenException(
+        'Tài khoản của bạn đã bị khóa bởi quản trị viên.',
+      );
     }
 
-    return userSchema.parse(user);
+    return publicUserSchema.parse(user);
   }
 
   async findByEmail(email: string) {
     const user = await this.userRepository.findByEmail(email);
+    // Trả về full schema (bao gồm passwordHash) vì chỉ dùng nội bộ cho auth
     return user ? userSchema.parse(user) : null;
   }
 
@@ -56,13 +71,34 @@ export class UserService {
     }
 
     const created = await this.userRepository.createAndSave(userData);
-    return userSchema.parse(created);
+    return publicUserSchema.parse(created);
   }
 
-  async update(id: string, payload: UpdateUserInput) {
+  async update(
+    id: string,
+    payload: UpdateUserInput,
+    requestingUserId: string,
+    requestingUserRole: string,
+  ) {
+    // Chỉ ADMIN hoặc chính user đó mới được cập nhật
+    if (requestingUserRole !== Role.ADMIN && requestingUserId !== id) {
+      throw new ForbiddenException(
+        'Bạn không có quyền cập nhật thông tin của người dùng khác.',
+      );
+    }
+
     const parsed = updateUserSchema.parse(payload);
+
+    // Người dùng thông thường không được tự đổi role, points, isVerified
+    if (requestingUserRole !== Role.ADMIN) {
+      delete (parsed as any).role;
+      delete (parsed as any).points;
+      delete (parsed as any).isVerified;
+      delete (parsed as any).status;
+    }
+
     const updated = await this.userRepository.updateById(id, parsed);
-    return userSchema.parse(updated);
+    return publicUserSchema.parse(updated);
   }
 
   async remove(id: string) {
@@ -75,7 +111,35 @@ export class UserService {
    */
   async activateMentee(id: string): Promise<void> {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new NotFoundException('Không tìm thấy thông tin người dùng.');
+    if (!user)
+      throw new NotFoundException('Không tìm thấy thông tin người dùng.');
     await this.userRepository.updateById(id, { isVerified: true });
+  }
+
+  /**
+   * Lắng nghe event payment.success do PaymentVerificationService phát ra.
+   *
+   * Đây là điểm tich hợp duy nhất giữa Payment domain và User domain.
+   * PaymentVerificationService không cần biết về UserService hay UserEntity.
+   */
+  @OnEvent(PAYMENT_SUCCESS_EVENT, { async: true })
+  async handlePaymentSuccess(payload: PaymentSuccessPayload): Promise<void> {
+    this.logger.log(
+      `[Event] Nhận payment.success: paymentId=${payload.paymentId}, userId=${payload.userId}`,
+    );
+
+    try {
+      await this.activateMentee(payload.userId);
+      this.logger.log(
+        `[Event] Kích hoạt thành công tài khoản Mentee: userId=${payload.userId}`,
+      );
+    } catch (error) {
+      // Ghi log lỗi nhưng KHÔNG re-throw — tránh crash event loop của các listener khác
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `[Event] Kích hoạt thất bại cho userId=${payload.userId}: ${message}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
   }
 }

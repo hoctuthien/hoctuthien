@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import envConfig from './config/env.config';
 import { validateEnv } from './config/validation';
 import { DatabaseModule } from './infrastructure/database/database.module';
@@ -21,6 +23,9 @@ import { SystemConfigModule } from './modules/system-config/system-config.module
 import { ConversationModule } from './modules/conversation/conversation.module';
 import { MessageModule } from './modules/message/message.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { MediaModule } from './modules/media/media.module';
+import { PostModule } from './modules/post/post.module';
+import { TagModule } from './modules/tag/tag.module';
 import { TraceIdMiddleware } from './common/middlewares/trace-id.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -32,6 +37,8 @@ import { AppService } from './app.service';
       load: [envConfig],
       validate: validateEnv,
     }),
+    ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     RedisModule,
     AuthModule,
@@ -51,6 +58,9 @@ import { AppService } from './app.service';
     ConversationModule,
     MessageModule,
     NotificationModule,
+    MediaModule,
+    PostModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],

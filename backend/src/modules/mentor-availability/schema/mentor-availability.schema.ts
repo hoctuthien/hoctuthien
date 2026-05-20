@@ -14,7 +14,9 @@ export const mentorAvailabilitySchema = z.object({
   skills: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
   metadata: z.record(z.string(), z.any()).default({}),
-  status: z.nativeEnum(MentorAvailabilityStatus).default(MentorAvailabilityStatus.PENDING),
+  status: z
+    .nativeEnum(MentorAvailabilityStatus)
+    .default(MentorAvailabilityStatus.PENDING),
   note: z.string().max(500).nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -29,25 +31,31 @@ export const createMentorAvailabilitySchema = z.object({
   yearsOfExperience: z.number().optional(),
   skills: z.array(z.string()).optional(),
   metadata: z.object({
-    certificates: z.array(z.object({
-      name: z.string(),
-      issuedBy: z.string().optional(),
-      imageUrl: z.string().url('Certificate image URL is required'),
-    })),
-    degrees: z.array(z.object({
-      name: z.string(),
-      university: z.string().optional(),
-      imageUrl: z.string().url('Degree image URL is required'),
-    })),
+    certificates: z.array(
+      z.object({
+        name: z.string(),
+        issuedBy: z.string().optional(),
+        imageUrl: z.string().url('Certificate image URL is required'),
+      }),
+    ),
+    degrees: z.array(
+      z.object({
+        name: z.string(),
+        university: z.string().optional(),
+        imageUrl: z.string().url('Degree image URL is required'),
+      }),
+    ),
   }),
   note: z.string().max(500).optional(),
 });
 
-export const updateMentorAvailabilitySchema = createMentorAvailabilitySchema.partial().extend({
-  status: z.nativeEnum(MentorAvailabilityStatus).optional(),
-  approvedBy: z.string().optional(),
-  isActive: z.boolean().optional(),
-});
+export const updateMentorAvailabilitySchema = createMentorAvailabilitySchema
+  .partial()
+  .extend({
+    status: z.nativeEnum(MentorAvailabilityStatus).optional(),
+    approvedBy: z.string().optional(),
+    isActive: z.boolean().optional(),
+  });
 
 export const updateMentorAvailabilityStatusSchema = z.object({
   status: z.enum([

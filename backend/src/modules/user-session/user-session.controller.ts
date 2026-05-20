@@ -8,7 +8,10 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserSessionService } from './services/user-session.service';
-import { CreateUserSessionInput, UpdateUserSessionInput } from './types/user-session.types';
+import {
+  CreateUserSessionInput,
+  UpdateUserSessionInput,
+} from './types/user-session.types';
 
 @Controller('user-sessions')
 export class UserSessionController {

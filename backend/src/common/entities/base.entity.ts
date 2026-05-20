@@ -6,7 +6,7 @@ import {
 } from 'typeorm';
 
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @CreateDateColumn({ name: 'created_at' })

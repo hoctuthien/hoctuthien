@@ -5,11 +5,16 @@ import {
   FindOneOptions,
   FindOptionsWhere,
   Repository,
+  SelectQueryBuilder,
 } from 'typeorm';
 import { BaseEntity } from '../entities/base.entity';
 
 export abstract class BaseRepository<T extends BaseEntity> {
   protected constructor(protected readonly repo: Repository<T>) {}
+
+  createQueryBuilder(alias: string): SelectQueryBuilder<T> {
+    return this.repo.createQueryBuilder(alias);
+  }
 
   async createAndSave(data: DeepPartial<T>): Promise<T> {
     const entity = this.repo.create(data);

@@ -5,14 +5,14 @@ import { MentorAvailabilityStatus } from '../../../common/enums/mentor-availabil
 
 @Entity({ name: 'mentor_availabilities' })
 export class MentorAvailabilityEntity extends BaseEntity {
-  @Column({ name: 'mentor_id', type: 'bigint' })
+  @Column({ name: 'mentor_id', type: 'uuid' })
   mentorId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'mentor_id' })
   mentor: UserEntity;
 
-  @Column({ name: 'approved_by', type: 'bigint', nullable: true })
+  @Column({ name: 'approved_by', type: 'uuid', nullable: true })
   approvedBy: string | null;
 
   @ManyToOne(() => UserEntity, { onDelete: 'SET NULL' })
@@ -28,7 +28,12 @@ export class MentorAvailabilityEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   bio: string | null;
 
-  @Column({ name: 'linkedin_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'linkedin_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   linkedinUrl: string | null;
 
   @Column({ name: 'years_of_experience', type: 'integer', nullable: true })

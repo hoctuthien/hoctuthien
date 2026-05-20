@@ -12,11 +12,13 @@ import {
 
 @Injectable()
 export class CourseCategoryService {
-  constructor(private readonly courseCategoryRepository: CourseCategoryRepository) {}
+  constructor(
+    private readonly courseCategoryRepository: CourseCategoryRepository,
+  ) {}
 
   async findAll() {
     const items = await this.courseCategoryRepository.findMany();
-    return items.map(item => courseCategorySchema.parse(item));
+    return items.map((item) => courseCategorySchema.parse(item));
   }
 
   async findOne(id: string) {

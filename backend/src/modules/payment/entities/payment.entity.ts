@@ -11,7 +11,7 @@ export { PaymentStatus };
 
 @Entity({ name: 'payments' })
 export class PaymentEntity extends BaseEntity {
-  @Column({ name: 'user_id', type: 'bigint' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
@@ -24,16 +24,31 @@ export class PaymentEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 10, default: 'VND' })
   currency: string;
 
-  @Column({ name: 'payment_method', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'payment_method',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   paymentMethod: string | null;
 
-  @Column({ name: 'transaction_id', type: 'varchar', length: 255, unique: true, nullable: true })
+  @Column({
+    name: 'transaction_id',
+    type: 'varchar',
+    length: 255,
+    unique: true,
+    nullable: true,
+  })
   transactionId: string | null;
 
   @Column({ name: 'description', type: 'varchar', length: 500, nullable: true })
   description: string | null;
 
-  @Column({ name: 'expired_at', type: 'timestamp with time zone', nullable: true })
+  @Column({
+    name: 'expired_at',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
   expiredAt: Date | null;
 
   @Column({ name: 'vietqr_qr_data_url', type: 'text', nullable: true })

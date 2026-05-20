@@ -1,13 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Icon } from "@/core/ui/Icon";
-import { UI_LABELS } from "@/shared/constants";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Auth");
+  const tCommon = useTranslations("Common");
+
   return (
     <div className="flex h-screen overflow-hidden font-[Montserrat]">
       <aside className="hidden lg:flex lg:w-1/2 relative flex-col justify-between overflow-hidden bg-[#0A1628]">
@@ -23,18 +26,15 @@ export default function AuthLayout({
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-3 w-fit group transition-all active:scale-95 no-underline"
+              className="flex items-center group transition-all active:scale-95 no-underline"
             >
               <Image
-                src="/images/avatar_link.png"
-                alt="Hoc Tu Thien"
-                width={56}
-                height={56}
-                className="object-contain rounded-full shadow-lg border border-white/10 transition-all"
+                src="/images/logo.png"
+                alt="Học Từ Thiện"
+                width={160}
+                height={80}
+                className="h-10 w-auto object-contain transition-all"
               />
-              <span className="text-white font-bold text-2xl tracking-tight group-hover:text-primary transition-colors no-underline">
-                Hoc Tu Thien
-              </span>
             </Link>
 
             {/* Home Button (Desktop - Internal) */}
@@ -46,29 +46,28 @@ export default function AuthLayout({
                 name="ChevronLeft"
                 className="w-4 h-4 transition-transform group-hover:scale-110"
               />
-              {UI_LABELS.AUTH.BACK_TO_HOME}
+              {t("backToHome")}
             </Link>
           </div>
 
           <div className="max-w-md">
             <h1 className="text-white text-5xl font-bold leading-[1.1] mb-6 tracking-tight">
-              Khám phá những ranh giới mới của học thuật xuất sắc.
+              {t("heroTitle")}
             </h1>
             <p className="text-white/70 text-lg leading-relaxed">
-              Không gian của chúng tôi cung cấp các công cụ và sự rõ ràng cần
-              thiết để định hướng trong các bối cảnh trí tuệ phức tạp.
+              {t("heroSubtitle")}
             </p>
           </div>
 
           <div className="flex gap-10 text-white/40 text-sm font-medium">
             <span className="hover:text-white transition-colors cursor-pointer">
-              {UI_LABELS.AUTH.POLICY}
+              {t("policy")}
             </span>
             <span className="hover:text-white transition-colors cursor-pointer">
-              {UI_LABELS.AUTH.ABOUT_US}
+              {t("aboutUs")}
             </span>
             <span className="hover:text-white transition-colors cursor-pointer">
-              {UI_LABELS.AUTH.REPORT_ISSUE}
+              {t("reportIssue")}
             </span>
           </div>
         </div>
@@ -86,18 +85,15 @@ export default function AuthLayout({
         <div className="lg:hidden w-full p-4 flex items-center justify-between bg-[#F8FAFC]/80 backdrop-blur-md z-30 border-b border-slate-100/50">
           <Link
             href="/"
-            className="flex items-center gap-2 group active:scale-95 transition-all no-underline"
+            className="flex items-center group active:scale-95 transition-all no-underline"
           >
             <Image
-              src="/images/avatar_browser.png"
-              alt="Hoc Tu Thien"
-              width={32}
-              height={32}
-              className="object-contain rounded-full shadow-sm"
+              src="/images/logo.png"
+              alt="Học Từ Thiện"
+              width={140}
+              height={40}
+              className="h-8 w-auto object-contain"
             />
-            <span className="text-slate-900 font-bold text-lg tracking-tight group-hover:text-primary transition-colors">
-              Hoc Tu Thien
-            </span>
           </Link>
           <Link
             href="/"

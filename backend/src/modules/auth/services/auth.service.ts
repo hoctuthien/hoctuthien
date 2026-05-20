@@ -1,8 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -38,11 +34,16 @@ export class AuthService implements IAuthService {
     private readonly userSessionService: UserSessionService,
   ) {
     this.googleClient = new OAuth2Client(
-      this.configService.get<string>('google.clientId') || process.env.GOOGLE_CLIENT_ID,
+      this.configService.get<string>('google.clientId') ||
+        process.env.GOOGLE_CLIENT_ID,
     );
   }
 
-  private async createSession(userId: string, refreshToken: string, deviceId?: string) {
+  private async createSession(
+    userId: string,
+    refreshToken: string,
+    deviceId?: string,
+  ) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // Mặc định 7 ngày
 
@@ -62,7 +63,9 @@ export class AuthService implements IAuthService {
     try {
       const ticket = await this.googleClient.verifyIdToken({
         idToken: idToken,
-        audience: this.configService.get<string>('google.clientId') || process.env.GOOGLE_CLIENT_ID,
+        audience:
+          this.configService.get<string>('google.clientId') ||
+          process.env.GOOGLE_CLIENT_ID,
       });
       const payload = ticket.getPayload();
       if (!payload) {
@@ -78,7 +81,9 @@ export class AuthService implements IAuthService {
 
       return this.validateGoogleUser(googleUser, deviceId);
     } catch (error) {
-      throw new UnauthorizedException('Xác thực Google thất bại: ' + error.message);
+      throw new UnauthorizedException(
+        'Xác thực Google thất bại: ' + error.message,
+      );
     }
   }
 
@@ -89,10 +94,16 @@ export class AuthService implements IAuthService {
     return value;
   }
 
-  async register(registerDto: RegisterDto, requestInfo?: { ip?: string; deviceId?: string }) {
-    const { email, password, name, deviceId, phone, dayOfBirth, gender } = registerDto;
+  async register(
+    registerDto: RegisterDto,
+    requestInfo?: { ip?: string; deviceId?: string },
+  ) {
+    const { email, password, name, phone, dayOfBirth, gender } = registerDto;
+    const deviceId = requestInfo?.deviceId;
 
-    const existingUser = await this.userRepository.findOne({ where: { email } });
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new ConflictException(AUTH_MESSAGES.EMAIL_ALREADY_EXISTS);
     }
@@ -113,7 +124,12 @@ export class AuthService implements IAuthService {
     });
     const user = await this.userRepository.save(newUser);
 
-    const payload = { sub: user.id, email: user.email, role: user.role, deviceId };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      deviceId,
+    };
     const tokens = await this.generateTokens(payload);
 
     return {
@@ -127,8 +143,12 @@ export class AuthService implements IAuthService {
     };
   }
 
-  async login(loginDto: LoginDto, requestInfo?: { ip?: string; userAgent?: string }) {
-    const { email, password, deviceId } = loginDto;
+  async login(
+    loginDto: LoginDto,
+    requestInfo?: { ip?: string; userAgent?: string; deviceId?: string },
+  ) {
+    const { email, password } = loginDto;
+    const deviceId = requestInfo?.deviceId;
 
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user || !user.passwordHash) {
@@ -140,7 +160,12 @@ export class AuthService implements IAuthService {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role, deviceId };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      deviceId,
+    };
     const tokens = await this.generateTokens(payload);
 
     return {
@@ -174,14 +199,24 @@ export class AuthService implements IAuthService {
       await this.userSessionService.remove(session.id);
 
       // Generate new tokens
-      const user = await this.userRepository.findOne({ where: { id: payload.sub } });
-      if (!user) throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
+      const user = await this.userRepository.findOne({
+        where: { id: payload.sub },
+      });
+      if (!user)
+        throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
 
-      const newPayload = { sub: user.id, email: user.email, role: user.role, deviceId };
+      const newPayload = {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+        deviceId,
+      };
       const tokens = await this.generateTokens(newPayload);
 
       // Create new session
-      const expiresAt = this.calculateExpirationDate(process.env.JWT_REFRESH_EXPIRES_IN || '7d');
+      const expiresAt = this.calculateExpirationDate(
+        process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+      );
       await this.userSessionService.create({
         userId: user.id,
         refreshToken: tokens.refresh_token,
@@ -201,14 +236,16 @@ export class AuthService implements IAuthService {
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       // Trả về lỗi chi tiết hơn thay vì mask mọi thứ vào DEVICE_INVALID
-      throw new UnauthorizedException(error.message || AUTH_MESSAGES.DEVICE_INVALID);
+      throw new UnauthorizedException(
+        error.message || AUTH_MESSAGES.DEVICE_INVALID,
+      );
     }
   }
 
   async logout(accessToken: string, refreshToken: string, deviceId: string) {
     // 1. Blacklist Access Token vào Redis
     try {
-      const payload = this.jwtService.decode(accessToken) as any;
+      const payload = this.jwtService.decode(accessToken);
       if (payload && payload.exp) {
         const now = Math.floor(Date.now() / 1000);
         const ttl = payload.exp - now; // Thời gian còn lại tính bằng giây
@@ -231,7 +268,6 @@ export class AuthService implements IAuthService {
       await this.userSessionService.remove(session.id);
     }
   }
-
 
   private calculateExpirationDate(expiresIn: string): Date {
     const value = parseInt(expiresIn);
@@ -281,7 +317,12 @@ export class AuthService implements IAuthService {
       user = (await this.userRepository.findOne({ where: { id: user.id } }))!;
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role, deviceId };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      deviceId,
+    };
     const tokens = await this.generateTokens(payload);
 
     return {

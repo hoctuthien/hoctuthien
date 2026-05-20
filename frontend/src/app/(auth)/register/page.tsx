@@ -1,10 +1,13 @@
-import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { RegisterForm } from "@/app/(auth)/register/components";
 
-export const metadata: Metadata = {
-  title: "Register | Học Từ Thiện",
-  description: "Create a new account on Học Từ Thiện.",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("Metadata");
+  return {
+    title: t("registerTitle"),
+    description: t("registerDescription"),
+  };
+}
 
 export default function RegisterPage() {
   return <RegisterForm />;

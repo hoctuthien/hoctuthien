@@ -3,7 +3,7 @@ import { fn } from "storybook/test";
 import { Pagination } from "./Pagination";
 
 const meta = {
-  title: "Shared/Pagination",
+  title: "Core/UI/Pagination",
   component: Pagination,
   parameters: {
     layout: "centered",
@@ -38,7 +38,7 @@ const meta = {
     onPageChange: fn(),
     onEntriesChange: fn(),
   },
-} satisfies Meta<typeof Pagination>;
+} as Meta<typeof Pagination>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

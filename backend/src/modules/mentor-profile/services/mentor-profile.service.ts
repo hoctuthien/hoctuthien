@@ -6,17 +6,19 @@ import {
   mentorProfileSchema,
 } from '../schema/mentor-profile.schema';
 import {
-  CreateMentorProfileInput,
-  UpdateMentorProfileInput,
-} from '../types/mentor-profile.types';
+  CreateMentorProfileDto,
+  UpdateMentorProfileDto,
+} from '../dtos/mentor-profile.dto';
 
 @Injectable()
 export class MentorProfileService {
-  constructor(private readonly mentorProfileRepository: MentorProfileRepository) {}
+  constructor(
+    private readonly mentorProfileRepository: MentorProfileRepository,
+  ) {}
 
   async findAll() {
     const items = await this.mentorProfileRepository.findMany();
-    return items.map(item => mentorProfileSchema.parse(item));
+    return items.map((item) => mentorProfileSchema.parse(item));
   }
 
   async findOne(id: string) {
@@ -27,16 +29,18 @@ export class MentorProfileService {
 
   async findByUserId(userId: string) {
     const item = await this.mentorProfileRepository.findOne({ userId });
-    return item ? mentorProfileSchema.parse(item) : null;
+    if (!item)
+      throw new NotFoundException('Mentor profile not found for this user');
+    return mentorProfileSchema.parse(item);
   }
 
-  async create(payload: CreateMentorProfileInput) {
+  async create(payload: CreateMentorProfileDto) {
     const parsed = createMentorProfileSchema.parse(payload);
     const created = await this.mentorProfileRepository.createAndSave(parsed);
     return mentorProfileSchema.parse(created);
   }
 
-  async update(id: string, payload: UpdateMentorProfileInput) {
+  async update(id: string, payload: UpdateMentorProfileDto) {
     const parsed = updateMentorProfileSchema.parse(payload);
     const updated = await this.mentorProfileRepository.updateById(id, parsed);
     return mentorProfileSchema.parse(updated);

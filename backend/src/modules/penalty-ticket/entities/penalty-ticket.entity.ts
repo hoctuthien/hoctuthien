@@ -4,7 +4,7 @@ import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity({ name: 'penalty_tickets' })
 export class PenaltyTicketEntity extends BaseEntity {
-  @Column({ name: 'user_id', type: 'bigint' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
@@ -17,7 +17,12 @@ export class PenaltyTicketEntity extends BaseEntity {
   @Column({ name: 'points_deducted', type: 'integer', default: 0 })
   pointsDeducted: number;
 
-  @Column({ name: 'evidence_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'evidence_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   evidenceUrl: string | null;
 
   @Column({ type: 'jsonb', default: {} })

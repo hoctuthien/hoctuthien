@@ -9,6 +9,5 @@ export interface SetCookieOptions {
   options?: CookieOptions;
 }
 
-export const SetCookie = (
-  options: SetCookieOptions | SetCookieOptions[],
-) => SetMetadata(SET_COOKIE_KEY, Array.isArray(options) ? options : [options]);
+export const SetCookie = (options: SetCookieOptions | SetCookieOptions[]) =>
+  SetMetadata(SET_COOKIE_KEY, Array.isArray(options) ? options : [options]);
