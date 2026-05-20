@@ -11,7 +11,8 @@ import {
   LuSlidersHorizontal,
   LuSparkles,
   LuAward,
-  LuGraduationCap
+  LuGraduationCap,
+  LuX
 } from "react-icons/lu";
 
 // Interface for Expert Mentors
@@ -50,6 +51,23 @@ export default function MentorCoursesClient() {
   const [formatFilter, setFormatFilter] = useState("all");
   
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+  // Kiểm tra xem có bộ lọc nào đang active không
+  const isFilterActive =
+    searchQuery !== "" ||
+    selectedTag !== "Tất cả Chủ đề" ||
+    academicLevel !== "all" ||
+    durationFilter !== "all" ||
+    formatFilter !== "all";
+
+  // Reset tất cả bộ lọc về mặc định
+  const clearAllFilters = () => {
+    setSearchQuery("");
+    setSelectedTag("Tất cả Chủ đề");
+    setAcademicLevel("all");
+    setDurationFilter("all");
+    setFormatFilter("all");
+  };
 
 
   // Quick Tags in Figma Mockup
@@ -283,9 +301,21 @@ export default function MentorCoursesClient() {
           {/* Bottom Row: Selection Filters */}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full md:w-auto">
-              <span className="text-[10px] font-black text-[#94A3B8] tracking-[0.2em] uppercase mr-2 block sm:inline">
-                LỌC THEO:
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black text-[#94A3B8] tracking-[0.2em] uppercase block sm:inline">
+                  LỌC THEO:
+                </span>
+                {isFilterActive && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 rounded-lg text-[10px] font-black transition-all cursor-pointer animate-in fade-in zoom-in-95 duration-200 border border-red-100"
+                    title="Xóa tất cả bộ lọc"
+                  >
+                    <LuX size={10} strokeWidth={3} />
+                    Xóa lọc
+                  </button>
+                )}
+              </div>
               
               <div className="grid grid-cols-1 sm:flex sm:flex-wrap items-center gap-3 w-full">
                 {/* Academic Level Select */}
@@ -334,7 +364,7 @@ export default function MentorCoursesClient() {
               </div>
             </div>
 
-            {/* Advanced Filter Trigger Button */}
+              {/* Advanced Filter Trigger Button */}
             <button className="flex items-center gap-1.5 text-xs font-black text-[#2563eb] hover:text-[#1d4ed8] transition-colors cursor-pointer self-start md:self-auto mt-2 md:mt-0">
               <LuSlidersHorizontal size={14} />
               <span>Bộ lọc Nâng cao</span>
