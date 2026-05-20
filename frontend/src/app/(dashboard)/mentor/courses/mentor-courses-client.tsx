@@ -209,7 +209,7 @@ export default function MentorCoursesClient() {
           {/* Left Text Column */}
           <div className="lg:col-span-6 flex flex-col gap-4">
             <span className="text-[#2563eb] text-[12px] font-black uppercase tracking-[0.15em] flex items-center gap-1">
-              <LuSparkles size={14} className="animate-pulse" /> HỌC TẬP TỔ CHỨC
+               TỔ CHỨC HỌC TẬP
             </span>
             <h1 className="text-4xl md:text-5xl font-black text-[#0F172A] leading-[1.15] tracking-tight font-[Montserrat]">
               Trao quyền cho <span className="text-[#2563eb] relative inline-block">Thế hệ Tiếp theo<span className="absolute bottom-1 left-0 w-full h-[6px] bg-[#2563eb]/10 rounded-full" /></span> của các <span className="text-[#2563eb] relative inline-block">Nhà giáo dục<span className="absolute bottom-1 left-0 w-full h-[6px] bg-[#2563eb]/10 rounded-full" /></span>
@@ -241,7 +241,7 @@ export default function MentorCoursesClient() {
             <div className="absolute -bottom-6 left-6 sm:left-10 md:left-12 bg-[#2563eb] text-white p-4 sm:p-6 rounded-[20px] sm:rounded-[24px] shadow-2xl max-w-[160px] sm:max-w-[200px] border border-blue-400/20 flex flex-col gap-1 z-10">
               <span className="text-2xl sm:text-4xl font-black tracking-tight">40+</span>
               <span className="text-[9px] sm:text-[11px] text-blue-100 font-bold leading-normal uppercase tracking-wider">
-                đối tác đại học toàn cầu trong năm 2024
+                đối tác đại học toàn cầu trong năm 2026
               </span>
             </div>
           </div>
