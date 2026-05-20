@@ -9,6 +9,8 @@ import { BecomeMentorSection } from './homepage/components/BecomeMentorSection';
 import { Newsletter } from './homepage/components/Newsletter';
 import { getPostsAction } from '@/app/admin/posts/actions/posts';
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   let posts: any[] = [];
   try {

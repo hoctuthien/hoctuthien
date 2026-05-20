@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostRepository } from '../repositories/post.repository';
 import { PostEntity } from '../entities/post.entity';
 import { DeepPartial } from 'typeorm';
@@ -125,7 +125,7 @@ export class PostService {
     }
 
     if (!post) {
-      throw new Error('Post not found');
+      throw new NotFoundException('Post not found');
     }
 
     return post;
