@@ -1,4 +1,15 @@
-export default function CoursesPage() {
+import { auth } from "@/auth";
+import MentorCoursesClient from "@/app/(dashboard)/mentor/courses/mentor-courses-client";
+
+export default async function CoursesPage() {
+  const session = await auth();
+
+  // Nếu người dùng đã đăng nhập và là Mentor, hiển thị Dashboard Quản lý khóa học của Mentor
+  if (session?.user?.role === "mentor") {
+    return <MentorCoursesClient />;
+  }
+
+  // Giao diện mặc định cho học viên / khách vãng lai
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Khóa học</h1>
@@ -12,3 +23,4 @@ export default function CoursesPage() {
     </div>
   );
 }
+
