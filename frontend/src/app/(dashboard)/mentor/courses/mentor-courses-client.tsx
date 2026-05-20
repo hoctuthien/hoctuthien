@@ -311,9 +311,9 @@ export default function MentorCoursesClient() {
                     className="w-full sm:w-auto appearance-none bg-white border border-[#E2E8F0] pl-4 pr-10 py-2.5 rounded-xl text-xs font-bold text-[#475569] outline-none focus:border-[#2563eb] cursor-pointer"
                   >
                     <option value="all">Thời lượng</option>
-                    <option value="short">Dưới 10 giờ (Ngắn)</option>
-                    <option value="medium">10 - 30 giờ (Trung bình)</option>
-                    <option value="long">Trên 30 giờ (Dài)</option>
+                    <option value="short">Dưới 1 giờ (Ngắn)</option>
+                    <option value="medium">1 - 3 giờ (Trung bình)</option>
+                    <option value="long">Trên 3 giờ (Dài)</option>
                   </select>
                   <LuChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b] pointer-events-none" size={14} />
                 </div>
@@ -327,7 +327,6 @@ export default function MentorCoursesClient() {
                   >
                     <option value="all">Định dạng</option>
                     <option value="online">Học trực tuyến</option>
-                    <option value="offline">Học trực tiếp</option>
                     <option value="hybrid">Học kết hợp (Hybrid)</option>
                   </select>
                   <LuChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b] pointer-events-none" size={14} />
