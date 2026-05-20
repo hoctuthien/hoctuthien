@@ -6,6 +6,33 @@ import { Icon } from "@/core/ui/Icon";
 import { Badge } from "@/core/ui/Badge";
 import { getPostAction } from "@/app/admin/posts/actions/posts";
 import { PostContent } from "./components/PostContent";
+import { auth } from "@/auth";
+
+/**
+ * Helper to extract clean text from BlockNote JSON string/array for SEO description
+ */
+function extractTextFromBlockNote(contentJson: string | any): string {
+  try {
+    if (!contentJson) return "";
+    const blocks = typeof contentJson === "string" ? JSON.parse(contentJson) : contentJson;
+    if (!Array.isArray(blocks)) return "";
+    
+    let text = "";
+    for (const block of blocks) {
+      if (block.content) {
+        if (Array.isArray(block.content)) {
+          text += block.content.map((c: any) => c.text || "").join("") + " ";
+        } else if (typeof block.content === "string") {
+          text += block.content + " ";
+        }
+      }
+      if (text.length > 250) break;
+    }
+    return text.trim();
+  } catch (e) {
+    return "";
+  }
+}
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -20,7 +47,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const post = await getPostAction(slug);
     
-    if (!post || post.status !== "published") {
+    const session = await auth();
+    const isAdmin = (session as any)?.user?.role === "admin";
+    const isPublished = post?.status === "published";
+
+    if (!post || (!isPublished && !isAdmin)) {
       return {
         title: "Bài viết không tìm thấy | Học Từ Thiện",
         description: "Không thể tìm thấy bài viết hoặc bài viết đã bị gỡ bỏ.",
@@ -28,20 +59,46 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 
     const title = `${post.title} | Học Từ Thiện`;
-    const description = post.summary || "Đọc bài viết ý nghĩa và hoạt động giáo dục từ Học Từ Thiện.";
-    const imageUrl = post.metadata?.thumbnail || post.coverImage?.url || "/images/og-default.png";
+    
+    // Dynamic description generation from post summary or content body
+    let description = post.summary;
+    if (!description && post.content) {
+      description = extractTextFromBlockNote(post.content);
+    }
+    if (!description) {
+      description = "Đọc bài viết ý nghĩa và hoạt động giáo dục từ Học Từ Thiện.";
+    }
+    if (description.length > 160) {
+      description = description.substring(0, 157) + "...";
+    }
+
+    // Process cover / thumbnail URL to ensure it is properly encoded (no space characters)
+    let imageUrl = post.metadata?.thumbnail || post.coverImage?.url;
+    const appUrl = process.env.AUTH_URL || "https://beta-app.hoctuthien.com";
+    
+    if (imageUrl) {
+      if (imageUrl.startsWith("/")) {
+        imageUrl = `${appUrl}${imageUrl}`;
+      }
+      // Properly encode special characters (especially spaces) to avoid breaking crawler/bot parses
+      imageUrl = encodeURI(imageUrl);
+    } else {
+      imageUrl = `${appUrl}/images/og-default.png`;
+    }
+
     const authorName = post.author?.fullName || "Học Từ Thiện";
     
     return {
       title,
       description,
+      metadataBase: new URL(appUrl),
       alternates: {
         canonical: `/posts/${post.slug}`,
       },
       openGraph: {
         title,
         description,
-        url: `https://hoctuthien.vn/posts/${post.slug}`,
+        url: `/posts/${post.slug}`,
         siteName: "Học Từ Thiện",
         images: [
           {
@@ -95,8 +152,12 @@ export default async function PostDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Security: only allow viewing of published posts for public visitors
-  if (!post || post.status !== "published") {
+  const session = await auth();
+  const isAdmin = (session as any)?.user?.role === "admin";
+  const isPublished = post?.status === "published";
+
+  // Security: only allow viewing of published posts for public visitors, but allow Admin to preview draft posts
+  if (!post || (!isPublished && !isAdmin)) {
     notFound();
   }
 
@@ -111,6 +172,12 @@ export default async function PostDetailPage({ params }: PageProps) {
 
   return (
     <div className="bg-slate-50/50 min-h-screen pb-24">
+      {!isPublished && (
+        <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-black text-center py-3 px-4 shadow-md relative z-20 flex items-center justify-center gap-2 uppercase tracking-widest">
+          <Icon name="AlertTriangle" size={14} />
+          <span>Bạn đang xem bài viết ở chế độ BẢN THẢO (PREVIEW). Bài viết này chưa xuất bản.</span>
+        </div>
+      )}
       {/* Dynamic cover glassmorphism background */}
       {imageUrl && (
         <div className="absolute top-[80px] left-0 right-0 h-[480px] overflow-hidden pointer-events-none select-none z-0">
