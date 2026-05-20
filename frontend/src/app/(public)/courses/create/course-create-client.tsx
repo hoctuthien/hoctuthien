@@ -166,13 +166,13 @@ export default function CourseCreateClient() {
   };
 
   const handleFinishRedirect = () => {
-    router.push("/courses");
+    router.push("/mentor/courses");
   };
 
   const breadcrumbItems = [
     { label: "Trang chủ", href: "/" },
-    { label: "Cố vấn", href: "/courses" },
-    { label: "Danh sách khóa học", href: "/courses" },
+    { label: "Cố vấn", href: "/mentor/courses" },
+    { label: "Danh sách khóa học", href: "/mentor/courses" },
     { label: "Tạo khóa học" },
   ];
 
@@ -187,7 +187,7 @@ export default function CourseCreateClient() {
           <Breadcrumb items={breadcrumbItems} />
           <div className="flex items-center justify-between mt-1">
             <Link 
-              href="/courses" 
+              href="/mentor/courses" 
               className="inline-flex items-center gap-2 text-slate-500 hover:text-[#2563eb] text-sm font-bold transition-colors cursor-pointer group"
             >
               <LuArrowLeft className="group-hover:-translate-x-1 transition-transform" size={16} />
@@ -200,8 +200,11 @@ export default function CourseCreateClient() {
           /* SUCCESS ANIMATION SCREEN */
           <div className="bg-white border border-[#ECFDF5] rounded-[32px] p-8 md:p-16 text-center shadow-xl shadow-slate-100 max-w-2xl mx-auto flex flex-col items-center gap-6 animate-in zoom-in-95 duration-500 my-12">
             <div className="w-20 h-20 bg-[#ECFDF5] rounded-full flex items-center justify-center text-[#10B981] animate-bounce">
-              <LuCheckCircle size={48} />
+              <svg className="w-10 h-10 text-[#10B981]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
             </div>
+
             <div className="flex flex-col gap-2">
               <h2 className="text-3xl font-black text-slate-900 tracking-tight">Khởi Tạo Khóa Học Thành Công!</h2>
               <p className="text-slate-500 text-sm leading-relaxed max-w-md mx-auto">
@@ -601,7 +604,7 @@ export default function CourseCreateClient() {
               {/* Action row at bottom of form */}
               <div className="flex items-center justify-end gap-4 mt-2">
                 <Link
-                  href="/courses"
+                  href="/mentor/courses"
                   className="px-6 py-3.5 text-xs font-black text-slate-500 hover:text-slate-700 transition-colors uppercase tracking-wider cursor-pointer"
                 >
                   Hủy bỏ & Trở lại
