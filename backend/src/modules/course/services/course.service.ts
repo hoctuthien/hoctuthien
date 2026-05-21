@@ -10,7 +10,7 @@ import {
   UpdateCourseInput,
   ApproveCourseInput,
 } from '../types/course.types';
-import { DataSource } from 'typeorm';
+import { DataSource, ILike } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { CourseCategoryEntity } from '../../course-category/entities/course-category.entity';
 import { MentorProfileEntity } from '../../mentor-profile/entities/mentor-profile.entity';
@@ -21,7 +21,10 @@ import {
   approveCourseSchema,
   courseSchema,
   updateCourseSchema,
+  findCoursesQuerySchema,
+  FindCoursesQuery,
 } from '../schema/course.schema';
+import { createPaginationMeta } from '../../../common/utils/pagination.util';
 
 @Injectable()
 export class CourseService {
@@ -30,9 +33,26 @@ export class CourseService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll() {
-    const courses = await this.courseRepository.findMany();
-    return courses.map((course) => courseSchema.parse(course));
+  async findAll(query: FindCoursesQuery) {
+    const { title, status, mentorId, page, limit } =
+      findCoursesQuerySchema.parse(query);
+
+    const where: Record<string, any> = {};
+    if (title) where['title'] = ILike(`%${title}%`);
+    if (status) where['status'] = status;
+    if (mentorId) where['mentorId'] = mentorId;
+
+    const [items, total] = await this.courseRepository.findManyWithCount({
+      where,
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      items: items.map((course) => courseSchema.parse(course)),
+      meta: createPaginationMeta(total, page, limit),
+    };
   }
 
   async findOne(id: string) {

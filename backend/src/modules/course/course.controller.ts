@@ -8,21 +8,27 @@ import {
   Delete,
   UseGuards,
   UsePipes,
+  Query,
 } from '@nestjs/common';
 import { CourseService } from './services/course.service';
 import {
   CreateCourseInput,
   UpdateCourseInput,
   ApproveCourseInput,
+  FindCoursesQuery,
 } from './types/course.types';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { User } from '../../common/decorators/user.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import {
+  ApiApproveCourseDoc,
   ApiCreateCourseDoc,
+  ApiFindAllCoursesDoc,
+  ApiFindOneCourseDoc,
   // ApiFindAllCoursesDoc,
   // ApiFindOneCourseDoc,
   ApiRemoveCourseDoc,
@@ -49,19 +55,19 @@ export class CourseController {
     return await this.courseService.create(payload, mentorId);
   }
 
-  // @Get()
-  // @ApiFindAllCoursesDoc()
-  // @UseGuards(JwtAuthGuard)
-  // findAll() {
-  //   return this.courseService.findAll();
-  // }
+  @Get()
+  @ApiFindAllCoursesDoc()
+  @Public()
+  findAll(@Query() query: FindCoursesQuery) {
+    return this.courseService.findAll(query);
+  }
 
-  // @Get(':id')
-  // @ApiFindOneCourseDoc()
-  // @UseGuards(JwtAuthGuard)
-  // findOne(@Param('id') id: string) {
-  //   return this.courseService.findOne(id);
-  // }
+  @Get(':id')
+  @ApiFindOneCourseDoc()
+  @Public()
+  findOne(@Param('id') id: string) {
+    return this.courseService.findOne(id);
+  }
 
   @Patch(':id')
   @ApiUpdateCourseDoc()
@@ -87,17 +93,17 @@ export class CourseController {
     return this.courseService.updateStatus(id, mentorId, status);
   }
 
-  // @Patch(':id/approve')
-  // @ApiApproveCourseDoc()
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
-  // approve(
-  //   @Param('id') id: string,
-  //   @Body() payload: ApproveCourseInput,
-  //   @User('id') adminId: string,
-  // ) {
-  //   return this.courseService.approve(id, { ...payload, approvedBy: adminId });
-  // }
+  @Patch(':id/approve')
+  @ApiApproveCourseDoc()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  approve(
+    @Param('id') id: string,
+    @Body() payload: ApproveCourseInput,
+    @User('id') adminId: string,
+  ) {
+    return this.courseService.approve(id, { ...payload, approvedBy: adminId });
+  }
 
   @Delete(':id')
   @ApiRemoveCourseDoc()

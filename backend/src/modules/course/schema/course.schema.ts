@@ -38,6 +38,16 @@ export const approveCourseSchema = z.object({
   status: z.nativeEnum(CourseStatus),
 });
 
+// Schema truy vấn danh sách khóa học có phân trang & bộ lọc
+import { paginationQuerySchema } from '../../../common/utils/pagination.util';
+
+export const findCoursesQuerySchema = paginationQuerySchema.extend({
+  title: z.string().optional(),
+  status: z.nativeEnum(CourseStatus).optional(),
+  mentorId: z.string().optional(),
+});
+
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
 export type ApproveCourseInput = z.infer<typeof approveCourseSchema>;
+export type FindCoursesQuery = z.infer<typeof findCoursesQuerySchema>;
