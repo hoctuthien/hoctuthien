@@ -63,6 +63,13 @@ export const Header = () => {
           <button className="p-2 text-text-muted hover:text-primary transition-colors">
             <Icon name="Search" size={20} />
           </button>
+
+          <Link href="/cart" className="p-2 text-text-muted hover:text-primary transition-colors relative no-underline">
+            <Icon name="ShoppingCart" size={20} />
+            <span className="absolute top-0.5 right-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#2563eb] text-[9px] font-black text-white ring-2 ring-white animate-pulse">
+              2
+            </span>
+          </Link>
           
           {isLoading ? (
             <div className="flex items-center gap-3 pl-2 pr-1 py-1 h-10">

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import MentorCoursesClient from "./mentor-courses-client";
+import MentorCoursesDashboardClient from "./mentor-courses-dashboard-client";
 
 export const metadata: Metadata = {
   title: "Quản lý khóa học - Mentor | Học Từ Thiện",
@@ -16,5 +16,6 @@ export default async function MentorCoursesPage() {
     redirect("/");
   }
 
-  return <MentorCoursesClient />;
+  return <MentorCoursesDashboardClient />;
 }
+
