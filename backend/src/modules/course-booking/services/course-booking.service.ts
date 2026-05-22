@@ -4,7 +4,9 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
+import { Not } from 'typeorm';
 import { CourseBookingRepository } from '../repositories/course-booking.repository';
+import { BookingStatus } from '../entities/course-booking.entity';
 import {
   createCourseBookingSchema,
   updateCourseBookingSchema,
@@ -124,9 +126,23 @@ export class CourseBookingService {
 
     this.validateMeetingTime(parsed.meetingTime, course.metadata);
 
+    // Kiểm tra trùng lặp: Mỗi khóa học chỉ cho phép tối đa một học viên đăng ký hoạt động
+    const existingActiveBooking = await this.courseBookingRepository.findOne({
+      courseId: parsed.courseId,
+      status: Not(BookingStatus.CANCELLED),
+    });
+
+    if (existingActiveBooking) {
+      throw new BadRequestException(
+        'Khóa học này đã có học viên đăng ký và đang hoạt động.',
+      );
+    }
+
+    // Tạm thời luồng payment tự động thành công (confirmed)
     const created = await this.courseBookingRepository.createAndSave({
       ...parsed,
       menteeId,
+      status: BookingStatus.CONFIRMED,
     });
     return courseBookingSchema.parse(created);
   }
