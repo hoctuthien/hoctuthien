@@ -45,6 +45,7 @@ describe('CourseService', () => {
 
     mockCourseRepo = {
       findMany: jest.fn(),
+      findManyWithCount: jest.fn(),
       findById: jest.fn(),
       updateById: jest.fn(),
       softDeleteById: jest.fn(),
@@ -182,6 +183,47 @@ describe('CourseService', () => {
       expect(result.status).toBe(CourseStatus.INACTIVE);
       expect(mockCourseRepo.updateById).toHaveBeenCalledWith(courseId, {
         status: CourseStatus.INACTIVE,
+      });
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return paginated list of courses and metadata', async () => {
+      const mockCourses = [
+        {
+          id: 'course-1',
+          mentorId: 'mentor-1',
+          title: 'Advanced React',
+          price: 500000,
+          durationMinutes: 60,
+          prerequisites: [],
+          metadata: {},
+          status: CourseStatus.ACTIVE,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+      mockCourseRepo.findManyWithCount.mockResolvedValueOnce([mockCourses, 1]);
+
+      const query = { page: 1, limit: 10, title: 'React' };
+      const result = await service.findAll(query as any);
+
+      expect(mockCourseRepo.findManyWithCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            title: expect.any(Object), // do dùng ILike
+          }),
+          skip: 0,
+          take: 10,
+        }),
+      );
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].title).toBe('Advanced React');
+      expect(result.meta).toEqual({
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
       });
     });
   });

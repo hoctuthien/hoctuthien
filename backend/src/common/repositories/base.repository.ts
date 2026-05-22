@@ -48,6 +48,12 @@ export abstract class BaseRepository<T extends BaseEntity> {
     return this.repo.find(options);
   }
 
+  async findManyWithCount(
+    options?: FindManyOptions<T>,
+  ): Promise<[T[], number]> {
+    return this.repo.findAndCount(options);
+  }
+
   async updateById(id: string, data: DeepPartial<T>): Promise<T> {
     const entity = await this.findByIdOrFail(id);
     Object.assign(entity, data);

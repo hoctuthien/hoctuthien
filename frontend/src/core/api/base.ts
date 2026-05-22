@@ -20,31 +20,47 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
       url += `?${searchParams.toString()}`;
     }
 
+    console.log(`[httpClient] Making request: ${options.method || 'GET'} ${url}`, {
+      headers: options.headers,
+    });
+
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw {
-        ...errorData,
+      console.log(`[httpClient] Received response from: ${url} | Status: ${response.status} ${response.statusText}`);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error(`[httpClient] Error Response from ${url}:`, {
+          status: response.status,
+          errorData,
+        });
+        throw {
+          ...errorData,
+          status: response.status,
+        };
+      }
+
+      // Trả về cả data và headers
+      const data = await response.json();
+      console.log(`[httpClient] Successfully parsed JSON data from ${url}:`, data);
+      return {
+        data,
+        headers: response.headers,
         status: response.status,
       };
+    } catch (fetchError: any) {
+      console.error(`[httpClient] Fetch exception calling ${url}:`, fetchError);
+      throw fetchError;
     }
-
-    // Trả về cả data và headers
-    const data = await response.json();
-    return {
-      data,
-      headers: response.headers,
-      status: response.status,
-    };
   };
 
   return {
