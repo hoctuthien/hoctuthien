@@ -21,4 +21,3 @@ export class VerifyActivationPaymentDto {
   @IsNotEmpty({ message: 'paymentId không được để trống.' })
   paymentId: string;
 }
-

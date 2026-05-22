@@ -144,7 +144,7 @@ export class TnAppService {
       `${baseUrl}/bank-account-transaction/${accountNo}/transactionsV2` +
       `?fromDate=${from}&toDate=${to}&keyword=&pageNumber=1&pageSize=50`;
 
-    let rawResponse: string | undefined;
+    let rawResponse = '';
 
     try {
       const response: AxiosResponse<TNApiWrapper> =
@@ -153,17 +153,6 @@ export class TnAppService {
             headers: { 'Content-Type': 'application/json' },
           }),
         );
-
-      if (response.status !== 200) {
-        this.logger.warn(
-          `[TnApp] HTTP ${response.status} cho tài khoản ${accountNo}`,
-        );
-        return {
-          found: false,
-          transaction: null,
-          error: `HTTP ${response.status}`,
-        };
-      }
 
       // API trả về: { status, data: { transactions: [...] } }
       const payload = response.data?.data;
@@ -191,8 +180,8 @@ export class TnAppService {
       return { found: false, transaction: null, rawResponse };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`[TnApp] Lỗi khi query giao dịch: ${message}`);
-      return { found: false, transaction: null, rawResponse, error: message };
+      this.logger.error(`[TnApp] findTransactionByCode lỗi: ${message}`);
+      return { found: false, transaction: null, error: message };
     }
   }
 }

@@ -1,17 +1,18 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { CourseStatus } from '../enums/course-status.enum';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity({ name: 'courses' })
 export class CourseEntity extends BaseEntity {
-  @Column({ name: 'mentor_id', type: 'bigint' })
+  @Column({ name: 'mentor_id', type: 'uuid' })
   mentorId: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'mentor_id' })
   mentor: UserEntity;
 
-  @Column({ name: 'approved_by', type: 'bigint', nullable: true })
+  @Column({ name: 'approved_by', type: 'uuid', nullable: true })
   approvedBy: string | null;
 
   @ManyToOne(() => UserEntity, { onDelete: 'SET NULL' })
@@ -44,6 +45,10 @@ export class CourseEntity extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata: Record<string, any>;
 
-  @Column({ type: 'varchar', length: 50, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: CourseStatus,
+    default: CourseStatus.DRAFT,
+  })
+  status: CourseStatus;
 }

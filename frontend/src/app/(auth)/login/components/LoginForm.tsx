@@ -4,22 +4,40 @@ import { useState } from "react";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Input } from "@/core/ui/Input";
 import { Button } from "@/core/ui/Button";
 import { AuthDivider, GoogleSignInButton } from "@/app/(auth)/components";
-import { MESSAGES, UI_LABELS } from "@/shared/constants";
 import { Icon } from "@/core/ui/Icon";
 import { Checkbox } from "@/core/ui/Selection/Checkbox";
 import {
   loginSchema,
   type LoginFormData,
 } from "@/app/(auth)/login/login.schema";
+import { signIn } from "next-auth/react";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export function LoginForm() {
+  const t = useTranslations("Auth");
+  const tError = useTranslations("Error");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get("error");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (errorParam === "CredentialsSignin") {
+      setGeneralError(tError("invalidCredentials"));
+    } else if (errorParam) {
+      setGeneralError(tError("unknownError") || "An error occurred during sign in.");
+    }
+  }, [errorParam, tError]);
 
   const {
     register,
@@ -41,11 +59,27 @@ export function LoginForm() {
     setGeneralError(null);
 
     try {
-      // TODO: replace with actual auth API call
-      console.log("Login data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-    } catch {
-      setGeneralError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
+      console.log("[LoginForm] Submitting login...");
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (!result || result.error) {
+        setGeneralError(tError("invalidCredentials"));
+      } else if (result.ok) {
+        // Lấy session mới nhất để check role
+        const res = await fetch("/api/auth/session");
+        const session = await res.json();
+        
+        const redirectUrl = session?.user?.role === "admin" ? "/admin/dashboard" : "/";
+        router.push(redirectUrl);
+        router.refresh();
+      }
+    } catch (error: any) {
+      console.error("[LoginForm] Submit Error:", error);
+      setGeneralError(tError("invalidCredentials"));
     } finally {
       setIsSubmitting(false);
     }
@@ -54,8 +88,10 @@ export function LoginForm() {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      // TODO: replace with actual Google OAuth flow
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Với Google, chúng ta để Middleware xử lý redirect dựa trên role ở trang callback
+      await signIn("google", { callbackUrl: "/admin/dashboard" });
+    } catch (error) {
+      console.error("Google login failed:", error);
     } finally {
       setIsGoogleLoading(false);
     }
@@ -65,29 +101,30 @@ export function LoginForm() {
     <div className="w-full max-w-md">
       <div className="mb-10">
         <h2 className="text-3xl md:text-4xl font-bold text-text-heading mb-3 tracking-tight">
-          {UI_LABELS.AUTH.WELCOME_BACK}
+          {t("welcomeBack")}
         </h2>
         <p className="text-text-muted text-base leading-relaxed font-[Montserrat]">
-          {UI_LABELS.AUTH.LOGIN_SUBTITLE}
+          {t("loginSubtitle")}
         </p>
       </div>
 
       <GoogleSignInButton
-        label={UI_LABELS.AUTH.SIGN_IN_WITH_GOOGLE}
+        label={t("signInWithGoogle")}
         onClick={handleGoogleSignIn}
         loading={isGoogleLoading}
       />
 
-      <AuthDivider text={UI_LABELS.AUTH.OR_CONTINUE_WITH_EMAIL} />
+      <AuthDivider text={t("orContinueWithEmail")} />
 
       <form
         onSubmit={handleSubmit(onSubmit)}
+        method="POST"
         noValidate
         className="flex flex-col gap-5"
       >
         <Input
           id="login-email"
-          label={UI_LABELS.AUTH.EMAIL_ADDRESS}
+          label={t("emailAddress")}
           type="email"
           placeholder="name@atelier.edu"
           error={errors.email?.message}
@@ -103,7 +140,7 @@ export function LoginForm() {
 
         <Input
           id="login-password"
-          label={UI_LABELS.AUTH.PASSWORD}
+          label={t("password")}
           type={showPassword ? "text" : "password"}
           placeholder="••••••••"
           error={errors.password?.message}
@@ -114,7 +151,7 @@ export function LoginForm() {
               href="/forgot-password"
               className="text-sm font-medium text-primary hover:underline font-[Montserrat]"
             >
-              {UI_LABELS.AUTH.FORGOT_PASSWORD}
+              {t("forgotPassword")}
             </Link>
           }
           suffix={
@@ -122,7 +159,7 @@ export function LoginForm() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="text-text-muted hover:text-text-heading transition-colors cursor-pointer focus:outline-none"
-              aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+              aria-label={showPassword ? t("hidePassword") : t("showPassword")}
               tabIndex={-1}
             >
               <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
@@ -137,7 +174,7 @@ export function LoginForm() {
             render={({ field }) => (
               <Checkbox
                 id="remember-me"
-                label={UI_LABELS.AUTH.REMEMBER_ME}
+                label={t("rememberMe")}
                 checked={field.value}
                 onChange={field.onChange}
               />
@@ -158,9 +195,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          label={
-            isSubmitting ? UI_LABELS.AUTH.ENTERING : UI_LABELS.AUTH.ENTER_LOGIN
-          }
+          label={isSubmitting ? t("signingIn") : t("signIn")}
           variant="primary"
           size="md"
           fullWidth
@@ -169,12 +204,12 @@ export function LoginForm() {
       </form>
 
       <p className="text-center text-sm text-text-muted mt-6 font-[Montserrat]">
-        {UI_LABELS.AUTH.NEW_TO_ACCOUNT}{" "}
+        {t("noAccount")}{" "}
         <Link
           href="/register"
           className="text-primary font-semibold hover:underline"
         >
-          {UI_LABELS.AUTH.CREATE_ACCOUNT}
+          {t("createAccount")}
         </Link>
       </p>
     </div>

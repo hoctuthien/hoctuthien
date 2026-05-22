@@ -3,7 +3,7 @@ import { fn } from "storybook/test";
 import { Switch } from "./Switch";
 
 const meta = {
-  title: "Shared/Switch",
+  title: "Core/UI/Selection/Switch",
   component: Switch,
   parameters: {
     layout: "centered",
@@ -20,7 +20,7 @@ const meta = {
     label: { control: "text" },
   },
   args: { onChange: fn() },
-} satisfies Meta<typeof Switch>;
+} as Meta<typeof Switch>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

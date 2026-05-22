@@ -155,15 +155,18 @@ export class PaymentService {
       throw new ForbiddenException(ErrorMessage[ErrorCode.PAYMENT_FORBIDDEN]);
     }
 
-    // Idempotency: đã kích hoạt rồi thì trả về luôn
+    // Trường hợp 1: Cron đã xác nhận thành công → báo ngay cho frontend
     if (payment.status === PaymentStatus.SUCCESS) {
-      this.logger.log(`Payment ${paymentId} đã SUCCESS, bỏ qua xác minh.`);
+      this.logger.log(
+        `[Poll] Payment ${paymentId} đã SUCCESS. Phản hồi cho user ${userId}.`,
+      );
       return {
         activated: true,
-        message: 'Tài khoản đã được kích hoạt trước đó.',
+        message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_SUCCESS],
       };
     }
 
+    // Trường hợp 2: QR đã hết hạn → yêu cầu tạo mới
     if (!payment.expiredAt || payment.expiredAt <= new Date()) {
       throw new UnprocessableEntityException(
         ErrorMessage[ErrorCode.PAYMENT_QR_EXPIRED],
@@ -288,4 +291,3 @@ export class PaymentService {
     }
   }
 }
-

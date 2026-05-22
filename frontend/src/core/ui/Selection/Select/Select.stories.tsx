@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Select } from './Select';
 
 const meta: Meta<typeof Select> = {
-  title: 'Shared/Select',
+  title: 'Core/UI/Selection/Select',
   component: Select,
   tags: ['autodocs'],
   parameters: {

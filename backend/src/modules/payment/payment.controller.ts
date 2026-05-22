@@ -14,6 +14,11 @@ import {
 } from './dtos/payment.dto';
 import { User } from '../../common/decorators/user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {
+  ApiGenerateActivationQrDoc,
+  ApiFindOnePaymentDoc,
+  ApiVerifyActivationPaymentDoc,
+} from './swagger/payment.swagger';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -44,6 +49,7 @@ export class PaymentController {
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập.' })
   @UseGuards(JwtAuthGuard)
   @Post('activation/generate-qr')
+  @ApiGenerateActivationQrDoc()
   generateActivationQr(
     @Body() _dto: GenerateActivationQrDto,
     @User('id') userId: string,
@@ -83,6 +89,7 @@ export class PaymentController {
   @ApiResponse({ status: 404, description: 'Không tìm thấy payment.' })
   @UseGuards(JwtAuthGuard)
   @Get(':id')
+  @ApiFindOnePaymentDoc()
   findOne(@Param('id') id: string) {
     return this.paymentService.findOne(id);
   }
@@ -122,6 +129,7 @@ export class PaymentController {
   @ApiResponse({ status: 503, description: 'TN App API tạm thời không khả dụng. Thử lại sau.' })
   @UseGuards(JwtAuthGuard)
   @Post('activation/verify')
+  @ApiVerifyActivationPaymentDoc()
   verifyActivationPayment(
     @Body() dto: VerifyActivationPaymentDto,
     @User('id') userId: string,
@@ -129,4 +137,3 @@ export class PaymentController {
     return this.paymentService.verifyActivationPayment(userId, dto.paymentId);
   }
 }
-

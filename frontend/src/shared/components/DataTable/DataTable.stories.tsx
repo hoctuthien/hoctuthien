@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { DataTable, Column } from "./DataTable";
-import { Badge } from "@ui";
+import { Badge } from '../../../core/ui/Badge/Badge';
 
 interface MockData {
   id: string;
@@ -12,13 +12,13 @@ interface MockData {
 }
 
 const meta = {
-  title: "Shared/DataTable",
+  title: "Shared/Components/DataTable",
   component: DataTable,
   parameters: {
     layout: "fullscreen",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof DataTable>;
+} as Meta<typeof DataTable>;
 
 export default meta;
 type Story = StoryObj<typeof DataTable>;

@@ -13,7 +13,7 @@ export class SystemConfigEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column({ name: 'created_by', type: 'bigint', nullable: true })
+  @Column({ name: 'created_by', type: 'uuid', nullable: true })
   createdBy: string | null;
 
   @ManyToOne(() => UserEntity, { onDelete: 'SET NULL' })

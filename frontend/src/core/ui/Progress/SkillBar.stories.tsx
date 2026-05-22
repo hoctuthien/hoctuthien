@@ -4,13 +4,13 @@ import { SkillBar } from "./SkillBar";
 import { LuSettings, LuMessageSquare, LuTowerControl } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/SkillBar",
+  title: "Core/UI/Progress/SkillBar",
   component: SkillBar,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof SkillBar>;
+} as Meta<typeof SkillBar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

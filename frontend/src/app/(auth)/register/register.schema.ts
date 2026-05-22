@@ -3,6 +3,7 @@ import { MESSAGES } from "@/shared/constants";
 
 export const registerSchema = z
   .object({
+    name: z.string().min(1, MESSAGES.ERROR.AUTH.FULL_NAME_REQUIRED),
     email: z
       .string()
       .min(1, MESSAGES.ERROR.AUTH.EMAIL_REQUIRED)

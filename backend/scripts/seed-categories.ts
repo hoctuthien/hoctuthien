@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { CategoryEntity } from '../src/modules/category/entities/category.entity';
+import { CategoryStatus } from '../src/modules/category/enums/category-status.enum';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -176,19 +177,21 @@ async function seed() {
       if (!existing) {
         const newCat = repository.create({
           ...cat,
-          status: 'active',
+          status: CategoryStatus.ACTIVE,
           metadata: {},
         });
         await repository.save(newCat);
-        console.log(`Inserted: ${cat.name}`);
+        console.log(`✅ Inserted: ${cat.name}`);
       } else {
-        console.log(`Skipped (exists): ${cat.name}`);
+        existing.status = CategoryStatus.ACTIVE;
+        await repository.save(existing);
+        console.log(`ℹ️ Updated: ${cat.name} (status set to ACTIVE)`);
       }
     }
 
-    console.log('Seeding completed successfully.');
+    console.log('\n🚀 Seeding completed successfully.');
   } catch (error) {
-    console.error('Error during seeding:', error);
+    console.error('❌ Error during seeding:', error);
   } finally {
     await dataSource.destroy();
   }

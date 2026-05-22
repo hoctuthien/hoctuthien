@@ -5,7 +5,7 @@ import { InputNumber, InputNumberBorderless } from "./InputNumber";
 
 
 const meta = {
-  title: "Shared/InputNumber",
+  title: "Core/UI/InputNumber",
   component: InputNumber,
   parameters: {
     layout: "centered",
@@ -48,7 +48,7 @@ const meta = {
     },
   },
   args: { onChange: fn() },
-} satisfies Meta<typeof InputNumber>;
+} as Meta<typeof InputNumber>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -167,7 +167,7 @@ export const AllStates: Story = {
 
 
 const borderlessMeta = {
-  title: "Shared/InputNumber/Borderless",
+  title: "Core/UI/InputNumber",
   component: InputNumberBorderless,
   parameters: {
     layout: "centered",
@@ -203,7 +203,7 @@ const borderlessMeta = {
     },
   },
   args: { onChange: fn() },
-} satisfies Meta<typeof InputNumberBorderless>;
+} as Meta<typeof InputNumberBorderless>;
 
 export const Borderless_CircleIcons: Story = {
   name: "Borderless — Circle Icons",

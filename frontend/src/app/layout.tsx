@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { cn } from "@/core/utils/cn";
 import { Providers } from "./providers";
+import { AuthProvider } from "./auth-provider";
+import { DeviceInitializer } from "@/shared/components/DeviceInitializer";
 import "./global.css";
 
 const montserrat = Montserrat({
@@ -46,18 +50,37 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+/**
+ * Root Layout — async vì cần await locale & messages từ server.
+ *
+ * Flow:
+ *   1. getLocale()   → đọc locale từ i18n/request.ts (hiện tại: 'vi')
+ *   2. getMessages() → load messages/vi.json
+ *   3. NextIntlClientProvider → truyền messages xuống Client Components
+ *   4. Providers → QueryClientProvider (React Query)
+ */
+import { auth } from "@/auth";
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const session = await auth();
+
   return (
-    <html lang="vi">
+    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
         className={cn(montserrat.variable, "font-sans antialiased")}
         suppressHydrationWarning
       >
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>
+            <AuthProvider session={session}>{children}</AuthProvider>
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -4,13 +4,13 @@ import { DescriptionList } from "./DescriptionList";
 import { LuUser, LuMail, LuBriefcase, LuGraduationCap } from "react-icons/lu";
 
 const meta = {
-  title: "Shared/DescriptionList",
+  title: "Shared/Components/DescriptionList",
   component: DescriptionList,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof DescriptionList>;
+} as Meta<typeof DescriptionList>;
 
 export default meta;
 type Story = StoryObj<typeof DescriptionList>;

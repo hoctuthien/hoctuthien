@@ -1,0 +1,22 @@
+#!/bin/sh
+echo "Running pre-commit checks for backend..."
+
+cd backend
+
+# Run ESLint
+echo "Running ESLint..."
+npm run lint
+LINT_EXIT=$?
+
+# Run Build (Compile Check)
+echo "Running Build (Compile Check)..."
+npm run build
+BUILD_EXIT=$?
+
+if [ $LINT_EXIT -ne 0 ] || [ $BUILD_EXIT -ne 0 ]; then
+  echo "❌ Pre-commit checks failed! Please fix errors before committing."
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"
+exit 0

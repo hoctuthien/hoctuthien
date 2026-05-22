@@ -1,0 +1,292 @@
+"use client";
+
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getMentorRegisterSchema, MentorRegisterValues } from "./mentor-register.schema";
+import { Button, Icon, Toast } from "@/core/ui";
+import { cn } from "@/core/utils/cn";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import { mentorGateway } from "@/core/gateway";
+import { useTranslations } from "next-intl";
+import { ConfirmModal, Modal } from "@/shared/components";
+import { HiCheckCircle, HiXCircle } from "react-icons/hi2";
+
+const Step1ProfessionalDetails = dynamic(() => import("./components").then(mod => mod.Step1ProfessionalDetails));
+const Step2ExpertiseBio = dynamic(() => import("./components").then(mod => mod.Step2ExpertiseBio));
+const Step3Credentials = dynamic(() => import("./components").then(mod => mod.Step3Credentials));
+
+export default function MentorRegisterClient() {
+  const t = useTranslations("MentorRegister");
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
+
+  const STEPS = [
+    { title: t("stepTitle1"), icon: "Briefcase" },
+    { title: t("stepTitle2"), icon: "Award" },
+    { title: t("stepTitle3"), icon: "FileText" },
+  ];
+
+  const form = useForm<MentorRegisterValues>({
+    resolver: zodResolver(getMentorRegisterSchema(t)),
+    defaultValues: {
+      jobTitle: "",
+      company: "",
+      yearsOfExperience: 0,
+      linkedinUrl: "",
+      bio: "",
+      skills: [],
+      note: "",
+      metadata: {
+        certificates: [],
+        degrees: [],
+      },
+    },
+    mode: "onChange",
+  });
+
+  const onSubmit = async (data: MentorRegisterValues) => {
+    try {
+      console.log("Submitting Mentor Application:", data);
+      await mentorGateway.createMentorAvailability(data);
+      setShowSuccessModal(true);
+    } catch (error: any) {
+      console.error("Failed to submit application:", error);
+      const msg = error.error?.details?.message || error.error?.message || t("errorMessage");
+      setErrorMessage(msg);
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 5000);
+    }
+  };
+
+  const nextStep = async () => {
+    let fieldsToValidate: any[] = [];
+    if (currentStep === 0) {
+      fieldsToValidate = ["jobTitle", "company", "yearsOfExperience", "linkedinUrl"];
+    } else if (currentStep === 1) {
+      fieldsToValidate = ["skills", "bio", "note"];
+    }
+
+    const isValid = await form.trigger(fieldsToValidate);
+    if (isValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1));
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F7F9FB] flex items-center justify-center py-10 md:py-20 px-4">
+      <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center lg:items-start">
+        
+        {/* Left Side: Info & Progress */}
+        <div className="lg:col-span-5 flex flex-col gap-8">
+          <div className="flex flex-col gap-4">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider w-fit">
+              {t("step", { current: currentStep + 1, total: STEPS.length })}
+            </span>
+            <h1 className="text-4xl lg:text-5xl font-bold text-[#181C20] leading-tight font-[Plus Jakarta Sans]">
+              {t("title")} <span className="text-primary">{t("titleHighlight")}</span>
+            </h1>
+            <p className="text-lg text-[#727785] font-[Plus Jakarta Sans]">
+              {t("subtitle")}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0 border border-slate-100">
+                <Icon name="ShieldCheck" className="text-primary" size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-[#181C20]">{t("identityTitle")}</h3>
+                <p className="text-sm text-[#727785]">{t("identityDesc")}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0 border border-slate-100">
+                <Icon name="Globe" className="text-primary" size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-[#181C20]">{t("networkTitle")}</h3>
+                <p className="text-sm text-[#727785]">{t("networkDesc")}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-auto hidden lg:block">
+            <div className="relative rounded-3xl overflow-hidden aspect-video shadow-2xl">
+              <img 
+                src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=1000" 
+                alt="Mentorship" 
+                className="object-cover w-full h-full"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                <p className="text-white font-medium italic">{t("quote")}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Form */}
+        <div className="lg:col-span-7 h-full">
+          <div className="bg-white rounded-[24px] md:rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-50 p-6 md:p-8 lg:p-12 min-h-[600px] lg:min-h-[720px] flex flex-col transition-all duration-500">
+            
+            {/* Horizontal Steps Header */}
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
+              {STEPS.map((step, idx) => (
+                <React.Fragment key={idx}>
+                  <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3 flex-1 px-1">
+                    <div className={cn(
+                      "w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all duration-300 flex-shrink-0",
+                      currentStep === idx ? "bg-primary text-white shadow-lg shadow-primary/20" : 
+                      currentStep > idx ? "bg-green-500 text-white" : "bg-slate-100 text-slate-400"
+                    )}>
+                      {currentStep > idx ? <Icon name="Check" size={14} /> : idx + 1}
+                    </div>
+                    <span className={cn(
+                      "text-[10px] sm:text-sm font-semibold transition-colors text-center sm:text-left leading-tight line-clamp-2 sm:line-clamp-none",
+                      currentStep === idx ? "text-primary" : "text-slate-400"
+                    )}>
+                      {step.title}
+                    </span>
+                  </div>
+                  {idx < STEPS.length - 1 && (
+                    <div className="hidden md:block h-[2px] w-4 lg:w-8 bg-slate-100 mx-1 flex-shrink-0" />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col">
+              <div className="flex-1">
+                {currentStep === 0 && (
+                  <Step1ProfessionalDetails form={form} />
+                )}
+                
+                {currentStep === 1 && (
+                  <Step2ExpertiseBio form={form} />
+                )}
+
+                {currentStep === 2 && (
+                  <Step3Credentials form={form} />
+                )}
+              </div>
+
+              <div className="flex items-center justify-between pt-8 border-t border-slate-100 mt-10">
+                <button
+                  type="button"
+                  onClick={currentStep === 0 ? () => router.back() : prevStep}
+                  className="flex items-center gap-2 text-slate-500 font-semibold hover:text-primary transition-colors px-4 py-2"
+                >
+                  <Icon name="ArrowLeft" size={20} />
+                  {currentStep === 0 ? t("cancel") : t("goBack")}
+                </button>
+
+                {currentStep < STEPS.length - 1 ? (
+                  <Button 
+                    key="next-btn"
+                    type="button" 
+                    onClick={nextStep}
+                    label={
+                      <div className="flex items-center">
+                        {t("nextStep")}
+                        <Icon name="ArrowRight" className="ml-2" size={20} />
+                      </div>
+                    }
+                    className="h-[54px] px-10 rounded-2xl shadow-xl shadow-primary/20"
+                  />
+                ) : (
+                  <Button 
+                    key="submit-btn"
+                    type="submit"
+                    label={
+                      <div className="flex items-center">
+                        {t("completeProfile")}
+                        <Icon name="Check" className="ml-2" size={20} />
+                      </div>
+                    }
+                    className="h-[54px] px-10 rounded-2xl shadow-xl shadow-primary/20"
+                    loading={form.formState.isSubmitting}
+                  />
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Success Modal */}
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          router.push("/");
+        }}
+        showCloseButton={false}
+        containerClassName="max-w-[500px]"
+      >
+        <div className="relative p-10 flex flex-col items-center text-center overflow-hidden">
+          {/* Decorative Background Elements */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10" />
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-green-500/5 rounded-full blur-2xl -z-10" />
+
+          {/* Animated Success Icon */}
+          <div className="relative mb-8">
+            <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping duration-[2000ms]" />
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-xl shadow-green-200 ring-8 ring-green-50">
+              <HiCheckCircle className="text-white" size={48} />
+            </div>
+          </div>
+
+          {/* Text Content */}
+          <h3 className="mb-4 text-4xl font-black tracking-tight text-[#181C20] bg-clip-text text-transparent bg-gradient-to-r from-[#181C20] to-[#414754]">
+            {t("successTitle") || "Chúc mừng!"}
+          </h3>
+          
+          <p className="mb-10 text-lg text-[#727785] leading-relaxed max-w-[340px]">
+            {t("successMessage")}
+          </p>
+
+          {/* Action Button */}
+          <Button
+            label={t("backToHome") || "Về trang chủ"}
+            fullWidth
+            onClick={() => {
+              setShowSuccessModal(false);
+              router.push("/");
+            }}
+            className="h-[60px] rounded-2xl text-lg font-bold shadow-2xl shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            iconRight={<Icon name="ArrowRight" size={20} />}
+          />
+          
+          <button 
+            onClick={() => setShowSuccessModal(false)}
+            className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            {t("close") || "Đóng"}
+          </button>
+        </div>
+      </Modal>
+
+      {/* Error Toast */}
+      {showErrorToast && (
+        <div className="fixed bottom-10 right-10 z-[100] animate-in slide-in-from-right-10 duration-500">
+          <Toast
+            message={errorMessage}
+            icon={<HiXCircle className="text-red-500" size={20} />}
+            onClose={() => setShowErrorToast(false)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
