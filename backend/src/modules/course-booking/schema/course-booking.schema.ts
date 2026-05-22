@@ -28,19 +28,19 @@ export const createCourseBookingSchema = z.object({
 
 // MENTEE chỉ được cập nhật notes và cancel
 export const updateCourseBookingByMenteeSchema = z.object({
-  notesForMentor: z.string().optional(),
-  cancellationReason: z.string().optional(),
+  notesForMentor: z.string().nullable().optional(),
+  cancellationReason: z.string().nullable().optional(),
   status: z.enum([BookingStatus.CANCELLED]).optional(),
 });
 
 // MENTOR/ADMIN được cập nhật đầy đủ hơn
 export const updateCourseBookingSchema = z.object({
   meetingTime: z.coerce.date().optional(),
-  googleMeetUrl: z.string().max(500).optional(),
-  calendarEventId: z.string().max(255).optional(),
-  notesForMentor: z.string().optional(),
-  cancellationReason: z.string().optional(),
-  paymentId: z.string().optional(),
+  googleMeetUrl: z.string().max(500).nullable().optional(),
+  calendarEventId: z.string().max(255).nullable().optional(),
+  notesForMentor: z.string().nullable().optional(),
+  cancellationReason: z.string().nullable().optional(),
+  paymentId: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.any()).optional(),
   status: z.nativeEnum(BookingStatus).optional(),
 });
