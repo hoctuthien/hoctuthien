@@ -8,7 +8,7 @@ export const courseSchema = z.object({
   title: z.string().max(255),
   description: z.string().nullable().optional(),
   thumbnailUrl: z.string().max(500).nullable().optional(),
-  price: z.number(),
+  price: z.coerce.number(),
   durationMinutes: z.number().default(60),
   prerequisites: z.array(z.string()).default([]),
   metadata: z.record(z.string(), z.any()).default({}),

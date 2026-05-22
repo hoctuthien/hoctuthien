@@ -236,7 +236,7 @@ export default function PublicCoursesClient() {
     return matchesSearch && matchesTag && matchesLevel && matchesDuration && matchesFormat;
   });
 
-  // Filter courses based on Search, Tags & Dropdowns
+  // Filter courses based on Search and Tag Pill (ignoring dropdown filters as requested)
   const filteredCourses = courses.filter((course) => {
     // Only show published/active courses on public page
     if (course.status !== "published") return false;
@@ -251,30 +251,7 @@ export default function PublicCoursesClient() {
       selectedTag === "All Topics" || 
       course.category === selectedTag;
 
-    // 3. Dropdowns (Simulated based on categories & course attributes for rich interactivity)
-    let courseLevel = "beginner";
-    let courseDuration = "short";
-    let courseFormat = "online";
-
-    if (course.category.includes("Web") || course.title.includes("Web") || course.title.includes("Next.js")) {
-      courseLevel = "intermediate";
-      courseDuration = "medium";
-      courseFormat = "online";
-    } else if (course.category.includes("Figma") || course.category.includes("Design") || course.title.includes("Figma")) {
-      courseLevel = "beginner";
-      courseDuration = "long";
-      courseFormat = "online";
-    } else if (course.category.includes("máy tính") || course.title.includes("thuật") || course.title.includes("TypeScript")) {
-      courseLevel = "advanced";
-      courseDuration = "medium";
-      courseFormat = "offline";
-    }
-
-    const matchesLevel = academicLevel === "all" || courseLevel === academicLevel;
-    const matchesDuration = durationFilter === "all" || courseDuration === durationFilter;
-    const matchesFormat = formatFilter === "all" || courseFormat === formatFilter;
-
-    return matchesSearch && matchesTag && matchesLevel && matchesDuration && matchesFormat;
+    return matchesSearch && matchesTag;
   });
 
   const breadcrumbItems = [
@@ -663,13 +640,21 @@ export default function PublicCoursesClient() {
               })}
             </div>
           ) : (
-            <div className="py-12">
-              <EmptyState
-                icon={<LuGraduationCap size={48} className="text-slate-400" />}
-                title="Không tìm thấy khóa học nào"
-                description="Chúng tôi không tìm thấy khóa học nào phù hợp với bộ lọc của bạn. Thử xóa bộ lọc hoặc tìm từ khóa khác."
-                actionText="Xóa tất cả bộ lọc"
-                onAction={clearAllFilters}
+            <div className="py-16 flex flex-col items-center justify-center bg-white rounded-[32px] border border-slate-100 shadow-[0_10px_35px_rgba(0,0,0,0.015)] max-w-2xl mx-auto w-full animate-in fade-in zoom-in duration-300">
+              <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-[#2563eb] mb-6 shadow-inner animate-bounce [animation-duration:3s]">
+                <LuGraduationCap size={44} />
+              </div>
+              <h3 className="text-2xl font-black text-[#0F172A] mb-3 text-center tracking-tight font-[Montserrat]">
+                Không tìm thấy khóa học nào
+              </h3>
+              <p className="text-[#64748b] text-sm font-semibold max-w-md text-center leading-relaxed mb-8 px-6">
+                Chúng tôi không tìm thấy khóa học nào phù hợp với từ khóa "{searchQuery}". Hãy thử tìm kiếm bằng từ khóa khác hoặc bấm nút dưới để xem tất cả.
+              </p>
+              <Button
+                variant="primary"
+                label="Xem tất cả khóa học"
+                onClick={clearAllFilters}
+                className="rounded-full font-black text-sm px-8 py-3.5 shadow-md shadow-blue-500/15 cursor-pointer hover:scale-[1.02] active:scale-95 transition-transform"
               />
             </div>
           )}

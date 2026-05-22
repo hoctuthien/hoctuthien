@@ -9,6 +9,7 @@ import {
   UseGuards,
   UsePipes,
   Query,
+  Req,
 } from '@nestjs/common';
 import { CourseService } from './services/course.service';
 import {
@@ -58,8 +59,33 @@ export class CourseController {
   @Get()
   @ApiFindAllCoursesDoc()
   @Public()
-  findAll(@Query() query: FindCoursesQuery) {
-    return this.courseService.findAll(query);
+  findAll(@Query() query: FindCoursesQuery, @Req() req: any) {
+    let userRole: string | undefined = undefined;
+    const authHeader = req.headers?.authorization;
+    let token: string | null = null;
+    if (req.cookies) {
+      token = req.cookies['access_token'];
+    }
+    if (!token && authHeader) {
+      const parts = authHeader.split(' ');
+      if (parts.length === 2 && parts[0].toLowerCase() === 'bearer') {
+        token = parts[1];
+      }
+    }
+    if (token) {
+      try {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(
+            Buffer.from(parts[1], 'base64').toString('utf-8'),
+          );
+          userRole = payload.role;
+        }
+      } catch (e) {
+        // ignore decoding errors
+      }
+    }
+    return this.courseService.findAll(query, userRole);
   }
 
   @Get(':id')

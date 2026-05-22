@@ -28,19 +28,31 @@ export const courseGateway = {
    * Lấy danh sách khóa học của mentor hiện tại
    */
   async getMyCourses(): Promise<MockCourse[]> {
+    console.log('[courseGateway] Executing getMyCourses()');
     try {
       // 1. Lấy thông tin tài khoản mentor hiện tại
+      console.log('[courseGateway] Fetching current mentor profile via GET /v1/users/me');
       const me = await httpClient.get<any>('/v1/users/me');
-      
+      console.log('[courseGateway] Mentor profile fetched successfully:', me);
+ 
       // 2. Lấy danh sách khóa học lọc theo mentorId
+      console.log(`[courseGateway] Fetching courses for mentorId=${me.id} via GET /v1/courses?mentorId=${me.id}&limit=100`);
       const response = await httpClient.get<{ items: any[] }>(`/v1/courses?mentorId=${me.id}&limit=100`);
+      console.log('[courseGateway] Mentor courses fetched successfully:', response);
       return (response.items || []).map(translateCourse);
-    } catch (error) {
-      console.warn('Failed to fetch mentor courses, fetching all public courses as fallback:', error);
-      
+    } catch (error: any) {
+      console.warn('[courseGateway] Failed to fetch mentor courses, fetching all public courses as fallback:', error);
+ 
       // Fallback: Lấy toàn bộ khóa học công khai nếu chưa đăng nhập hoặc gặp lỗi
-      const response = await httpClient.get<{ items: any[] }>('/v1/courses?limit=100');
-      return (response.items || []).map(translateCourse);
+      console.log('[courseGateway] Executing fallback: Fetching public courses via GET /v1/courses?limit=100');
+      try {
+        const response = await httpClient.get<{ items: any[] }>('/v1/courses?limit=100');
+        console.log('[courseGateway] Fallback public courses fetched successfully:', response);
+        return (response.items || []).map(translateCourse);
+      } catch (fallbackError: any) {
+        console.error('[courseGateway] Fallback fetch failed:', fallbackError);
+        throw fallbackError;
+      }
     }
   },
 
@@ -48,8 +60,19 @@ export const courseGateway = {
    * Lấy danh sách khóa học công khai từ backend
    */
   async getPublicCourses(): Promise<MockCourse[]> {
-    const response = await httpClient.get<{ items: any[] }>('/v1/courses?limit=100');
-    return (response.items || []).map(translateCourse);
+    console.log('[courseGateway] Executing getPublicCourses() calling GET /v1/courses?limit=100');
+    try {
+      const response = await httpClient.get<{ items: any[] }>('/v1/courses?limit=100');
+      console.log('[courseGateway] Successfully fetched courses from backend:', response);
+      return (response.items || []).map(translateCourse);
+    } catch (error: any) {
+      console.error('[courseGateway] Error in getPublicCourses():', {
+        status: error.status,
+        message: error.message || 'Unknown error',
+        errorDetails: error
+      });
+      throw error;
+    }
   },
 
   /**
@@ -92,7 +115,7 @@ export const courseGateway = {
       else if (payload.status === 'rejected') status = 'INACTIVE';
       body.status = status;
     }
-    
+
     // Nếu category được cập nhật, đảm bảo giữ các trường metadata cũ hoặc ghi đè
     if (payload.category !== undefined) {
       body.metadata = {

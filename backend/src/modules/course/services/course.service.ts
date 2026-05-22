@@ -10,7 +10,7 @@ import {
   UpdateCourseInput,
   ApproveCourseInput,
 } from '../types/course.types';
-import { DataSource, ILike } from 'typeorm';
+import { DataSource, ILike, Not, IsNull } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { CourseCategoryEntity } from '../../course-category/entities/course-category.entity';
 import { MentorProfileEntity } from '../../mentor-profile/entities/mentor-profile.entity';
@@ -33,7 +33,7 @@ export class CourseService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(query: FindCoursesQuery) {
+  async findAll(query: FindCoursesQuery, userRole?: string) {
     const { title, status, mentorId, page, limit } =
       findCoursesQuerySchema.parse(query);
 
@@ -41,6 +41,11 @@ export class CourseService {
     if (title) where['title'] = ILike(`%${title}%`);
     if (status) where['status'] = status;
     if (mentorId) where['mentorId'] = mentorId;
+
+    if (userRole !== 'admin') {
+      where['approvedBy'] = Not(IsNull());
+      where['status'] = CourseStatus.ACTIVE;
+    }
 
     const [items, total] = await this.courseRepository.findManyWithCount({
       where,
