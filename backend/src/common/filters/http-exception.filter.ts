@@ -31,7 +31,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = ERROR_MESSAGES.VALIDATION_FAILED;
       
       // Chuyển đổi ZodError thành Object mapping lỗi field-by-field tương tự Class-Validator
-      details = exception.errors.reduce((acc, err) => {
+      details = exception.issues.reduce((acc: Record<string, string>, err) => {
         const field = err.path.join('.') || 'body';
         acc[field] = err.message;
         return acc;
