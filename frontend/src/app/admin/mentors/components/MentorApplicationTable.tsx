@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { DataTable, Column } from "@/shared/components/DataTable/DataTable";
 import { Badge, Avatar, Icon, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@/core/ui";
+import Link from "next/link";
 
 import { AdminMentorApplication } from "../mock-data/mentor-management.types";
 import { useTranslations } from "next-intl";
@@ -31,7 +32,7 @@ export const MentorApplicationTable = ({ initialData }: { initialData: AdminMent
       render: (item) => (
         <div>
           <p className="font-semibold text-slate-700">{item.jobTitle}</p>
-          <p className="text-[12px] text-slate-400">{item.yearsOfExperience} năm kn.</p>
+          <p className="text-[12px] text-slate-400">{t("yearsCountAbbrev", { count: item.yearsOfExperience })}</p>
         </div>
       )
     },
@@ -55,6 +56,21 @@ export const MentorApplicationTable = ({ initialData }: { initialData: AdminMent
         } as const;
         return <Badge variant={variants[item.status]}>{item.status}</Badge>;
       },
+    },
+    {
+      key: "actions",
+      header: t("viewDetails"),
+      render: (item) => (
+        <Link href={`/admin/mentors/${item.id}`}>
+          <Button
+            label={t("viewDetails")}
+            variant="outline"
+            size="sm"
+            iconLeft={<Icon name="Eye" size={14} />}
+            className="!px-3 !py-1 text-xs hover:bg-slate-50 transition-colors"
+          />
+        </Link>
+      ),
     },
   ];
 
