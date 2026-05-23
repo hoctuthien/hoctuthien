@@ -2,6 +2,15 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type CategoryGql {
+  groupCategory: GroupCategoryGql
+  iconUrl: String
+  id: ID!
+  name: String!
+  slug: String
+  status: String!
+}
+
 type Certificate {
   imageUrl: String!
   issuedBy: String
@@ -12,6 +21,19 @@ input CertificateInput {
   imageUrl: String!
   issuedBy: String
   name: String!
+}
+
+type CourseGql {
+  approvedBy: String
+  categories: [CategoryGql]
+  description: String
+  durationMinutes: Int!
+  id: ID!
+  mentorId: String!
+  price: Float!
+  status: String!
+  thumbnailUrl: String
+  title: String!
 }
 
 input CreateMentorAvailabilityGqlInput {
@@ -45,6 +67,14 @@ input DegreeInput {
   imageUrl: String!
   name: String!
   university: String
+}
+
+type GroupCategoryGql {
+  categories: [CategoryGql]
+  id: ID!
+  name: String!
+  slug: String
+  status: String!
 }
 
 type MentorAvailability {
@@ -96,6 +126,12 @@ type Mutation {
 }
 
 type Query {
+  categories: [CategoryGql!]!
+  category(id: ID!): CategoryGql!
+  course(id: ID!): CourseGql!
+  courses: [CourseGql!]!
+  groupCategories: [GroupCategoryGql!]!
+  groupCategory(id: ID!): GroupCategoryGql!
   mentorAvailabilities: [MentorAvailability!]!
   mentorAvailability(id: ID!): MentorAvailability!
   myMentorAvailabilities: [MentorAvailability!]!

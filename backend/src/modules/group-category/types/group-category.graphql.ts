@@ -19,3 +19,22 @@ export class GroupCategoryGql {
   categories?: CategoryGql[];
 }
 
+// Test query:
+// query GetCoursesWithCategories {
+//   courses {
+//     id
+//     title
+//     price
+//     durationMinutes
+//     categories {
+//       id
+//       name
+//       slug
+//       groupCategory {
+//         id
+//         name
+//         slug
+//       }
+//     }
+//   }
+// }
