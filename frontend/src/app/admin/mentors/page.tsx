@@ -8,30 +8,44 @@ import { Card } from "@/core/ui/Card";
 
 
 
+import { mentorGateway } from "@/core/gateway/mentorGateway";
+
 export default async function MentorManagementPage() {
   const t = await getTranslations("Admin.mentors");
+
+  let applications = [];
+  try {
+    applications = await mentorGateway.getAllApplications();
+  } catch (error) {
+    console.error("Failed to fetch mentor applications:", error);
+  }
+
+  const pendingCount = applications.filter((app: any) => app.status === "PENDING").length;
+  const approvedCount = applications.filter((app: any) => app.status === "APPROVED").length;
+  const totalCount = applications.length;
+  const approvalRate = totalCount > 0 ? Math.round((approvedCount / totalCount) * 100) : 100;
 
   const stats = [
     { 
       label: "PENDING APPLICATIONS", 
-      value: "12", 
-      trend: "+2 today", 
+      value: pendingCount.toString(), 
+      trend: `+${pendingCount} pending`, 
       icon: "ClipboardList", 
       color: "text-blue-600", 
       bg: "bg-blue-50" 
     },
     { 
-      label: "TOTAL MENTORS", 
-      value: "145", 
-      trend: "Active Network", 
+      label: "TOTAL APPLICATIONS", 
+      value: totalCount.toString(), 
+      trend: "All-time submissions", 
       icon: "ShieldCheck", 
       color: "text-emerald-600", 
       bg: "bg-emerald-50" 
     },
     { 
       label: "APPROVAL RATE", 
-      value: "88%", 
-      trend: "High Quality", 
+      value: `${approvalRate}%`, 
+      trend: `${approvedCount} approved`, 
       icon: "PieChart", 
       color: "text-amber-600", 
       bg: "bg-amber-50" 
@@ -70,7 +84,7 @@ export default async function MentorManagementPage() {
 
       {/* Table Section */}
       <Card className="p-8 border-none shadow-sm">
-        <MentorApplicationTable initialData={MOCK_MENTOR_APPLICATIONS} />
+        <MentorApplicationTable initialData={applications} />
       </Card>
     </div>
   );

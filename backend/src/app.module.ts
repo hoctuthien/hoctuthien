@@ -29,6 +29,9 @@ import { TagModule } from './modules/tag/tag.module';
 import { TraceIdMiddleware } from './common/middlewares/trace-id.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -36,6 +39,13 @@ import { AppService } from './app.service';
       isGlobal: true,
       load: [envConfig],
       validate: validateEnv,
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+      playground: process.env.NODE_ENV !== 'production',
+      context: ({ req, res }) => ({ req, res }),
     }),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),

@@ -4,6 +4,7 @@ import { MentorAvailabilityController } from './mentor-availability.controller';
 import { MentorAvailabilityService } from './services/mentor-availability.service';
 import { MentorAvailabilityEntity } from './entities/mentor-availability.entity';
 import { MentorAvailabilityRepository } from './repositories/mentor-availability.repository';
+import { MentorAvailabilityResolver } from './mentor-availability.resolver';
 import { MentorProfileModule } from '../mentor-profile/mentor-profile.module';
 import { UserModule } from '../user/user.module';
 
@@ -14,7 +15,11 @@ import { UserModule } from '../user/user.module';
     UserModule,
   ],
   controllers: [MentorAvailabilityController],
-  providers: [MentorAvailabilityService, MentorAvailabilityRepository],
+  providers: [
+    MentorAvailabilityService,
+    MentorAvailabilityRepository,
+    MentorAvailabilityResolver,
+  ],
   exports: [MentorAvailabilityService, MentorAvailabilityRepository],
 })
 export class MentorAvailabilityModule {}
