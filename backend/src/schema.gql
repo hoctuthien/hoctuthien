@@ -127,7 +127,7 @@ type Mutation {
 
 type Query {
   categories: [CategoryGql!]!
-  category(id: ID!): CategoryGql!
+  category(id: String, slug: String): CategoryGql!
   course(id: ID!): CourseGql!
   courses(categoryId: String, categorySlug: String, groupCategoryId: String, groupCategorySlug: String): [CourseGql!]!
   groupCategories: [GroupCategoryGql!]!

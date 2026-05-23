@@ -21,8 +21,11 @@ export class CategoryResolver {
 
   @Query(() => CategoryGql, { name: 'category' })
   @Public()
-  async getCategory(@Args('id', { type: () => ID }) id: string) {
-    return this.categoryService.findOne(id);
+  async getCategory(
+    @Args('id', { type: () => String, nullable: true }) id?: string,
+    @Args('slug', { type: () => String, nullable: true }) slug?: string,
+  ) {
+    return this.categoryService.findOne(id, slug);
   }
 
   @ResolveField('groupCategory', () => GroupCategoryGql, { nullable: true })
