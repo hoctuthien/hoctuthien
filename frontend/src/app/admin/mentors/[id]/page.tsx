@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Icon, Button } from "@/core/ui";
-import { mentorGateway } from "@/core/gateway/mentorGateway";
+import { mentorApplicationsGateway } from "@/core/gateway";
 
 // Import modular presentational components
 import { ApplicationHeader } from "./components/ApplicationHeader";
@@ -26,7 +26,7 @@ export default async function MentorApplicationDetailPage(props: PageProps) {
   let fetchError = null;
 
   try {
-    application = await mentorGateway.getApplicationDetail(id);
+    application = await mentorApplicationsGateway.getApplicationDetail(id);
   } catch (error: any) {
     console.error("Failed to fetch mentor application detail:", error);
     fetchError = error.message || tMentors("loadError");
@@ -86,13 +86,16 @@ export default async function MentorApplicationDetailPage(props: PageProps) {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-16">
       {/* Component 1: Application Title & Status & Action Buttons Header */}
       <ApplicationHeader
+        id={application.id}
         name={application.user?.name || "Không tên"}
+        status={application.status}
         statusLabel={currentStatus.label}
         statusVariant={currentStatus.variant}
         titleTranslation={tMentors("title")}
         detailTranslation={tMentors("detailTitle")}
         approveLabel={tMentors("approve")}
         rejectLabel={tMentors("reject")}
+        startProcessingLabel="Tiến hành xử lý"
       />
 
       {/* Main Two-Column Layout */}
