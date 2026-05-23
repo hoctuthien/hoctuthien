@@ -300,5 +300,15 @@
       "settings": "Cài đặt hệ thống",
       "signOut": "Đăng xuất"
     }
+  },
+  "ImageUploader": {
+    "label": "Hình ảnh xác thực",
+    "placeholder": "Kéo thả hình ảnh vào đây",
+    "subPlaceholder": "hoặc click để chọn tệp từ máy tính",
+    "uploading": "Đang tải lên cloud...",
+    "viewOriginal": "Xem ảnh gốc",
+    "delete": "Xóa ảnh",
+    "onlyImagesError": "Chỉ chấp nhận tệp tin định dạng hình ảnh!",
+    "uploadFailedError": "Tải lên tệp tin thất bại. Vui lòng kiểm tra định dạng tệp."
   }
 }

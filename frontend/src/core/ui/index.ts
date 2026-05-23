@@ -14,4 +14,5 @@ export * from './Status';
 export * from './Steps';
 export * from './Card';
 export * from './Feedback';
+export * from './ImageUploader';
 
