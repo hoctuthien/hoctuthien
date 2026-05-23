@@ -14,8 +14,16 @@ export class CourseResolver {
 
   @Query(() => [CourseGql], { name: 'courses' })
   @Public()
-  async getCourses() {
-    const result = await this.courseService.findAll({ page: 1, limit: 100 });
+  async getCourses(
+    @Args('groupCategoryId', { type: () => String, nullable: true }) groupCategoryId?: string,
+    @Args('groupCategorySlug', { type: () => String, nullable: true }) groupCategorySlug?: string,
+  ) {
+    const result = await this.courseService.findAll({
+      page: 1,
+      limit: 100,
+      groupCategoryId,
+      groupCategorySlug,
+    });
     return result.items;
   }
 
