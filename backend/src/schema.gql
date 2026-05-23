@@ -129,7 +129,7 @@ type Query {
   categories: [CategoryGql!]!
   category(id: ID!): CategoryGql!
   course(id: ID!): CourseGql!
-  courses(groupCategoryId: String, groupCategorySlug: String): [CourseGql!]!
+  courses(categoryId: String, categorySlug: String, groupCategoryId: String, groupCategorySlug: String): [CourseGql!]!
   groupCategories: [GroupCategoryGql!]!
   groupCategory(id: ID!): GroupCategoryGql!
   mentorAvailabilities: [MentorAvailability!]!

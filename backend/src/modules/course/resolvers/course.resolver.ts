@@ -17,12 +17,16 @@ export class CourseResolver {
   async getCourses(
     @Args('groupCategoryId', { type: () => String, nullable: true }) groupCategoryId?: string,
     @Args('groupCategorySlug', { type: () => String, nullable: true }) groupCategorySlug?: string,
+    @Args('categoryId', { type: () => String, nullable: true }) categoryId?: string,
+    @Args('categorySlug', { type: () => String, nullable: true }) categorySlug?: string,
   ) {
     const result = await this.courseService.findAll({
       page: 1,
       limit: 100,
       groupCategoryId,
       groupCategorySlug,
+      categoryId,
+      categorySlug,
     });
     return result.items;
   }

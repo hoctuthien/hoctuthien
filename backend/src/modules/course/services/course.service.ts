@@ -35,7 +35,7 @@ export class CourseService {
   ) {}
 
   async findAll(query: FindCoursesQuery, userRole?: string) {
-    const { title, status, mentorId, groupCategoryId, groupCategorySlug, page, limit } =
+    const { title, status, mentorId, groupCategoryId, groupCategorySlug, categoryId, categorySlug, page, limit } =
       findCoursesQuerySchema.parse(query);
 
     const where: Record<string, any> = {};
@@ -43,11 +43,15 @@ export class CourseService {
     if (status) where['status'] = status;
     if (mentorId) where['mentorId'] = mentorId;
 
-    if (groupCategoryId || groupCategorySlug) {
+    if (groupCategoryId || groupCategorySlug || categoryId || categorySlug) {
+      const categoryWhere: Record<string, any> = {};
+      if (groupCategoryId) categoryWhere['groupCategoryId'] = groupCategoryId;
+      if (groupCategorySlug) categoryWhere['groupCategory'] = { slug: groupCategorySlug };
+      if (categoryId) categoryWhere['id'] = categoryId;
+      if (categorySlug) categoryWhere['slug'] = categorySlug;
+
       const categories = await this.dataSource.getRepository(CategoryEntity).find({
-        where: groupCategoryId 
-          ? { groupCategoryId } 
-          : { groupCategory: { slug: groupCategorySlug } },
+        where: categoryWhere,
         select: ['id'],
       });
       const categoryIds = categories.map((c) => c.id);
