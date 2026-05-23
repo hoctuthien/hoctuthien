@@ -1,6 +1,12 @@
 /**
- * TN App trả timestamp theo giờ VN (UTC+7) không có timezone info → cần xử lý thủ công.
- * Chuyển Date object sang chuỗi YYYY-MM-DD theo giờ Việt Nam.
+ * Utility functions dùng chung trong Payment module.
+ * Tách ra khỏi tn-app.service.ts để tránh circular dependency
+ * và cho phép cả PaymentService lẫn PaymentVerificationService sử dụng.
+ */
+
+/**
+ * Chuyển Date thành chuỗi ngày VN (UTC+7) dạng YYYY-MM-DD.
+ * TN App API yêu cầu fromDate/toDate theo giờ VN, không có timezone info.
  */
 export function toVNDateString(date: Date): string {
   const vnDate = new Date(date.getTime() + 7 * 60 * 60 * 1000);
@@ -8,8 +14,9 @@ export function toVNDateString(date: Date): string {
 }
 
 /**
- * Parse chuỗi timestamp từ TN App (không có timezone) sang Date object.
- * Ví dụ: "2024-05-09 15:30:00" → Date với offset +07:00
+ * Parse chuỗi thời gian VN (UTC+7) từ TN App thành Date object.
+ * TN App trả transactionTime dạng "2026-05-19 14:30:00" — không có timezone.
+ * Ta gắn +07:00 vào để JS parse đúng thành UTC.
  */
 export function parseVNTime(vnTimeStr: string): Date {
   return new Date(vnTimeStr + '+07:00');
