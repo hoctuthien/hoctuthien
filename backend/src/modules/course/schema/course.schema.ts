@@ -45,6 +45,10 @@ export const findCoursesQuerySchema = paginationQuerySchema.extend({
   title: z.string().optional(),
   status: z.nativeEnum(CourseStatus).optional(),
   mentorId: z.string().optional(),
+  groupCategoryId: z.string().uuid().optional(),
+  groupCategorySlug: z.string().optional(),
+  categoryId: z.string().uuid().optional(),
+  categorySlug: z.string().optional(),
 });
 
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
