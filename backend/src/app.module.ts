@@ -47,6 +47,20 @@ import { join } from 'path';
       sortSchema: true,
       playground: process.env.NODE_ENV !== 'production',
       context: ({ req, res }) => ({ req, res }),
+      formatError: (error: any) => {
+        const originalError = error.extensions?.originalError;
+        if (originalError) {
+          return {
+            message: Array.isArray(originalError.message)
+              ? originalError.message[0]
+              : originalError.message || error.message,
+            code: originalError.error || 'BAD_REQUEST',
+            statusCode: originalError.statusCode || 400,
+            path: error.path,
+          };
+        }
+        return error;
+      },
     }),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
