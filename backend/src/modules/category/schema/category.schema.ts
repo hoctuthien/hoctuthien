@@ -10,6 +10,7 @@ export const categorySchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable().optional(),
+  groupCategoryId: z.string().uuid().nullable().optional(),
 });
 
 export const createCategorySchema = z.object({
@@ -18,6 +19,7 @@ export const createCategorySchema = z.object({
   iconUrl: z.string().max(500).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
   status: z.string().optional(),
+  groupCategoryId: z.string().uuid().nullable().optional(),
 });
 
 export const updateCategorySchema = createCategorySchema.partial();
@@ -26,6 +28,8 @@ export const findCategoriesQuerySchema = z.object({
   name: z.string().optional(),
   slug: z.string().optional(),
   status: z.string().optional(),
+  groupCategoryId: z.string().uuid().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
+
