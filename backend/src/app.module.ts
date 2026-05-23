@@ -12,6 +12,7 @@ import { UserSessionModule } from './modules/user-session/user-session.module';
 import { MentorProfileModule } from './modules/mentor-profile/mentor-profile.module';
 import { MentorAvailabilityModule } from './modules/mentor-availability/mentor-availability.module';
 import { CategoryModule } from './modules/category/category.module';
+import { GroupCategoryModule } from './modules/group-category/group-category.module';
 import { CourseModule } from './modules/course/course.module';
 import { CourseCategoryModule } from './modules/course-category/course-category.module';
 import { CourseBookingModule } from './modules/course-booking/course-booking.module';
@@ -57,6 +58,7 @@ import { join } from 'path';
     MentorProfileModule,
     MentorAvailabilityModule,
     CategoryModule,
+    GroupCategoryModule,
     CourseModule,
     CourseCategoryModule,
     CourseBookingModule,

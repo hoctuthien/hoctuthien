@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { CategoryStatus } from '../enums/category-status.enum';
+import { GroupCategoryEntity } from '../../group-category/entities/group-category.entity';
 
 @Entity({ name: 'categories' })
 export class CategoryEntity extends BaseEntity {
@@ -22,4 +23,14 @@ export class CategoryEntity extends BaseEntity {
     default: CategoryStatus.ACTIVE,
   })
   status: string;
+
+  @Column({ name: 'group_category_id', type: 'uuid', nullable: true })
+  groupCategoryId: string | null;
+
+  @ManyToOne(() => GroupCategoryEntity, (group) => group.categories, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'group_category_id' })
+  groupCategory: GroupCategoryEntity;
 }
+
