@@ -62,12 +62,13 @@ type MentorAvailability {
   skills: [String!]!
   status: MentorAvailabilityStatus!
   updatedAt: DateTime!
+  user: UserGql
   yearsOfExperience: Int
 }
 
 type MentorAvailabilityMetadata {
-  certificates: [Certificate!]!
-  degrees: [Degree!]!
+  certificates: [Certificate!]
+  degrees: [Degree!]
 }
 
 input MentorAvailabilityMetadataInput {
@@ -113,4 +114,11 @@ input UpdateMentorAvailabilityGqlInput {
   skills: [String!]
   status: MentorAvailabilityStatus
   yearsOfExperience: Int
+}
+
+type UserGql {
+  avatarUrl: String
+  email: String!
+  id: ID!
+  name: String!
 }

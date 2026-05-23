@@ -14,6 +14,10 @@ export class ResponseTransformInterceptor implements NestInterceptor {
   constructor(private reflector: Reflector) {} // Nhớ inject Reflector vào nhé
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    if (context.getType<string>() === 'graphql') {
+      return next.handle();
+    }
+
     // 1. Kiểm tra xem hàm đang chạy có dán nhãn Bypass không
     const isBypass = this.reflector.getAllAndOverride<boolean>(IS_BYPASS_KEY, [
       context.getHandler(),

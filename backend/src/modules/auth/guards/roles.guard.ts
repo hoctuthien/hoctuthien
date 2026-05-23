@@ -5,6 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { ROLES_KEY } from '../../../common/decorators/roles.decorator';
 import { Role } from '../../../common/enums/role.enum';
 
@@ -22,7 +23,15 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    let req;
+    if (context.getType<string>() === 'graphql') {
+      const ctx = GqlExecutionContext.create(context);
+      req = ctx.getContext().req;
+    } else {
+      req = context.switchToHttp().getRequest();
+    }
+
+    const user = req?.user;
 
     if (!user || !user.role) {
       throw new ForbiddenException(

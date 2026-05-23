@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, ID, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, Int, ResolveField, Parent } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { MentorAvailabilityService } from './services/mentor-availability.service';
 import {
@@ -6,18 +6,30 @@ import {
   CreateMentorAvailabilityResult,
   CreateMentorAvailabilityGqlInput,
   UpdateMentorAvailabilityGqlInput,
+  UserGql,
 } from './types/mentor-availability.graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { User } from '../../common/decorators/user.decorator';
+import { UserService } from '../user/services/user.service';
 
 @Resolver(() => MentorAvailability)
 export class MentorAvailabilityResolver {
   constructor(
     private readonly mentorAvailabilityService: MentorAvailabilityService,
+    private readonly userService: UserService,
   ) {}
+
+  @ResolveField('user', () => UserGql, { nullable: true })
+  async getUser(@Parent() mentorAvailability: MentorAvailability) {
+    try {
+      return await this.userService.findOne(mentorAvailability.mentorId);
+    } catch {
+      return null;
+    }
+  }
 
   /**
    * @description Lấy danh sách tất cả các yêu cầu làm Mentor (Dành cho Admin duyệt)

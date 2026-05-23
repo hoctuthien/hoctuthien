@@ -33,17 +33,35 @@ export class Degree {
 
 @ObjectType()
 export class MentorAvailabilityMetadata {
-  @Field(() => [Certificate])
-  certificates: Certificate[];
+  @Field(() => [Certificate], { nullable: true })
+  certificates?: Certificate[];
 
-  @Field(() => [Degree])
-  degrees: Degree[];
+  @Field(() => [Degree], { nullable: true })
+  degrees?: Degree[];
+}
+
+@ObjectType()
+export class UserGql {
+  @Field(() => ID)
+  id: string;
+
+  @Field()
+  name: string;
+
+  @Field()
+  email: string;
+
+  @Field({ nullable: true })
+  avatarUrl?: string;
 }
 
 @ObjectType()
 export class MentorAvailability {
   @Field(() => ID)
   id: string;
+
+  @Field(() => UserGql, { nullable: true })
+  user?: UserGql;
 
   @Field()
   mentorId: string;
