@@ -106,9 +106,11 @@ export class MentorAvailabilityController {
 
   /**
    * @description Cập nhật thông tin yêu cầu làm Mentor
-   * @access Chưa phân quyền (Cần xem xét bổ sung Guard)
+   * @access Admin (Role.ADMIN) hoặc Mentee (Role.MENTEE)
    */
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MENTEE)
   update(
     @Param('id') id: string,
     @Body() payload: UpdateMentorAvailabilityDto,
@@ -182,9 +184,11 @@ export class MentorAvailabilityController {
 
   /**
    * @description Xóa yêu cầu làm Mentor
-   * @access Chưa phân quyền (Cần xem xét bổ sung Guard)
+   * @access Admin (Role.ADMIN)
    */
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
     return this.mentorAvailabilityService.remove(id);
   }
