@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Breadcrumb } from "@shared";
 import { Button, InlineMessage } from "@/core/ui";
-import { courseGateway } from "@/core/gateway";
+import { courseGateway, courseBookingGateway, mentorGateway } from "@/core/gateway";
 import { MockCourse } from "@/shared/mocks/mentorCourses.mock";
 import { 
   LuBookOpen, 
@@ -19,18 +20,54 @@ import {
   LuBookmark, 
   LuAward, 
   LuUsers,
-  LuExternalLink
+  LuExternalLink,
+  LuCalendar,
+  LuX,
+  LuMessageSquare
 } from "react-icons/lu";
 
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params?.id as string;
+  const { data: session } = useSession();
 
   const [course, setCourse] = useState<MockCourse | null>(null);
+  const [mentorProfile, setMentorProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+
+  // Booking UI States
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [bookingDate, setBookingDate] = useState(() => {
+    // Ngày mai làm ngày mặc định
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split("T")[0];
+  });
+  const [bookingTime, setBookingTime] = useState("09:00");
+  const [notesForMentor, setNotesForMentor] = useState("");
+  
+  const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+
+  // Lấy các khung giờ rảnh thực tế từ database/backend của Mentor cho ngày được chọn
+  const getAvailableSlots = (): string[] => {
+    if (mentorProfile?.metadata?.time) {
+      const dayOfWeek = new Date(bookingDate).toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+      const slots = mentorProfile.metadata.time[dayOfWeek];
+      if (slots && Array.isArray(slots) && slots.length > 0) {
+        // Ánh xạ sang mốc bắt đầu
+        return slots.map((s: string) => s.split("-")[0].trim());
+      }
+    }
+    // Trả về mặc định nếu mentor chưa thiết lập giờ rảnh chi tiết
+    return ["09:00", "10:30", "14:00", "15:30", "19:00", "20:30"];
+  };
+
+  const availableSlots = getAvailableSlots();
 
   useEffect(() => {
     if (!id) return;
@@ -43,6 +80,16 @@ export default function CourseDetailPage() {
           setError("Khóa học không tồn tại hoặc đã bị gỡ bỏ.");
         } else {
           setCourse(data);
+
+          // Tải hồ sơ cố vấn (Mentor Profile) từ backend dựa theo mentorId của khóa học
+          if (data.mentorId) {
+            try {
+              const mProfile = await mentorGateway.getMentorProfileByUserId(data.mentorId);
+              setMentorProfile(mProfile);
+            } catch (mErr) {
+              console.warn("Failed to fetch mentor profile from backend:", mErr);
+            }
+          }
         }
       } catch (err: any) {
         console.error("Failed to load course detail:", err);
@@ -54,6 +101,54 @@ export default function CourseDetailPage() {
 
     loadCourse();
   }, [id]);
+
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!course) return;
+
+    try {
+      setIsSubmittingBooking(true);
+      setBookingError(null);
+
+      // Tạo đối tượng Date kết hợp Date và Time
+      const meetingTime = new Date(`${bookingDate}T${bookingTime}:00`);
+
+      await courseBookingGateway.bookCourse({
+        courseId: course.id,
+        meetingTime,
+        notesForMentor: notesForMentor || undefined,
+      });
+
+      setBookingSuccess(true);
+      setTimeout(() => {
+        setIsBookingModalOpen(false);
+        setBookingSuccess(false);
+        setNotesForMentor("");
+      }, 3500);
+    } catch (err: any) {
+      console.error("Failed to book course:", err);
+      const errMsg = err?.message || err?.error?.message || "Đăng ký khóa học thất bại. Vui lòng thử lại sau.";
+      setBookingError(errMsg);
+    } finally {
+      setIsSubmittingBooking(false);
+    }
+  };
+
+  const handleStartBooking = () => {
+    if (!session) {
+      // Nếu chưa đăng nhập, hướng dẫn chuyển hướng đến trang login
+      alert("Vui lòng đăng nhập tài khoản Học viên để thực hiện đăng ký khóa học.");
+      router.push(`/login?callbackUrl=/courses/detail/${id}`);
+      return;
+    }
+    
+    if (session.user?.role !== "mentee") {
+      alert("Tài khoản của bạn không phải là Học viên (Mentee). Chỉ học viên mới được quyền đăng ký học khóa học.");
+      return;
+    }
+
+    setIsBookingModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -100,13 +195,10 @@ export default function CourseDetailPage() {
 
   // Dynamic premium gradient based on course category
   let gradientClass = "from-blue-600 via-indigo-600 to-violet-700";
-  let tagColorClass = "bg-blue-50 text-blue-600 border-blue-100";
   if (course.category.toLowerCase().includes("design") || course.category.toLowerCase().includes("ui") || course.category.toLowerCase().includes("ux")) {
     gradientClass = "from-purple-600 via-pink-600 to-rose-700";
-    tagColorClass = "bg-pink-50 text-pink-600 border-pink-100";
   } else if (course.category.toLowerCase().includes("trí tuệ") || course.category.toLowerCase().includes("ai")) {
     gradientClass = "from-violet-600 via-purple-600 to-indigo-700";
-    tagColorClass = "bg-violet-50 text-violet-600 border-violet-100";
   }
 
   const breadcrumbItems = [
@@ -115,13 +207,39 @@ export default function CourseDetailPage() {
     { label: course.title },
   ];
 
-  // Syllabus mock data
-  const mockSyllabus = [
-    { title: "Phần 1: Giới thiệu & Thiết lập môi trường", lectures: ["Bài 1: Tổng quan chương trình học và lộ trình", "Bài 2: Chuẩn bị công cụ và cài đặt môi trường phát triển", "Bài 3: Hello World đầu tiên và hiểu cơ chế hoạt động"] },
-    { title: "Phần 2: Nền tảng chuyên sâu kiến thức cốt lõi", lectures: ["Bài 4: Các khái niệm cơ bản quan trọng cần nắm vững", "Bài 5: Quản lý vòng đời và luồng xử lý dữ liệu", "Bài 6: Thực hành xây dựng giao diện / API cơ sở"] },
-    { title: "Phần 3: Tích hợp Hệ thống & Cơ sở dữ liệu", lectures: ["Bài 7: Thiết kế cơ sở dữ liệu và tích hợp ORM", "Bài 8: Xử lý bảo mật, xác thực người dùng (Auth)", "Bài 9: Xử lý lỗi nâng cao và tối ưu truy vấn"] },
-    { title: "Phần 4: Triển khai & Tối ưu hóa dự án", lectures: ["Bài 10: Tối ưu hóa hiệu năng và nén tài nguyên", "Bài 11: Dockerize ứng dụng và chuẩn bị môi trường production", "Bài 12: Đưa ứng dụng lên Cloud (Deploy VPS, CI/CD)"] },
-  ];
+  // Generate dynamic, adaptive syllabus based on live DB fields
+  const getDynamicSyllabus = () => {
+    const lectureCount = course?.metadata?.lectureCount || (course?.price === 0 ? 12 : 32);
+    const lecturesPerSection = Math.ceil(lectureCount / 4);
+    
+    const shortCategory = course?.category || "Chuyên môn";
+    const shortTitle = course?.title 
+      ? (course.title.includes("&") 
+          ? course.title.split("&")[0].trim() 
+          : (course.title.includes("và") ? course.title.split("và")[0].trim() : course.title)) 
+      : "Cơ bản";
+    
+    return [
+      {
+        title: `Phần 1: Giới thiệu & Thiết lập Môi trường ${shortCategory}`,
+        lectures: Array.from({ length: Math.min(lecturesPerSection, 12) }, (_, i) => `Bài ${i + 1}: Tổng quan chương trình học, chuẩn bị công cụ và thiết lập ban đầu`)
+      },
+      {
+        title: `Phần 2: Kiến thức Nền tảng Cốt lõi của ${shortTitle}`,
+        lectures: Array.from({ length: Math.min(lecturesPerSection, 12) }, (_, i) => `Bài ${lecturesPerSection + i + 1}: Các khái niệm quan trọng cần nắm vững, xây dựng giao diện / luồng xử lý cơ bản`)
+      },
+      {
+        title: `Phần 3: Tích hợp Hệ thống, Xử lý Bảo mật & Database`,
+        lectures: Array.from({ length: Math.min(lecturesPerSection, 12) }, (_, i) => `Bài ${lecturesPerSection * 2 + i + 1}: Thiết kế cơ sở dữ liệu, kết nối API, xử lý Authentication & Authorization`)
+      },
+      {
+        title: `Phần 4: Tối ưu hóa Hiệu năng & Triển khai Docker, Cloud`,
+        lectures: Array.from({ length: Math.min(lecturesPerSection, 12) }, (_, i) => `Bài ${lecturesPerSection * 3 + i + 1}: Dockerize ứng dụng, tối ưu hóa câu lệnh query, nén tài nguyên và deploy VPS`)
+      }
+    ].filter(section => section.lectures.length > 0);
+  };
+
+  const syllabus = getDynamicSyllabus();
 
   return (
     <div className="w-full bg-[#FAFBFD] min-h-screen py-8 px-4 md:px-8 font-sans overflow-x-hidden">
@@ -151,21 +269,21 @@ export default function CourseDetailPage() {
             </h1>
 
             <p className="text-white/85 text-sm md:text-base font-semibold max-w-3xl leading-relaxed mt-2">
-              Khám phá chương trình đào tạo chuyên sâu được xây dựng bởi các chuyên gia thực chiến hàng đầu. Tự học dễ dàng, bài bản và hiệu quả cùng Mentor giàu kinh nghiệm giúp bạn nhanh chóng làm chủ công nghệ thực tế.
+              {course.description || "Khám phá chương trình đào tạo chuyên sâu được xây dựng bởi các chuyên gia thực chiến hàng đầu. Tự học dễ dàng, bài bản và hiệu quả cùng Mentor giàu kinh nghiệm giúp bạn nhanh chóng làm chủ công nghệ thực tế."}
             </p>
 
             <div className="flex flex-wrap items-center gap-6 mt-6 text-xs font-bold text-white/90">
               <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl">
                 <LuClock size={16} />
-                <span>8 tuần (tổng {course.price === 0 ? "12" : "32"} bài giảng)</span>
+                <span>{course.metadata?.durationWeeks || 8} tuần (tổng {course.metadata?.lectureCount || (course.price === 0 ? 12 : 32)} bài giảng)</span>
               </span>
               <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl">
                 <LuBookOpen size={16} />
-                <span>Thời lượng: 6 - 10 giờ học thực chiến</span>
+                <span>Thời lượng: {Math.round((course.durationMinutes || 60) / 60)} giờ học thực chiến</span>
               </span>
               <span className="flex items-center gap-2 bg-amber-400 text-[#0F172A] px-4 py-2 rounded-xl">
                 <LuStar size={14} className="fill-current text-[#0F172A]" />
-                <span>4.9/5.0 Đánh giá tốt</span>
+                <span>{course.rating > 0 ? course.rating.toFixed(1) : "4.9"}/5.0 Đánh giá tốt</span>
               </span>
             </div>
 
@@ -209,7 +327,7 @@ export default function CourseDetailPage() {
               </h2>
               
               <div className="flex flex-col gap-4">
-                {mockSyllabus.map((section, idx) => (
+                {syllabus.map((section, idx) => (
                   <div key={idx} className="border border-slate-100 rounded-2xl overflow-hidden">
                     <div className="bg-slate-50/70 p-4 border-b border-slate-100 flex justify-between items-center">
                       <span className="text-sm font-black text-[#0F172A]">{section.title}</span>
@@ -240,9 +358,17 @@ export default function CourseDetailPage() {
                 <span>Yêu cầu tiên quyết</span>
               </h2>
               <ul className="list-disc pl-5 flex flex-col gap-2.5 text-xs font-semibold text-[#475569] leading-relaxed">
-                <li>Phù hợp với các bạn đã có kiến thức nền tảng cơ bản về lập trình nói chung.</li>
-                <li>Có máy tính cá nhân kết nối Internet ổn định để thực hành gõ code trực tiếp.</li>
-                <li>Đặc biệt cần có tinh thần chủ động, kiên trì tự học và tương tác cùng các Mentor.</li>
+                {course.prerequisites && course.prerequisites.length > 0 ? (
+                  course.prerequisites.map((req, idx) => (
+                    <li key={idx}>{req}</li>
+                  ))
+                ) : (
+                  <>
+                    <li>Phù hợp với các bạn đã có kiến thức nền tảng cơ bản về lập trình nói chung.</li>
+                    <li>Có máy tính cá nhân kết nối Internet ổn định để thực hành gõ code trực tiếp.</li>
+                    <li>Đặc biệt cần có tinh thần chủ động, kiên trì tự học và tương tác cùng các Mentor.</li>
+                  </>
+                )}
               </ul>
             </div>
 
@@ -298,7 +424,7 @@ export default function CourseDetailPage() {
                 <Button
                   variant="primary"
                   label="Đăng ký học ngay"
-                  onClick={() => alert("Đăng ký thành công! Hãy chờ email hướng dẫn học tập tiếp theo nhé.")}
+                  onClick={handleStartBooking}
                   className="w-full rounded-2xl font-black py-4 shadow-lg shadow-blue-500/10 cursor-pointer text-center text-sm"
                 />
                 
@@ -334,31 +460,45 @@ export default function CourseDetailPage() {
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-blue-500 to-indigo-600 shadow-md">
                   <img
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"
+                    src={mentorProfile?.user?.avatarUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"}
                     alt="Mentor avatar"
                     className="w-full h-full object-cover rounded-full border-2 border-white"
                   />
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <h4 className="text-base font-black text-[#0F172A] tracking-tight">Mentor Học Tự Thiện</h4>
-                  <span className="text-[11px] text-[#2563eb] font-bold">Chuyên gia Lập trình thực chiến</span>
+                  <h4 className="text-base font-black text-[#0F172A] tracking-tight">
+                    {mentorProfile?.user?.name || "Mentor Học Tự Thiện"}
+                  </h4>
+                  <span className="text-[11px] text-[#2563eb] font-bold">
+                    {mentorProfile?.jobTitle || "Chuyên gia Lập trình thực chiến"} {mentorProfile?.company ? `tại ${mentorProfile.company}` : ""}
+                  </span>
                 </div>
               </div>
 
               <p className="text-xs text-[#64748b] leading-relaxed font-semibold">
-                Là chuyên gia có hơn 8 năm làm việc tại các tập đoàn lớn, nhiệt huyết chia sẻ tri thức thực tế để thúc đẩy cộng đồng lập trình viên Việt Nam cống hiến giá trị.
+                {mentorProfile?.bio || "Chào mọi người, mình là mentor của Học Tự Thiện. Rất vui được đồng hành cùng các bạn chia sẻ tri thức cộng đồng."}
               </p>
+
+              {mentorProfile?.skills && mentorProfile.skills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {mentorProfile.skills.map((skill: string, sIdx: number) => (
+                    <span key={sIdx} className="text-[10px] bg-slate-50 text-slate-500 font-extrabold px-2 py-0.5 rounded-md border border-slate-100">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <div className="h-px bg-slate-100 w-full" />
 
               <div className="flex items-center justify-between text-xs font-bold text-[#475569]">
                 <span className="flex items-center gap-1">
                   <LuUsers size={14} className="text-[#2563eb]" />
-                  <span>250+ buổi học</span>
+                  <span>{mentorProfile?.totalStudents || 250}+ học viên</span>
                 </span>
                 <span className="flex items-center gap-1 text-emerald-600">
                   <LuAward size={14} />
-                  <span>100% Hỗ trợ học viên</span>
+                  <span>{mentorProfile?.yearsOfExperience || 8} năm kinh nghiệm</span>
                 </span>
               </div>
             </div>
@@ -368,6 +508,161 @@ export default function CourseDetailPage() {
         </div>
 
       </div>
+
+      {/* 3. Stunning, Ultra-Premium Booking Modal Overlay */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-[32px] border border-slate-100 shadow-2xl max-w-lg w-full p-8 relative flex flex-col gap-6 animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
+            
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsBookingModalOpen(false)}
+              className="absolute top-6 right-6 p-2 text-[#64748b] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-full transition-colors cursor-pointer select-none"
+            >
+              <LuX size={18} strokeWidth={2.5} />
+            </button>
+
+            {/* Modal Success Overlay */}
+            {bookingSuccess ? (
+              <div className="flex flex-col items-center justify-center py-10 text-center animate-in fade-in zoom-in duration-300">
+                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-6 shadow-inner animate-bounce">
+                  <LuCheck size={40} strokeWidth={3.5} />
+                </div>
+                <h3 className="text-2xl font-black text-[#0F172A] mb-3 font-[Montserrat]">
+                  Đăng ký thành công!
+                </h3>
+                <p className="text-[#475569] text-sm font-semibold max-w-sm leading-relaxed mb-4">
+                  Buổi học của bạn đã được hệ thống tự động xác nhận (`confirmed`).
+                </p>
+                <div className="bg-emerald-50/70 border border-emerald-100 p-4 rounded-2xl w-full text-xs font-semibold text-emerald-700 flex flex-col gap-1.5 items-start mt-2">
+                  <span>📅 <strong>Thời gian:</strong> {bookingDate} lúc {bookingTime}</span>
+                  <span>🔗 <strong>Phòng học:</strong> Link Google Meet sẽ được gửi qua email của bạn trước giờ học.</span>
+                </div>
+                <p className="text-[11px] text-[#94A3B8] font-bold mt-8">
+                  Cửa sổ này sẽ tự động đóng lại...
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleBookingSubmit} className="flex flex-col gap-6">
+                
+                {/* Modal Header */}
+                <div className="flex flex-col gap-1.5 pr-8">
+                  <span className="text-[#2563eb] text-[10px] font-black uppercase tracking-[0.25em]">Đặt lịch học tập</span>
+                  <h3 className="text-2xl font-black text-[#0F172A] tracking-tight font-[Montserrat] leading-snug">
+                    Đăng Ký Khóa Học
+                  </h3>
+                  <p className="text-slate-400 text-xs font-semibold">
+                    Vui lòng chọn thời gian rảnh của bạn để bắt đầu học tập cùng Mentor.
+                  </p>
+                </div>
+
+                <div className="h-px bg-slate-100 w-full" />
+
+                {/* Error Banner */}
+                {bookingError && (
+                  <div className="bg-red-50 border border-red-200/80 rounded-2xl p-4 flex items-start gap-3 text-red-700 animate-in slide-in-from-top-4 duration-300">
+                    <svg className="w-[18px] h-[18px] flex-shrink-0 mt-0.5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <div className="flex flex-col gap-0.5 text-xs font-bold">
+                      <span className="uppercase text-[9px] tracking-wider text-red-800">Không thể đăng ký</span>
+                      <p className="font-semibold text-red-600 mt-0.5 leading-relaxed">{bookingError}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Form Fields */}
+                <div className="flex flex-col gap-5">
+                  
+                  {/* Select Date */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-black text-[#475569] uppercase tracking-wider flex items-center gap-1.5">
+                      <LuCalendar size={14} className="text-[#2563eb]" />
+                      <span>Chọn Ngày Học:</span>
+                    </label>
+                    <input 
+                      type="date"
+                      required
+                      value={bookingDate}
+                      onChange={(e) => setBookingDate(e.target.value)}
+                      min={new Date(Date.now() + 86400000).toISOString().split("T")[0]} // Tối thiểu ngày mai
+                      className="w-full border border-[#E2E8F0] rounded-2xl px-4 py-3.5 outline-none focus:border-[#2563eb] focus:ring-4 focus:ring-blue-50 text-sm font-semibold transition-all"
+                    />
+                  </div>
+
+                  {/* Select Time Slot */}
+                  <div className="flex flex-col gap-2.5">
+                    <label className="text-xs font-black text-[#475569] uppercase tracking-wider">
+                      Chọn Khung Giờ Bắt Đầu:
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {availableSlots.map((time) => {
+                        const isActive = bookingTime === time;
+                        return (
+                          <button
+                            type="button"
+                            key={time}
+                            onClick={() => setBookingTime(time)}
+                            className={`py-3 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none ${
+                              isActive 
+                                ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10" 
+                                : "bg-white border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]"
+                            }`}
+                          >
+                            {time}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Notes for Mentor */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-black text-[#475569] uppercase tracking-wider flex items-center gap-1.5">
+                      <LuMessageSquare size={14} className="text-[#2563eb]" />
+                      <span>Nhắn gửi tới Mentor (Tùy chọn):</span>
+                    </label>
+                    <textarea 
+                      placeholder="Mô tả mục tiêu của bạn khi học khóa học này, kiến thức hiện tại, hoặc các câu hỏi mong muốn thảo luận cùng Mentor nhé..."
+                      value={notesForMentor}
+                      onChange={(e) => setNotesForMentor(e.target.value)}
+                      rows={3}
+                      className="w-full border border-[#E2E8F0] rounded-2xl px-4 py-3 outline-none focus:border-[#2563eb] focus:ring-4 focus:ring-blue-50 text-xs font-semibold leading-relaxed transition-all resize-none"
+                    />
+                  </div>
+
+                </div>
+
+                <div className="h-px bg-slate-100 w-full mt-2" />
+
+                {/* Footer Actions */}
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsBookingModalOpen(false)}
+                    className="flex-1 py-3.5 border border-[#E2E8F0] text-[#64748b] hover:bg-[#F8FAFC] font-extrabold text-xs rounded-2xl uppercase tracking-wider transition-colors cursor-pointer text-center"
+                  >
+                    Hủy bỏ
+                  </button>
+                  
+                  <button
+                    type="submit"
+                    disabled={isSubmittingBooking}
+                    className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-extrabold text-xs rounded-2xl uppercase tracking-wider transition-all cursor-pointer text-center shadow-lg shadow-blue-500/10 active:scale-95 disabled:scale-100"
+                  >
+                    {isSubmittingBooking ? "Đang xử lý..." : "Xác nhận đăng ký"}
+                  </button>
+                </div>
+
+              </form>
+            )}
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

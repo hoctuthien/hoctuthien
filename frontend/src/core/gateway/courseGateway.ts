@@ -22,6 +22,11 @@ const translateCourse = (course: any): MockCourse => {
     reviewsCount: course.metadata?.reviewsCount || 0,
     status,
     createdAt: course.createdAt ? new Date(course.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    description: course.description || '',
+    durationMinutes: Number(course.durationMinutes || 60),
+    prerequisites: course.prerequisites || [],
+    metadata: course.metadata || {},
+    mentorId: course.mentorId || '',
   };
 };
 

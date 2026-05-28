@@ -30,4 +30,12 @@ export const mentorGateway = {
     const result = await gqlClient.request<any>(GET_ALL_AVAILABILITIES_QUERY);
     return result.mentorAvailabilities;
   },
+
+  /**
+   * Lấy thông tin Mentor Profile của một User cụ thể (REST API)
+   */
+  async getMentorProfileByUserId(userId: string): Promise<any> {
+    console.log(`[mentorGateway] Fetching mentor profile for userId=\${userId} via GET /v1/mentor-profiles/user/\${userId}`);
+    return httpClient.get(`/v1/mentor-profiles/user/\${userId}`);
+  },
 };

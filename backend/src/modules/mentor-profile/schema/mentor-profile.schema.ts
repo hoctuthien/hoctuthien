@@ -15,6 +15,12 @@ export const mentorProfileSchema = z.object({
   approvedBy: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.any()).default({}),
   status: z.string().max(50).default('PENDING'),
+  user: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string().email(),
+    avatarUrl: z.string().nullable().optional(),
+  }).nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable().optional(),

@@ -9,6 +9,11 @@ export interface MockCourse {
   reviewsCount: number;
   status: 'draft' | 'pending' | 'published' | 'rejected';
   createdAt: string;
+  description?: string;
+  durationMinutes?: number;
+  prerequisites?: string[];
+  metadata?: Record<string, any>;
+  mentorId?: string;
 }
 
 export const mockMentorCourses: MockCourse[] = [
