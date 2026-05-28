@@ -1,5 +1,7 @@
 import { MockCourse } from '@/shared/mocks/mentorCourses.mock';
 import { httpClient } from '../api/client';
+import { gql } from 'graphql-request';
+import { gqlClient } from '../api/graphql-client';
 
 const translateCourse = (course: any): MockCourse => {
   // Map backend status to frontend status
@@ -13,13 +15,13 @@ const translateCourse = (course: any): MockCourse => {
     id: course.id,
     title: course.title,
     thumbnail: course.thumbnailUrl || 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=300&q=80',
-    category: course.metadata?.categoryName || 'Chưa phân loại',
+    category: course.categories?.[0]?.name || course.metadata?.categoryName || 'Chưa phân loại',
     price: Number(course.price),
     studentsCount: course.metadata?.studentsCount || 0,
     rating: course.metadata?.rating || 0,
     reviewsCount: course.metadata?.reviewsCount || 0,
     status,
-    createdAt: new Date(course.createdAt).toISOString().split('T')[0],
+    createdAt: course.createdAt ? new Date(course.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
   };
 };
 
@@ -57,21 +59,94 @@ export const courseGateway = {
   },
 
   /**
-   * Lấy danh sách khóa học công khai từ backend
+   * Lấy danh sách khóa học công khai từ backend (GraphQL)
    */
   async getPublicCourses(): Promise<MockCourse[]> {
-    console.log('[courseGateway] Executing getPublicCourses() calling GET /v1/courses?limit=100');
+    console.log('[courseGateway] Executing getPublicCourses() calling GraphQL query "courses"');
     try {
-      const response = await httpClient.get<{ items: any[] }>('/v1/courses?limit=100');
-      console.log('[courseGateway] Successfully fetched courses from backend:', response);
-      return (response.items || []).map(translateCourse);
+      const query = gql`
+        query GetPublicCourses {
+          courses {
+            id
+            mentorId
+            approvedBy
+            title
+            description
+            thumbnailUrl
+            price
+            durationMinutes
+            status
+            categories {
+              id
+              name
+              slug
+            }
+          }
+        }
+      `;
+      const response = await gqlClient.request<any>(query);
+      console.log('[courseGateway] Successfully fetched courses from GraphQL:', response);
+      return (response.courses || []).map(translateCourse);
     } catch (error: any) {
-      console.error('[courseGateway] Error in getPublicCourses():', {
-        status: error.status,
+      console.error('[courseGateway] Error in getPublicCourses() via GraphQL:', {
         message: error.message || 'Unknown error',
         errorDetails: error
       });
-      throw error;
+      
+      // Fallback: Lấy toàn bộ khóa học công khai qua REST GET nếu GraphQL gặp lỗi
+      console.log('[courseGateway] Fallback: Fetching public courses via REST GET /v1/courses?limit=100');
+      try {
+        const restResponse = await httpClient.get<{ items: any[] }>('/v1/courses?limit=100');
+        console.log('[courseGateway] Fallback REST public courses fetched successfully:', restResponse);
+        return (restResponse.items || []).map(translateCourse);
+      } catch (restError) {
+        console.error('[courseGateway] Fallback REST fetch also failed:', restError);
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Lấy chi tiết khóa học theo ID từ backend (GraphQL)
+   */
+  async getCourseDetail(id: string): Promise<MockCourse | null> {
+    console.log(`[courseGateway] Executing getCourseDetail() calling GraphQL query "course" for ID: \${id}`);
+    try {
+      const query = gql`
+        query GetCourse($id: ID!) {
+          course(id: $id) {
+            id
+            mentorId
+            approvedBy
+            title
+            description
+            thumbnailUrl
+            price
+            durationMinutes
+            status
+            categories {
+              id
+              name
+              slug
+            }
+          }
+        }
+      `;
+      const response = await gqlClient.request<any>(query, { id });
+      if (!response.course) return null;
+      return translateCourse(response.course);
+    } catch (error: any) {
+      console.error(`[courseGateway] Error in getCourseDetail() via GraphQL:`, error);
+      
+      // Fallback: Lấy chi tiết qua REST GET
+      console.log(`[courseGateway] Fallback: Fetching course detail via REST GET /v1/courses/\${id}`);
+      try {
+        const response = await httpClient.get<any>(`/v1/courses/\${id}`);
+        return translateCourse(response);
+      } catch (restError) {
+        console.error('[courseGateway] Fallback REST fetch failed:', restError);
+        throw error;
+      }
     }
   },
 
