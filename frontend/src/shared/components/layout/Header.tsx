@@ -96,6 +96,11 @@ export const Header = () => {
                   <p className="text-xs text-text-muted truncate">{session.user?.email}</p>
                 </div>
                 <div className="lg:hidden h-px bg-outline-variant my-1 mx-2" />
+                <Link href="/dashboard" className="no-underline">
+                  <DropdownItem icon={<Icon name="Layers" size={18} />}>
+                    Bảng điều khiển
+                  </DropdownItem>
+                </Link>
                 <Link href="/profile" className="no-underline">
                   <DropdownItem icon={<Icon name="User" size={18} />}>
                     {t('profile')}
