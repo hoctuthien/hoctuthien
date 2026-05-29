@@ -61,6 +61,7 @@ export class CourseBookingService {
             ...(menteeId ? { menteeId } : {}),
             ...(status ? { status } : {}),
           },
+          relations: ['course', 'course.mentor', 'mentee'],
           order: { createdAt: 'DESC' },
           skip: (page - 1) * limit,
           take: limit,
@@ -79,6 +80,7 @@ export class CourseBookingService {
     const [items, total] = await this.courseBookingRepository.findManyWithCount(
       {
         where,
+        relations: ['course', 'course.mentor', 'mentee'],
         order: { createdAt: 'DESC' },
         skip: (page - 1) * limit,
         take: limit,
@@ -96,7 +98,9 @@ export class CourseBookingService {
     requestingUserId: string,
     requestingUserRole: string,
   ) {
-    const item = await this.courseBookingRepository.findById(id);
+    const item = await this.courseBookingRepository.findById(id, {
+      relations: ['course', 'course.mentor', 'mentee'],
+    });
     if (!item) throw new NotFoundException('Course booking not found');
 
     if (
@@ -116,6 +120,74 @@ export class CourseBookingService {
     return courseBookingSchema.parse(item);
   }
 
+  async checkConflict(meetingTime: Date, courseId: string, menteeId: string) {
+    const course = await this.courseRepository.findById(courseId);
+    if (!course) throw new NotFoundException('Course not found');
+    const mentorId = course.mentorId;
+    const duration = course.durationMinutes || 60;
+
+    const proposedStart = new Date(meetingTime);
+    const proposedEnd = new Date(proposedStart.getTime() + duration * 60 * 1000);
+
+    // 1. Check Mentee conflicts
+    const menteeBookings = await this.courseBookingRepository.findMany({
+      where: {
+        menteeId,
+        status: Not(BookingStatus.CANCELLED),
+      },
+      relations: ['course'],
+    });
+
+    for (const booking of menteeBookings) {
+      const bookingStart = new Date(booking.meetingTime);
+      const bookingDuration = booking.course?.durationMinutes || 60;
+      const bookingEnd = new Date(bookingStart.getTime() + bookingDuration * 60 * 1000);
+
+      if (proposedStart < bookingEnd && bookingStart < proposedEnd) {
+        return {
+          hasConflict: true,
+          conflictType: 'mentee',
+          message: `Lịch học bị trùng với một buổi học khác của bạn: Khóa học "${booking.course?.title}" từ ${bookingStart.toLocaleTimeString('vi-VN')} đến ${bookingEnd.toLocaleTimeString('vi-VN')}.`,
+        };
+      }
+    }
+
+    // 2. Check Mentor conflicts (all active bookings of this Mentor's courses)
+    const mentorCourses = await this.courseRepository.findMany({
+      where: { mentorId },
+      select: ['id'],
+    });
+    const mentorCourseIds = mentorCourses.map((c) => c.id);
+
+    if (mentorCourseIds.length > 0) {
+      const [mentorBookings] = await this.courseBookingRepository.findByCourseIds(
+        mentorCourseIds,
+        {
+          where: { status: Not(BookingStatus.CANCELLED) },
+          relations: ['course'],
+        },
+      );
+
+      for (const booking of mentorBookings) {
+        const bookingStart = new Date(booking.meetingTime);
+        const bookingDuration = booking.course?.durationMinutes || 60;
+        const bookingEnd = new Date(bookingStart.getTime() + bookingDuration * 60 * 1000);
+
+        if (proposedStart < bookingEnd && bookingStart < proposedEnd) {
+          return {
+            hasConflict: true,
+            conflictType: 'mentor',
+            message: `Lịch học bị trùng với lịch giảng dạy khác của Cố vấn (Mentor) vào khung giờ này.`,
+          };
+        }
+      }
+    }
+
+    return {
+      hasConflict: false,
+    };
+  }
+
   // menteeId lấy từ JWT, không để client tự truyền
   async create(payload: CreateCourseBookingInput, menteeId: string) {
     const parsed = createCourseBookingSchema.parse(payload);
@@ -125,6 +197,12 @@ export class CourseBookingService {
     if (!course) throw new NotFoundException('Course not found');
 
     this.validateMeetingTime(parsed.meetingTime, course.metadata);
+
+    // Kiểm tra trùng lịch
+    const conflictCheck = await this.checkConflict(parsed.meetingTime, parsed.courseId, menteeId);
+    if (conflictCheck.hasConflict) {
+      throw new BadRequestException(conflictCheck.message);
+    }
 
     // Kiểm tra trùng lặp: Mỗi khóa học chỉ cho phép tối đa một học viên đăng ký hoạt động
     const existingActiveBooking = await this.courseBookingRepository.findOne({

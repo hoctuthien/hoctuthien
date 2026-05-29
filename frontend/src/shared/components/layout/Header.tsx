@@ -107,11 +107,18 @@ export const Header = () => {
                   </DropdownItem>
                 </Link>
                 {session?.user?.role === 'mentor' && (
-                  <Link href="/mentor/courses" className="no-underline">
-                    <DropdownItem icon={<Icon name="Layers" size={18} />}>
-                      {t('createdCourses')}
-                    </DropdownItem>
-                  </Link>
+                  <>
+                    <Link href="/mentor/courses" className="no-underline">
+                      <DropdownItem icon={<Icon name="Layers" size={18} />}>
+                        {t('createdCourses')}
+                      </DropdownItem>
+                    </Link>
+                    <Link href="/mentor/bookings" className="no-underline">
+                      <DropdownItem icon={<Icon name="Calendar" size={18} />}>
+                        Quản lý lịch dạy
+                      </DropdownItem>
+                    </Link>
+                  </>
                 )}
                 <DropdownDivider />
                 <DropdownItem
