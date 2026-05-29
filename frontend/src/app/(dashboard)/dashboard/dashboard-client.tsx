@@ -13,7 +13,7 @@ import {
 // Import SOLID Subcomponents
 import { WelcomeBanner } from './components/WelcomeBanner';
 import { MetricsGrid } from './components/MetricsGrid';
-import { DashboardCalendar } from './components/DashboardCalendar';
+import { DashboardCalendar, getLocalDateString } from './components/DashboardCalendar';
 import { CourseList } from './components/CourseList';
 import { UpcomingClassCard } from './components/UpcomingClassCard';
 
@@ -46,6 +46,7 @@ interface CalendarSlot {
 export default function DashboardClient() {
   const { data: session, status: authStatus } = useSession();
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   
   // Dashboard Metrics state
   const [metrics, setMetrics] = useState({
@@ -77,7 +78,7 @@ export default function DashboardClient() {
     for (let i = 0; i < 7; i++) {
       const currentDay = new Date(monday);
       currentDay.setDate(monday.getDate() + i);
-      const dateStr = currentDay.toISOString().split('T')[0];
+      const dateStr = getLocalDateString(currentDay);
       days.push({
         dayName: dayNames[i],
         date: currentDay,
@@ -142,14 +143,14 @@ export default function DashboardClient() {
         });
         setCourses(mappedCourses);
 
-        // Map Calendar slots for Mentor
+        // Map Calendar slots for Mentor (with Date validity check)
         const slots: CalendarSlot[] = bookings.map((b: any) => {
           const mTime = b.meetingTime ? new Date(b.meetingTime) : null;
           const isValid = mTime && !isNaN(mTime.getTime());
           return {
             id: b.id,
             timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
-            dateStr: isValid ? mTime.toISOString().split('T')[0] : '',
+            dateStr: (isValid && mTime) ? getLocalDateString(mTime) : '',
             courseTitle: b.course?.title || 'Khóa học',
             partnerName: b.mentee?.name || 'Học viên',
             partnerAvatar: b.mentee?.avatarUrl,
@@ -209,14 +210,14 @@ export default function DashboardClient() {
         });
         setCourses(mappedCourses);
 
-        // Map Calendar slots for Mentee
+        // Map Calendar slots for Mentee (with Date validity check)
         const slots: CalendarSlot[] = bookings.map((b: any) => {
           const mTime = b.meetingTime ? new Date(b.meetingTime) : null;
           const isValid = mTime && !isNaN(mTime.getTime());
           return {
             id: b.id,
             timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
-            dateStr: isValid ? mTime.toISOString().split('T')[0] : '',
+            dateStr: (isValid && mTime) ? getLocalDateString(mTime) : '',
             courseTitle: b.course?.title || 'Khóa học',
             partnerName: b.course?.mentor?.name || 'Cố vấn học tập',
             partnerAvatar: b.course?.mentor?.avatarUrl,
@@ -260,6 +261,82 @@ export default function DashboardClient() {
     { label: 'Bảng điều khiển' },
   ];
 
+  // Reusable Sidebar right column content
+  const rightSidebarContent = (
+    <>
+      {/* Quick Explore / Creation banner */}
+      {isMentor ? (
+        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[32px] p-6 shadow-lg shadow-emerald-500/10 flex flex-col gap-4 text-white">
+          <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
+            <LuPlus size={24} className="text-emerald-200" />
+          </div>
+          <h3 className="text-base font-black tracking-tight leading-snug font-[Montserrat] mt-1">
+            Tạo Thêm Khóa Học Mới
+          </h3>
+          <p className="text-xs text-emerald-100/90 leading-relaxed font-medium">
+            Truyền thụ tri thức và giúp đỡ các em học sinh có hoàn cảnh khó khăn qua những bài giảng bổ ích của bạn.
+          </p>
+          
+          <button
+            onClick={() => window.location.href = '/mentor/courses'}
+            className="bg-white hover:bg-slate-50 text-emerald-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1 opacity-90 border-0"
+          >
+            <span>Tạo khóa học mới</span>
+            <LuPlus size={14} />
+          </button>
+        </div>
+      ) : (
+        <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[32px] p-6 shadow-lg shadow-indigo-500/10 flex flex-col gap-4 text-white">
+          <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
+            <LuGraduationCap size={24} className="text-cyan-300" />
+          </div>
+          <h3 className="text-base font-black tracking-tight leading-snug font-[Montserrat] mt-1">
+            Đăng Ký Khóa Học Mới?
+          </h3>
+          <p className="text-xs text-indigo-100/90 leading-relaxed font-medium">
+            Hàng ngàn Cố vấn học tập tận tụy từ khắp các trường Đại học luôn sẵn lòng đồng hành cùng bạn 100% miễn phí.
+          </p>
+          
+          <button
+            onClick={() => window.location.href = '/courses'}
+            className="bg-white hover:bg-slate-50 text-indigo-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1 opacity-90 border-0"
+          >
+            <span>Khám phá ngay</span>
+            <LuArrowRight size={14} />
+          </button>
+        </div>
+      )}
+
+      {/* Upcoming Next Study Class Card */}
+      <UpcomingClassCard 
+        isMentor={isMentor} 
+        allBookings={allBookings} 
+      />
+
+      {/* Quick Profile details */}
+      <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
+          <img 
+            src={session?.user?.image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'} 
+            alt={session?.user?.name || 'Tài khoản'} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex flex-col min-w-0 gap-0.5">
+          <strong className="text-xs font-black text-slate-800 block truncate leading-tight">
+            {session?.user?.name}
+          </strong>
+          <span className="text-[10px] text-slate-400 font-bold block truncate leading-tight">
+            {session?.user?.email}
+          </span>
+          <span className="text-[8px] bg-slate-100 text-slate-500 font-black px-2 py-0.5 rounded-full uppercase tracking-wider w-max border border-slate-200/50 mt-1">
+            {isMentor ? 'Cố vấn' : 'Học viên'}
+          </span>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="w-full bg-[#FAFBFD] min-h-screen py-8 px-4 md:px-8 font-sans">
       <div className="max-w-7xl mx-auto flex flex-col gap-8">
@@ -284,106 +361,54 @@ export default function DashboardClient() {
           stat4={metrics.stat4} 
         />
 
-        {/* 2-Column Main Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Column Left (2/3 width) */}
-          <div className="lg:col-span-2 flex flex-col gap-8">
+        {/* 2. Responsive Main Layout */}
+        {viewMode === 'month' ? (
+          <div className="flex flex-col gap-8 w-full">
+            {/* FULL-WIDTH MONTHLY CALENDAR GRID */}
+            <div className="w-full">
+              <DashboardCalendar 
+                currentWeekDays={currentWeekDays} 
+                calendarSlots={calendarSlots} 
+                isMentor={isMentor} 
+                setWeekOffset={setWeekOffset} 
+                weekOffset={weekOffset}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+              />
+            </div>
             
-            {/* Unified Calendar Component (Week & Month views) */}
-            <DashboardCalendar 
-              currentWeekDays={currentWeekDays} 
-              calendarSlots={calendarSlots} 
-              isMentor={isMentor} 
-              setWeekOffset={setWeekOffset} 
-              weekOffset={weekOffset}
-            />
-
-            {/* Courses Enrolled / Created Component */}
-            <CourseList 
-              courses={courses} 
-              isMentor={isMentor} 
-            />
-
-          </div>
-
-          {/* Column Right (1/3 width) */}
-          <div className="flex flex-col gap-8">
-            
-            {/* Quick Explore / Creation banner */}
-            {isMentor ? (
-              <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[32px] p-6 shadow-lg shadow-emerald-500/10 flex flex-col gap-4 text-white">
-                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-                  <LuPlus size={24} className="text-emerald-200" />
-                </div>
-                <h3 className="text-base font-black tracking-tight leading-snug font-[Montserrat] mt-1">
-                  Tạo Thêm Khóa Học Mới
-                </h3>
-                <p className="text-xs text-emerald-100/90 leading-relaxed font-medium">
-                  Truyền thụ tri thức và giúp đỡ các em học sinh có hoàn cảnh khó khăn qua những bài giảng bổ ích của bạn.
-                </p>
-                
-                <button
-                  onClick={() => window.location.href = '/mentor/courses'}
-                  className="bg-white hover:bg-slate-50 text-emerald-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1 opacity-90"
-                >
-                  <span>Tạo khóa học mới</span>
-                  <LuPlus size={14} />
-                </button>
+            {/* Rest of items in columns below */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 flex flex-col gap-8">
+                <CourseList courses={courses} isMentor={isMentor} />
               </div>
-            ) : (
-              <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[32px] p-6 shadow-lg shadow-indigo-500/10 flex flex-col gap-4 text-white">
-                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-                  <LuGraduationCap size={24} className="text-cyan-300" />
-                </div>
-                <h3 className="text-base font-black tracking-tight leading-snug font-[Montserrat] mt-1">
-                  Đăng Ký Khóa Học Mới?
-                </h3>
-                <p className="text-xs text-indigo-100/90 leading-relaxed font-medium">
-                  Hàng ngàn Cố vấn học tập tận tụy từ khắp các trường Đại học luôn sẵn lòng đồng hành cùng bạn 100% miễn phí.
-                </p>
-                
-                <button
-                  onClick={() => window.location.href = '/courses'}
-                  className="bg-white hover:bg-slate-50 text-indigo-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1 opacity-90"
-                >
-                  <span>Khám phá ngay</span>
-                  <LuArrowRight size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Upcoming Next Study Class Card */}
-            <UpcomingClassCard 
-              isMentor={isMentor} 
-              allBookings={allBookings} 
-            />
-
-            {/* Quick Profile details */}
-            <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
-                <img 
-                  src={session?.user?.image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'} 
-                  alt={session?.user?.name || 'Tài khoản'} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex flex-col min-w-0 gap-0.5">
-                <strong className="text-xs font-black text-slate-800 block truncate leading-tight">
-                  {session?.user?.name}
-                </strong>
-                <span className="text-[10px] text-slate-400 font-bold block truncate leading-tight">
-                  {session?.user?.email}
-                </span>
-                <span className="text-[8px] bg-slate-100 text-slate-500 font-black px-2 py-0.5 rounded-full uppercase tracking-wider w-max border border-slate-200/50 mt-1">
-                  {isMentor ? 'Cố vấn' : 'Học viên'}
-                </span>
+              <div className="flex flex-col gap-8">
+                {rightSidebarContent}
               </div>
             </div>
-
           </div>
-
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* 2/3 COLUMN WEEKLY CALENDAR & COURSES */}
+            <div className="lg:col-span-2 flex flex-col gap-8">
+              <DashboardCalendar 
+                currentWeekDays={currentWeekDays} 
+                calendarSlots={calendarSlots} 
+                isMentor={isMentor} 
+                setWeekOffset={setWeekOffset} 
+                weekOffset={weekOffset}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+              />
+              <CourseList courses={courses} isMentor={isMentor} />
+            </div>
+            
+            {/* 1/3 COLUMN SIDEBAR */}
+            <div className="flex flex-col gap-8">
+              {rightSidebarContent}
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

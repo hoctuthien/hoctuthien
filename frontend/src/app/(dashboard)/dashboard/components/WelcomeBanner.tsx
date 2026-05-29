@@ -19,7 +19,7 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ name, isMentor, me
       </div>
       
       <h1 className="text-2xl md:text-3xl font-black tracking-tight leading-tight mt-1 font-[Montserrat]">
-        Chào mừng trở lại, {name}! ✨
+        Chào mừng trở lại, {name}!
       </h1>
       <p className="text-sm text-blue-100/90 font-medium max-w-2xl leading-relaxed">
         {message}

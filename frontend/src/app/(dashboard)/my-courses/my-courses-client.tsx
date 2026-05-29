@@ -19,6 +19,7 @@ import {
   LuTrash2
 } from 'react-icons/lu';
 import { useSession } from 'next-auth/react';
+import { DashboardCalendar, getLocalDateString } from '../dashboard/components/DashboardCalendar';
 
 interface BookingRelation {
   id: string;
@@ -63,6 +64,52 @@ export default function MyCoursesClient() {
   const [cancelBookingId, setCancelBookingId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState('');
   const [submittingCancel, setSubmittingCancel] = useState(false);
+
+  // Calendar States
+  const [viewType, setViewType] = useState<'list' | 'calendar'>('list');
+  const [calendarViewMode, setCalendarViewMode] = useState<'week' | 'month'>('month');
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [currentWeekDays, setCurrentWeekDays] = useState<{ dayName: string; date: Date; dateStr: string }[]>([]);
+
+  // Calculate current week dates dynamically based on weekOffset
+  useEffect(() => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const differenceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + differenceToMonday + weekOffset * 7);
+
+    const days = [];
+    const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+    
+    for (let i = 0; i < 7; i++) {
+      const currentDay = new Date(monday);
+      currentDay.setDate(monday.getDate() + i);
+      const dateStr = getLocalDateString(currentDay);
+      days.push({
+        dayName: dayNames[i],
+        date: currentDay,
+        dateStr,
+      });
+    }
+    setCurrentWeekDays(days);
+  }, [weekOffset]);
+
+  // Map bookings to calendarSlots structure
+  const calendarSlots = bookings.map((b: any) => {
+    const mTime = b.meetingTime ? new Date(b.meetingTime) : null;
+    const isValid = mTime && !isNaN(mTime.getTime());
+    return {
+      id: b.id,
+      timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
+      dateStr: (isValid && mTime) ? getLocalDateString(mTime) : '',
+      courseTitle: b.course?.title || 'Khóa học',
+      partnerName: b.course?.mentor?.name || 'Cố vấn học tập',
+      partnerAvatar: b.course?.mentor?.avatarUrl,
+      googleMeetUrl: b.googleMeetUrl,
+      status: b.status,
+    };
+  }).filter((s: any) => s.dateStr !== '');
 
   const fetchBookings = async () => {
     try {
@@ -141,299 +188,338 @@ export default function MyCoursesClient() {
       <div className="max-w-7xl mx-auto flex flex-col gap-8">
         
         {/* Title and Breadcrumbs */}
-        <div className="flex flex-col gap-2">
-          <Breadcrumb items={breadcrumbItems} />
-          <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mt-1 font-[Montserrat]">
-            Khóa học & Lịch học của Tôi
-          </h1>
-          <p className="text-sm text-[#64748b] font-semibold">
-            Theo dõi tiến trình học tập, quản lý lịch hẹn học và kết nối với các Cố vấn (Mentor) tâm huyết.
-          </p>
-        </div>
-
-        {/* 1. Thống kê */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-            <div className="w-10 h-10 bg-blue-50 text-[#2563eb] rounded-xl flex items-center justify-center flex-shrink-0">
-              <LuBookOpen size={20} />
-            </div>
-            <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">TỔNG BUỔI HỌC</span>
-              <span className="text-xl font-black text-[#0F172A]">{loading ? '...' : total}</span>
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col gap-2">
+            <Breadcrumb items={breadcrumbItems} />
+            <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mt-1 font-[Montserrat]">
+              Khóa học & Lịch học của Tôi
+            </h1>
+            <p className="text-sm text-[#64748b] font-semibold">
+              Theo dõi tiến trình học tập, quản lý lịch hẹn học và kết nối với các Cố vấn (Mentor) tâm huyết.
+            </p>
           </div>
 
-          <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-            <div className="w-10 h-10 bg-amber-50 text-[#D97706] rounded-xl flex items-center justify-center flex-shrink-0">
-              <LuCalendar size={20} />
-            </div>
-            <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">LỊCH SẮP TỚI</span>
-              <span className="text-xl font-black text-[#D97706]">{loading ? '...' : upcomingCount}</span>
-            </div>
-          </div>
-
-          <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-            <div className="w-10 h-10 bg-emerald-50 text-[#10B981] rounded-xl flex items-center justify-center flex-shrink-0">
-              <LuCheck size={20} />
-            </div>
-            <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">HOÀN THÀNH</span>
-              <span className="text-xl font-black text-[#10B981]">{loading ? '...' : completedCount}</span>
-            </div>
-          </div>
-
-          <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-            <div className="w-10 h-10 bg-rose-50 text-[#EF4444] rounded-xl flex items-center justify-center flex-shrink-0">
-              <LuX size={20} />
-            </div>
-            <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ HỦY</span>
-              <span className="text-xl font-black text-[#EF4444]">{loading ? '...' : cancelledCount}</span>
-            </div>
+          {/* View Mode Toggle */}
+          <div className="flex bg-[#F1F5F9] p-1 rounded-2xl border border-[#E2E8F0] self-start sm:self-center">
+            <button
+              onClick={() => setViewType('list')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
+                viewType === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+              }`}
+            >
+              <span>Dạng Danh sách</span>
+            </button>
+            <button
+              onClick={() => setViewType('calendar')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
+                viewType === 'calendar' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+              }`}
+            >
+              <span>Dạng Lịch Tháng</span>
+            </button>
           </div>
         </div>
 
-        {/* 2. Filters & Searches */}
-        <div className="bg-white border border-[#E2E8F0] p-4 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Tabs */}
-          <div className="flex items-center gap-1.5 bg-[#F8FAFC] p-1.5 rounded-2xl w-full md:w-auto">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
-                activeTab === 'all'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-[#475569] hover:bg-slate-100'
-              }`}
-            >
-              Tất cả
-            </button>
-            <button
-              onClick={() => setActiveTab('upcoming')}
-              className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
-                activeTab === 'upcoming'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-[#475569] hover:bg-slate-100'
-              }`}
-            >
-              Lịch sắp tới
-            </button>
-            <button
-              onClick={() => setActiveTab('completed')}
-              className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
-                activeTab === 'completed'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-[#475569] hover:bg-slate-100'
-              }`}
-            >
-              Đã học
-            </button>
-            <button
-              onClick={() => setActiveTab('cancelled')}
-              className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
-                activeTab === 'cancelled'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-[#475569] hover:bg-slate-100'
-              }`}
-            >
-              Đã hủy
-            </button>
-          </div>
-
-          {/* Search bar */}
-          <div className="relative w-full md:w-[320px]">
-            <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
-            <input
-              type="text"
-              placeholder="Tìm theo tên khóa học hoặc Cố vấn..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl outline-none focus:bg-white focus:border-[#2563eb] text-xs font-semibold transition-all"
+        {viewType === 'calendar' ? (
+          <div className="w-full">
+            <DashboardCalendar
+              currentWeekDays={currentWeekDays}
+              calendarSlots={calendarSlots}
+              isMentor={false}
+              setWeekOffset={setWeekOffset}
+              weekOffset={weekOffset}
+              viewMode={calendarViewMode}
+              setViewMode={setCalendarViewMode}
+              onManageSlot={(id) => setCancelBookingId(id)}
             />
-          </div>
-        </div>
-
-        {/* 3. Bookings Content */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[1, 2].map((n) => (
-              <div key={n} className="bg-white rounded-3xl p-6 border border-slate-100 flex flex-col gap-4 animate-pulse">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-slate-100 rounded-2xl" />
-                  <div className="flex-1 flex flex-col gap-2">
-                    <div className="h-4 bg-slate-100 rounded w-1/3" />
-                    <div className="h-6 bg-slate-100 rounded w-5/6" />
-                  </div>
-                </div>
-                <div className="h-px bg-slate-100" />
-                <div className="h-10 bg-slate-100 rounded-xl" />
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="bg-white border border-red-100 p-6 rounded-3xl text-center">
-            <p className="text-sm font-semibold text-rose-500">{error}</p>
-            <Button
-              variant="outline"
-              label="Tải lại dữ liệu"
-              onClick={fetchBookings}
-              className="mt-3 rounded-full text-xs font-black"
-            />
-          </div>
-        ) : filteredBookings.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredBookings.map((booking, index) => {
-              const meetingDate = new Date(booking.meetingTime);
-              
-              // Status Badge logic
-              let statusLabel = 'Đang xử lý';
-              let statusStyles = 'bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]';
-              if (booking.status === 'confirmed') {
-                statusLabel = 'Đã xác nhận';
-                statusStyles = 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]';
-              } else if (booking.status === 'completed') {
-                statusLabel = 'Đã hoàn thành';
-                statusStyles = 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]';
-              } else if (booking.status === 'cancelled') {
-                statusLabel = 'Đã hủy';
-                statusStyles = 'bg-[#FEF2F2] text-[#EF4444] border-[#FEE2E2]';
-              } else if (booking.status === 'rescheduled') {
-                statusLabel = 'Đã đổi lịch';
-                statusStyles = 'bg-blue-50 text-blue-600 border-blue-100';
-              }
-
-              // Active Cancel/Modify states
-              const isCancellable = booking.status === 'pending' || booking.status === 'confirmed';
-
-              return (
-                <div 
-                  key={`${booking.id || 'booking'}-${index}`}
-                  className="bg-white rounded-3xl p-6 border border-slate-100/90 shadow-[0_8px_30px_rgba(0,0,0,0.005)] transition-all duration-300 hover:shadow-md flex flex-col justify-between"
-                >
-                  <div className="flex flex-col gap-4">
-                    {/* Header: Status & Price */}
-                    <div className="flex items-center justify-between gap-3">
-                      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black border uppercase tracking-wider ${statusStyles}`}>
-                        {statusLabel}
-                      </span>
-                      <span className="text-[11px] font-black text-[#10B981] bg-[#ECFDF5] px-2.5 py-1 rounded-lg">
-                        {booking.course?.price === 0 ? '100% Miễn phí' : `${(booking.course?.price || 0).toLocaleString('vi-VN')}đ`}
-                      </span>
-                    </div>
-
-                    {/* Content Identity */}
-                    <div className="flex items-start gap-4">
-                      {/* Avatar/Thumbnail */}
-                      <div className="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 flex-shrink-0">
-                        <img
-                          src={booking.course?.thumbnailUrl || 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=120&q=80'}
-                          alt={booking.course?.title || 'Khóa học'}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      
-                      {/* Title and Mentor */}
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <h3 className="text-[15px] font-black text-[#0F172A] tracking-tight leading-snug truncate">
-                          {booking.course?.title}
-                        </h3>
-                        <div className="flex items-center gap-1.5 text-xs text-[#64748b] font-semibold">
-                          <LuUser size={13} className="text-slate-400" />
-                          <span>Cố vấn: <strong className="text-[#475569]">{booking.course?.mentor?.name || 'Chưa phân công'}</strong></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Class Schedule detail */}
-                    <div className="bg-[#F8FAFC] border border-[#E2E8F0]/70 p-4 rounded-2xl flex flex-col gap-2 text-xs">
-                      <div className="flex items-center justify-between gap-3 font-semibold text-[#475569]">
-                        <span className="text-[#94A3B8] font-bold">Thời gian học:</span>
-                        <span className="flex items-center gap-1">
-                          <LuClock size={13} className="text-blue-500" />
-                          {meetingDate.toLocaleDateString('vi-VN', { weekday: 'long' })}, {meetingDate.toLocaleDateString('vi-VN')} vào {meetingDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-
-                      {booking.googleMeetUrl && (
-                        <div className="flex items-center justify-between gap-3 font-semibold text-[#475569] border-t border-[#E2E8F0] pt-2 mt-1">
-                          <span className="text-[#94A3B8] font-bold">Phòng học online:</span>
-                          <a 
-                            href={booking.googleMeetUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 flex items-center gap-1 no-underline font-black"
-                          >
-                            <span>Google Meet Link</span>
-                            <LuExternalLink size={12} />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Mentee notes */}
-                    {booking.notesForMentor && (
-                      <div className="flex items-start gap-2 text-xs text-slate-500 border border-slate-100 p-3 rounded-2xl bg-white shadow-[0_4px_12px_rgba(0,0,0,0.002)]">
-                        <LuMessageSquare className="text-slate-400 flex-shrink-0 mt-0.5" size={14} />
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lời nhắn của bạn:</span>
-                          <p className="font-medium italic leading-relaxed text-[#475569]">{booking.notesForMentor}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Cancellation reason if cancelled */}
-                    {booking.status === 'cancelled' && booking.cancellationReason && (
-                      <div className="flex items-start gap-2 text-xs text-rose-600 bg-rose-50/50 border border-rose-100 p-3 rounded-2xl">
-                        <LuTriangleAlert className="text-rose-500 flex-shrink-0 mt-0.5" size={14} />
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-[10px] font-black text-rose-500 uppercase tracking-wider">Lý do hủy buổi học:</span>
-                          <p className="font-semibold leading-relaxed text-rose-700">{booking.cancellationReason}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions buttons */}
-                  {isCancellable && (
-                    <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-50">
-                      {booking.googleMeetUrl ? (
-                        <a 
-                          href={booking.googleMeetUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider no-underline shadow-md shadow-blue-500/10 transition-all cursor-pointer"
-                        >
-                          Vào phòng học (Google Meet)
-                        </a>
-                      ) : (
-                        <div className="flex-1 bg-slate-50 text-slate-400 font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider text-center border border-slate-100">
-                          Chờ Mentor gửi link Meet
-                        </div>
-                      )}
-
-                      <button
-                        onClick={() => setCancelBookingId(booking.id)}
-                        className="px-4 py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-all cursor-pointer border border-rose-100 flex items-center justify-center"
-                        title="Hủy buổi học này"
-                      >
-                        <LuTrash2 size={15} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
           </div>
         ) : (
-          <div className="py-16 bg-white rounded-[32px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.005)]">
-            <EmptyState
-              icon={<LuCalendar size={48} className="text-slate-400 animate-pulse" />}
-              title="Không có lịch học nào"
-              description="Bạn chưa đăng ký lịch học hoặc bộ lọc hiện tại không khớp với kết quả nào."
-              actionText="Khám phá khóa học ngay"
-              onAction={() => window.location.href = '/courses'}
-            />
-          </div>
+          <>
+            {/* 1. Thống kê */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
+                <div className="w-10 h-10 bg-blue-50 text-[#2563eb] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <LuBookOpen size={20} />
+                </div>
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">TỔNG BUỔI HỌC</span>
+                  <span className="text-xl font-black text-[#0F172A]">{loading ? '...' : total}</span>
+                </div>
+              </div>
+
+              <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
+                <div className="w-10 h-10 bg-amber-50 text-[#D97706] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <LuCalendar size={20} />
+                </div>
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">LỊCH SẮP TỚI</span>
+                  <span className="text-xl font-black text-[#D97706]">{loading ? '...' : upcomingCount}</span>
+                </div>
+              </div>
+
+              <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
+                <div className="w-10 h-10 bg-emerald-50 text-[#10B981] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <LuCheck size={20} />
+                </div>
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">HOÀN THÀNH</span>
+                  <span className="text-xl font-black text-[#10B981]">{loading ? '...' : completedCount}</span>
+                </div>
+              </div>
+
+              <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
+                <div className="w-10 h-10 bg-rose-50 text-[#EF4444] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <LuX size={20} />
+                </div>
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ HỦY</span>
+                  <span className="text-xl font-black text-[#EF4444]">{loading ? '...' : cancelledCount}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Filters & Searches */}
+            <div className="bg-white border border-[#E2E8F0] p-4 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* Tabs */}
+              <div className="flex items-center gap-1.5 bg-[#F8FAFC] p-1.5 rounded-2xl w-full md:w-auto">
+                <button
+                  onClick={() => setActiveTab('all')}
+                  className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
+                    activeTab === 'all'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-[#475569] hover:bg-slate-100'
+                  }`}
+                >
+                  Tất cả
+                </button>
+                <button
+                  onClick={() => setActiveTab('upcoming')}
+                  className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
+                    activeTab === 'upcoming'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-[#475569] hover:bg-slate-100'
+                  }`}
+                >
+                  Lịch sắp tới
+                </button>
+                <button
+                  onClick={() => setActiveTab('completed')}
+                  className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
+                    activeTab === 'completed'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-[#475569] hover:bg-slate-100'
+                  }`}
+                >
+                  Đã học
+                </button>
+                <button
+                  onClick={() => setActiveTab('cancelled')}
+                  className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
+                    activeTab === 'cancelled'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-[#475569] hover:bg-slate-100'
+                  }`}
+                >
+                  Đã hủy
+                </button>
+              </div>
+
+              {/* Search bar */}
+              <div className="relative w-full md:w-[320px]">
+                <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
+                <input
+                  type="text"
+                  placeholder="Tìm theo tên khóa học hoặc Cố vấn..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-11 pr-4 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl outline-none focus:bg-white focus:border-[#2563eb] text-xs font-semibold transition-all"
+                />
+              </div>
+            </div>
+
+            {/* 3. Bookings Content */}
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[1, 2].map((n) => (
+                  <div key={n} className="bg-white rounded-3xl p-6 border border-slate-100 flex flex-col gap-4 animate-pulse">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-slate-100 rounded-2xl" />
+                      <div className="flex-1 flex flex-col gap-2">
+                        <div className="h-4 bg-slate-100 rounded w-1/3" />
+                        <div className="h-6 bg-slate-100 rounded w-5/6" />
+                      </div>
+                    </div>
+                    <div className="h-px bg-slate-100" />
+                    <div className="h-10 bg-slate-100 rounded-xl" />
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="bg-white border border-red-100 p-6 rounded-3xl text-center">
+                <p className="text-sm font-semibold text-rose-500">{error}</p>
+                <Button
+                  variant="outline"
+                  label="Tải lại dữ liệu"
+                  onClick={fetchBookings}
+                  className="mt-3 rounded-full text-xs font-black"
+                />
+              </div>
+            ) : filteredBookings.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredBookings.map((booking, index) => {
+                  const meetingDate = new Date(booking.meetingTime);
+                  
+                  // Status Badge logic
+                  let statusLabel = 'Đang xử lý';
+                  let statusStyles = 'bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]';
+                  if (booking.status === 'confirmed') {
+                    statusLabel = 'Đã xác nhận';
+                    statusStyles = 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]';
+                  } else if (booking.status === 'completed') {
+                    statusLabel = 'Đã hoàn thành';
+                    statusStyles = 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]';
+                  } else if (booking.status === 'cancelled') {
+                    statusLabel = 'Đã hủy';
+                    statusStyles = 'bg-[#FEF2F2] text-[#EF4444] border-[#FEE2E2]';
+                  } else if (booking.status === 'rescheduled') {
+                    statusLabel = 'Đã đổi lịch';
+                    statusStyles = 'bg-blue-50 text-blue-600 border-blue-100';
+                  }
+
+                  // Active Cancel/Modify states
+                  const isCancellable = booking.status === 'pending' || booking.status === 'confirmed';
+
+                  return (
+                    <div 
+                      key={`${booking.id || 'booking'}-${index}`}
+                      className="bg-white rounded-3xl p-6 border border-slate-100/90 shadow-[0_8px_30px_rgba(0,0,0,0.005)] transition-all duration-300 hover:shadow-md flex flex-col justify-between"
+                    >
+                      <div className="flex flex-col gap-4">
+                        {/* Header: Status & Price */}
+                        <div className="flex items-center justify-between gap-3">
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black border uppercase tracking-wider ${statusStyles}`}>
+                            {statusLabel}
+                          </span>
+                          <span className="text-[11px] font-black text-[#10B981] bg-[#ECFDF5] px-2.5 py-1 rounded-lg">
+                            {booking.course?.price === 0 ? '100% Miễn phí' : `${(booking.course?.price || 0).toLocaleString('vi-VN')}đ`}
+                          </span>
+                        </div>
+
+                        {/* Content Identity */}
+                        <div className="flex items-start gap-4">
+                          {/* Avatar/Thumbnail */}
+                          <div className="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 flex-shrink-0">
+                            <img
+                              src={booking.course?.thumbnailUrl || 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=120&q=80'}
+                              alt={booking.course?.title || 'Khóa học'}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          
+                          {/* Title and Mentor */}
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <h3 className="text-[15px] font-black text-[#0F172A] tracking-tight leading-snug truncate">
+                              {booking.course?.title}
+                            </h3>
+                            <div className="flex items-center gap-1.5 text-xs text-[#64748b] font-semibold">
+                              <LuUser size={13} className="text-slate-400" />
+                              <span>Cố vấn: <strong className="text-[#475569]">{booking.course?.mentor?.name || 'Chưa phân công'}</strong></span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Class Schedule detail */}
+                        <div className="bg-[#F8FAFC] border border-[#E2E8F0]/70 p-4 rounded-2xl flex flex-col gap-2 text-xs">
+                          <div className="flex items-center justify-between gap-3 font-semibold text-[#475569]">
+                            <span className="text-[#94A3B8] font-bold">Thời gian học:</span>
+                            <span className="flex items-center gap-1">
+                              <LuClock size={13} className="text-blue-500" />
+                              {meetingDate.toLocaleDateString('vi-VN', { weekday: 'long' })}, {meetingDate.toLocaleDateString('vi-VN')} vào {meetingDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+
+                          {booking.googleMeetUrl && (
+                            <div className="flex items-center justify-between gap-3 font-semibold text-[#475569] border-t border-[#E2E8F0] pt-2 mt-1">
+                              <span className="text-[#94A3B8] font-bold">Phòng học online:</span>
+                              <a 
+                                href={booking.googleMeetUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-700 flex items-center gap-1 no-underline font-black"
+                              >
+                                <span>Google Meet Link</span>
+                                <LuExternalLink size={12} />
+                              </a>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Mentee notes */}
+                        {booking.notesForMentor && (
+                          <div className="flex items-start gap-2 text-xs text-slate-500 border border-slate-100 p-3 rounded-2xl bg-white shadow-[0_4px_12px_rgba(0,0,0,0.002)]">
+                            <LuMessageSquare className="text-slate-400 flex-shrink-0 mt-0.5" size={14} />
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lời nhắn của bạn:</span>
+                              <p className="font-medium italic leading-relaxed text-[#475569]">{booking.notesForMentor}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Cancellation reason if cancelled */}
+                        {booking.status === 'cancelled' && booking.cancellationReason && (
+                          <div className="flex items-start gap-2 text-xs text-rose-600 bg-rose-50/50 border border-rose-100 p-3 rounded-2xl">
+                            <LuTriangleAlert className="text-rose-500 flex-shrink-0 mt-0.5" size={14} />
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[10px] font-black text-rose-500 uppercase tracking-wider">Lý do hủy buổi học:</span>
+                              <p className="font-semibold leading-relaxed text-rose-700">{booking.cancellationReason}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Actions buttons */}
+                      {isCancellable && (
+                        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-50">
+                          {booking.googleMeetUrl ? (
+                            <a 
+                              href={booking.googleMeetUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider no-underline shadow-md shadow-blue-500/10 transition-all cursor-pointer"
+                            >
+                              Vào phòng học (Google Meet)
+                            </a>
+                          ) : (
+                            <div className="flex-1 bg-slate-50 text-slate-400 font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider text-center border border-slate-100">
+                              Chờ Mentor gửi link Meet
+                            </div>
+                          )}
+
+                          <button
+                            onClick={() => setCancelBookingId(booking.id)}
+                            className="px-4 py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-all cursor-pointer border border-rose-100 flex items-center justify-center"
+                            title="Hủy buổi học này"
+                          >
+                            <LuTrash2 size={15} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="py-16 bg-white rounded-[32px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.005)]">
+                <EmptyState
+                  icon={<LuCalendar size={48} className="text-slate-400 animate-pulse" />}
+                  title="Không có lịch học nào"
+                  description="Bạn chưa đăng ký lịch học hoặc bộ lọc hiện tại không khớp với kết quả nào."
+                  actionText="Khám phá khóa học ngay"
+                  onAction={() => window.location.href = '/courses'}
+                />
+              </div>
+            )}
+          </>
         )}
 
         {/* Cancellation Reason Modal */}
