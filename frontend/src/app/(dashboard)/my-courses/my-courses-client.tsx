@@ -50,7 +50,7 @@ interface BookingRelation {
 }
 
 export default function MyCoursesClient() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [bookings, setBookings] = useState<BookingRelation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,10 +79,10 @@ export default function MyCoursesClient() {
   };
 
   useEffect(() => {
-    if (session) {
+    if (status === 'authenticated') {
       fetchBookings();
     }
-  }, [session]);
+  }, [status]);
 
   const handleCancelBooking = async () => {
     if (!cancelBookingId || !cancelReason.trim()) return;
@@ -282,7 +282,7 @@ export default function MyCoursesClient() {
           </div>
         ) : filteredBookings.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredBookings.map((booking) => {
+            {filteredBookings.map((booking, index) => {
               const meetingDate = new Date(booking.meetingTime);
               
               // Status Badge logic
@@ -307,7 +307,7 @@ export default function MyCoursesClient() {
 
               return (
                 <div 
-                  key={booking.id}
+                  key={`${booking.id || 'booking'}-${index}`}
                   className="bg-white rounded-3xl p-6 border border-slate-100/90 shadow-[0_8px_30px_rgba(0,0,0,0.005)] transition-all duration-300 hover:shadow-md flex flex-col justify-between"
                 >
                   <div className="flex flex-col gap-4">
