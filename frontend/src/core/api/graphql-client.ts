@@ -11,17 +11,26 @@ const getGqlEndpoint = () => {
 
 const GQL_ENDPOINT = getGqlEndpoint();
 
+let cachedGqlToken: string | null = null;
+
+export const setGqlClientToken = (token: string | null) => {
+    cachedGqlToken = token;
+};
+
 export const gqlClient = new GraphQLClient(GQL_ENDPOINT, {
     requestMiddleware: async (request) => {
-        let token = null;
+        let token = cachedGqlToken;
         if (typeof window !== 'undefined') {
-            const session = await getSession();
-            token = (session as any)?.accessToken;
+            if (!token) {
+                const session = await getSession();
+                token = (session as any)?.accessToken || null;
+                cachedGqlToken = token;
+            }
         } else {
             try {
                 const { auth } = await import('@/auth');
                 const session = await auth();
-                token = (session as any)?.accessToken;
+                token = (session as any)?.accessToken || null;
             } catch (err) {
                 console.error('[GraphQL Client] Error fetching session token on server:', err);
             }
