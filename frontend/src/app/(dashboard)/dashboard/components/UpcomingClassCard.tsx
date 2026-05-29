@@ -24,7 +24,8 @@ export const UpcomingClassCard: React.FC<UpcomingClassCardProps> = ({ isMentor, 
 
       {nextBooking ? (
         (() => {
-          const bTime = new Date(nextBooking.meetingTime);
+          const bTime = nextBooking.meetingTime ? new Date(nextBooking.meetingTime) : null;
+          const isValid = bTime && !isNaN(bTime.getTime());
           const isConfirmed = nextBooking.status === 'confirmed';
           const partnerAvatar = isMentor ? nextBooking.mentee?.avatarUrl : nextBooking.course?.mentor?.avatarUrl;
           const partnerName = isMentor ? nextBooking.mentee?.name : nextBooking.course?.mentor?.name;
@@ -35,7 +36,9 @@ export const UpcomingClassCard: React.FC<UpcomingClassCardProps> = ({ isMentor, 
                 <span className="text-[#64748B] font-bold">Giờ họp:</span>
                 <strong className="text-slate-800 flex items-center gap-1 font-black">
                   <LuClock size={13} className="text-blue-500" />
-                  {bTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}, {bTime.toLocaleDateString('vi-VN')}
+                  {isValid 
+                    ? `${bTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}, ${bTime.toLocaleDateString('vi-VN')}` 
+                    : 'Chưa sắp lịch'}
                 </strong>
               </div>
 

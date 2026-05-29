@@ -13,7 +13,7 @@ import {
 // Import SOLID Subcomponents
 import { WelcomeBanner } from './components/WelcomeBanner';
 import { MetricsGrid } from './components/MetricsGrid';
-import { WeeklyCalendar } from './components/WeeklyCalendar';
+import { DashboardCalendar } from './components/DashboardCalendar';
 import { CourseList } from './components/CourseList';
 import { UpcomingClassCard } from './components/UpcomingClassCard';
 
@@ -144,18 +144,19 @@ export default function DashboardClient() {
 
         // Map Calendar slots for Mentor
         const slots: CalendarSlot[] = bookings.map((b: any) => {
-          const mTime = new Date(b.meetingTime);
+          const mTime = b.meetingTime ? new Date(b.meetingTime) : null;
+          const isValid = mTime && !isNaN(mTime.getTime());
           return {
             id: b.id,
-            timeLabel: mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-            dateStr: mTime.toISOString().split('T')[0],
+            timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
+            dateStr: isValid ? mTime.toISOString().split('T')[0] : '',
             courseTitle: b.course?.title || 'Khóa học',
             partnerName: b.mentee?.name || 'Học viên',
             partnerAvatar: b.mentee?.avatarUrl,
             googleMeetUrl: b.googleMeetUrl,
             status: b.status,
           };
-        });
+        }).filter((s: CalendarSlot) => s.dateStr !== '');
         setCalendarSlots(slots);
 
       } else {
@@ -210,18 +211,19 @@ export default function DashboardClient() {
 
         // Map Calendar slots for Mentee
         const slots: CalendarSlot[] = bookings.map((b: any) => {
-          const mTime = new Date(b.meetingTime);
+          const mTime = b.meetingTime ? new Date(b.meetingTime) : null;
+          const isValid = mTime && !isNaN(mTime.getTime());
           return {
             id: b.id,
-            timeLabel: mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-            dateStr: mTime.toISOString().split('T')[0],
+            timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
+            dateStr: isValid ? mTime.toISOString().split('T')[0] : '',
             courseTitle: b.course?.title || 'Khóa học',
             partnerName: b.course?.mentor?.name || 'Cố vấn học tập',
             partnerAvatar: b.course?.mentor?.avatarUrl,
             googleMeetUrl: b.googleMeetUrl,
             status: b.status,
           };
-        });
+        }).filter((s: CalendarSlot) => s.dateStr !== '');
         setCalendarSlots(slots);
       }
     } catch (error) {
@@ -288,12 +290,13 @@ export default function DashboardClient() {
           {/* Column Left (2/3 width) */}
           <div className="lg:col-span-2 flex flex-col gap-8">
             
-            {/* Weekly Calendar Component */}
-            <WeeklyCalendar 
+            {/* Unified Calendar Component (Week & Month views) */}
+            <DashboardCalendar 
               currentWeekDays={currentWeekDays} 
               calendarSlots={calendarSlots} 
               isMentor={isMentor} 
               setWeekOffset={setWeekOffset} 
+              weekOffset={weekOffset}
             />
 
             {/* Courses Enrolled / Created Component */}
@@ -322,7 +325,7 @@ export default function DashboardClient() {
                 
                 <button
                   onClick={() => window.location.href = '/mentor/courses'}
-                  className="bg-white hover:bg-slate-50 text-emerald-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1"
+                  className="bg-white hover:bg-slate-50 text-emerald-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1 opacity-90"
                 >
                   <span>Tạo khóa học mới</span>
                   <LuPlus size={14} />
@@ -342,7 +345,7 @@ export default function DashboardClient() {
                 
                 <button
                   onClick={() => window.location.href = '/courses'}
-                  className="bg-white hover:bg-slate-50 text-indigo-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1"
+                  className="bg-white hover:bg-slate-50 text-indigo-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1 opacity-90"
                 >
                   <span>Khám phá ngay</span>
                   <LuArrowRight size={14} />

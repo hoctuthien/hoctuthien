@@ -15,7 +15,8 @@ import {
   LuHouse, 
   LuMenu, 
   LuX,
-  LuChevronLeft
+  LuChevronLeft,
+  LuChevronRight
 } from 'react-icons/lu';
 
 interface SidebarItem {
@@ -33,6 +34,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   if (status === 'loading') {
     return (
@@ -67,55 +69,77 @@ export default function DashboardLayout({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#1E293B] text-white p-6 font-sans">
-      {/* Brand Logo */}
-      <div className="flex items-center gap-3 mb-8 border-b border-slate-700/50 pb-6">
-        <div className="w-9 h-9 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-white text-base">
-          HT
+    <div className="flex flex-col h-full bg-white border-r border-[#E2E8F0] p-4 font-sans justify-between transition-all duration-300">
+      <div className="flex flex-col gap-6">
+        {/* Brand Logo */}
+        <div className={`flex items-center gap-3 border-b border-[#F1F5F9] pb-5 ${collapsed ? 'justify-center' : 'px-2'}`}>
+          <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-white text-base shadow-md shadow-blue-500/10">
+            HT
+          </div>
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="font-black text-sm text-[#0F172A] tracking-tight">HỌC TỪ THIỆN</span>
+              <span className="text-[9px] text-[#94A3B8] font-black uppercase tracking-widest">Dashboard</span>
+            </div>
+          )}
         </div>
-        <div className="flex flex-col">
-          <span className="font-black text-sm tracking-tight">HỌC TỪ THIỆN</span>
-          <span className="text-[9px] text-[#94A3B8] font-black uppercase tracking-widest">Dashboard</span>
-        </div>
+
+        {/* Nav Menu */}
+        <nav className="flex flex-col gap-1.5">
+          {sidebarItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link 
+                key={item.href} 
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black transition-all no-underline ${
+                  isActive 
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/15' 
+                    : 'text-[#475569] hover:text-blue-600 hover:bg-[#F0F7FF]'
+                } ${collapsed ? 'justify-center' : ''}`}
+                title={collapsed ? item.label : undefined}
+              >
+                <div className={`${isActive ? 'text-white' : 'text-slate-500 group-hover:text-blue-600'}`}>
+                  {item.icon}
+                </div>
+                {!collapsed && <span>{item.label}</span>}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* Nav Menu */}
-      <nav className="flex-1 flex flex-col gap-1.5">
-        {sidebarItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link 
-              key={item.href} 
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-xs font-bold tracking-wide transition-all no-underline ${
-                isActive 
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 font-black' 
-                  : 'text-[#94A3B8] hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
       {/* Footer / Exit Links */}
-      <div className="border-t border-slate-700/50 pt-6 mt-6 flex flex-col gap-2">
+      <div className="flex flex-col gap-1.5 border-t border-[#F1F5F9] pt-4">
         <Link 
           href="/" 
-          className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-xs font-bold tracking-wide text-[#94A3B8] hover:text-white hover:bg-slate-800 no-underline"
+          className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black text-[#475569] hover:text-blue-600 hover:bg-[#F0F7FF] no-underline ${collapsed ? 'justify-center' : ''}`}
+          title={collapsed ? 'Về trang chủ' : undefined}
         >
-          <LuHouse size={18} />
-          <span>Về trang chủ</span>
+          <LuHouse size={18} className="text-slate-500" />
+          {!collapsed && <span>Về trang chủ</span>}
         </Link>
         <button 
           onClick={handleSignOut}
-          className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-xs font-bold tracking-wide text-rose-400 hover:text-white hover:bg-rose-500/10 cursor-pointer text-left border-0 bg-transparent transition-all"
+          className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black text-rose-500 hover:text-white hover:bg-rose-500 transition-all cursor-pointer text-left border-0 bg-transparent ${collapsed ? 'justify-center' : ''}`}
+          title={collapsed ? 'Đăng xuất' : undefined}
         >
           <LuLogOut size={18} />
-          <span>Đăng xuất</span>
+          {!collapsed && <span>Đăng xuất</span>}
+        </button>
+
+        {/* Desktop Collapse Toggle Switch */}
+        <button 
+          onClick={() => setCollapsed(!collapsed)}
+          className="hidden lg:flex items-center justify-center w-full mt-2 py-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all cursor-pointer border-0 bg-transparent"
+        >
+          {collapsed ? <LuChevronRight size={18} /> : (
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-slate-400">
+              <LuChevronLeft size={16} />
+              <span>Thu gọn</span>
+            </div>
+          )}
         </button>
       </div>
     </div>
@@ -125,7 +149,10 @@ export default function DashboardLayout({
     <div className="flex min-h-screen bg-[#FAFBFD] font-sans">
       
       {/* 1. Desktop Sidebar */}
-      <aside className="hidden lg:block w-[260px] h-screen sticky top-0 flex-shrink-0 z-30 border-r border-slate-200">
+      <aside 
+        className="hidden lg:block h-screen sticky top-0 flex-shrink-0 z-30 transition-all duration-300 ease-in-out"
+        style={{ width: collapsed ? '80px' : '260px' }}
+      >
         {sidebarContent}
       </aside>
 
@@ -139,7 +166,7 @@ export default function DashboardLayout({
           <aside className="relative w-[260px] h-full shadow-2xl flex flex-col animate-slide-in">
             <button 
               onClick={() => setMobileOpen(false)}
-              className="absolute top-4 right-4 text-white hover:text-slate-200 z-50 p-1"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-800 z-50 p-1"
             >
               <LuX size={20} />
             </button>
@@ -152,7 +179,7 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* Top Header */}
-        <header className="sticky top-0 bg-white border-b border-[#E2E8F0] h-16 flex items-center justify-between px-6 z-20 shadow-sm">
+        <header className="sticky top-0 bg-white border-b border-[#E2E8F0] h-16 flex items-center justify-between px-6 z-20 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setMobileOpen(true)}
@@ -172,14 +199,14 @@ export default function DashboardLayout({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2.5">
               <div className="flex flex-col text-right hidden md:flex">
-                <strong className="text-xs text-slate-700 leading-tight block">{session?.user?.name}</strong>
+                <strong className="text-xs text-slate-700 leading-tight block font-black">{session?.user?.name}</strong>
                 <span className="text-[10px] text-slate-400 font-semibold block">{session?.user?.email}</span>
               </div>
               <Avatar 
                 src={session?.user?.image || undefined} 
                 name={session?.user?.name || ''} 
                 size="sm"
-                className="border border-slate-200"
+                className="border border-slate-200 shadow-sm"
               />
             </div>
           </div>
