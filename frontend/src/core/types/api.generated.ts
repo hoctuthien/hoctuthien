@@ -499,6 +499,43 @@ export interface paths {
         patch: operations["CategoryController_update"];
         trace?: never;
     };
+    "/api/v1/group-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lấy danh sách nhóm danh mục (có tìm kiếm & phân trang & kèm categories con) */
+        get: operations["GroupCategoryController_findAll"];
+        put?: never;
+        /** Tạo nhóm danh mục mới (chỉ ADMIN) */
+        post: operations["GroupCategoryController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/group-categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lấy chi tiết nhóm danh mục theo id (kèm categories con) */
+        get: operations["GroupCategoryController_findOne"];
+        put?: never;
+        post?: never;
+        /** Xóa mềm nhóm danh mục theo id (chỉ ADMIN) */
+        delete: operations["GroupCategoryController_remove"];
+        options?: never;
+        head?: never;
+        /** Cập nhật nhóm danh mục theo id (chỉ ADMIN) */
+        patch: operations["GroupCategoryController_update"];
+        trace?: never;
+    };
     "/api/v1/courses": {
         parameters: {
             query?: never;
@@ -534,6 +571,22 @@ export interface paths {
         head?: never;
         /** Cập nhật khóa học theo id */
         patch: operations["CourseController_update"];
+        trace?: never;
+    };
+    "/api/v1/courses/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["CourseController_updateStatus"];
         trace?: never;
     };
     "/api/v1/courses/{id}/approve": {
@@ -607,6 +660,23 @@ export interface paths {
         put?: never;
         /** Tạo booking khóa học mới (MENTEE) */
         post: operations["CourseBookingController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/course-bookings/check-conflict": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kiểm tra trùng lịch học (MENTEE) */
+        get: operations["CourseBookingController_checkConflict"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -722,7 +792,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Tạo một payment record và trả về QR VietQR để mentee chuyển khoản phí kích hoạt. Nếu đã có QR chưa hết hạn, hệ thống trả lại QR cũ thay vì tạo mới. */
+        /**
+         * Tạo mã QR kích hoạt tài khoản
+         * @description Tạo hoặc lấy lại mã QR VietQR để mentee thanh toán phí kích hoạt. Nếu đã có QR còn hạn → trả về QR cũ. QR hết hạn sau 15 phút.
+         */
         post: operations["PaymentController_generateActivationQr"];
         delete?: never;
         options?: never;
@@ -737,6 +810,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Lấy thông tin chi tiết một payment
+         * @description Tra cứu trạng thái hoặc chi tiết của một payment record.
+         */
         get: operations["PaymentController_findOne"];
         put?: never;
         post?: never;
@@ -755,7 +832,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Kiểm tra trạng thái thanh toán kích hoạt. API chỉ đọc trạng thái từ DB — Cron Job ngầm tự động đối soát với TN App mỗi phút. Nếu `activated: false`, FE polling lại sau 5–10 giây. */
+        /**
+         * Xác minh thanh toán kích hoạt
+         * @description User bấm "Tôi đã chuyển khoản" → backend gọi TN App API kiểm tra giao dịch. Có Redis distributed lock để chống race condition với cron job tự động. Gọi API này sau khi đã chuyển khoản với đúng nội dung transactionCode.
+         */
         post: operations["PaymentController_verifyActivationPayment"];
         delete?: never;
         options?: never;
@@ -938,6 +1018,109 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lấy danh sách tất cả file media trong thư viện */
+        get: operations["MediaController_findAll"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Xóa tệp tin media khỏi thư viện */
+        delete: operations["MediaController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lấy danh sách tất cả bài viết */
+        get: operations["PostController_findAll"];
+        put?: never;
+        /** Tạo bài viết mới (Chỉ Admin) */
+        post: operations["PostController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/posts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lấy thông tin chi tiết một bài viết */
+        get: operations["PostController_findOne"];
+        put?: never;
+        post?: never;
+        /** Xóa bài viết (Chỉ Admin) */
+        delete: operations["PostController_remove"];
+        options?: never;
+        head?: never;
+        /** Cập nhật bài viết (Chỉ Admin) */
+        patch: operations["PostController_update"];
+        trace?: never;
+    };
+    "/api/v1/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TagController_findAll"];
+        put?: never;
+        post: operations["TagController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tags/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TagController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["TagController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["TagController_update"];
         trace?: never;
     };
 }
@@ -1307,10 +1490,64 @@ export interface components {
         GenerateActivationQrDto: Record<string, never>;
         VerifyActivationPaymentDto: {
             /**
-             * @description ID của giao dịch thanh toán
-             * @example PAY123456
+             * @description ID của payment record (lấy từ response của generate-qr)
+             * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
              */
             paymentId: string;
+        };
+        CreatePostDto: {
+            /** @description Tiêu đề của bài viết */
+            title: string;
+            /** @description Nội dung bài viết (JSON từ BlockNote) */
+            content?: Record<string, never>;
+            /** @description Tóm tắt ngắn gọn của bài viết */
+            summary?: string;
+            /**
+             * @description Trạng thái bài viết
+             * @default draft
+             * @enum {string}
+             */
+            status: "draft" | "published" | "archived";
+            /**
+             * Format: uuid
+             * @description ID của Category
+             */
+            categoryId?: string;
+            /** @description Dữ liệu metadata (thumbnail, SEO tags, v.v) */
+            metadata?: Record<string, never>;
+        };
+        UpdatePostDto: {
+            /** @description Tiêu đề của bài viết */
+            title?: string;
+            /** @description Nội dung bài viết (JSON từ BlockNote) */
+            content?: Record<string, never>;
+            /** @description Tóm tắt ngắn gọn của bài viết */
+            summary?: string;
+            /**
+             * @description Trạng thái bài viết
+             * @default draft
+             * @enum {string}
+             */
+            status: "draft" | "published" | "archived";
+            /**
+             * Format: uuid
+             * @description ID của Category
+             */
+            categoryId?: string;
+            /** @description Dữ liệu metadata (thumbnail, SEO tags, v.v) */
+            metadata?: Record<string, never>;
+        };
+        TagEntity: {
+            name: string;
+            slug: string;
+            status: string;
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            /** Format: date-time */
+            deletedAt?: string | null;
         };
     };
     responses: never;
@@ -2836,6 +3073,390 @@ export interface operations {
             };
         };
     };
+    GroupCategoryController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Tìm kiếm theo tên (partial match) */
+                name?: string;
+                /** @description Tìm kiếm theo slug (partial match) */
+                slug?: string;
+                /** @description Lọc theo trạng thái */
+                status?: string;
+                /** @description Trang hiện tại (mặc định: 1) */
+                page?: number;
+                /** @description Số bản ghi mỗi trang (mặc định: 20, tối đa: 100) */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lấy danh sách nhóm danh mục thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example a0100000-0000-0000-0000-000000000001 */
+                            id?: string;
+                            /** @example Công nghệ thông tin */
+                            name?: string;
+                            /** @example cong-nghe-thong-tin */
+                            slug?: string | null;
+                            /** @example ACTIVE */
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                            categories?: {
+                                /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                                id?: string;
+                                /** @example Lập trình Web */
+                                name?: string;
+                                /** @example lap-trinh-web */
+                                slug?: string | null;
+                                /** @example https://example.com/icon.png */
+                                iconUrl?: string | null;
+                                /** @example {} */
+                                metadata?: Record<string, never>;
+                                /** @example ACTIVE */
+                                status?: string;
+                                /** Format: date-time */
+                                createdAt?: string;
+                                /** Format: date-time */
+                                updatedAt?: string;
+                            }[];
+                        }[];
+                        meta?: {
+                            /** @example 10 */
+                            total?: number;
+                            /** @example 1 */
+                            page?: number;
+                            /** @example 20 */
+                            limit?: number;
+                            /** @example 1 */
+                            totalPages?: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    GroupCategoryController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @example Công nghệ thông tin */
+                    name: string;
+                    /**
+                     * @description Nếu không truyền, hệ thống sẽ tự sinh từ name
+                     * @example cong-nghe-thong-tin
+                     */
+                    slug?: string;
+                    /**
+                     * @default ACTIVE
+                     * @example ACTIVE
+                     */
+                    status?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Tạo nhóm danh mục thành công */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example a0100000-0000-0000-0000-000000000001 */
+                            id?: string;
+                            /** @example Công nghệ thông tin */
+                            name?: string;
+                            /** @example cong-nghe-thong-tin */
+                            slug?: string | null;
+                            /** @example ACTIVE */
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                            categories?: {
+                                /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                                id?: string;
+                                /** @example Lập trình Web */
+                                name?: string;
+                                /** @example lap-trinh-web */
+                                slug?: string | null;
+                                /** @example https://example.com/icon.png */
+                                iconUrl?: string | null;
+                                /** @example {} */
+                                metadata?: Record<string, never>;
+                                /** @example ACTIVE */
+                                status?: string;
+                                /** Format: date-time */
+                                createdAt?: string;
+                                /** Format: date-time */
+                                updatedAt?: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Dữ liệu đầu vào không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền ADMIN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Slug đã tồn tại */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GroupCategoryController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của nhóm danh mục (UUID) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lấy chi tiết nhóm danh mục thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example a0100000-0000-0000-0000-000000000001 */
+                            id?: string;
+                            /** @example Công nghệ thông tin */
+                            name?: string;
+                            /** @example cong-nghe-thong-tin */
+                            slug?: string | null;
+                            /** @example ACTIVE */
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                            categories?: {
+                                /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                                id?: string;
+                                /** @example Lập trình Web */
+                                name?: string;
+                                /** @example lap-trinh-web */
+                                slug?: string | null;
+                                /** @example https://example.com/icon.png */
+                                iconUrl?: string | null;
+                                /** @example {} */
+                                metadata?: Record<string, never>;
+                                /** @example ACTIVE */
+                                status?: string;
+                                /** Format: date-time */
+                                createdAt?: string;
+                                /** Format: date-time */
+                                updatedAt?: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Không tìm thấy nhóm danh mục */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GroupCategoryController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của nhóm danh mục */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Xóa nhóm danh mục thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example {} */
+                        data?: Record<string, never>;
+                        meta?: Record<string, never>;
+                        error?: string | null;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền ADMIN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy nhóm danh mục */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GroupCategoryController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của nhóm danh mục */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    slug?: string;
+                    /** @example ACTIVE */
+                    status?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Cập nhật nhóm danh mục thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example a0100000-0000-0000-0000-000000000001 */
+                            id?: string;
+                            /** @example Công nghệ thông tin */
+                            name?: string;
+                            /** @example cong-nghe-thong-tin */
+                            slug?: string | null;
+                            /** @example ACTIVE */
+                            status?: string;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                            categories?: {
+                                /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
+                                id?: string;
+                                /** @example Lập trình Web */
+                                name?: string;
+                                /** @example lap-trinh-web */
+                                slug?: string | null;
+                                /** @example https://example.com/icon.png */
+                                iconUrl?: string | null;
+                                /** @example {} */
+                                metadata?: Record<string, never>;
+                                /** @example ACTIVE */
+                                status?: string;
+                                /** Format: date-time */
+                                createdAt?: string;
+                                /** Format: date-time */
+                                updatedAt?: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Dữ liệu đầu vào không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền ADMIN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy nhóm danh mục */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Slug đã tồn tại */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     CourseController_findAll: {
         parameters: {
             query?: never;
@@ -3057,6 +3678,25 @@ export interface operations {
             };
             /** @description Không tìm thấy khóa học */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseController_updateStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3456,6 +4096,27 @@ export interface operations {
             };
             /** @description Không có quyền MENTEE */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseBookingController_checkConflict: {
+        parameters: {
+            query: {
+                meetingTime: string;
+                courseId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kiểm tra trùng lịch thành công */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3981,6 +4642,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description Body rỗng — không cần truyền gì. */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["GenerateActivationQrDto"];
@@ -4016,13 +4678,20 @@ export interface operations {
                     };
                 };
             };
+            /** @description QR tạo thành công hoặc trả về QR còn hạn. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": unknown;
+                };
             };
-            /** @description Chưa đăng nhập hoặc token không hợp lệ */
+            /**
+             * @description Chưa đăng nhập hoặc token không hợp lệ
+             *
+             *     Chưa đăng nhập.
+             */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4043,81 +4712,35 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Lấy chi tiết payment thành công */
+            /**
+             * @description Lấy chi tiết payment thành công
+             *
+             *     Trả về payment entity.
+             */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data?: {
-                            /** @example 9a7d8e3f-1a2b-4c5d-9e0f-123456789abc */
-                            id?: string;
-                            /** @example 42 */
-                            userId?: string;
-                            /** @example 10000 */
-                            amount?: number;
-                            /** @example VND */
-                            currency?: string;
-                            /** @example activation */
-                            paymentMethod?: string | null;
-                            /** @example null */
-                            transactionId?: string | null;
-                            /** @example KICHHOAT 42AXYZ */
-                            description?: string | null;
-                            /**
-                             * Format: date-time
-                             * @example 2026-05-01T08:15:00.000Z
-                             */
-                            expiredAt?: string | null;
-                            /** @example https://img.vietqr.io/image/MB-... */
-                            vietqrQrDataUrl?: string | null;
-                            /**
-                             * @example {
-                             *       "transactionCode": "KICHHOAT 42AXYZ",
-                             *       "qrUrl": "https://img.vietqr.io/...",
-                             *       "generatedAt": "2026-05-01T07:00:00.000Z"
-                             *     }
-                             */
-                            vietqrPayload?: Record<string, never>;
-                            /** @example {} */
-                            paymentGatewayPayload?: Record<string, never>;
-                            /**
-                             * Format: date-time
-                             * @example null
-                             */
-                            paidAt?: string | null;
-                            /**
-                             * @example pending
-                             * @enum {string}
-                             */
-                            status?: "pending" | "success" | "failed" | "expired";
-                            /**
-                             * Format: date-time
-                             * @example 2026-05-01T07:00:00.000Z
-                             */
-                            createdAt?: string;
-                            /**
-                             * Format: date-time
-                             * @example 2026-05-01T07:00:00.000Z
-                             */
-                            updatedAt?: string;
-                        }[];
-                        /** @example {} */
-                        meta?: Record<string, never>;
-                        /** @example null */
-                        error?: string | null;
-                    };
+                    "application/json": unknown;
                 };
             };
-            /** @description Chưa đăng nhập hoặc token không hợp lệ */
+            /**
+             * @description Chưa đăng nhập hoặc token không hợp lệ
+             *
+             *     Chưa đăng nhập.
+             */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Không tìm thấy thông tin thanh toán */
+            /**
+             * @description Không tìm thấy thông tin thanh toán
+             *
+             *     Không tìm thấy payment.
+             */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4159,35 +4782,61 @@ export interface operations {
                     };
                 };
             };
+            /** @description Kết quả xác minh thanh toán. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": unknown | unknown | unknown;
+                };
             };
-            /** @description Chưa đăng nhập hoặc token không hợp lệ */
+            /**
+             * @description Chưa đăng nhập hoặc token không hợp lệ
+             *
+             *     Chưa đăng nhập.
+             */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Bạn không có quyền xác minh thanh toán này */
+            /**
+             * @description Bạn không có quyền xác minh thanh toán này
+             *
+             *     Không có quyền xác minh payment này.
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Không tìm thấy thông tin thanh toán */
+            /**
+             * @description Không tìm thấy thông tin thanh toán
+             *
+             *     Không tìm thấy payment.
+             */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại */
+            /**
+             * @description Mã QR đã hết hạn, vui lòng tạo mã mới và chuyển khoản lại
+             *
+             *     Mã QR đã hết hạn — cần tạo QR mới.
+             */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description TN App API tạm thời không khả dụng. Thử lại sau. */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4712,6 +5361,288 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    MediaController_findAll: {
+        parameters: {
+            query?: {
+                folder?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Danh sách các file media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MediaController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Xóa thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PostController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Filter by Category ID */
+                categoryId?: string;
+                /** @description Filter by Category Slug */
+                categorySlug?: string;
+                /** @description Filter by Tag ID */
+                tagId?: string;
+                /** @description Filter by Tag Slug */
+                tagSlug?: string;
+                /** @description Search term for post title */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trả về danh sách bài viết. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PostController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePostDto"];
+            };
+        };
+        responses: {
+            /** @description Bài viết đã được tạo thành công. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PostController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trả về thông tin chi tiết bài viết. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy bài viết. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PostController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Xóa thành công. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy bài viết. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PostController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePostDto"];
+            };
+        };
+        responses: {
+            /** @description Cập nhật thành công. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy bài viết. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TagController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagEntity"][];
+                };
+            };
+        };
+    };
+    TagController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagEntity"];
+                };
+            };
+        };
+    };
+    TagController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagEntity"];
+                };
+            };
+        };
+    };
+    TagController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TagController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagEntity"];
+                };
             };
         };
     };

@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Breadcrumb } from '@shared';
-import { courseBookingGateway, courseGateway } from '@/core/gateway';
+import { courseBookingGateway, courseGateway, authGateway } from '@/core/gateway';
 import { useSession } from 'next-auth/react';
 import { 
   LuPlus, 
   LuArrowRight, 
-  LuGraduationCap 
+  LuGraduationCap,
+  LuInfo
 } from 'react-icons/lu';
 
 // Import SOLID Subcomponents
@@ -47,6 +48,7 @@ export default function DashboardClient() {
   const { data: session, status: authStatus } = useSession();
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+  const [isVerified, setIsVerified] = useState<boolean>(true);
   
   // Dashboard Metrics state
   const [metrics, setMetrics] = useState({
@@ -93,6 +95,14 @@ export default function DashboardClient() {
     try {
       setLoading(true);
       const isMentor = session.user?.role === 'mentor';
+
+      // Fetch user verified status
+      try {
+        const meRes = await authGateway.getMe();
+        setIsVerified((meRes.user as any)?.isVerified ?? false);
+      } catch (err) {
+        console.error('Error fetching user profile verified status:', err);
+      }
 
       // 1. Fetch All Bookings
       const bookingsRes = await courseBookingGateway.getMyBookings({ limit: 100 });
@@ -351,6 +361,31 @@ export default function DashboardClient() {
             message={welcomeMessage} 
           />
         </div>
+
+        {/* Activation Warning Banner for Unverified Mentees */}
+        {!isMentor && !isVerified && (
+          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-[32px] p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_4px_20px_rgba(245,158,11,0.03)] animate-pulse-subtle">
+            <div className="flex items-center gap-4 text-center sm:text-left flex-col sm:flex-row">
+              <div className="w-12 h-12 bg-amber-500/20 text-amber-600 rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-500/10 shadow-inner">
+                <LuInfo size={24} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <h4 className="text-sm font-black text-slate-800 font-[Montserrat] tracking-tight">
+                  Tài Khoản Chưa Được Kích Hoạt 🔐
+                </h4>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-xl">
+                  Để bắt đầu đăng ký học 100% miễn phí từ hàng ngàn Cố vấn tận tâm, hãy tiến hành kích hoạt tài khoản của bạn.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => window.location.href = '/activation'}
+              className="w-full sm:w-max bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-black px-6 py-3.5 rounded-2xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-lg shadow-amber-500/15 hover:shadow-xl hover:shadow-amber-500/20 active:scale-[0.98] border-0"
+            >
+              Kích hoạt ngay
+            </button>
+          </div>
+        )}
 
         {/* 1. Statistics Cards */}
         <MetricsGrid 

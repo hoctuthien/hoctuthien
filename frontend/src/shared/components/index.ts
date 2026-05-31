@@ -1,4 +1,5 @@
 export * from './Breadcrumb';
+export * from './CurrencyDisplay';
 export * from './Calendar';
 export * from './DataTable';
 export * from './DatePicker';
