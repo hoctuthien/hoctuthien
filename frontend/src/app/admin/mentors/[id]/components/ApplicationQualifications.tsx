@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { Card } from "@/core/ui/Card";
 import { Icon } from "@/core/ui";
 
@@ -15,6 +16,7 @@ interface Certificate {
 }
 
 interface ApplicationQualificationsProps {
+  id: string;
   metadata?: {
     degrees?: Degree[];
     certificates?: Certificate[];
@@ -28,6 +30,7 @@ interface ApplicationQualificationsProps {
 }
 
 export function ApplicationQualifications({
+  id,
   metadata,
   degreesLabel,
   certificatesLabel,
@@ -66,16 +69,15 @@ export function ApplicationQualifications({
                 </div>
 
                 {degree.imageUrl && (
-                  <a
-                    href={degree.imageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-violet-600 hover:text-violet-800 group"
+                  <Link
+                    href={`/admin/mentors/${id}/verification?url=${encodeURIComponent(degree.imageUrl)}&title=${encodeURIComponent(degree.name)}`}
+                    scroll={false}
+                    className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-violet-600 hover:text-violet-800 group border-none bg-transparent p-0 cursor-pointer text-left w-fit"
                   >
                     <Icon name="FileText" size={14} className="group-hover:scale-105 transition-transform" />
                     <span>{viewDegreeLabel}</span>
                     <Icon name="ExternalLink" size={12} className="opacity-60" />
-                  </a>
+                  </Link>
                 )}
               </div>
             ))}
@@ -115,16 +117,15 @@ export function ApplicationQualifications({
                 </div>
 
                 {cert.imageUrl && (
-                  <a
-                    href={cert.imageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-emerald-600 hover:text-emerald-800 group"
+                  <Link
+                    href={`/admin/mentors/${id}/verification?url=${encodeURIComponent(cert.imageUrl)}&title=${encodeURIComponent(cert.name)}`}
+                    scroll={false}
+                    className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-emerald-600 hover:text-emerald-800 group border-none bg-transparent p-0 cursor-pointer text-left w-fit"
                   >
                     <Icon name="Image" size={14} className="group-hover:scale-105 transition-transform" />
                     <span>{viewCertLabel}</span>
                     <Icon name="ExternalLink" size={12} className="opacity-60" />
-                  </a>
+                  </Link>
                 )}
               </div>
             ))}

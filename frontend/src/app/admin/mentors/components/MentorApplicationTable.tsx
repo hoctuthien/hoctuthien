@@ -16,12 +16,13 @@ export const MentorApplicationTable = ({ initialData }: { initialData: AdminMent
     {
       key: "name",
       header: t("applicant"),
+      className: "max-w-[200px]",
       render: (item) => (
-        <div className="flex items-center gap-3">
-          <Avatar name={item.user.name} src={item.user.avatarUrl || undefined} size="sm" className="w-8 h-8" />
-          <div>
-            <p className="font-bold text-[#1e293b]">{item.user.name}</p>
-            <p className="text-[12px] text-slate-400 font-normal">{item.user.email}</p>
+        <div className="flex items-center gap-3 max-w-[200px]">
+          <Avatar name={item.user.name} src={item.user.avatarUrl || undefined} size="sm" className="w-8 h-8 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="font-bold text-[#1e293b] truncate" title={item.user.name}>{item.user.name}</p>
+            <p className="text-[12px] text-slate-400 font-normal truncate" title={item.user.email}>{item.user.email}</p>
           </div>
         </div>
       ),
@@ -29,9 +30,10 @@ export const MentorApplicationTable = ({ initialData }: { initialData: AdminMent
     {
       key: "jobTitle",
       header: t("professional"),
+      className: "max-w-[200px]",
       render: (item) => (
-        <div>
-          <p className="font-semibold text-slate-700">{item.jobTitle}</p>
+        <div className="max-w-[200px] min-w-0">
+          <p className="font-semibold text-slate-700 truncate" title={item.jobTitle}>{item.jobTitle}</p>
           <p className="text-[12px] text-slate-400">{t("yearsCountAbbrev", { count: item.yearsOfExperience })}</p>
         </div>
       )

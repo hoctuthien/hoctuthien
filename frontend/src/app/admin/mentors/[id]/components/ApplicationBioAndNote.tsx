@@ -31,7 +31,7 @@ export function ApplicationBioAndNote({
           <span className="absolute -top-3 left-1 text-slate-100 text-6xl font-serif select-none pointer-events-none">
             “
           </span>
-          <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line italic relative z-10">
+          <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line italic relative z-10 break-words overflow-hidden">
             {bio || "Không có đoạn giới thiệu bản thân."}
           </p>
         </div>
@@ -43,7 +43,7 @@ export function ApplicationBioAndNote({
           <Icon name="MessageSquare" size={16} className="text-slate-400" />
           {noteLabel}
         </h3>
-        <div className="bg-slate-50/80 p-5 rounded-2xl border border-slate-100 text-slate-600 text-sm leading-relaxed whitespace-pre-line">
+        <div className="bg-slate-50/80 p-5 rounded-2xl border border-slate-100 text-slate-600 text-sm leading-relaxed whitespace-pre-line break-words overflow-hidden">
           {note || noNoteMessage}
         </div>
       </Card>

@@ -7,8 +7,10 @@ import { cn } from "@/core/utils/cn";
 
 export default function AdminLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal?: React.ReactNode;
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -24,6 +26,7 @@ export default function AdminLayout({
 
         <main className="flex-1 p-6 lg:p-10 overflow-y-auto">
           {children}
+          {modal}
         </main>
       </div>
     </div>

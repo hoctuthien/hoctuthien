@@ -113,6 +113,7 @@ export default async function MentorApplicationDetailPage(props: PageProps) {
 
           {/* Component 3: Academic Degrees & Professional Certificates */}
           <ApplicationQualifications
+            id={application.id}
             metadata={application.metadata}
             degreesLabel={tRegister("degrees")}
             certificatesLabel={tRegister("certificates")}
