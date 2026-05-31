@@ -154,6 +154,7 @@
 
 /* Compatibility tokens for existing logic if needed */
 :root {
+  --z-modal: 9999;
   --background: var(--color-background);
   --foreground: var(--color-text-body);
   --card: var(--color-surface);

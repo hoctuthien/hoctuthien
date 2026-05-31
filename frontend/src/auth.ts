@@ -72,7 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             });
             const responseData = await res.json();
             const actualData = responseData.data?.[0];
-            
+
             if (actualData) {
               return {
                 ...token,

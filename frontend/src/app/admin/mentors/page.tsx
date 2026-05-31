@@ -8,14 +8,14 @@ import { Card } from "@/core/ui/Card";
 
 
 
-import { mentorGateway } from "@/core/gateway/mentorGateway";
+import { mentorApplicationsGateway } from "@/core/gateway";
 
 export default async function MentorManagementPage() {
   const t = await getTranslations("Admin.mentors");
 
   let applications = [];
   try {
-    applications = await mentorGateway.getAllApplications();
+    applications = await mentorApplicationsGateway.getAllApplications();
   } catch (error) {
     console.error("Failed to fetch mentor applications:", error);
   }
