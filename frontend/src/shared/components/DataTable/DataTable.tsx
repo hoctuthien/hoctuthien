@@ -44,7 +44,7 @@ export function DataTable<T extends { id: string; selected?: boolean }>({
         className,
       )}
     >
-      <table className="w-full border-separate border-spacing-y-2 min-w-[600px]">
+      <table className="w-full border-separate border-spacing-y-2 min-w-full">
         <thead>
           <tr>
             <th className="w-16 p-3 px-6">

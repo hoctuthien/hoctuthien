@@ -30,7 +30,7 @@ export const MentorApplicationTable = ({ initialData }: { initialData: AdminMent
     {
       key: "jobTitle",
       header: t("professional"),
-      className: "max-w-[200px]",
+      className: "hidden sm:table-cell max-w-[200px]",
       render: (item) => (
         <div className="max-w-[200px] min-w-0">
           <p className="font-semibold text-slate-700 truncate" title={item.jobTitle}>{item.jobTitle}</p>
@@ -41,6 +41,7 @@ export const MentorApplicationTable = ({ initialData }: { initialData: AdminMent
     {
       key: "appliedAt",
       header: t("appliedDate"),
+      className: "hidden md:table-cell",
       render: (item) => (
         <span className="text-slate-500">{new Date(item.createdAt).toLocaleDateString("vi-VN")}</span>
       )
@@ -65,11 +66,11 @@ export const MentorApplicationTable = ({ initialData }: { initialData: AdminMent
       render: (item) => (
         <Link href={`/admin/mentors/${item.id}`}>
           <Button
-            label={t("viewDetails")}
+            label={<span className="hidden sm:inline">{t("viewDetails")}</span>}
             variant="outline"
             size="sm"
             iconLeft={<Icon name="Eye" size={14} />}
-            className="!px-3 !py-1 text-xs hover:bg-slate-50 transition-colors"
+            className="!p-2 sm:!px-3 sm:!py-1 text-xs hover:bg-slate-50 transition-colors w-fit shrink-0"
           />
         </Link>
       ),
@@ -85,12 +86,12 @@ export const MentorApplicationTable = ({ initialData }: { initialData: AdminMent
           <Button label={t("export")} variant="outline" size="sm" iconLeft={<Icon name="Download" size={16} />} />
         </div>
       </div>
-      
+
       <DataTable
         data={data}
         columns={columns}
         onSelect={(id) => {
-          setData(prev => prev.map(item => 
+          setData(prev => prev.map(item =>
             item.id === id ? { ...item, selected: !item.selected } : item
           ));
         }}
