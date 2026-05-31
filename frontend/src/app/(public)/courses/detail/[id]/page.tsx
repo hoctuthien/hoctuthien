@@ -5,20 +5,20 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Breadcrumb } from "@shared";
-import { Button, InlineMessage } from "@/core/ui";
-import { courseGateway, courseBookingGateway, mentorGateway } from "@/core/gateway";
+import { Button } from "@/core/ui";
+import { courseGateway, courseBookingGateway, mentorApplicationsGateway, mentorGateway } from "@/core/gateway";
 import { MockCourse } from "@/shared/mocks/mentorCourses.mock";
-import { 
-  LuBookOpen, 
-  LuClock, 
-  LuDollarSign, 
-  LuGraduationCap, 
-  LuStar, 
-  LuArrowLeft, 
-  LuCheck, 
-  LuShare2, 
-  LuBookmark, 
-  LuAward, 
+import {
+  LuBookOpen,
+  LuClock,
+  LuDollarSign,
+  LuGraduationCap,
+  LuStar,
+  LuArrowLeft,
+  LuCheck,
+  LuShare2,
+  LuBookmark,
+  LuAward,
   LuUsers,
   LuExternalLink,
   LuCalendar,
@@ -48,7 +48,7 @@ export default function CourseDetailPage() {
   });
   const [bookingTime, setBookingTime] = useState("09:00");
   const [notesForMentor, setNotesForMentor] = useState("");
-  
+
   const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
@@ -141,7 +141,7 @@ export default function CourseDetailPage() {
       router.push(`/login?callbackUrl=/courses/detail/${id}`);
       return;
     }
-    
+
     if (session.user?.role !== "mentee") {
       alert("Tài khoản của bạn không phải là Học viên (Mentee). Chỉ học viên mới được quyền đăng ký học khóa học.");
       return;
@@ -211,14 +211,14 @@ export default function CourseDetailPage() {
   const getDynamicSyllabus = () => {
     const lectureCount = course?.metadata?.lectureCount || (course?.price === 0 ? 12 : 32);
     const lecturesPerSection = Math.ceil(lectureCount / 4);
-    
+
     const shortCategory = course?.category || "Chuyên môn";
-    const shortTitle = course?.title 
-      ? (course.title.includes("&") 
-          ? course.title.split("&")[0].trim() 
-          : (course.title.includes("và") ? course.title.split("và")[0].trim() : course.title)) 
+    const shortTitle = course?.title
+      ? (course.title.includes("&")
+        ? course.title.split("&")[0].trim()
+        : (course.title.includes("và") ? course.title.split("và")[0].trim() : course.title))
       : "Cơ bản";
-    
+
     return [
       {
         title: `Phần 1: Giới thiệu & Thiết lập Môi trường ${shortCategory}`,
@@ -244,7 +244,7 @@ export default function CourseDetailPage() {
   return (
     <div className="w-full bg-[#FAFBFD] min-h-screen py-8 px-4 md:px-8 font-sans overflow-x-hidden">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
-        
+
         {/* Breadcrumb & Quay lại */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <Breadcrumb items={breadcrumbItems} />
@@ -258,7 +258,7 @@ export default function CourseDetailPage() {
         <div className={`relative w-full rounded-[32px] bg-gradient-to-r ${gradientClass} text-white p-8 md:p-12 shadow-2xl overflow-hidden`}>
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3" />
           <div className="relative z-10 max-w-4xl flex flex-col gap-4">
-            
+
             {/* Category Tag */}
             <span className="self-start px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-xs font-extrabold tracking-wider uppercase">
               {course.category} • ACADEMY
@@ -292,10 +292,10 @@ export default function CourseDetailPage() {
 
         {/* 2. Main Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-4">
-          
+
           {/* Left Column: Course Detail Info & Tabs */}
           <div className="lg:col-span-8 flex flex-col gap-8">
-            
+
             {/* What you'll learn */}
             <div className="bg-white border border-[#E2E8F0] p-8 rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
               <h2 className="text-xl font-black text-[#0F172A] mb-6 tracking-tight flex items-center gap-2 font-[Montserrat]">
@@ -325,7 +325,7 @@ export default function CourseDetailPage() {
                 <LuBookOpen size={22} className="text-[#2563eb]" />
                 <span>Chi tiết chương trình đào tạo</span>
               </h2>
-              
+
               <div className="flex flex-col gap-4">
                 {syllabus.map((section, idx) => (
                   <div key={idx} className="border border-slate-100 rounded-2xl overflow-hidden">
@@ -376,10 +376,10 @@ export default function CourseDetailPage() {
 
           {/* Right Column: Enrollment Card & Mentor Bio */}
           <div className="lg:col-span-4 flex flex-col gap-6">
-            
+
             {/* Sticky Action Card */}
             <div className="bg-white border border-[#E2E8F0] p-6 rounded-[28px] shadow-[0_12px_35px_rgba(0,0,0,0.02)] flex flex-col gap-6 relative overflow-hidden">
-              
+
               {/* Circular light gradient on top right */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#2563eb]/5 rounded-full blur-2xl pointer-events-none" />
 
@@ -427,21 +427,20 @@ export default function CourseDetailPage() {
                   onClick={handleStartBooking}
                   className="w-full rounded-2xl font-black py-4 shadow-lg shadow-blue-500/10 cursor-pointer text-center text-sm"
                 />
-                
+
                 <div className="grid grid-cols-2 gap-3">
-                  <button 
+                  <button
                     onClick={() => setIsBookmarked(!isBookmarked)}
-                    className={`flex items-center justify-center gap-2 border rounded-xl py-3 text-xs font-bold transition-all cursor-pointer ${
-                      isBookmarked 
-                        ? "bg-amber-50 border-amber-300 text-amber-600" 
-                        : "bg-white border-[#E2E8F0] text-[#64748b] hover:bg-[#F8FAFC]"
-                    }`}
+                    className={`flex items-center justify-center gap-2 border rounded-xl py-3 text-xs font-bold transition-all cursor-pointer ${isBookmarked
+                      ? "bg-amber-50 border-amber-300 text-amber-600"
+                      : "bg-white border-[#E2E8F0] text-[#64748b] hover:bg-[#F8FAFC]"
+                      }`}
                   >
                     <LuBookmark size={14} className={isBookmarked ? "fill-amber-500" : ""} />
                     <span>{isBookmarked ? "Đã lưu" : "Lưu khóa học"}</span>
                   </button>
 
-                  <button 
+                  <button
                     onClick={() => alert("Đã sao chép liên kết chia sẻ khóa học!")}
                     className="flex items-center justify-center gap-2 bg-white border border-[#E2E8F0] text-[#64748b] hover:bg-[#F8FAFC] rounded-xl py-3 text-xs font-bold transition-all cursor-pointer"
                   >
@@ -456,7 +455,7 @@ export default function CourseDetailPage() {
             {/* Mentor Info Box */}
             <div className="bg-white border border-[#E2E8F0] p-6 rounded-[28px] shadow-[0_12px_35px_rgba(0,0,0,0.02)] flex flex-col gap-5 relative overflow-hidden">
               <span className="text-[10px] font-black text-[#94A3B8] tracking-widest uppercase">CỐ VẤN CHƯƠNG TRÌNH</span>
-              
+
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-blue-500 to-indigo-600 shadow-md">
                   <img
@@ -513,9 +512,9 @@ export default function CourseDetailPage() {
       {isBookingModalOpen && (
         <div className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
           <div className="bg-white rounded-[32px] border border-slate-100 shadow-2xl max-w-lg w-full p-8 relative flex flex-col gap-6 animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
-            
+
             {/* Close Button */}
-            <button 
+            <button
               onClick={() => setIsBookingModalOpen(false)}
               className="absolute top-6 right-6 p-2 text-[#64748b] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-full transition-colors cursor-pointer select-none"
             >
@@ -544,7 +543,7 @@ export default function CourseDetailPage() {
               </div>
             ) : (
               <form onSubmit={handleBookingSubmit} className="flex flex-col gap-6">
-                
+
                 {/* Modal Header */}
                 <div className="flex flex-col gap-1.5 pr-8">
                   <span className="text-[#2563eb] text-[10px] font-black uppercase tracking-[0.25em]">Đặt lịch học tập</span>
@@ -575,14 +574,14 @@ export default function CourseDetailPage() {
 
                 {/* Form Fields */}
                 <div className="flex flex-col gap-5">
-                  
+
                   {/* Select Date */}
                   <div className="flex flex-col gap-2">
                     <label className="text-xs font-black text-[#475569] uppercase tracking-wider flex items-center gap-1.5">
                       <LuCalendar size={14} className="text-[#2563eb]" />
                       <span>Chọn Ngày Học:</span>
                     </label>
-                    <input 
+                    <input
                       type="date"
                       required
                       value={bookingDate}
@@ -605,11 +604,10 @@ export default function CourseDetailPage() {
                             type="button"
                             key={time}
                             onClick={() => setBookingTime(time)}
-                            className={`py-3 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none ${
-                              isActive 
-                                ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10" 
-                                : "bg-white border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]"
-                            }`}
+                            className={`py-3 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none ${isActive
+                              ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10"
+                              : "bg-white border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]"
+                              }`}
                           >
                             {time}
                           </button>
@@ -624,7 +622,7 @@ export default function CourseDetailPage() {
                       <LuMessageSquare size={14} className="text-[#2563eb]" />
                       <span>Nhắn gửi tới Mentor (Tùy chọn):</span>
                     </label>
-                    <textarea 
+                    <textarea
                       placeholder="Mô tả mục tiêu của bạn khi học khóa học này, kiến thức hiện tại, hoặc các câu hỏi mong muốn thảo luận cùng Mentor nhé..."
                       value={notesForMentor}
                       onChange={(e) => setNotesForMentor(e.target.value)}
@@ -646,7 +644,7 @@ export default function CourseDetailPage() {
                   >
                     Hủy bỏ
                   </button>
-                  
+
                   <button
                     type="submit"
                     disabled={isSubmittingBooking}
