@@ -28,7 +28,7 @@ export class MentorProfileService {
   }
 
   async findByUserId(userId: string) {
-    const item = await this.mentorProfileRepository.findOne({ userId });
+    const item = await this.mentorProfileRepository.findOne({ userId }, { relations: ['user'] });
     if (!item)
       throw new NotFoundException('Mentor profile not found for this user');
     return mentorProfileSchema.parse(item);

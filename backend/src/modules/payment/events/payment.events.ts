@@ -1,15 +1,20 @@
 /**
- * Tên sự kiện phát ra sau khi cron job xác nhận một giao dịch thanh toán thành công.
- * Các module nghiệp vụ (User, Course...) lắng nghe event này để xử lý logic riêng.
+ * Event constants và payload types cho Payment module.
+ *
+ * Khi payment được xác nhận thành công (bởi API hoặc Cron),
+ * service emit event này để các module khác (User, Notification, ...)
+ * lắng nghe và xử lý nghiệp vụ riêng — KHÔNG coupling trực tiếp.
  */
+
 export const PAYMENT_SUCCESS_EVENT = 'payment.success';
 
-/**
- * Payload đính kèm theo event PAYMENT_SUCCESS_EVENT.
- * Chỉ chứa các ID cần thiết — không leak domain object của Payment ra bên ngoài.
- */
 export interface PaymentSuccessPayload {
+  /** ID của payment record vừa được xác nhận */
   paymentId: string;
+
+  /** ID giao dịch từ TN App (unique) */
   transactionId: string;
+
+  /** ID của user sở hữu payment */
   userId: string;
 }

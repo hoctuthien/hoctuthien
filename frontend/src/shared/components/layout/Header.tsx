@@ -9,12 +9,12 @@ import { Button } from '@/core/ui/Button';
 import { Icon } from '@/core/ui/Icon';
 import { Avatar } from '@/core/ui/Avatar';
 import { Skeleton } from '@/core/ui/Skeleton';
-import { 
-  Dropdown, 
-  DropdownTrigger, 
-  DropdownMenu, 
-  DropdownItem, 
-  DropdownDivider 
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownDivider
 } from '@/core/ui/Dropdown';
 import { cn } from '@/core/utils/cn';
 
@@ -30,7 +30,7 @@ export const Header = () => {
   const { data: session, status } = useSession();
   const isAuthenticated = status === 'authenticated';
   const isLoading = status === 'loading';
-  
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-outline-variant">
       <div className="container-custom h-20 flex items-center justify-between">
@@ -63,7 +63,14 @@ export const Header = () => {
           <button className="p-2 text-text-muted hover:text-primary transition-colors">
             <Icon name="Search" size={20} />
           </button>
-          
+
+          <Link href="/cart" className="p-2 text-text-muted hover:text-primary transition-colors relative no-underline">
+            <Icon name="ShoppingCart" size={20} />
+            <span className="absolute top-0.5 right-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-blue-500 text-[9px] font-black text-white ring-2 ring-white animate-pulse">
+              2
+            </span>
+          </Link>
+
           {isLoading ? (
             <div className="flex items-center gap-3 pl-2 pr-1 py-1 h-10">
               <Skeleton className="hidden lg:block h-4 w-24 rounded-full" />
@@ -76,10 +83,10 @@ export const Header = () => {
                   <span className="hidden lg:block text-sm font-bold text-text-heading group-hover:text-primary ">
                     {session.user?.name}
                   </span>
-                  <Avatar 
-                    src={session.user?.image || undefined} 
-                    name={session.user?.name || ''} 
-                    size="sm" 
+                  <Avatar
+                    src={session.user?.image || undefined}
+                    name={session.user?.name || ''}
+                    size="sm"
                   />
                 </div>
               </DropdownTrigger>
@@ -89,6 +96,11 @@ export const Header = () => {
                   <p className="text-xs text-text-muted truncate">{session.user?.email}</p>
                 </div>
                 <div className="lg:hidden h-px bg-outline-variant my-1 mx-2" />
+                <Link href="/dashboard" className="no-underline">
+                  <DropdownItem icon={<Icon name="Layers" size={18} />}>
+                    Bảng điều khiển
+                  </DropdownItem>
+                </Link>
                 <Link href="/profile" className="no-underline">
                   <DropdownItem icon={<Icon name="User" size={18} />}>
                     {t('profile')}
@@ -99,10 +111,24 @@ export const Header = () => {
                     {t('myCourses')}
                   </DropdownItem>
                 </Link>
+                {session?.user?.role === 'mentor' && (
+                  <>
+                    <Link href="/mentor/courses" className="no-underline">
+                      <DropdownItem icon={<Icon name="Layers" size={18} />}>
+                        {t('createdCourses')}
+                      </DropdownItem>
+                    </Link>
+                    <Link href="/mentor/bookings" className="no-underline">
+                      <DropdownItem icon={<Icon name="Calendar" size={18} />}>
+                        Quản lý lịch dạy
+                      </DropdownItem>
+                    </Link>
+                  </>
+                )}
                 <DropdownDivider />
-                <DropdownItem 
-                  icon={<Icon name="LogOut" size={18} />} 
-                  isDanger 
+                <DropdownItem
+                  icon={<Icon name="LogOut" size={18} />}
+                  isDanger
                   onClick={() => signOut()}
                 >
                   {t('signOut')}

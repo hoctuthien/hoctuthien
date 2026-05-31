@@ -33,6 +33,7 @@
     "loading": "Đang tải...",
     "profile": "Trang cá nhân",
     "myCourses": "Khóa học của tôi",
+    "createdCourses": "Khóa học đã tạo",
     "signOut": "Đăng xuất"
   },
 
@@ -83,7 +84,12 @@
     "scienceDesc": "Khám phá những bí ẩn của thế giới tự nhiên.",
     "geographyDesc": "Hiểu về hành tinh của chúng ta và các nền văn hóa đa dạng.",
     "economicsDesc": "Phân tích thị trường và hệ thống tài chính toàn cầu.",
-    "brandDescription": "Nền tảng giáo dục phi lợi nhuận, kết nối tri thức và lan tỏa yêu thương thông qua các khóa học và chương trình cố vấn chất lượng cao."
+    "brandDescription": "Nền tảng giáo dục phi lợi nhuận, kết nối tri thức và lan tỏa yêu thương thông qua các khóa học và chương trình cố vấn chất lượng cao.",
+    "latestPosts": "Bài viết & Tin tức mới nhất",
+    "latestPostsDesc": "Cập nhật những kiến thức, câu chuyện ý nghĩa và hoạt động giáo dục từ cộng đồng của chúng tôi.",
+    "readMore": "Đọc bài viết",
+    "noPostsFound": "Không tìm thấy bài viết nào.",
+    "uncategorized": "Chưa phân loại"
   },
 
   "Auth": {

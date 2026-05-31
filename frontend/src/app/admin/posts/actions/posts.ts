@@ -78,14 +78,27 @@ export async function getPostsAction(query?: { categoryId?: string, tagId?: stri
  */
 export async function getPostAction(id: string): Promise<any> {
   const headers = await getAuthHeaders();
+  const url = `${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts/${id}`;
 
-  const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/posts/${id}`, {
-    cache: "no-store",
-    headers,
-  });
+  try {
+    console.log(`[getPostAction] Fetching post from: ${url}`);
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers,
+    });
 
-  if (!res.ok) throw new Error("Failed to fetch post");
-  return extractOne(await res.json());
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => "N/A");
+      console.error(`[getPostAction] Failed to fetch post. URL: ${url}, Status: ${res.status} (${res.statusText}), Response: ${errorText}`);
+      throw new Error(`Failed to fetch post. Status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return extractOne(data);
+  } catch (error: any) {
+    console.error(`[getPostAction] Error in getPostAction for id/slug "${id}":`, error);
+    throw error;
+  }
 }
 
 /**

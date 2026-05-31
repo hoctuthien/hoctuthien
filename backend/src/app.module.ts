@@ -12,6 +12,7 @@ import { UserSessionModule } from './modules/user-session/user-session.module';
 import { MentorProfileModule } from './modules/mentor-profile/mentor-profile.module';
 import { MentorAvailabilityModule } from './modules/mentor-availability/mentor-availability.module';
 import { CategoryModule } from './modules/category/category.module';
+import { GroupCategoryModule } from './modules/group-category/group-category.module';
 import { CourseModule } from './modules/course/course.module';
 import { CourseCategoryModule } from './modules/course-category/course-category.module';
 import { CourseBookingModule } from './modules/course-booking/course-booking.module';
@@ -46,6 +47,53 @@ import { join } from 'path';
       sortSchema: true,
       playground: process.env.NODE_ENV !== 'production',
       context: ({ req, res }) => ({ req, res }),
+      formatError: (error: any) => {
+        const originalError = error.extensions?.originalError as any;
+        let code = 'INTERNAL_SERVER_ERROR';
+        let message = error.message;
+        let details: any = null;
+        let statusCode = 500;
+        if (originalError) {
+          statusCode = originalError.statusCode || 400;
+          if (statusCode === 400) {
+            code = 'VALIDATION_FAILED';
+            details = originalError.message;
+          } else if (statusCode === 401) {
+            code = 'UNAUTHORIZED';
+          } else if (statusCode === 403) {
+            code = 'FORBIDDEN';
+          } else if (statusCode === 404) {
+            code = 'NOT_FOUND';
+          } else if (statusCode === 409) {
+            code = 'CONFLICT';
+          } else {
+            code = originalError.error || 'BAD_REQUEST';
+          }
+          message = Array.isArray(originalError.message)
+            ? originalError.message[0]
+            : originalError.message || error.message;
+          if (!details) {
+            details =
+              typeof originalError.message === 'object'
+                ? originalError.message
+                : { message: originalError.message || message };
+          }
+        } else {
+          const extensions = error.extensions ? { ...error.extensions } : {};
+          code = extensions.code || 'INTERNAL_SERVER_ERROR';
+        }
+        return {
+          message,
+          code,
+          path: error.path,
+          locations: error.locations,
+          extensions: {
+            code,
+            statusCode,
+            details,
+          },
+        };
+      },
     }),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
@@ -57,6 +105,7 @@ import { join } from 'path';
     MentorProfileModule,
     MentorAvailabilityModule,
     CategoryModule,
+    GroupCategoryModule,
     CourseModule,
     CourseCategoryModule,
     CourseBookingModule,

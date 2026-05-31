@@ -180,7 +180,12 @@ export default function AdminEditPostPage() {
         status: newStatus,
         content,
         summary: summary || null,
-        metadata: { ...metadata, thumbnail: thumbnail || null },
+        metadata: {
+          ...metadata,
+          thumbnail: thumbnail || null,
+          image: thumbnail || null,
+          summary: summary || null,
+        },
       };
       if (categoryId) payload.categoryId = categoryId;
 

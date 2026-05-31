@@ -6,6 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { ERROR_CODES, ERROR_MESSAGES } from '../constants/error.constant';
 
 @Catch()
@@ -19,7 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request & { traceId?: string }>();
 
-    const status =
+    let status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -28,7 +29,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message: string = ERROR_MESSAGES.INTERNAL_SERVER_ERROR;
     let details: any = undefined;
 
-    if (exception instanceof HttpException) {
+    if (exception instanceof ZodError) {
+      status = HttpStatus.BAD_REQUEST;
+      code = ERROR_CODES.VALIDATION_FAILED;
+      message = ERROR_MESSAGES.VALIDATION_FAILED;
+      
+      // Chuyển đổi ZodError thành Object mapping lỗi field-by-field tương tự Class-Validator
+      details = exception.issues.reduce((acc: Record<string, string>, err) => {
+        const field = err.path.join('.') || 'body';
+        acc[field] = err.message;
+        return acc;
+      }, {} as Record<string, string>);
+    } else if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse() as any;
       const exceptionMessage =
         typeof exceptionResponse === 'object'
@@ -90,3 +102,4 @@ export class HttpExceptionFilter implements ExceptionFilter {
     });
   }
 }
+

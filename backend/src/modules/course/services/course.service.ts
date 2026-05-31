@@ -10,18 +10,22 @@ import {
   UpdateCourseInput,
   ApproveCourseInput,
 } from '../types/course.types';
-import { DataSource } from 'typeorm';
+import { DataSource, ILike, Not, IsNull, In } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { CourseCategoryEntity } from '../../course-category/entities/course-category.entity';
 import { MentorProfileEntity } from '../../mentor-profile/entities/mentor-profile.entity';
 import { SystemConfigEntity } from '../../system-config/entities/system-config.entity';
+import { CategoryEntity } from '../../category/entities/category.entity';
 import { CourseStatus } from '../enums/course-status.enum';
 import { COURSE_MESSAGES } from '../../../common/constants/message.constant';
 import {
   approveCourseSchema,
   courseSchema,
   updateCourseSchema,
+  findCoursesQuerySchema,
+  FindCoursesQuery,
 } from '../schema/course.schema';
+import { createPaginationMeta } from '../../../common/utils/pagination.util';
 
 @Injectable()
 export class CourseService {
@@ -30,9 +34,61 @@ export class CourseService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll() {
-    const courses = await this.courseRepository.findMany();
-    return courses.map((course) => courseSchema.parse(course));
+  async findAll(query: FindCoursesQuery, userRole?: string) {
+    const { title, status, mentorId, groupCategoryId, groupCategorySlug, categoryId, categorySlug, page, limit } =
+      findCoursesQuerySchema.parse(query);
+
+    const where: Record<string, any> = {};
+    if (title) where['title'] = ILike(`%${title}%`);
+    if (status) where['status'] = status;
+    if (mentorId) where['mentorId'] = mentorId;
+
+    if (groupCategoryId || groupCategorySlug || categoryId || categorySlug) {
+      const categoryWhere: Record<string, any> = {};
+      if (groupCategoryId) categoryWhere['groupCategoryId'] = groupCategoryId;
+      if (groupCategorySlug) categoryWhere['groupCategory'] = { slug: groupCategorySlug };
+      if (categoryId) categoryWhere['id'] = categoryId;
+      if (categorySlug) categoryWhere['slug'] = categorySlug;
+
+      const categories = await this.dataSource.getRepository(CategoryEntity).find({
+        where: categoryWhere,
+        select: ['id'],
+      });
+      const categoryIds = categories.map((c) => c.id);
+
+      if (categoryIds.length > 0) {
+        const courseCategories = await this.dataSource.getRepository(CourseCategoryEntity).find({
+          where: { categoryId: In(categoryIds) },
+          select: ['courseId'],
+        });
+        const courseIds = courseCategories.map((cc) => cc.courseId);
+
+        if (courseIds.length > 0) {
+          where['id'] = In(courseIds);
+        } else {
+          where['id'] = In(['00000000-0000-0000-0000-000000000000']);
+        }
+      } else {
+        where['id'] = In(['00000000-0000-0000-0000-000000000000']);
+      }
+    }
+
+    if (userRole !== 'admin') {
+      where['approvedBy'] = Not(IsNull());
+      where['status'] = CourseStatus.ACTIVE;
+    }
+
+    const [items, total] = await this.courseRepository.findManyWithCount({
+      where,
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      items: items.map((course) => courseSchema.parse(course)),
+      meta: createPaginationMeta(total, page, limit),
+    };
   }
 
   async findOne(id: string) {

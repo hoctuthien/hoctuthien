@@ -94,8 +94,11 @@ export class MentorAvailabilityResolver {
 
   /**
    * @description Cập nhật thông tin yêu cầu làm Mentor
+   * @access Admin (Role.ADMIN) hoặc Mentee (Role.MENTEE)
    */
   @Mutation(() => MentorAvailability, { name: 'updateMentorAvailability' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MENTEE)
   async update(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateMentorAvailabilityGqlInput,
@@ -163,8 +166,11 @@ export class MentorAvailabilityResolver {
 
   /**
    * @description Xóa yêu cầu làm Mentor
+   * @access Admin (Role.ADMIN)
    */
   @Mutation(() => Boolean, { name: 'removeMentorAvailability' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async remove(@Args('id', { type: () => ID }) id: string) {
     await this.mentorAvailabilityService.remove(id);
     return true;

@@ -7,6 +7,12 @@ import { createHttpClient } from './base';
  */
 const client = createHttpClient('', '/api');
 
+let cachedToken: string | null = null;
+
+export const setClientToken = (token: string | null) => {
+  cachedToken = token;
+};
+
 /**
  * auto refresh
  */
@@ -19,11 +25,12 @@ const request = async <T>(
   try {
     const fn = (client as any)[method];
     
-    // Lấy token từ NextAuth session thay vì cookie thủ công
-    let token = null;
-    if (typeof window !== 'undefined') {
+    // Lấy token từ cache với fallback an toàn
+    let token = cachedToken;
+    if (!token && typeof window !== 'undefined') {
       const session = await getSession();
-      token = (session as any)?.accessToken;
+      token = (session as any)?.accessToken || null;
+      cachedToken = token;
     }
 
     const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};

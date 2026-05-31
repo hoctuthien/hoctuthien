@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostRepository } from '../repositories/post.repository';
 import { PostEntity } from '../entities/post.entity';
 import { DeepPartial } from 'typeorm';
@@ -108,12 +108,24 @@ export class PostService {
   }
 
   async findOne(id: string): Promise<PostEntity> {
-    const post = await this.postRepository.findById(id, {
-      relations: ['author', 'category', 'coverImage', 'postTags', 'postTags.tag'],
-    });
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    let post: PostEntity | null = null;
+
+    if (isUuid) {
+      post = await this.postRepository.findById(id, {
+        relations: ['author', 'category', 'coverImage', 'postTags', 'postTags.tag'],
+      });
+    } else {
+      post = await this.postRepository.findOne(
+        { slug: id } as any,
+        {
+          relations: ['author', 'category', 'coverImage', 'postTags', 'postTags.tag'],
+        },
+      );
+    }
 
     if (!post) {
-      throw new Error('Post not found');
+      throw new NotFoundException('Post not found');
     }
 
     return post;
