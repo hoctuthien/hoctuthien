@@ -216,11 +216,11 @@ export class CourseBookingService {
       );
     }
 
-    // Tạm thời luồng payment tự động thành công (confirmed)
+    // Tạo booking với trạng thái PENDING chờ thanh toán
     const created = await this.courseBookingRepository.createAndSave({
       ...parsed,
       menteeId,
-      status: BookingStatus.CONFIRMED,
+      status: BookingStatus.PENDING,
     });
     return courseBookingSchema.parse(created);
   }
