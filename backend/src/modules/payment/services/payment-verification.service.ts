@@ -19,8 +19,11 @@ import {
  */
 function parseTxTime(txTime: string): Date {
   const normalized = txTime.replace(' ', 'T');
-  const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
-  return new Date(new Date(normalized).getTime() - VN_OFFSET_MS);
+  const withOffset =
+    normalized.includes('+') || normalized.endsWith('Z')
+      ? normalized
+      : `${normalized}+07:00`;
+  return new Date(withOffset);
 }
 
 // Key lưu trong Redis: timestamp (ISO string) của lần sync cuối cùng với TN App

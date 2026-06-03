@@ -96,8 +96,19 @@ export class PaymentService {
       );
     }
 
-    const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const transactionCode = `KICHHOAT ${userId}${randomStr}`;
+    let transactionCode = '';
+    let isUnique = false;
+    while (!isUnique) {
+      const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+      transactionCode = `KICHHOAT HTT${randomStr}`;
+      const exists = await this.paymentRepository.exists({
+        description: transactionCode,
+        status: PaymentStatus.PENDING,
+      });
+      if (!exists) {
+        isUnique = true;
+      }
+    }
     const qrUrl = this.vietqrService.generateQrUrl(amount, transactionCode);
 
     const expiredAt = new Date();
