@@ -23,9 +23,7 @@ import {
   PAYMENT_SUCCESS_EVENT,
   PaymentSuccessPayload,
 } from '../events/payment.events';
-
-const ACTIVATION_FEE_CONFIG_KEY = 'activation_fee';
-const ACTIVATION_FEE_DEFAULT = 5_000;
+import { PaymentStrategyRegistry } from './payment-strategy.registry';
 
 // Lock TTL: 20 giây — đồng bộ với PaymentVerificationService
 const LOCK_TTL_MS = 20_000;
@@ -41,6 +39,7 @@ export class PaymentService {
     private readonly tnAppService: TnAppService,
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2,
+    private readonly paymentStrategyRegistry: PaymentStrategyRegistry,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) { }
 
@@ -51,56 +50,54 @@ export class PaymentService {
     );
   }
 
-  // Tạo QR VietQR để mentee thanh toán phí kích hoạt tài khoản (hết hạn sau 15 phút)
-  async generateActivationQr(userId: string): Promise<{
+  // Luồng tạo QR thanh toán chung (Strategy Pattern)
+  async generateGenericQr(
+    userId: string,
+    paymentType: string,
+    referenceId: string,
+    customAmount?: number,
+  ): Promise<{
     paymentId: string;
     amount: number;
     transactionCode: string;
     qrUrl: string;
     expiredAt: Date;
   }> {
-    const existing = await this.paymentRepository.findPendingActivation(userId);
+    const strategy = this.paymentStrategyRegistry.get(paymentType);
+    const amount = await strategy.resolveAmount(referenceId, customAmount);
+    const descriptionPrefix = strategy.resolveDescriptionPrefix(referenceId);
+
+    // Tìm kiếm xem đã có QR PENDING nào cho nghiệp vụ này chưa
+    const existing = await this.paymentRepository.findOne({
+      userId,
+      paymentMethod: paymentType,
+      status: PaymentStatus.PENDING,
+    });
+
     if (existing) {
-      const isStillValid =
-        existing.expiredAt && existing.expiredAt > new Date();
-
+      const isStillValid = existing.expiredAt && existing.expiredAt > new Date();
       if (isStillValid) {
-        this.logger.log(`User ${userId} đã có QR kích hoạt chưa hết hạn.`);
-        return {
-          paymentId: existing.id,
-          amount: Number(existing.amount),
-          transactionCode: existing.vietqrPayload?.transactionCode ?? '',
-          qrUrl: existing.vietqrQrDataUrl ?? '',
-          expiredAt: existing.expiredAt,
-        };
+        const matchesDescription = existing.description?.startsWith(descriptionPrefix);
+        if (matchesDescription) {
+          this.logger.log(`User ${userId} đã có hóa đơn PENDING cho ${paymentType} còn hạn.`);
+          return {
+            paymentId: existing.id,
+            amount: Number(existing.amount),
+            transactionCode: existing.vietqrPayload?.transactionCode ?? '',
+            qrUrl: existing.vietqrQrDataUrl ?? '',
+            expiredAt: existing.expiredAt,
+          };
+        }
       }
-
-      // Lazy Expiry: payment PENDING quá hạn → tự động chuyển EXPIRED
-      this.logger.log(
-        `Payment ${existing.id} đã hết hạn. Chuyển sang EXPIRED.`,
-      );
+      this.logger.log(`Hóa đơn PENDING ${existing.id} đã hết hạn. Chuyển sang EXPIRED.`);
       await this.paymentRepository.expirePayment(existing.id);
-    }
-
-    let amount = ACTIVATION_FEE_DEFAULT;
-    try {
-      const config = await this.systemConfigService.findByKey(
-        ACTIVATION_FEE_CONFIG_KEY,
-      );
-      if (config && typeof config.configValue === 'number') {
-        amount = config.configValue;
-      }
-    } catch {
-      this.logger.warn(
-        `Không tìm thấy config '${ACTIVATION_FEE_CONFIG_KEY}'. Dùng fallback: ${ACTIVATION_FEE_DEFAULT} VND.`,
-      );
     }
 
     let transactionCode = '';
     let isUnique = false;
     while (!isUnique) {
       const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
-      transactionCode = `KICHHOAT HTT${randomStr}`;
+      transactionCode = `${descriptionPrefix} HTT${randomStr}`;
       const exists = await this.paymentRepository.exists({
         description: transactionCode,
         status: PaymentStatus.PENDING,
@@ -109,8 +106,8 @@ export class PaymentService {
         isUnique = true;
       }
     }
-    const qrUrl = this.vietqrService.generateQrUrl(amount, transactionCode);
 
+    const qrUrl = this.vietqrService.generateQrUrl(amount, transactionCode);
     const expiredAt = new Date();
     expiredAt.setMinutes(expiredAt.getMinutes() + 15);
 
@@ -118,7 +115,7 @@ export class PaymentService {
       userId,
       amount,
       currency: 'VND',
-      paymentMethod: PaymentType.ACTIVATION,
+      paymentMethod: paymentType,
       status: PaymentStatus.PENDING,
       description: transactionCode,
       expiredAt,
@@ -130,8 +127,11 @@ export class PaymentService {
       },
     } as Partial<PaymentEntity>);
 
+    // Liên kết thực thể nghiệp vụ thông qua Strategy
+    await strategy.onGenerate(payment, referenceId);
+
     this.logger.log(
-      `Tạo QR kích hoạt thành công cho user ${userId}: ${transactionCode}`,
+      `Tạo QR ${paymentType} thành công cho user ${userId}: ${transactionCode}`,
     );
 
     return {
@@ -143,17 +143,19 @@ export class PaymentService {
     };
   }
 
-  /**
-   * User bấm "Tôi đã chuyển khoản" → Active-Fetch với Redis Lock.
-   *
-   * Flow:
-   * 1. Check idempotency (đã SUCCESS → return true)
-   * 2. Check expiry (hết hạn → throw 422)
-   * 3. Acquire Redis Lock cho paymentId
-   *    - Lock acquired → gọi TN App → update DB → emit event
-   *    - Lock NOT acquired (cron đang xử lý) → đọc DB status → return
-   */
-  async verifyActivationPayment(
+  // Wrapper tương thích ngược cho việc kích hoạt tài khoản
+  async generateActivationQr(userId: string): Promise<{
+    paymentId: string;
+    amount: number;
+    transactionCode: string;
+    qrUrl: string;
+    expiredAt: Date;
+  }> {
+    return this.generateGenericQr(userId, PaymentType.ACTIVATION, userId);
+  }
+
+  // Luồng xác nhận thanh toán chung (Strategy Pattern)
+  async verifyPayment(
     userId: string,
     paymentId: string,
   ): Promise<{ activated: boolean; message: string }> {
@@ -166,7 +168,6 @@ export class PaymentService {
       throw new ForbiddenException(ErrorMessage[ErrorCode.PAYMENT_FORBIDDEN]);
     }
 
-    // Trường hợp 1: Cron đã xác nhận thành công → báo ngay cho frontend
     if (payment.status === PaymentStatus.SUCCESS) {
       this.logger.log(
         `[Poll] Payment ${paymentId} đã SUCCESS. Phản hồi cho user ${userId}.`,
@@ -177,7 +178,6 @@ export class PaymentService {
       };
     }
 
-    // Trường hợp 2: QR đã hết hạn → yêu cầu tạo mới
     if (!payment.expiredAt || payment.expiredAt <= new Date()) {
       throw new UnprocessableEntityException(
         ErrorMessage[ErrorCode.PAYMENT_QR_EXPIRED],
@@ -193,7 +193,6 @@ export class PaymentService {
       );
     }
 
-    // ── Acquire Redis Distributed Lock ──
     const lockKey = `${PAYMENT_LOCK_PREFIX}${paymentId}`;
     const lockAcquired = await this.redis.set(
       lockKey,
@@ -204,7 +203,6 @@ export class PaymentService {
     );
 
     if (!lockAcquired) {
-      // Lock bị chiếm (Cron đang xử lý) → đọc lại DB xem cron đã update chưa
       this.logger.debug(
         `[Verify] Lock bị chiếm cho payment ${paymentId}. Đọc DB status.`,
       );
@@ -225,9 +223,7 @@ export class PaymentService {
       };
     }
 
-    // ── Lock acquired — gọi TN App trực tiếp ──
     try {
-      // Double-check sau khi có lock (phòng trường hợp cron vừa xử lý xong trước khi ta lấy lock)
       const freshPayment = await this.paymentRepository.findByIdOrFail(
         paymentId,
         ErrorMessage[ErrorCode.PAYMENT_NOT_FOUND],
@@ -261,7 +257,6 @@ export class PaymentService {
         };
       }
 
-      // Cập nhật payment thành SUCCESS trong DB transaction
       const tx = result.transaction;
       await this.dataSource.transaction(async (manager) => {
         await manager.update(
@@ -282,10 +277,14 @@ export class PaymentService {
       });
 
       this.logger.log(
-        `[Verify] Payment ${paymentId} SUCCESS. User ${userId} đang được kích hoạt qua event.`,
+        `[Verify] Payment ${paymentId} SUCCESS. Kích hoạt nghiệp vụ thông qua Strategy.`,
       );
 
-      // Emit event — UserModule listener sẽ kích hoạt user
+      // Kích hoạt nghiệp vụ cụ thể qua Strategy
+      const strategy = this.paymentStrategyRegistry.get(payment.paymentMethod || PaymentType.ACTIVATION);
+      await strategy.onSuccess(payment);
+
+      // Emit event để tương thích ngược với các listener hiện tại
       this.eventEmitter.emit(PAYMENT_SUCCESS_EVENT, {
         paymentId,
         transactionId: tx.id,
@@ -297,8 +296,15 @@ export class PaymentService {
         message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_SUCCESS],
       };
     } finally {
-      // ── Luôn release lock dù thành công hay thất bại ──
       await this.redis.del(lockKey).catch(() => { });
     }
+  }
+
+  // Wrapper tương thích ngược cho việc kích hoạt tài khoản
+  async verifyActivationPayment(
+    userId: string,
+    paymentId: string,
+  ): Promise<{ activated: boolean; message: string }> {
+    return this.verifyPayment(userId, paymentId);
   }
 }

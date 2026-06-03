@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,6 +15,8 @@ import { PaymentRepository } from './repositories/payment.repository';
 import { vietqrConfig } from '../../config/vietqr.config';
 import { tnAppConfig } from '../../config/tn-app.config';
 import { SystemConfigModule } from '../system-config/system-config.module';
+import { PaymentStrategyRegistry } from './services/payment-strategy.registry';
+import { ActivationPaymentStrategy } from './strategies/activation-payment.strategy';
 
 @Module({
   imports: [
@@ -34,7 +36,25 @@ import { SystemConfigModule } from '../system-config/system-config.module';
     TnAppService,
     PaymentVerificationService,
     PaymentSuccessListener,
+    PaymentStrategyRegistry,
+    ActivationPaymentStrategy,
   ],
-  exports: [PaymentService, PaymentRepository, VietqrService, TnAppService],
+  exports: [
+    PaymentService,
+    PaymentRepository,
+    VietqrService,
+    TnAppService,
+    PaymentStrategyRegistry,
+    ActivationPaymentStrategy,
+  ],
 })
-export class PaymentModule {}
+export class PaymentModule implements OnModuleInit {
+  constructor(
+    private readonly registry: PaymentStrategyRegistry,
+    private readonly activationStrategy: ActivationPaymentStrategy,
+  ) {}
+
+  onModuleInit() {
+    this.registry.register(this.activationStrategy);
+  }
+}

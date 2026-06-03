@@ -5,6 +5,8 @@ import { PaymentStatus } from '../../../common/enums/database.enum';
 
 export enum PaymentType {
   ACTIVATION = 'activation',
+  COURSE_BOOKING = 'course_booking',
+  DONATION = 'donation',
 }
 
 export { PaymentStatus };
