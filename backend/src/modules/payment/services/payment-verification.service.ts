@@ -6,12 +6,13 @@ import type { Redis } from 'ioredis';
 import { REDIS_CLIENT } from '../../redis/redis.module';
 import { TnAppService, TNTransaction } from './tn-app.service';
 import { PaymentRepository } from '../repositories/payment.repository';
-import { PaymentEntity } from '../entities/payment.entity';
+import { PaymentEntity, PaymentType } from '../entities/payment.entity';
 import { PaymentStatus } from '../../../common/enums/database.enum';
 import {
   PAYMENT_SUCCESS_EVENT,
   PaymentSuccessPayload,
 } from '../events/payment.events';
+import { PaymentStrategyRegistry } from './payment-strategy.registry';
 
 /**
  * Parse transactionTime từ TN App API → Date UTC.
@@ -19,8 +20,11 @@ import {
  */
 function parseTxTime(txTime: string): Date {
   const normalized = txTime.replace(' ', 'T');
-  const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
-  return new Date(new Date(normalized).getTime() - VN_OFFSET_MS);
+  const withOffset =
+    normalized.includes('+') || normalized.endsWith('Z')
+      ? normalized
+      : `${normalized}+07:00`;
+  return new Date(withOffset);
 }
 
 // Key lưu trong Redis: timestamp (ISO string) của lần sync cuối cùng với TN App
@@ -44,6 +48,7 @@ export class PaymentVerificationService {
     private readonly paymentRepository: PaymentRepository,
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2,
+    private readonly paymentStrategyRegistry: PaymentStrategyRegistry,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) {}
 
@@ -183,6 +188,21 @@ export class PaymentVerificationService {
     } finally {
       // ── Luôn release lock dù thành công hay thất bại ──
       await this.redis.del(lockKey).catch(() => {});
+    }
+
+    // Kích hoạt nghiệp vụ cụ thể qua Strategy
+    try {
+      const strategy = this.paymentStrategyRegistry.get(
+        payment.paymentMethod || PaymentType.ACTIVATION,
+      );
+      await strategy.onSuccess(payment);
+    } catch (strategyError) {
+      this.logger.error(
+        `[Cron] Lỗi khi chạy onSuccess strategy cho payment ${payment.id}: ${
+          strategyError instanceof Error ? strategyError.message : String(strategyError)
+        }`,
+        strategyError instanceof Error ? strategyError.stack : undefined,
+      );
     }
 
     // Emit event decoupled — UserModule lắng nghe và xử lý nghiệp vụ riêng

@@ -11,6 +11,8 @@ import { PaymentService } from './services/payment.service';
 import {
   GenerateActivationQrDto,
   VerifyActivationPaymentDto,
+  GeneratePaymentQrDto,
+  VerifyPaymentDto,
 } from './dtos/payment.dto';
 import { User } from '../../common/decorators/user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -135,5 +137,40 @@ export class PaymentController {
     @User('id') userId: string,
   ) {
     return this.paymentService.verifyActivationPayment(userId, dto.paymentId);
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Tạo mã QR thanh toán chung',
+    description: 'Sinh QR VietQR để thanh toán động cho bất kỳ nghiệp vụ nào (activation, course_booking, donation).',
+  })
+  @ApiResponse({ status: 201, description: 'QR tạo thành công.' })
+  @UseGuards(JwtAuthGuard)
+  @Post('generate-qr')
+  generateGenericQr(
+    @Body() dto: GeneratePaymentQrDto,
+    @User('id') userId: string,
+  ) {
+    return this.paymentService.generateGenericQr(
+      userId,
+      dto.paymentType,
+      dto.referenceId,
+      dto.amount,
+    );
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Xác minh thanh toán chung',
+    description: 'Xác thực thanh toán và kích hoạt nghiệp vụ tương ứng thông qua Strategy Pattern.',
+  })
+  @ApiResponse({ status: 201, description: 'Kết quả xác minh.' })
+  @UseGuards(JwtAuthGuard)
+  @Post('verify')
+  verifyGenericPayment(
+    @Body() dto: VerifyPaymentDto,
+    @User('id') userId: string,
+  ) {
+    return this.paymentService.verifyPayment(userId, dto.paymentId);
   }
 }

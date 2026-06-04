@@ -33,6 +33,7 @@ import { TnAppService } from '../../src/modules/payment/services/tn-app.service'
 import { ErrorCode, ErrorMessage } from '../../src/common/enums/error-code.enum';
 import { PAYMENT_SUCCESS_EVENT } from '../../src/modules/payment/events/payment.events';
 import { PAYMENT_LOCK_PREFIX } from '../../src/modules/payment/services/payment-verification.service';
+import { PaymentStrategyRegistry } from '../../src/modules/payment/services/payment-strategy.registry';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -103,6 +104,7 @@ describe('PaymentService — verifyActivationPayment', () => {
   let tnAppService: jest.Mocked<TnAppService>;
   let dataSource: jest.Mocked<DataSource>;
   let eventEmitter: jest.Mocked<EventEmitter2>;
+  let paymentStrategyRegistry: jest.Mocked<PaymentStrategyRegistry>;
   let redis: {
     set: jest.Mock;
     del: jest.Mock;
@@ -148,6 +150,16 @@ describe('PaymentService — verifyActivationPayment', () => {
       emit: jest.fn(),
     } as unknown as jest.Mocked<EventEmitter2>;
 
+    paymentStrategyRegistry = {
+      get: jest.fn().mockReturnValue({
+        onSuccess: jest.fn().mockResolvedValue(undefined),
+        resolveAmount: jest.fn().mockResolvedValue(10000),
+        resolveDescriptionPrefix: jest.fn().mockReturnValue('KICHHOAT'),
+        onGenerate: jest.fn().mockResolvedValue(undefined),
+      }),
+      register: jest.fn(),
+    } as unknown as jest.Mocked<PaymentStrategyRegistry>;
+
     redis = {
       set: jest.fn(),
       del: jest.fn().mockResolvedValue(1),
@@ -161,6 +173,7 @@ describe('PaymentService — verifyActivationPayment', () => {
       tnAppService,
       dataSource,
       eventEmitter,
+      paymentStrategyRegistry,
       redis as any,
     );
   });

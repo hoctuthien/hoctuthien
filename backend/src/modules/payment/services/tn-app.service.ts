@@ -12,10 +12,12 @@ import { toVNDateString } from '../payment.utils';
  * Test mock dùng "YYYY-MM-DD HH:mm:ss" → cần hỗ trợ cả hai format.
  */
 function parseTxTime(txTime: string): Date {
-  // Chuẩn hóa về "YYYY-MM-DDTHH:mm:ss" rồi gán UTC+7
-  const normalized = txTime.replace(' ', 'T'); // "2026-05-20 17:21:00" → "2026-05-20T17:21:00"
-  const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
-  return new Date(new Date(normalized).getTime() - VN_OFFSET_MS);
+  const normalized = txTime.replace(' ', 'T');
+  const withOffset =
+    normalized.includes('+') || normalized.endsWith('Z')
+      ? normalized
+      : `${normalized}+07:00`;
+  return new Date(withOffset);
 }
 
 export interface TNTransaction {
@@ -153,6 +155,11 @@ export class TnAppService {
             headers: { 'Content-Type': 'application/json' },
           }),
         );
+
+      if (response.status !== 200) {
+        this.logger.warn(`[TnApp] findTransactionByCode HTTP ${response.status}`);
+        return { found: false, transaction: null, error: `HTTP ${response.status}`, rawResponse };
+      }
 
       // API trả về: { status, data: { transactions: [...] } }
       const payload = response.data?.data;

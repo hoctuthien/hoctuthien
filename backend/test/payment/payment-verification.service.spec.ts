@@ -22,6 +22,7 @@ import { PaymentRepository } from '../../src/modules/payment/repositories/paymen
 import { PaymentEntity, PaymentType } from '../../src/modules/payment/entities/payment.entity';
 import { PaymentStatus } from '../../src/common/enums/database.enum';
 import { PAYMENT_SUCCESS_EVENT } from '../../src/modules/payment/events/payment.events';
+import { PaymentStrategyRegistry } from '../../src/modules/payment/services/payment-strategy.registry';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -93,6 +94,7 @@ describe('PaymentVerificationService', () => {
   let paymentRepository: jest.Mocked<PaymentRepository>;
   let dataSource: { createQueryBuilder: jest.Mock };
   let eventEmitter: jest.Mocked<EventEmitter2>;
+  let paymentStrategyRegistry: jest.Mocked<PaymentStrategyRegistry>;
   let redis: { set: jest.Mock; del: jest.Mock; get: jest.Mock };
 
   beforeEach(() => {
@@ -114,6 +116,16 @@ describe('PaymentVerificationService', () => {
       emit: jest.fn(),
     } as unknown as jest.Mocked<EventEmitter2>;
 
+    paymentStrategyRegistry = {
+      get: jest.fn().mockReturnValue({
+        onSuccess: jest.fn().mockResolvedValue(undefined),
+        resolveAmount: jest.fn().mockResolvedValue(10000),
+        resolveDescriptionPrefix: jest.fn().mockReturnValue('KICHHOAT'),
+        onGenerate: jest.fn().mockResolvedValue(undefined),
+      }),
+      register: jest.fn(),
+    } as unknown as jest.Mocked<PaymentStrategyRegistry>;
+
     redis = {
       set: jest.fn().mockResolvedValue('OK'),
       del: jest.fn().mockResolvedValue(1),
@@ -125,6 +137,7 @@ describe('PaymentVerificationService', () => {
       paymentRepository,
       dataSource as unknown as DataSource,
       eventEmitter,
+      paymentStrategyRegistry,
       redis as any,
     );
   });
