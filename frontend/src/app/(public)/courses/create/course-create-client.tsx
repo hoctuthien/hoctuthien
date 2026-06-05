@@ -55,13 +55,11 @@ export default function CourseCreateClient() {
   const [isPaid, setIsPaid] = useState(false);
   const [price, setPrice] = useState("0");
 
-  // Category & Group Category states
+  // Category states
   const [categories, setCategories] = useState<any[]>([]);
-  const [groupCategories, setGroupCategories] = useState<any[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCatName, setNewCatName] = useState("");
-  const [newCatGroupId, setNewCatGroupId] = useState("");
   const [loadingCategories, setLoadingCategories] = useState(true);
 
   // Thumbnail uploading states
@@ -112,26 +110,19 @@ export default function CourseCreateClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Load categories and group categories
+  // Load categories
   useEffect(() => {
     async function loadData() {
       try {
         setLoadingCategories(true);
-        const [cats, groups] = await Promise.all([
-          categoryGateway.getCategories(),
-          categoryGateway.getGroupCategories(),
-        ]);
+        const cats = await categoryGateway.getCategories();
         setCategories(cats);
-        setGroupCategories(groups);
         if (cats.length > 0) {
           setSelectedCategoryId(cats[0].id);
           setCategory(cats[0].name);
         }
-        if (groups.length > 0) {
-          setNewCatGroupId(groups[0].id);
-        }
       } catch (err) {
-        console.error("Failed to load categories/groups:", err);
+        console.warn("Failed to load categories:", err);
       } finally {
         setLoadingCategories(false);
       }
@@ -144,11 +135,7 @@ export default function CourseCreateClient() {
     if (!newCatName.trim()) return;
 
     try {
-      const newCat = await categoryGateway.createCategory({
-        name: newCatName.trim(),
-        // groupCategoryId optional - chỉ truyền nếu có
-        ...(newCatGroupId ? { groupCategoryId: newCatGroupId } : {}),
-      });
+      const newCat = await categoryGateway.createCategory({ name: newCatName.trim() });
       if (!newCat || !newCat.id) {
         throw new Error('Phản hồi từ server không hợp lệ');
       }
@@ -157,7 +144,6 @@ export default function CourseCreateClient() {
       setCategory(newCat.name);
       setIsCategoryModalOpen(false);
       setNewCatName("");
-      alert("Đã tạo và chọn danh mục mới thành công!");
     } catch (err: any) {
       console.error("Failed to create category:", err);
       alert("Tạo danh mục thất bại: " + (err?.error?.message || err?.message || "Lỗi không xác định"));
@@ -868,58 +854,35 @@ export default function CourseCreateClient() {
       {/* category Creation Modal */}
       {isCategoryModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] p-6 max-w-md w-full border border-slate-100 shadow-2xl flex flex-col gap-5">
+          <div className="bg-white rounded-[24px] p-6 max-w-sm w-full border border-slate-100 shadow-2xl flex flex-col gap-5">
             <div>
-              <h3 className="text-base font-black text-slate-900">Tạo danh mục mới</h3>
-              <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Bổ sung danh mục học tập mới thuộc chủ đề quản lý</p>
+              <h3 className="text-base font-black text-slate-900">Thêm danh mục mới</h3>
+              <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Nhập tên danh mục, sau khi tạo sẽ được chọn tự động</p>
             </div>
-            
+
             <form onSubmit={handleCreateCategorySubmit} className="flex flex-col gap-4">
-              {/* Chỉ hiển thị group select nếu có dữ liệu */}
-              {groupCategories.length > 0 && (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Chủ đề gốc (Group Category)</label>
-                  <select
-                    value={newCatGroupId}
-                    onChange={(e) => setNewCatGroupId(e.target.value)}
-                    className="w-full h-11 px-3 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#2563eb]"
-                  >
-                    <option value="">-- Không có nhóm --</option>
-                    {groupCategories.map((group) => (
-                      <option key={group.id} value={group.id}>
-                        {group.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              <input
+                type="text"
+                placeholder="Ví dụ: Lập trình Vue.js, Tiếng Nhật N3..."
+                value={newCatName}
+                onChange={(e) => setNewCatName(e.target.value)}
+                required
+                autoFocus
+                className="w-full h-11 px-3 text-sm font-semibold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] focus:ring-4 focus:ring-blue-50 transition-all placeholder:text-slate-400"
+              />
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Tên danh mục mới <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: Lập trình Vue.js..."
-                  value={newCatName}
-                  onChange={(e) => setNewCatName(e.target.value)}
-                  required
-                  className="w-full h-11 px-3 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#2563eb]"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 mt-2">
+              <div className="flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsCategoryModalOpen(false);
-                    setNewCatName("");
-                  }}
+                  onClick={() => { setIsCategoryModalOpen(false); setNewCatName(""); }}
                   className="px-4 py-2 text-xs font-extrabold text-slate-500 hover:text-slate-700 uppercase"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-[#2563eb] text-white text-xs font-black rounded-xl hover:bg-blue-700 uppercase shadow-md shadow-blue-500/10"
+                  disabled={!newCatName.trim()}
+                  className="px-5 py-2.5 bg-[#2563eb] text-white text-xs font-black rounded-xl hover:bg-blue-700 uppercase shadow-md shadow-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Tạo danh mục
                 </button>
