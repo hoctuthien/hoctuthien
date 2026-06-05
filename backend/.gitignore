@@ -7,5 +7,5 @@ hoctuthien_postman_collection.json
 # Ignore Unit Test and Coverage files
 *.spec.ts
 *.test.ts
-*.e2e-spec.ts
 coverage/
+# E2E tests (*.e2e-spec.ts) are tracked in git for CI/CD
