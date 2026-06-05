@@ -44,10 +44,13 @@ export default function CourseDetailPage() {
   // Booking UI States
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [bookingDate, setBookingDate] = useState(() => {
-    // Ngày mai làm ngày mặc định
+    // Ngày mai làm ngày mặc định (đảm bảo lấy theo giờ địa phương)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0];
+    const yyyy = tomorrow.getFullYear();
+    const mm = String(tomorrow.getMonth() + 1).padStart(2, "0");
+    const dd = String(tomorrow.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
   });
   const [bookingTime, setBookingTime] = useState("09:00");
   const [notesForMentor, setNotesForMentor] = useState("");
@@ -220,7 +223,9 @@ export default function CourseDetailPage() {
   // Lấy các khung giờ rảnh thực tế từ database/backend của Khóa học cho ngày được chọn
   const getAvailableSlots = (): string[] => {
     if (course?.metadata?.time) {
-      const dayOfWeek = new Date(bookingDate).toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+      const [year, month, day] = bookingDate.split("-").map(Number);
+      const localDate = new Date(year, month - 1, day);
+      const dayOfWeek = localDate.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
       const slots = course.metadata.time[dayOfWeek];
       if (slots && Array.isArray(slots) && slots.length > 0) {
         // Ánh xạ sang mốc bắt đầu
@@ -231,7 +236,9 @@ export default function CourseDetailPage() {
   };
 
   const getSelectedDayLabel = (): string => {
-    const dayName = new Date(bookingDate).toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+    const [year, month, day] = bookingDate.split("-").map(Number);
+    const localDate = new Date(year, month - 1, day);
+    const dayName = localDate.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
     const mapping: Record<string, string> = {
       monday: "Thứ Hai",
       tuesday: "Thứ Ba",
@@ -296,8 +303,8 @@ export default function CourseDetailPage() {
       setIsSubmittingBooking(true);
       setBookingError(null);
 
-      // Tạo đối tượng Date kết hợp Date và Time
-      const meetingTime = new Date(`${bookingDate}T${bookingTime}:00`);
+      // Tạo đối tượng Date kết hợp Date và Time, mặc định theo múi giờ Việt Nam (+07:00)
+      const meetingTime = new Date(`${bookingDate}T${bookingTime}:00+07:00`);
 
       const bookingRes = await courseBookingGateway.bookCourse({
         courseId: course.id,
