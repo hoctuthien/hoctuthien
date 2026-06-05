@@ -7,10 +7,10 @@ export const categoryGateway = {
   async getCategories(): Promise<any[]> {
     const response = await httpClient.get<any>('/v1/categories?limit=100&page=1');
     const raw = response.data ?? response;
-    if (Array.isArray(raw)) return raw;
-    if (Array.isArray(raw?.data)) return raw.data;
     // Handle double-wrap: { data: [{ data: [...], meta: {} }] }
     if (Array.isArray(raw?.[0]?.data)) return raw[0].data;
+    if (Array.isArray(raw?.data)) return raw.data;
+    if (Array.isArray(raw)) return raw;
     return [];
   },
 
