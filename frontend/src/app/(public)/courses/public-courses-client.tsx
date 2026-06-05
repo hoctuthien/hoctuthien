@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Breadcrumb, EmptyState } from "@shared";
 import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, InlineMessage } from "@/core/ui";
 import { courseGateway } from "@/core/gateway";
 import { MockCourse, mockMentorCourses } from "@/shared/mocks/mentorCourses.mock";
+import { useQuery } from "@tanstack/react-query";
 import { 
   LuSearch, 
   LuPlus, 
@@ -52,11 +53,6 @@ interface PhDMentor {
 export default function PublicCoursesClient() {
   const { data: session } = useSession();
 
-  // Live courses state
-  const [courses, setCourses] = useState<MockCourse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState("All Topics");
@@ -64,20 +60,18 @@ export default function PublicCoursesClient() {
   const [durationFilter, setDurationFilter] = useState("all");
   const [formatFilter, setFormatFilter] = useState("all");
 
-  // Fetch courses from PostgreSQL via courseGateway
-  useEffect(() => {
-    async function loadCourses() {
+  // Fetch courses via TanStack Query
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["publicCourses"],
+    queryFn: async () => {
       try {
-        setLoading(true);
-        const data = await courseGateway.getPublicCourses();
-        setCourses(data);
-        setError(null);
+        const resData = await courseGateway.getPublicCourses();
+        return { courses: resData, errorMsg: null };
       } catch (err: any) {
         console.warn("Failed to load public courses from backend, falling back to mock data:", err);
         
         // Dùng danh sách mock làm fallback để giao diện luôn hiển thị đầy đủ khóa học
         const activeMocks = mockMentorCourses.filter(c => c.status === "published");
-        setCourses(activeMocks);
         
         // Báo lỗi ngắn gọn cho Dev qua mã lỗi thô, người dùng thường nhìn vào chỉ thấy như mất mạng/bảo trì thông thường
         const rawMsg = err?.error?.message || err?.message || "";
@@ -88,13 +82,16 @@ export default function PublicCoursesClient() {
           errCode = "BE_ERR_500_SERVER";
         }
         
-        setError(`Không thể tải dữ liệu mới từ máy chủ. Đang hiển thị danh sách khóa học dự phòng. (Mã lỗi: ${errCode})`);
-      } finally {
-        setLoading(false);
+        return {
+          courses: activeMocks,
+          errorMsg: `Không thể tải dữ liệu mới từ máy chủ. Đang hiển thị danh sách khóa học dự phòng. (Mã lỗi: ${errCode})`
+        };
       }
     }
-    loadCourses();
-  }, []);
+  });
+
+  const courses = data?.courses || [];
+  const error = data?.errorMsg || null;
 
   // Check if any filter is active
   const isFilterActive =
@@ -236,22 +233,62 @@ export default function PublicCoursesClient() {
     return matchesSearch && matchesTag && matchesLevel && matchesDuration && matchesFormat;
   });
 
-  // Filter courses based on Search and Tag Pill (ignoring dropdown filters as requested)
+  // Filter courses based on Search, Tag Pill, and Dropdowns (Academic Level, Duration, Format)
   const filteredCourses = courses.filter((course) => {
     // Only show published/active courses on public page
     if (course.status !== "published") return false;
 
-    // 1. Search Query
+    // Helper functions to normalize levels and formats (supporting English and Vietnamese)
+    const normalizeLevel = (lvl: string) => {
+      const l = (lvl || "").toLowerCase();
+      if (l === "cơ bản" || l === "beginner" || l === "basic") return "beginner";
+      if (l === "trung cấp" || l === "intermediate" || l === "medium") return "intermediate";
+      if (l === "nâng cao" || l === "advanced") return "advanced";
+      return "intermediate"; // default fallback
+    };
+
+    const normalizeFormat = (fmt: string) => {
+      const f = (fmt || "").toLowerCase();
+      if (f === "trực tuyến" || f === "online") return "online";
+      if (f === "trực tiếp" || f === "offline") return "offline";
+      if (f === "hỗn hợp" || f === "hybrid") return "hybrid";
+      return "online"; // default fallback
+    };
+
+    // 1. Search Query (matches title, description, or category)
     const matchesSearch = 
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (course.description || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.category.toLowerCase().includes(searchQuery.toLowerCase());
       
-    // 2. Tag Pill Filter
+    // 2. Tag Pill Filter (matches category with substring/alias support)
     const matchesTag = 
       selectedTag === "All Topics" || 
-      course.category === selectedTag;
+      course.category.toLowerCase().includes(selectedTag.toLowerCase()) || 
+      (selectedTag === "Lập trình Web" && (course.category.toLowerCase().includes("web") || course.category.toLowerCase().includes("frontend") || course.category.toLowerCase().includes("backend"))) ||
+      (selectedTag === "UI/UX Design" && (course.category.toLowerCase().includes("design") || course.category.toLowerCase().includes("ui") || course.category.toLowerCase().includes("ux") || course.category.toLowerCase().includes("figma"))) ||
+      (selectedTag === "Khoa học máy tính" && (course.category.toLowerCase().includes("máy tính") || course.category.toLowerCase().includes("computer") || course.category.toLowerCase().includes("khoa học") || course.category.toLowerCase().includes("c/c++"))) ||
+      (selectedTag === "Lập trình di động" && (course.category.toLowerCase().includes("di động") || course.category.toLowerCase().includes("mobile") || course.category.toLowerCase().includes("android") || course.category.toLowerCase().includes("ios") || course.category.toLowerCase().includes("react native")));
 
-    return matchesSearch && matchesTag;
+    // 3. Academic Level (read from metadata.level, default to 'intermediate')
+    const courseLevel = normalizeLevel(course.metadata?.level || "intermediate");
+    const matchesLevel = academicLevel === "all" || courseLevel === academicLevel;
+
+    // 4. Format (read from metadata.format, default to 'online')
+    const courseFormat = normalizeFormat(course.metadata?.format || "online");
+    const matchesFormat = formatFilter === "all" || courseFormat === formatFilter;
+
+    // 5. Duration (mapped from durationMinutes or metadata.totalHours, default to 12)
+    const courseHours = course.durationMinutes ? (course.durationMinutes / 60) : Number(course.metadata?.totalHours || 12);
+    let durationGroup = "long";
+    if (courseHours <= 1) {
+      durationGroup = "short";
+    } else if (courseHours <= 3) {
+      durationGroup = "medium";
+    }
+    const matchesDuration = durationFilter === "all" || durationGroup === durationFilter;
+
+    return matchesSearch && matchesTag && matchesLevel && matchesFormat && matchesDuration;
   });
 
   const breadcrumbItems = [
@@ -602,7 +639,7 @@ export default function PublicCoursesClient() {
 
                       {/* Course Professional Description */}
                       <p className="text-[13px] leading-relaxed text-[#64748b] font-medium line-clamp-3">
-                        {courseDesc}
+                        {course.description || courseDesc}
                       </p>
                     </div>
 

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Breadcrumb } from '@shared';
 import { courseBookingGateway, courseGateway, authGateway } from '@/core/gateway';
 import { useSession } from 'next-auth/react';
+import { useQuery } from '@tanstack/react-query';
 import { 
   LuPlus, 
   LuArrowRight, 
@@ -35,40 +36,24 @@ interface CourseItem {
 
 export default function DashboardClient() {
   const { data: session, status: authStatus } = useSession();
-  const [loading, setLoading] = useState(true);
-  const [isVerified, setIsVerified] = useState<boolean>(true);
-  
-  // Dashboard Metrics state
-  const [metrics, setMetrics] = useState({
-    stat1: 0,
-    stat2: 0,
-    stat3: 0,
-    stat4: 0,
-  });
-
-  const [courses, setCourses] = useState<CourseItem[]>([]);
-  const [allBookings, setAllBookings] = useState<any[]>([]);
-
-  const loadDashboardData = async () => {
-    if (!session) return;
-    try {
-      setLoading(true);
+  // Fetch all dashboard data via TanStack Query
+  const { data: dashboardData, isLoading: queryLoading } = useQuery({
+    queryKey: ["dashboardData", session?.user?.id, session?.user?.role],
+    queryFn: async () => {
+      if (!session) return null;
       const isMentor = session.user?.role === 'mentor';
-
-      // Fetch user verified status
+      
+      let isVerifiedVal = true;
       try {
         const meRes = await authGateway.getMe();
-        setIsVerified((meRes.user as any)?.isVerified ?? false);
+        isVerifiedVal = (meRes.user as any)?.isVerified ?? false;
       } catch (err) {
         console.error('Error fetching user profile verified status:', err);
       }
 
-      // 1. Fetch All Bookings
       const bookingsRes = await courseBookingGateway.getMyBookings({ limit: 100 });
       const bookings = bookingsRes.data || [];
-      setAllBookings(bookings);
 
-      // 2. Fetch Mentor Courses if Mentor
       let mentorCourses: any[] = [];
       if (isMentor) {
         try {
@@ -79,21 +64,22 @@ export default function DashboardClient() {
       }
 
       // Calculate Metrics and Courses list based on Role
+      let metricsVal = { stat1: 0, stat2: 0, stat3: 0, stat4: 0 };
+      let coursesVal: CourseItem[] = [];
+
       if (isMentor) {
-        // Mentor Dashboard Logic
         const upcomingCount = bookings.filter((b: any) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'rescheduled').length;
         const completedCount = bookings.filter((b: any) => b.status === 'completed').length;
         const uniqueStudents = new Set(bookings.map((b: any) => b.menteeId));
 
-        setMetrics({
+        metricsVal = {
           stat1: mentorCourses.length,
           stat2: upcomingCount,
           stat3: completedCount,
           stat4: uniqueStudents.size,
-        });
+        };
 
-        // Map Mentor Taught Courses
-        const mappedCourses: CourseItem[] = mentorCourses.map((c: any) => {
+        coursesVal = mentorCourses.map((c: any) => {
           const courseBookings = bookings.filter((b: any) => b.courseId === c.id);
           const distinctStudents = new Set(courseBookings.map((b: any) => b.menteeId)).size;
           
@@ -110,14 +96,10 @@ export default function DashboardClient() {
             studentsCount: distinctStudents,
           };
         });
-        setCourses(mappedCourses);
-
       } else {
-        // Mentee / Student Dashboard Logic
         const upcomingCount = bookings.filter((b: any) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'rescheduled').length;
         const completedCount = bookings.filter((b: any) => b.status === 'completed').length;
         
-        // Group bookings to get unique Enrolled Courses
         const courseMap = new Map<string, any>();
         bookings.forEach((b: any) => {
           if (b.courseId && b.course) {
@@ -131,18 +113,16 @@ export default function DashboardClient() {
           }
         });
 
-        // 1 session ~ 1.5 hours studied
         const totalHours = completedCount * 1.5; 
 
-        setMetrics({
+        metricsVal = {
           stat1: courseMap.size,
           stat2: upcomingCount,
           stat3: completedCount,
           stat4: totalHours,
-        });
+        };
 
-        // Map Enrolled Courses
-        const mappedCourses: CourseItem[] = Array.from(courseMap.values()).map(({ course, bookings: courseBookings }) => {
+        coursesVal = Array.from(courseMap.values()).map(({ course, bookings: courseBookings }) => {
           const completed = courseBookings.filter((b: any) => b.status === 'completed').length;
           const total = courseBookings.length;
           const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -160,20 +140,23 @@ export default function DashboardClient() {
             category: 'Khóa học đã đăng ký',
           };
         });
-        setCourses(mappedCourses);
       }
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    if (authStatus === 'authenticated') {
-      loadDashboardData();
-    }
-  }, [authStatus, session]);
+      return {
+        isVerified: isVerifiedVal,
+        allBookings: bookings,
+        metrics: metricsVal,
+        courses: coursesVal
+      };
+    },
+    enabled: authStatus === 'authenticated',
+  });
+
+  const loading = queryLoading || !dashboardData;
+  const isVerified = dashboardData?.isVerified ?? true;
+  const metrics = dashboardData?.metrics || { stat1: 0, stat2: 0, stat3: 0, stat4: 0 };
+  const courses = dashboardData?.courses || [];
+  const allBookings = dashboardData?.allBookings || [];
 
   if (authStatus === 'loading' || loading) {
     return (

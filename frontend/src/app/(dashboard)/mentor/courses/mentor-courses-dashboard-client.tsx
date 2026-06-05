@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Breadcrumb, EmptyState, Modal } from "@shared";
 import { courseGateway } from "@/core/gateway";
 import { MockCourse } from "@/shared/mocks/mentorCourses.mock";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   LuPlus, 
   LuBookOpen, 
@@ -21,44 +22,38 @@ import {
 } from "react-icons/lu";
 
 export default function MentorCoursesDashboardClient() {
-  const [courses, setCourses] = useState<MockCourse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [deleteCourseId, setDeleteCourseId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // Fetch courses on mount
-  useEffect(() => {
-    async function loadCourses() {
-      try {
-        setLoading(true);
-        const data = await courseGateway.getMyCourses();
-        setCourses(data);
-      } catch (error) {
-        console.error("Failed to load courses:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadCourses();
-  }, []);
+  // Fetch courses via TanStack Query
+  const { data: courses = [], isLoading: loading } = useQuery<MockCourse[]>({
+    queryKey: ["mentorCourses"],
+    queryFn: () => courseGateway.getMyCourses(),
+  });
 
-  // Handle course deletion
+  // Handle course deletion via TanStack Query Mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => courseGateway.deleteCourse(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mentorCourses"] });
+      queryClient.invalidateQueries({ queryKey: ["publicCourses"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+      setDeleteCourseId(null);
+    },
+    onError: (error) => {
+      console.error("Failed to delete course:", error);
+    }
+  });
+
+  const isDeleting = deleteMutation.isPending;
+
   const handleDeleteConfirm = async () => {
     if (!deleteCourseId) return;
-    try {
-      setIsDeleting(true);
-      await courseGateway.deleteCourse(deleteCourseId);
-      setCourses(courses.filter(c => c.id !== deleteCourseId));
-      setDeleteCourseId(null);
-    } catch (error) {
-      console.error("Failed to delete course:", error);
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteMutation.mutate(deleteCourseId);
   };
 
   // Filtered courses

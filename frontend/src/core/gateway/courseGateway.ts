@@ -4,6 +4,71 @@ import { gql } from 'graphql-request';
 import { gqlClient } from '../api/graphql-client';
 import { authGateway } from './authGateway';
 
+const getNormalizedCategory = (course: any): string => {
+  const title = course.title || '';
+  const t = title.toLowerCase();
+  
+  if (
+    t.includes('web') || 
+    t.includes('frontend') || 
+    t.includes('backend') || 
+    t.includes('react') || 
+    t.includes('next.js') || 
+    t.includes('tailwind') || 
+    t.includes('nestjs') || 
+    t.includes('express') || 
+    t.includes('node.js') || 
+    t.includes('html') || 
+    t.includes('css') || 
+    t.includes('websocket') || 
+    t.includes('postgre') || 
+    t.includes('typeorm') || 
+    t.includes('sql') || 
+    t.includes('typescript') || 
+    t.includes('javascript') || 
+    t.includes('coding') || 
+    t.includes('kỹ năng mềm') || 
+    t.includes('thăng tiến')
+  ) {
+    return 'Lập trình Web';
+  }
+  if (t.includes('figma') || t.includes('design') || t.includes('ui') || t.includes('ux') || t.includes('giao diện') || t.includes('thiết kế')) {
+    return 'UI/UX Design';
+  }
+  if (t.includes('di động') || t.includes('mobile') || t.includes('react native') || t.includes('android') || t.includes('ios') || t.includes('hybrid')) {
+    return 'Lập trình di động';
+  }
+  if (
+    t.includes('thuật toán') || 
+    t.includes('cấu trúc dữ liệu') || 
+    t.includes('giải thuật') || 
+    t.includes('algorithm') || 
+    t.includes('faang') || 
+    t.includes('khoa học máy tính') || 
+    t.includes('computer science') || 
+    t.includes('python') || 
+    t.includes('c++') || 
+    t.includes('c/c++') || 
+    t.includes('docker') || 
+    t.includes('kubernetes') || 
+    t.includes('microservice') || 
+    t.includes('hệ thống lớn') || 
+    t.includes('system design') || 
+    t.includes('ai') || 
+    t.includes('llm') || 
+    t.includes('chatgpt') || 
+    t.includes('claude')
+  ) {
+    return 'Khoa học máy tính';
+  }
+
+  // Fallback to database categories if available
+  const dbCat = course.categories?.[0]?.name || course.metadata?.categoryName;
+  if (dbCat) return dbCat;
+
+  return 'Lập trình Web'; // Default fallback
+};
+
 const translateCourse = (course: any): MockCourse => {
   // Map backend status to frontend status
   let status: MockCourse['status'] = 'draft';
@@ -16,7 +81,7 @@ const translateCourse = (course: any): MockCourse => {
     id: course.id,
     title: course.title,
     thumbnail: course.thumbnailUrl || 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=300&q=80',
-    category: course.categories?.[0]?.name || course.metadata?.categoryName || 'Chưa phân loại',
+    category: getNormalizedCategory(course),
     price: Number(course.price),
     studentsCount: course.metadata?.studentsCount || 0,
     rating: course.metadata?.rating || 0,
@@ -94,6 +159,8 @@ export const courseGateway = {
               name
               slug
             }
+            prerequisites
+            metadata
           }
         }
       `;
