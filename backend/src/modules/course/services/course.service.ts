@@ -10,7 +10,7 @@ import {
   UpdateCourseInput,
   ApproveCourseInput,
 } from '../types/course.types';
-import { DataSource, ILike, Not, IsNull, In } from 'typeorm';
+import { DataSource, ILike, In } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { CourseCategoryEntity } from '../../course-category/entities/course-category.entity';
 import { MentorProfileEntity } from '../../mentor-profile/entities/mentor-profile.entity';
@@ -77,7 +77,7 @@ export class CourseService {
     const isOwnMentorQuery = mentorId && userId && mentorId === userId;
 
     if (!isAdmin && !isOwnMentorQuery) {
-      where['approvedBy'] = Not(IsNull());
+      // Hiển thị tất cả khoá học ACTIVE (không bắt buộc phải có approvedBy)
       where['status'] = CourseStatus.ACTIVE;
     }
 
@@ -124,11 +124,12 @@ export class CourseService {
         }
       }
 
-      // 3. Tạo khóa học (status mặc định = ACTIVE)
+      // 3. Tạo khóa học — tự động set approvedBy = mentorId (auto-approve)
       const newCourse = manager.create(CourseEntity, {
         ...courseData,
         durationMinutes: duration,
         mentorId,
+        approvedBy: mentorId,
         status: CourseStatus.ACTIVE,
       });
 

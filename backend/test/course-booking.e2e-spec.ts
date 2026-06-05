@@ -30,6 +30,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
 
   let menteeAccessToken: string;
   let mentorAccessToken: string;
+  let mentorId: string;
   let adminAccessToken: string;
   let mentorApplicationId: string;
   let categoryId: string;
@@ -126,6 +127,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       expect(mentorLoginRes.status).toBe(201);
       expect(mentorLoginRes.body.user.role).toBe(UserRole.MENTOR);
       mentorAccessToken = mentorLoginRes.body.access_token || mentorLoginRes.body.accessToken;
+      mentorId = mentorLoginRes.body.user.id;
     });
 
     it('should fetch or create a category', async () => {
@@ -181,6 +183,19 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       expect(courseRes.status).toBe(201);
       courseId = courseRes.body.id;
       expect(courseId).toBeDefined();
+      expect(courseRes.body.approvedBy).toBe(mentorId);
+    });
+
+    it('should fetch the course publicly (without authentication)', async () => {
+      const getRes = await supertest(app.getHttpServer())
+        .get(`${apiPrefix}/courses`)
+        .query({ limit: 100 });
+      
+      expect(getRes.status).toBe(200);
+      const items = getRes.body.items || [];
+      const createdCourse = items.find((c: any) => c.id === courseId);
+      expect(createdCourse).toBeDefined();
+      expect(createdCourse.status).toBe('ACTIVE');
     });
   });
 
