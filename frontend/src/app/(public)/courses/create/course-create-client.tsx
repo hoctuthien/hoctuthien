@@ -414,9 +414,9 @@ export default function CourseCreateClient() {
                         onChange={(e) => setLevel(e.target.value)}
                         className="w-full h-12 px-4 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] cursor-pointer"
                       >
-                        <option value="beginner">Cơ bản (Beginner)</option>
-                        <option value="intermediate">Trung cấp (Intermediate)</option>
-                        <option value="advanced">Nâng cao (Advanced)</option>
+                        <option key="beginner" value="beginner">Cơ bản (Beginner)</option>
+                        <option key="intermediate" value="intermediate">Trung cấp (Intermediate)</option>
+                        <option key="advanced" value="advanced">Nâng cao (Advanced)</option>
                       </select>
                     </div>
                   </div>
@@ -464,9 +464,9 @@ export default function CourseCreateClient() {
                         onChange={(e) => setFormat(e.target.value)}
                         className="w-full h-12 px-4 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] cursor-pointer"
                       >
-                        <option value="online">Học trực tuyến (Online)</option>
-                        <option value="offline">Học trực tiếp (Offline)</option>
-                        <option value="hybrid">Học kết hợp (Hybrid)</option>
+                        <option key="online" value="online">Học trực tuyến (Online)</option>
+                        <option key="offline" value="offline">Học trực tiếp (Offline)</option>
+                        <option key="hybrid" value="hybrid">Học kết hợp (Hybrid)</option>
                       </select>
                     </div>
                   </div>

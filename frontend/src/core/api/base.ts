@@ -35,14 +35,10 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
         headers,
       });
 
-      console.log(`[httpClient] Received response from: ${url} | Status: ${response.status} ${response.statusText}`);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error(`[httpClient] Error Response from ${url}:`, {
-          status: response.status,
-          errorData,
-        });
+        // Dùng warn thay vì error - caller có thể tự handle
+        console.warn(`[httpClient] ${response.status} from ${url}:`, errorData?.error?.message || response.statusText);
         throw {
           ...errorData,
           status: response.status,
@@ -51,14 +47,16 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
 
       // Trả về cả data và headers
       const data = await response.json();
-      console.log(`[httpClient] Successfully parsed JSON data from ${url}:`, data);
       return {
         data,
         headers: response.headers,
         status: response.status,
       };
     } catch (fetchError: any) {
-      console.error(`[httpClient] Fetch exception calling ${url}:`, fetchError);
+      // Chỉ log nếu không phải lỗi HTTP đã được xử lý bên trên
+      if (!fetchError?.status) {
+        console.warn(`[httpClient] Network error calling ${url}:`, fetchError?.message || fetchError);
+      }
       throw fetchError;
     }
   };
