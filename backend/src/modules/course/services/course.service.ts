@@ -34,7 +34,7 @@ export class CourseService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(query: FindCoursesQuery, userRole?: string) {
+  async findAll(query: FindCoursesQuery, userRole?: string, userId?: string) {
     const { title, status, mentorId, groupCategoryId, groupCategorySlug, categoryId, categorySlug, page, limit } =
       findCoursesQuerySchema.parse(query);
 
@@ -73,7 +73,10 @@ export class CourseService {
       }
     }
 
-    if (userRole !== 'admin') {
+    const isAdmin = userRole === 'admin';
+    const isOwnMentorQuery = mentorId && userId && mentorId === userId;
+
+    if (!isAdmin && !isOwnMentorQuery) {
       where['approvedBy'] = Not(IsNull());
       where['status'] = CourseStatus.ACTIVE;
     }

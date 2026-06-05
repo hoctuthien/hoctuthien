@@ -61,6 +61,7 @@ export class CourseController {
   @Public()
   findAll(@Query() query: FindCoursesQuery, @Req() req: any) {
     let userRole: string | undefined = undefined;
+    let userId: string | undefined = undefined;
     const authHeader = req.headers?.authorization;
     let token: string | null = null;
     if (req.cookies) {
@@ -80,12 +81,13 @@ export class CourseController {
             Buffer.from(parts[1], 'base64').toString('utf-8'),
           );
           userRole = payload.role;
+          userId = payload.sub || payload.id;
         }
       } catch (e) {
         // ignore decoding errors
       }
     }
-    return this.courseService.findAll(query, userRole);
+    return this.courseService.findAll(query, userRole, userId);
   }
 
   @Get(':id')
