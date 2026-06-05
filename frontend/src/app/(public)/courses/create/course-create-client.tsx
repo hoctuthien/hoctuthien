@@ -224,7 +224,28 @@ export default function CourseCreateClient() {
       setIsSuccess(true);
     } catch (error: any) {
       console.error("Failed to create course:", error);
-      alert("Đã xảy ra lỗi khi tạo khóa học. Vui lòng kiểm tra lại quyền của Mentor (profile phải được duyệt).");
+      let errorMsg = "Đã xảy ra lỗi khi tạo khóa học. Vui lòng kiểm tra lại quyền của Mentor (profile phải được duyệt).";
+      if (error?.error?.details) {
+        if (typeof error.error.details === "object") {
+          if (error.error.details.message) {
+            errorMsg += `\n\nChi tiết: ${error.error.details.message}`;
+          } else {
+            const detailLines = Object.entries(error.error.details)
+              .map(([field, msg]) => `- ${field}: ${msg}`)
+              .join("\n");
+            if (detailLines) {
+              errorMsg += `\n\nChi tiết lỗi nhập liệu:\n${detailLines}`;
+            }
+          }
+        } else if (typeof error.error.details === "string") {
+          errorMsg += `\n\nChi tiết: ${error.error.details}`;
+        }
+      } else if (error?.error?.message) {
+        errorMsg += `\n\nChi tiết: ${error.error.message}`;
+      } else if (error?.message) {
+        errorMsg += `\n\nChi tiết: ${error.message}`;
+      }
+      alert(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
