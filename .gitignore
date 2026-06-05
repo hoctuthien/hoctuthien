@@ -1,6 +1,8 @@
 node_modules/
 package-lock.json
 .env
+.env.*
+!.env.example
 .DS_Store
 dist/
 build/
@@ -10,3 +12,5 @@ build/
 coverage/
 .vscode/
 .idea/
+Thumbs.db
+.nx/
