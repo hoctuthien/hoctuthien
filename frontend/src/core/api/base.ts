@@ -37,8 +37,7 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        // Dùng warn thay vì error - caller có thể tự handle
-        console.warn(`[httpClient] ${response.status} from ${url}:`, errorData?.error?.message || response.statusText);
+        console.warn(`[httpClient] ${response.status} Error Response from ${url}:`, errorData);
         throw {
           ...errorData,
           status: response.status,
@@ -47,6 +46,7 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
 
       // Trả về cả data và headers
       const data = await response.json();
+      console.log(`[httpClient] ${response.status} Success Response from ${url}:`, data);
       return {
         data,
         headers: response.headers,
