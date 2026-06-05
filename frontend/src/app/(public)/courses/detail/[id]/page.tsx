@@ -217,21 +217,43 @@ export default function CourseDetailPage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Lấy các khung giờ rảnh thực tế từ database/backend của Mentor cho ngày được chọn
+  // Lấy các khung giờ rảnh thực tế từ database/backend của Khóa học cho ngày được chọn
   const getAvailableSlots = (): string[] => {
-    if (mentorProfile?.metadata?.time) {
+    if (course?.metadata?.time) {
       const dayOfWeek = new Date(bookingDate).toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
-      const slots = mentorProfile.metadata.time[dayOfWeek];
+      const slots = course.metadata.time[dayOfWeek];
       if (slots && Array.isArray(slots) && slots.length > 0) {
         // Ánh xạ sang mốc bắt đầu
         return slots.map((s: string) => s.split("-")[0].trim());
       }
     }
-    // Trả về mặc định nếu mentor chưa thiết lập giờ rảnh chi tiết
-    return ["09:00", "10:30", "14:00", "15:30", "19:00", "20:30"];
+    return [];
+  };
+
+  const getSelectedDayLabel = (): string => {
+    const dayName = new Date(bookingDate).toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+    const mapping: Record<string, string> = {
+      monday: "Thứ Hai",
+      tuesday: "Thứ Ba",
+      wednesday: "Thứ Tư",
+      thursday: "Thứ Năm",
+      friday: "Thứ Sáu",
+      saturday: "Thứ Bảy",
+      sunday: "Chủ Nhật"
+    };
+    return mapping[dayName] || "";
   };
 
   const availableSlots = getAvailableSlots();
+
+  // Tự động đồng bộ hóa khung giờ khi chuyển ngày học
+  useEffect(() => {
+    if (availableSlots.length > 0) {
+      setBookingTime(availableSlots[0]);
+    } else {
+      setBookingTime("");
+    }
+  }, [bookingDate, course]);
 
   useEffect(() => {
     if (!id) return;
@@ -733,24 +755,30 @@ export default function CourseDetailPage() {
                     <label className="text-xs font-black text-[#475569] uppercase tracking-wider">
                       Chọn Khung Giờ Bắt Đầu:
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {availableSlots.map((time) => {
-                        const isActive = bookingTime === time;
-                        return (
-                          <button
-                            type="button"
-                            key={time}
-                            onClick={() => setBookingTime(time)}
-                            className={`py-3 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none ${isActive
-                              ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10"
-                              : "bg-white border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]"
-                              }`}
-                          >
-                            {time}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    {availableSlots.length > 0 ? (
+                      <div className="grid grid-cols-3 gap-2">
+                        {availableSlots.map((time) => {
+                          const isActive = bookingTime === time;
+                          return (
+                            <button
+                              type="button"
+                              key={time}
+                              onClick={() => setBookingTime(time)}
+                              className={`py-3 rounded-xl text-xs font-bold transition-all border cursor-pointer select-none ${isActive
+                                ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10"
+                                : "bg-white border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]"
+                                }`}
+                            >
+                              {time}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-amber-600 bg-amber-50 border border-amber-100 p-4 rounded-2xl font-bold leading-relaxed">
+                        ⚠️ Cố vấn không cấu hình lịch giảng dạy vào ngày {getSelectedDayLabel()}. Vui lòng chọn một ngày khác trong tuần.
+                      </div>
+                    )}
                   </div>
 
                   {/* Notes for Mentor */}
@@ -784,8 +812,8 @@ export default function CourseDetailPage() {
 
                   <button
                     type="submit"
-                    disabled={isSubmittingBooking}
-                    className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-extrabold text-xs rounded-2xl uppercase tracking-wider transition-all cursor-pointer text-center shadow-lg shadow-blue-500/10 active:scale-95 disabled:scale-100"
+                    disabled={isSubmittingBooking || availableSlots.length === 0}
+                    className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-extrabold text-xs rounded-2xl uppercase tracking-wider transition-all cursor-pointer text-center shadow-lg shadow-blue-500/10 active:scale-95 disabled:scale-100"
                   >
                     {isSubmittingBooking ? "Đang xử lý..." : "Xác nhận đăng ký"}
                   </button>

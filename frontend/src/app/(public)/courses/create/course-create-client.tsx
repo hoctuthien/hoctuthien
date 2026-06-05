@@ -1,36 +1,46 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Breadcrumb } from "@shared";
-import { courseGateway } from "@/core/gateway";
+import { courseGateway, categoryGateway } from "@/core/gateway";
+import { uploadImageToCloud } from "@/core/utils/upload";
 import {
   LuArrowLeft,
   LuSparkles,
   LuImage,
-  LuBookOpen,
   LuClock,
   LuDollarSign,
   LuPlus,
   LuTrash2,
   LuCheck,
   LuStar,
-  LuGraduationCap
+  LuUpload,
+  LuCalendar
 } from "react-icons/lu";
 
-
-interface Lesson {
-  id: string;
-  title: string;
-  duration: string;
+interface TimeSlot {
+  start: string;
+  end: string;
 }
 
-interface Module {
-  id: string;
-  title: string;
-  lessons: Lesson[];
-}
+const WEEKDAYS = [
+  { key: "monday", label: "Thứ Hai" },
+  { key: "tuesday", label: "Thứ Ba" },
+  { key: "wednesday", label: "Thứ Tư" },
+  { key: "thursday", label: "Thứ Năm" },
+  { key: "friday", label: "Thứ Sáu" },
+  { key: "saturday", label: "Thứ Bảy" },
+  { key: "sunday", label: "Chủ Nhật" }
+];
+
+const TIME_OPTIONS = [
+  "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
+  "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
+  "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30",
+  "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00"
+];
 
 export default function CourseCreateClient() {
   const router = useRouter();
@@ -38,14 +48,43 @@ export default function CourseCreateClient() {
   // Form states
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
-  const [category, setCategory] = useState("UI/UX Design");
+  const [category, setCategory] = useState("Chưa phân loại");
   const [level, setLevel] = useState("intermediate");
   const [duration, setDuration] = useState("12");
   const [format, setFormat] = useState("online");
   const [isPaid, setIsPaid] = useState(false);
   const [price, setPrice] = useState("0");
-  
-  // Dynamic Unsplash preset images for premium visual feel
+
+  // Category & Group Category states
+  const [categories, setCategories] = useState<any[]>([]);
+  const [groupCategories, setGroupCategories] = useState<any[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCatName, setNewCatName] = useState("");
+  const [newCatGroupId, setNewCatGroupId] = useState("");
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  // Thumbnail uploading states
+  const [customThumbUrl, setCustomThumbUrl] = useState("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  // Teaching schedule state (Mandatory)
+  const [schedule, setSchedule] = useState<Record<string, string[]>>({
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: []
+  });
+
+  // Temporary selectors for adding slot
+  const [activeAddDay, setActiveAddDay] = useState<string | null>(null);
+  const [tempStart, setTempStart] = useState("09:00");
+  const [tempEnd, setTempEnd] = useState("10:30");
+
+  // Dynamic Unsplash preset images for premium visual feel fallback
   const thumbPresets = [
     {
       id: "preset-1",
@@ -70,116 +109,132 @@ export default function CourseCreateClient() {
   ];
 
   const [selectedThumb, setSelectedThumb] = useState(thumbPresets[0].url);
-  const [customThumbUrl, setCustomThumbUrl] = useState("");
-  
-  // Curriculum outline list
-  const [modules, setModules] = useState<Module[]>([
-    {
-      id: "mod-1",
-      title: "Chương 1: Giới thiệu và Nền tảng cốt lõi",
-      lessons: [
-        { id: "les-1", title: "Bài 1.1: Tổng quan lộ trình và quy chuẩn học thuật", duration: "15 phút" },
-        { id: "les-2", title: "Bài 1.2: Các khái niệm cơ bản đầu tiên", duration: "30 phút" }
-      ]
-    }
-  ]);
-
-  // Form submission and success screen state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Curriculum functions
-  const addModule = () => {
-    const newMod: Module = {
-      id: `mod-${Date.now()}`,
-      title: `Chương ${modules.length + 1}: Chương học mới`,
-      lessons: []
-    };
-    setModules([...modules, newMod]);
-  };
-
-  const removeModule = (modId: string) => {
-    if (modules.length === 1) return; // Keep at least one
-    setModules(modules.filter(m => m.id !== modId));
-  };
-
-  const updateModuleTitle = (modId: string, value: string) => {
-    setModules(modules.map(m => m.id === modId ? { ...m, title: value } : m));
-  };
-
-  const addLesson = (modId: string) => {
-    setModules(modules.map(m => {
-      if (m.id === modId) {
-        const newLes: Lesson = {
-          id: `les-${Date.now()}`,
-          title: `Bài học mới ${m.lessons.length + 1}`,
-          duration: "20 phút"
-        };
-        return { ...m, lessons: [...m.lessons, newLes] };
+  // Load categories and group categories
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoadingCategories(true);
+        const [cats, groups] = await Promise.all([
+          categoryGateway.getCategories(),
+          categoryGateway.getGroupCategories(),
+        ]);
+        setCategories(cats);
+        setGroupCategories(groups);
+        if (cats.length > 0) {
+          setSelectedCategoryId(cats[0].id);
+          setCategory(cats[0].name);
+        }
+        if (groups.length > 0) {
+          setNewCatGroupId(groups[0].id);
+        }
+      } catch (err) {
+        console.error("Failed to load categories/groups:", err);
+      } finally {
+        setLoadingCategories(false);
       }
-      return m;
-    }));
+    }
+    loadData();
+  }, []);
+
+  const handleCreateCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCatName.trim() || !newCatGroupId) return;
+
+    try {
+      const newCat = await categoryGateway.createCategory({
+        name: newCatName.trim(),
+        groupCategoryId: newCatGroupId,
+      });
+      setCategories((prev) => [...prev, newCat]);
+      setSelectedCategoryId(newCat.id);
+      setCategory(newCat.name);
+      setIsCategoryModalOpen(false);
+      setNewCatName("");
+      alert("Đã tạo và chọn danh mục mới thành công!");
+    } catch (err: any) {
+      console.error("Failed to create category:", err);
+      alert("Tạo danh mục thất bại: " + (err.message || "Lỗi không xác định"));
+    }
   };
 
-  const updateLessonTitle = (modId: string, lesId: string, value: string) => {
-    setModules(modules.map(m => {
-      if (m.id === modId) {
-        return {
-          ...m,
-          lessons: m.lessons.map(l => l.id === lesId ? { ...l, title: value } : l)
-        };
-      }
-      return m;
-    }));
+  const addTimeSlot = (day: string) => {
+    const slotStr = `${tempStart}-${tempEnd}`;
+    const daySlots = schedule[day] || [];
+    
+    // Check duplication
+    if (daySlots.includes(slotStr)) {
+      alert("Khung giờ này đã tồn tại trong ngày.");
+      return;
+    }
+
+    // Sort helper
+    const updated = [...daySlots, slotStr].sort((a, b) => {
+      return a.split("-")[0].localeCompare(b.split("-")[0]);
+    });
+
+    setSchedule({
+      ...schedule,
+      [day]: updated
+    });
+    setActiveAddDay(null);
   };
 
-  const updateLessonDuration = (modId: string, lesId: string, value: string) => {
-    setModules(modules.map(m => {
-      if (m.id === modId) {
-        return {
-          ...m,
-          lessons: m.lessons.map(l => l.id === lesId ? { ...l, duration: value } : l)
-        };
-      }
-      return m;
-    }));
+  const removeTimeSlot = (day: string, slotIndex: number) => {
+    const daySlots = schedule[day] || [];
+    setSchedule({
+      ...schedule,
+      [day]: daySlots.filter((_, idx) => idx !== slotIndex)
+    });
   };
 
-  const removeLesson = (modId: string, lesId: string) => {
-    setModules(modules.map(m => {
-      if (m.id === modId) {
-        return { ...m, lessons: m.lessons.filter(l => l.id !== lesId) };
-      }
-      return m;
-    }));
+  const countTotalSlots = () => {
+    return Object.values(schedule).reduce((acc, curr) => acc + curr.length, 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
+    // Check mandatory teaching schedule
+    const totalSlots = countTotalSlots();
+    if (totalSlots === 0) {
+      alert("Vui lòng thiết lập ít nhất một khung giờ lịch dạy (đây là điều kiện bắt buộc để học viên đăng ký học).");
+      return;
+    }
+
+    if (!selectedCategoryId) {
+      alert("Vui lòng chọn danh mục cho khóa học.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await courseGateway.createCourse({
+      const payload: any = {
         title,
         description: subtitle,
         category,
+        categoryIds: [selectedCategoryId],
         price: isPaid ? Number(price) : 0,
-        status: 'published', // ACTIVE
+        status: 'published',
         thumbnail: currentThumb,
-        durationMinutes: 60, // Phút của một buổi học
+        durationMinutes: 60,
         prerequisites: [],
         metadata: {
           level,
           totalHours: Number(duration),
           format,
-          modules, // Lưu giáo trình
+          time: schedule, // Save weekly schedule
         }
-      });
+      };
+
+      await courseGateway.createCourse(payload);
       setIsSuccess(true);
     } catch (error: any) {
       console.error("Failed to create course:", error);
-      alert("Đã xảy ra lỗi khi tạo khóa học. Vui lòng kiểm tra lại quyền của Mentor (phải có profile được phê duyệt).");
+      alert("Đã xảy ra lỗi khi tạo khóa học. Vui lòng kiểm tra lại quyền của Mentor (profile phải được duyệt).");
     } finally {
       setIsSubmitting(false);
     }
@@ -218,7 +273,7 @@ export default function CourseCreateClient() {
 
         {isSuccess ? (
           /* SUCCESS ANIMATION SCREEN */
-          <div className="bg-white border border-[#ECFDF5] rounded-[32px] p-8 md:p-16 text-center shadow-xl shadow-slate-100 max-w-2xl mx-auto flex flex-col items-center gap-6 animate-in zoom-in-95 duration-500 my-12">
+          <div className="bg-white border border-[#ECFDF5] rounded-[32px] p-8 md:p-16 text-center shadow-xl shadow-slate-100 max-w-2xl mx-auto flex flex-col items-center gap-6 my-12">
             <div className="w-20 h-20 bg-[#ECFDF5] rounded-full flex items-center justify-center text-[#10B981] animate-bounce">
               <svg className="w-10 h-10 text-[#10B981]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
@@ -228,27 +283,25 @@ export default function CourseCreateClient() {
             <div className="flex flex-col gap-2">
               <h2 className="text-3xl font-black text-slate-900 tracking-tight">Khởi Tạo Khóa Học Thành Công!</h2>
               <p className="text-slate-500 text-sm leading-relaxed max-w-md mx-auto">
-                Khóa học <span className="font-extrabold text-[#2563eb]">"{title}"</span> đã được ghi nhận trên hệ thống và chuyển đến ban kiểm duyệt chuyên môn.
+                Khóa học <span className="font-extrabold text-[#2563eb]">"{title}"</span> đã được ghi nhận trên hệ thống và chuyển đến trạng thái hoạt động.
               </p>
             </div>
 
-            {/* Structured Syllabus stats */}
+            {/* Structured schedule details */}
             <div className="bg-[#FAF9FF] border border-slate-100 p-5 rounded-2xl w-full flex items-center justify-around gap-4 text-left">
               <div>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">CHƯƠNG TRÌNH</span>
-                <span className="text-sm font-black text-slate-800">{modules.length} Chương học</span>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">LỊCH GIẢNG DẠY</span>
+                <span className="text-sm font-black text-slate-800">{countTotalSlots()} Khung giờ học</span>
               </div>
               <div className="w-px h-8 bg-slate-200" />
               <div>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">BÀI GIẢNG</span>
-                <span className="text-sm font-black text-slate-800">
-                  {modules.reduce((acc, curr) => acc + curr.lessons.length, 0)} Bài học
-                </span>
-              </div>
-              <div className="w-px h-8 bg-slate-200" />
-              <div>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">ĐỊNH DẠNG</span>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">HÌNH THỨC</span>
                 <span className="text-sm font-black text-slate-800 capitalize">{format}</span>
+              </div>
+              <div className="w-px h-8 bg-slate-200" />
+              <div>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">HỌC PHÍ</span>
+                <span className="text-sm font-black text-[#10B981]">{isPaid ? `${Number(price).toLocaleString("vi-VN")}đ` : "Miễn Phí"}</span>
               </div>
             </div>
 
@@ -314,23 +367,43 @@ export default function CourseCreateClient() {
                       <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
                         Chủ đề / Danh mục đào tạo
                       </label>
-                      <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className="w-full h-12 px-4 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] cursor-pointer"
-                      >
-                        <option value="UI/UX Design">UI/UX Design</option>
-                        <option value="Báo chí">Báo chí</option>
-                        <option value="Truyền thông Kỹ thuật số">Truyền thông Kỹ thuật số</option>
-                        <option value="Viết sáng tạo">Viết sáng tạo</option>
-                        <option value="Đạo đức">Đạo đức</option>
-                        <option value="Lập trình di động">Lập trình di động</option>
-                      </select>
+                      <div className="flex gap-2 items-center">
+                        <select
+                          value={selectedCategoryId}
+                          onChange={(e) => {
+                            const catId = e.target.value;
+                            setSelectedCategoryId(catId);
+                            const catObj = categories.find((c) => c.id === catId);
+                            if (catObj) setCategory(catObj.name);
+                          }}
+                          className="flex-1 h-12 px-4 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] cursor-pointer"
+                        >
+                          {loadingCategories ? (
+                            <option value="">Đang tải danh mục...</option>
+                          ) : categories.length > 0 ? (
+                            categories.map((cat) => (
+                              <option key={cat.id} value={cat.id}>
+                                {cat.name}
+                              </option>
+                            ))
+                          ) : (
+                            <option value="">Chưa có danh mục nào</option>
+                          )}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setIsCategoryModalOpen(true)}
+                          className="h-12 px-4 bg-blue-50 text-[#2563eb] text-xs font-bold rounded-xl border border-blue-100 hover:bg-blue-100 transition-all cursor-pointer flex items-center gap-1 flex-shrink-0"
+                        >
+                          <LuPlus size={14} />
+                          <span>Tạo mới</span>
+                        </button>
+                      </div>
                     </div>
 
                     <div>
                       <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
-                        Cấp độ đào tạo
+                        Trình độ chuyên môn
                       </label>
                       <select
                         value={level}
@@ -362,12 +435,12 @@ export default function CourseCreateClient() {
                   <div className="flex flex-col gap-4">
                     <div>
                       <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
-                        Tổng thời lượng (Giờ học)
+                        Tổng thời lượng khóa học
                       </label>
                       <div className="relative">
                         <input
                           type="number"
-                          placeholder="Ví dụ: 15"
+                          placeholder="Ví dụ: 12"
                           value={duration}
                           onChange={(e) => setDuration(e.target.value)}
                           min={1}
@@ -441,7 +514,7 @@ export default function CourseCreateClient() {
                 </div>
               </div>
 
-              {/* Box 3: Cover image selection */}
+              {/* Box 3: Cover image upload */}
               <div className="bg-white border border-slate-100 p-6 md:p-8 rounded-[32px] shadow-sm flex flex-col gap-5">
                 <div className="flex items-center gap-2 border-b border-slate-50 pb-4">
                   <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-[#2563eb]">
@@ -449,7 +522,7 @@ export default function CourseCreateClient() {
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-slate-900 tracking-tight">Ảnh Bìa Đại Diện</h3>
-                    <p className="text-[11px] text-slate-400 font-medium">Lựa chọn các mẫu thiết kế nghệ thuật cao cấp để định hình nhận diện trực quan</p>
+                    <p className="text-[11px] text-slate-400 font-medium">Tải hình ảnh hoặc chọn preset thiết kế chuyên nghiệp định hình nhận diện trực quan</p>
                   </div>
                 </div>
 
@@ -491,133 +564,160 @@ export default function CourseCreateClient() {
                   {/* Divider */}
                   <div className="flex items-center gap-3 py-1">
                     <div className="h-px bg-slate-100 flex-1" />
-                    <span className="text-[9px] text-slate-400 font-extrabold tracking-wider uppercase">HOẶC DÙNG ẢNH TÙY CHỌN</span>
+                    <span className="text-[9px] text-slate-400 font-extrabold tracking-wider uppercase">TẢI ẢNH TỪ MÁY TÍNH</span>
                     <div className="h-px bg-slate-100 flex-1" />
                   </div>
 
-                  {/* Custom URL Input */}
-                  <div>
-                    <input
-                      type="url"
-                      placeholder="Dán đường dẫn ảnh thumbnail của bạn (URL)..."
-                      value={customThumbUrl}
-                      onChange={(e) => setCustomThumbUrl(e.target.value)}
-                      className="w-full h-12 px-4 text-sm font-semibold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] transition-all placeholder:text-slate-400"
-                    />
+                  {/* Custom upload area */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="thumbnail-upload"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          try {
+                            setIsUploadingImage(true);
+                            const url = await uploadImageToCloud(file);
+                            setCustomThumbUrl(url);
+                            setSelectedThumb(url);
+                            alert("Đã upload ảnh thành công!");
+                          } catch (err: any) {
+                            console.error("Upload failed:", err);
+                            alert("Tải ảnh thất bại: " + (err.message || "Lỗi không xác định"));
+                          } finally {
+                            setIsUploadingImage(false);
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="thumbnail-upload"
+                        className="flex items-center gap-2 px-5 py-3 border-2 border-dashed border-slate-200 hover:border-[#2563eb] hover:text-[#2563eb] text-slate-600 rounded-xl text-xs font-black transition-all cursor-pointer select-none"
+                      >
+                        <LuUpload size={14} />
+                        {isUploadingImage ? "Đang tải lên cloud..." : "Chọn tệp hình ảnh"}
+                      </label>
+                      {customThumbUrl && (
+                        <span className="text-xs text-emerald-600 font-extrabold flex items-center gap-1.5">
+                          <LuCheck size={14} />
+                          Tải ảnh lên thành công!
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Box 4: Interactive Syllabus Outline Builder */}
+              {/* Box 4: Teaching Schedule Slots Builder (Weekly Scheduler) */}
               <div className="bg-white border border-slate-100 p-6 md:p-8 rounded-[32px] shadow-sm flex flex-col gap-5">
-                <div className="flex items-center justify-between border-b border-slate-50 pb-4 flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-[#2563eb]">
-                      <LuBookOpen size={16} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-black text-slate-900 tracking-tight">Khung Giáo Trình Giảng Dạy</h3>
-                      <p className="text-[11px] text-slate-400 font-medium">Thiết kế cấu trúc chương học và danh sách bài giảng trực quan</p>
-                    </div>
+                <div className="flex items-center gap-2 border-b border-slate-50 pb-4">
+                  <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-[#2563eb]">
+                    <LuCalendar size={16} />
                   </div>
-                  
-                  <button
-                    type="button"
-                    onClick={addModule}
-                    className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-[11px] py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition-all shadow-sm active:scale-[0.98] cursor-pointer"
-                  >
-                    <LuPlus size={12} strokeWidth={3} />
-                    Thêm Chương học
-                  </button>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Cấu Hình Lịch Giảng Dạy</h3>
+                    <p className="text-[11px] text-slate-400 font-medium">Chọn ngày học trong tuần và thiết lập các khung giờ rảnh cố định của bạn (Bắt buộc)</p>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-6">
-                  {modules.map((mod, modIdx) => (
-                    <div 
-                      key={mod.id} 
-                      className="border border-slate-100 bg-[#FAF9FF]/40 rounded-2xl p-5 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-300 relative group"
-                    >
-                      {/* Chapter header row */}
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 flex-1">
-                          <span className="w-7 h-7 bg-slate-900 text-white rounded-lg flex items-center justify-center text-xs font-black">
-                            {modIdx + 1}
-                          </span>
-                          <input
-                            type="text"
-                            value={mod.title}
-                            onChange={(e) => updateModuleTitle(mod.id, e.target.value)}
-                            required
-                            className="bg-transparent border-b border-transparent hover:border-slate-200 focus:border-[#2563eb] outline-none text-sm font-black text-slate-900 py-0.5 flex-1"
-                          />
-                        </div>
-
-                        {modules.length > 1 && (
+                <div className="flex flex-col gap-5">
+                  {WEEKDAYS.map((day) => {
+                    const slots = schedule[day.key] || [];
+                    const isAddingThisDay = activeAddDay === day.key;
+                    
+                    return (
+                      <div key={day.key} className="border border-slate-100 rounded-2xl p-4 bg-[#FAF9FF]/40 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-black text-slate-800">{day.label}</span>
+                          
                           <button
                             type="button"
-                            onClick={() => removeModule(mod.id)}
-                            className="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-red-50 cursor-pointer"
-                            title="Xóa chương học này"
+                            onClick={() => {
+                              setActiveAddDay(isAddingThisDay ? null : day.key);
+                            }}
+                            className="bg-blue-50 hover:bg-blue-100 text-[#2563eb] text-[10px] font-black px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer border border-blue-100/50"
                           >
-                            <LuTrash2 size={14} />
+                            <LuPlus size={12} />
+                            Thêm khung giờ
                           </button>
-                        )}
-                      </div>
+                        </div>
 
-                      {/* Lessons inside chapter */}
-                      <div className="flex flex-col gap-3 pl-9">
-                        {mod.lessons.map((les, lesIdx) => (
-                          <div 
-                            key={les.id} 
-                            className="bg-white border border-slate-100 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative animate-in slide-in-from-left-2 duration-200"
-                          >
-                            <div className="flex items-center gap-2 flex-1 w-full">
-                              <span className="text-[10px] text-slate-400 font-extrabold flex-shrink-0">
-                                BÀI {modIdx + 1}.{lesIdx + 1}
-                              </span>
-                              <input
-                                type="text"
-                                value={les.title}
-                                onChange={(e) => updateLessonTitle(mod.id, les.id, e.target.value)}
-                                required
-                                placeholder="Tên bài giảng cụ thể..."
-                                className="bg-transparent border-b border-transparent hover:border-slate-100 focus:border-[#2563eb] outline-none text-xs font-bold text-slate-800 py-0.5 flex-1 w-full"
-                              />
+                        {/* Inline Adding Form */}
+                        {isAddingThisDay && (
+                          <div className="bg-white border border-blue-100 rounded-xl p-3.5 flex items-center gap-4 text-xs font-semibold animate-in slide-in-from-top-2 duration-200">
+                            <div className="flex items-center gap-1.5">
+                              <span>Từ:</span>
+                              <select
+                                value={tempStart}
+                                onChange={(e) => setTempStart(e.target.value)}
+                                className="bg-slate-50 border border-slate-200 px-2 py-1 rounded outline-none font-bold text-slate-700"
+                              >
+                                {TIME_OPTIONS.map(t => (
+                                  <option key={t} value={t}>{t}</option>
+                                ))}
+                              </select>
                             </div>
-
-                            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto self-stretch sm:self-auto border-t sm:border-t-0 pt-2 sm:pt-0">
-                              <input
-                                type="text"
-                                value={les.duration}
-                                onChange={(e) => updateLessonDuration(mod.id, les.id, e.target.value)}
-                                required
-                                placeholder="15 phút"
-                                className="bg-[#FAF9FF] border border-slate-200 rounded-lg px-2.5 py-1 text-[10px] font-extrabold text-slate-600 outline-none text-center max-w-[80px]"
-                              />
+                            <div className="flex items-center gap-1.5">
+                              <span>Đến:</span>
+                              <select
+                                value={tempEnd}
+                                onChange={(e) => setTempEnd(e.target.value)}
+                                className="bg-slate-50 border border-slate-200 px-2 py-1 rounded outline-none font-bold text-slate-700"
+                              >
+                                {TIME_OPTIONS.map(t => (
+                                  <option key={t} value={t}>{t}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="flex items-center gap-2 ml-auto">
                               <button
                                 type="button"
-                                onClick={() => removeLesson(mod.id, les.id)}
-                                className="text-slate-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50 cursor-pointer"
-                                title="Xóa bài học này"
+                                onClick={() => setActiveAddDay(null)}
+                                className="px-3 py-1.5 border rounded-lg hover:bg-slate-50 font-bold"
                               >
-                                <LuTrash2 size={12} />
+                                Hủy
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => addTimeSlot(day.key)}
+                                className="px-3 py-1.5 bg-[#2563eb] text-white rounded-lg hover:bg-blue-700 font-black"
+                              >
+                                Xác nhận
                               </button>
                             </div>
                           </div>
-                        ))}
+                        )}
 
-                        {/* Add lesson button */}
-                        <button
-                          type="button"
-                          onClick={() => addLesson(mod.id)}
-                          className="self-start text-[10px] font-black text-[#2563eb] hover:text-[#1d4ed8] transition-colors flex items-center gap-1 mt-1 cursor-pointer bg-blue-50/50 hover:bg-blue-50 px-3 py-1.5 rounded-lg border border-dashed border-blue-200/50"
-                        >
-                          <LuPlus size={10} strokeWidth={3} />
-                          THÊM BÀI HỌC
-                        </button>
+                        {/* Configured Slots List */}
+                        {slots.length > 0 ? (
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {slots.map((slot, sIdx) => (
+                              <span 
+                                key={sIdx} 
+                                className="bg-white border border-slate-200 text-xs font-black text-slate-700 px-3 py-1.5 rounded-xl flex items-center gap-2 hover:border-red-200 hover:text-red-500 group transition-all"
+                              >
+                                <LuClock size={12} className="text-slate-400 group-hover:text-red-400" />
+                                <span>{slot}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeTimeSlot(day.key, sIdx)}
+                                  className="text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
+                                  title="Xóa khung giờ"
+                                >
+                                  <LuTrash2 size={12} />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-slate-400 font-semibold italic">Chưa có lịch dạy trong ngày này.</span>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -657,7 +757,7 @@ export default function CourseCreateClient() {
                 </div>
               </div>
 
-              {/* CARD PREVIEW DESIGN (EXACT PORTRAIT MATCH TO THE FIGMA MENTOR CARD SCREENSHOT) */}
+              {/* CARD PREVIEW DESIGN */}
               <div className="bg-white rounded-[24px] p-6 shadow-[0_12px_30px_rgba(0,0,0,0.06)] border border-slate-100/90 flex flex-col justify-between aspect-auto">
                 <div>
                   {/* Thumbnail Cover Area */}
@@ -680,7 +780,6 @@ export default function CourseCreateClient() {
                   {/* Name & Mentor Title */}
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-xl overflow-hidden shadow-inner bg-slate-100 border border-slate-200/50 flex-shrink-0">
-                      {/* Placeholder mentor avatar */}
                       <img
                         src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"
                         alt="Mentor placeholder"
@@ -738,26 +837,20 @@ export default function CourseCreateClient() {
                 </div>
               </div>
 
-              {/* High-fidelity summary stats card */}
+              {/* High-fidelity summary schedule card */}
               <div className="bg-[#FAF9FF] border border-slate-100 rounded-2xl p-5 flex flex-col gap-3.5">
-                <span className="text-[10px] font-black text-slate-500 tracking-wider uppercase">TÓM TẮT GIÁO TRÌNH</span>
+                <span className="text-[10px] font-black text-slate-500 tracking-wider uppercase">TÓM TẮT LỊCH DẠY</span>
                 
                 <div className="flex items-center justify-between text-xs font-bold text-slate-600">
-                  <div className="flex items-center gap-1.5">
-                    <LuBookOpen size={14} className="text-slate-400" />
-                    <span>Số lượng chương:</span>
-                  </div>
-                  <span className="font-black text-slate-800">{modules.length}</span>
+                  <span>Số ngày dạy trong tuần:</span>
+                  <span className="font-black text-slate-800">
+                    {Object.values(schedule).filter(slots => slots.length > 0).length} ngày
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between text-xs font-bold text-slate-600">
-                  <div className="flex items-center gap-1.5">
-                    <LuGraduationCap size={14} className="text-slate-400" />
-                    <span>Tổng số bài giảng:</span>
-                  </div>
-                  <span className="font-black text-slate-800">
-                    {modules.reduce((acc, curr) => acc + curr.lessons.length, 0)} bài
-                  </span>
+                  <span>Tổng số khung giờ:</span>
+                  <span className="font-black text-slate-800">{countTotalSlots()} khung giờ</span>
                 </div>
               </div>
 
@@ -767,6 +860,67 @@ export default function CourseCreateClient() {
         )}
 
       </div>
+
+      {/* category Creation Modal */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[24px] p-6 max-w-md w-full border border-slate-100 shadow-2xl flex flex-col gap-5">
+            <div>
+              <h3 className="text-base font-black text-slate-900">Tạo danh mục mới</h3>
+              <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Bổ sung danh mục học tập mới thuộc chủ đề quản lý</p>
+            </div>
+            
+            <form onSubmit={handleCreateCategorySubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Chủ đề gốc (Group Category)</label>
+                <select
+                  value={newCatGroupId}
+                  onChange={(e) => setNewCatGroupId(e.target.value)}
+                  required
+                  className="w-full h-11 px-3 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#2563eb]"
+                >
+                  {groupCategories.map((group) => (
+                    <option key={group.id} value={group.id}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Tên danh mục mới</label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Lập trình Vue.js..."
+                  value={newCatName}
+                  onChange={(e) => setNewCatName(e.target.value)}
+                  required
+                  className="w-full h-11 px-3 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#2563eb]"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCategoryModalOpen(false);
+                    setNewCatName("");
+                  }}
+                  className="px-4 py-2 text-xs font-extrabold text-slate-500 hover:text-slate-700 uppercase"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-[#2563eb] text-white text-xs font-black rounded-xl hover:bg-blue-700 uppercase shadow-md shadow-blue-500/10"
+                >
+                  Tạo danh mục
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

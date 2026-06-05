@@ -14,6 +14,7 @@ export interface MockCourse {
   prerequisites?: string[];
   metadata?: Record<string, any>;
   mentorId?: string;
+  categoryIds?: string[];
 }
 
 export const mockMentorCourses: MockCourse[] = [

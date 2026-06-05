@@ -28,6 +28,7 @@ const translateCourse = (course: any): MockCourse => {
     prerequisites: course.prerequisites || [],
     metadata: course.metadata || {},
     mentorId: course.mentorId || '',
+    categoryIds: course.categories?.map((c: any) => c.id) || [],
   };
 };
 
@@ -183,6 +184,7 @@ export const courseGateway = {
       durationMinutes: payload.durationMinutes || 60,
       prerequisites: payload.prerequisites || [],
       status,
+      categoryIds: payload.categoryIds || [],
       metadata: {
         categoryName: payload.category || 'Chưa phân loại',
         rating: 0,
@@ -208,6 +210,7 @@ export const courseGateway = {
     if (payload.price !== undefined) body.price = Number(payload.price);
     if (payload.durationMinutes !== undefined) body.durationMinutes = Number(payload.durationMinutes);
     if (payload.prerequisites !== undefined) body.prerequisites = payload.prerequisites;
+    if (payload.categoryIds !== undefined) body.categoryIds = payload.categoryIds;
     if (payload.status !== undefined) {
       let status = 'DRAFT';
       if (payload.status === 'published') status = 'ACTIVE';

@@ -37,7 +37,7 @@ export class CategoryController {
   @Post()
   @ApiCreateCategoryDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.MENTOR)
   create(@Body() payload: CreateCategoryInput) {
     return this.categoryService.create(payload);
   }
