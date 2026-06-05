@@ -369,7 +369,7 @@ export default function CourseCreateClient() {
                           className="flex-1 h-12 px-4 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] cursor-pointer"
                         >
                           {loadingCategories ? (
-                            <option value="">Đang tải danh mục...</option>
+                            <option key="loading" value="">Đang tải danh mục...</option>
                           ) : categories.length > 0 ? (
                             categories.map((cat) => (
                               <option key={cat.id} value={cat.id}>
@@ -377,7 +377,7 @@ export default function CourseCreateClient() {
                               </option>
                             ))
                           ) : (
-                            <option value="">Chưa có danh mục nào</option>
+                            <option key="empty" value="">Chưa có danh mục nào</option>
                           )}
                         </select>
                         <button
