@@ -104,7 +104,7 @@ describe('PaymentVerificationService', () => {
     } as unknown as jest.Mocked<TnAppService>;
 
     paymentRepository = {
-      expireStaleActivations: jest.fn().mockResolvedValue(0),
+      expireStalePayments: jest.fn().mockResolvedValue(0),
       findAllPendingActive: jest.fn().mockResolvedValue([]),
     } as unknown as jest.Mocked<PaymentRepository>;
 
@@ -148,21 +148,21 @@ describe('PaymentVerificationService', () => {
 
   describe('A. scanAndReconcile — Expire Stale Payments', () => {
     /**
-     * TC-101: Cron luôn gọi expireStaleActivations trước tiên
+     * TC-101: Cron luôn gọi expireStalePayments trước tiên
      */
-    it('TC-101: nên gọi expireStaleActivations ở đầu mỗi chu kỳ cron', async () => {
+    it('TC-101: nên gọi expireStalePayments ở đầu mỗi chu kỳ cron', async () => {
       tnAppService.fetchLatestBatch.mockResolvedValue([]);
 
       await service.scanAndReconcile();
 
-      expect(paymentRepository.expireStaleActivations).toHaveBeenCalledTimes(1);
+      expect(paymentRepository.expireStalePayments).toHaveBeenCalledTimes(1);
     });
 
     /**
      * TC-102: Nếu không có payment nào expired, cron vẫn tiếp tục
      */
     it('TC-102: nên tiếp tục xử lý dù không có payment nào bị expire', async () => {
-      paymentRepository.expireStaleActivations.mockResolvedValue(0);
+      paymentRepository.expireStalePayments.mockResolvedValue(0);
       tnAppService.fetchLatestBatch.mockResolvedValue([]);
 
       await service.scanAndReconcile();
@@ -502,6 +502,7 @@ describe('PaymentVerificationService', () => {
         paymentId: PAYMENT_ID,
         transactionId: TX_ID,
         userId: USER_ID,
+        paymentMethod: PaymentType.ACTIVATION,
       });
     });
 

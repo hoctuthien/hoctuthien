@@ -59,7 +59,7 @@ export class PaymentVerificationService {
     this.logger.debug('[Cron] scanAndReconcile bắt đầu...');
 
     // Bước 1: Expire stale payments — dọn rác trước khi xử lý để tránh đối soát nhầm
-    const expiredCount = await this.paymentRepository.expireStaleActivations();
+    const expiredCount = await this.paymentRepository.expireStalePayments();
     if (expiredCount > 0) {
       this.logger.log(`[Cron] Đã expire ${expiredCount} payment quá hạn.`);
     }
@@ -211,6 +211,7 @@ export class PaymentVerificationService {
       paymentId: payment.id,
       transactionId: tx.id,
       userId: payment.userId,
+      paymentMethod: payment.paymentMethod || PaymentType.ACTIVATION,
     } satisfies PaymentSuccessPayload);
 
     return true;

@@ -289,6 +289,7 @@ export class PaymentService {
         paymentId,
         transactionId: tx.id,
         userId,
+        paymentMethod: payment.paymentMethod || PaymentType.ACTIVATION,
       } satisfies PaymentSuccessPayload);
 
       return {

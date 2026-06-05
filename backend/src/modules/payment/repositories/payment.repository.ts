@@ -33,10 +33,9 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
   }
 
   // Bulk-expire tất cả payment PENDING đã quá expiredAt — có thể gọi từ cron job
-  async expireStaleActivations(): Promise<number> {
+  async expireStalePayments(): Promise<number> {
     const result = await this.repo.update(
       {
-        paymentMethod: PaymentType.ACTIVATION,
         status: PaymentStatus.PENDING,
         expiredAt: LessThan(new Date()),
       },
@@ -46,7 +45,7 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
   }
 
   /**
-   * Lấy tất cả payment PENDING + ACTIVATION + chưa hết hạn.
+   * Lấy tất cả payment PENDING + chưa hết hạn.
    * Dùng bởi Cron job để đối soát với TN App.
    *
    * @param limit Giới hạn số records (mặc định 20 — đủ cho MVP)
@@ -55,7 +54,6 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
   async findAllPendingActive(limit = 20): Promise<PaymentEntity[]> {
     return this.repo.find({
       where: {
-        paymentMethod: PaymentType.ACTIVATION,
         status: PaymentStatus.PENDING,
         expiredAt: MoreThan(new Date()),
       },

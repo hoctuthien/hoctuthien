@@ -125,8 +125,13 @@ export class UserService {
   @OnEvent(PAYMENT_SUCCESS_EVENT, { async: true })
   async handlePaymentSuccess(payload: PaymentSuccessPayload): Promise<void> {
     this.logger.log(
-      `[Event] Nhận payment.success: paymentId=${payload.paymentId}, userId=${payload.userId}`,
+      `[Event] Nhận payment.success: paymentId=${payload.paymentId}, userId=${payload.userId}, paymentMethod=${payload.paymentMethod}`,
     );
+
+    // Chỉ kích hoạt tài khoản nếu loại payment là ACTIVATION
+    if (payload.paymentMethod !== 'activation') {
+      return;
+    }
 
     try {
       await this.activateMentee(payload.userId);

@@ -527,6 +527,7 @@ describe('PaymentService — verifyActivationPayment', () => {
         paymentId: PAYMENT_ID,
         transactionId: TRANSACTION_ID,
         userId: USER_ID,
+        paymentMethod: PaymentType.ACTIVATION,
       });
     });
 

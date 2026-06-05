@@ -17,4 +17,7 @@ export interface PaymentSuccessPayload {
 
   /** ID của user sở hữu payment */
   userId: string;
+
+  /** Loại hình thanh toán (activation, course_booking, donation) */
+  paymentMethod?: string;
 }

@@ -23,7 +23,12 @@ export class PaymentSuccessListener {
 
   @OnEvent(PAYMENT_SUCCESS_EVENT)
   async handlePaymentSuccess(payload: PaymentSuccessPayload): Promise<void> {
-    const { paymentId, userId, transactionId } = payload;
+    const { paymentId, userId, transactionId, paymentMethod } = payload;
+
+    // Chỉ xử lý kích hoạt tài khoản nếu loại payment là ACTIVATION
+    if (paymentMethod && paymentMethod !== 'activation') {
+      return;
+    }
 
     try {
       await this.dataSource
