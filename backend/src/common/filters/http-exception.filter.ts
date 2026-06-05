@@ -42,20 +42,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }, {} as Record<string, string>);
     } else if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse() as any;
-      const exceptionMessage =
-        typeof exceptionResponse === 'object'
-          ? exceptionResponse.message || exceptionResponse
-          : exceptionResponse;
+      
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        details = exceptionResponse;
+        message = exceptionResponse.message || ERROR_MESSAGES.VALIDATION_FAILED;
+      } else {
+        details = { message: exceptionResponse };
+        message = exceptionResponse || ERROR_MESSAGES.VALIDATION_FAILED;
+      }
 
+      const exceptionMessage = message;
       const actualMessage = Array.isArray(exceptionMessage)
         ? exceptionMessage[0]
         : exceptionMessage;
-
-      // Mặc định details sẽ là một Object để FE luôn xử lý đồng nhất
-      details =
-        typeof exceptionMessage === 'object'
-          ? exceptionMessage
-          : { message: exceptionMessage };
 
       switch (status) {
         case HttpStatus.BAD_REQUEST:
