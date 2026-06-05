@@ -250,7 +250,7 @@ export default function MentorBookingsClient() {
             <button
               onClick={() => setViewType('list')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewType === 'list' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewType === 'list' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
               }`}
             >
               <span>Dạng Danh sách</span>
@@ -258,7 +258,7 @@ export default function MentorBookingsClient() {
             <button
               onClick={() => setViewType('calendar')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewType === 'calendar' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewType === 'calendar' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
               }`}
             >
               <span>Dạng Lịch Tháng</span>
@@ -284,7 +284,7 @@ export default function MentorBookingsClient() {
             {/* 1. Statistics Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-blue-50 text-[#2563eb] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-[#DFEFFF] text-[#005BBF] rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuCalendar size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
@@ -294,7 +294,7 @@ export default function MentorBookingsClient() {
               </div>
 
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-amber-50 text-[#D97706] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-amber-50 text-amber-700 rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuClock size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
@@ -304,32 +304,32 @@ export default function MentorBookingsClient() {
               </div>
 
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-[#89FA9B]/35 text-[#005320] rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuCalendar size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ XÁC NHẬN</span>
-                  <span className="text-xl font-black text-indigo-600">{loading ? '...' : confirmedCount}</span>
+                  <span className="text-xl font-black text-[#005320]">{loading ? '...' : confirmedCount}</span>
                 </div>
               </div>
 
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-emerald-50 text-[#10B981] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuCheck size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ HOÀN THÀNH</span>
-                  <span className="text-xl font-black text-[#10B981]">{loading ? '...' : completedCount}</span>
+                  <span className="text-xl font-black text-emerald-700">{loading ? '...' : completedCount}</span>
                 </div>
               </div>
 
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-rose-50 text-[#EF4444] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-rose-50 text-rose-700 rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuX size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ HỦY BỎ</span>
-                  <span className="text-xl font-black text-[#EF4444]">{loading ? '...' : cancelledCount}</span>
+                  <span className="text-xl font-black text-rose-700">{loading ? '...' : cancelledCount}</span>
                 </div>
               </div>
             </div>
@@ -342,8 +342,8 @@ export default function MentorBookingsClient() {
                   onClick={() => setActiveTab('all')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'all'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Tất cả
@@ -352,8 +352,8 @@ export default function MentorBookingsClient() {
                   onClick={() => setActiveTab('pending')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'pending'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Chờ xác nhận
@@ -362,8 +362,8 @@ export default function MentorBookingsClient() {
                   onClick={() => setActiveTab('confirmed')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'confirmed'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Đã xác nhận
@@ -372,8 +372,8 @@ export default function MentorBookingsClient() {
                   onClick={() => setActiveTab('completed')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'completed'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Đã học
@@ -382,8 +382,8 @@ export default function MentorBookingsClient() {
                   onClick={() => setActiveTab('cancelled')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'cancelled'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Đã hủy
@@ -431,19 +431,19 @@ export default function MentorBookingsClient() {
                   
                   // Status Styling logic
                   let statusLabel = 'Đang xử lý';
-                  let statusStyles = 'bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]';
+                  let statusStyles = 'bg-amber-500 text-white border-none';
                   if (booking.status === 'confirmed') {
                     statusLabel = 'Đã xác nhận';
-                    statusStyles = 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]';
+                    statusStyles = 'bg-emerald-600 text-white border-none';
                   } else if (booking.status === 'completed') {
                     statusLabel = 'Đã hoàn thành';
-                    statusStyles = 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]';
+                    statusStyles = 'bg-slate-400 text-white border-none';
                   } else if (booking.status === 'cancelled') {
                     statusLabel = 'Đã hủy';
-                    statusStyles = 'bg-[#FEF2F2] text-[#EF4444] border-[#FEE2E2]';
+                    statusStyles = 'bg-rose-500 text-white border-none';
                   } else if (booking.status === 'rescheduled') {
                     statusLabel = 'Đã đổi lịch';
-                    statusStyles = 'bg-blue-50 text-blue-600 border-blue-100';
+                    statusStyles = 'bg-[#005BBF] text-white border-none';
                   }
 
                   // Access rules
@@ -465,7 +465,7 @@ export default function MentorBookingsClient() {
                           {canEdit && (
                             <button
                               onClick={() => handleOpenEdit(booking)}
-                              className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all cursor-pointer"
+                              className="p-2 text-slate-400 hover:text-[#005BBF] hover:bg-[#DFEFFF]/50 rounded-xl transition-all cursor-pointer"
                               title="Cập nhật buổi học"
                             >
                               <LuSettings size={15} />
@@ -567,7 +567,7 @@ export default function MentorBookingsClient() {
                               </button>
                               <button
                                 onClick={() => handleQuickConfirm(booking.id)}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider text-center shadow-md shadow-blue-500/10 transition-all cursor-pointer"
+                                className="flex-1 bg-[#005BBF] hover:bg-[#004493] text-white font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider text-center shadow-md shadow-[#005BBF]/10 transition-all cursor-pointer"
                               >
                                 Xác nhận lịch học
                               </button>
@@ -684,7 +684,7 @@ export default function MentorBookingsClient() {
                 <button
                   onClick={handleUpdateBookingSubmit}
                   disabled={submittingEdit}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-2.5 px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md shadow-blue-500/10 active:scale-[0.98] min-w-[120px] cursor-pointer"
+                  className="bg-[#005BBF] hover:bg-[#004493] text-white font-extrabold text-xs py-2.5 px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md shadow-[#005BBF]/10 active:scale-[0.98] min-w-[120px] cursor-pointer"
                 >
                   {submittingEdit ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

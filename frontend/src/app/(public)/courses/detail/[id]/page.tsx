@@ -377,39 +377,8 @@ export default function CourseDetailPage() {
     { label: course.title },
   ];
 
-  // Generate dynamic, adaptive syllabus based on live DB fields
-  const getDynamicSyllabus = () => {
-    const lectureCount = course?.metadata?.lectureCount || (course?.price === 0 ? 12 : 32);
-    const lecturesPerSection = Math.ceil(lectureCount / 4);
-
-    const shortCategory = course?.category || "Chuyên môn";
-    const shortTitle = course?.title
-      ? (course.title.includes("&")
-        ? course.title.split("&")[0].trim()
-        : (course.title.includes("và") ? course.title.split("và")[0].trim() : course.title))
-      : "Cơ bản";
-
-    return [
-      {
-        title: `Phần 1: Giới thiệu & Thiết lập Môi trường ${shortCategory}`,
-        lectures: Array.from({ length: Math.min(lecturesPerSection, 12) }, (_, i) => `Bài ${i + 1}: Tổng quan chương trình học, chuẩn bị công cụ và thiết lập ban đầu`)
-      },
-      {
-        title: `Phần 2: Kiến thức Nền tảng Cốt lõi của ${shortTitle}`,
-        lectures: Array.from({ length: Math.min(lecturesPerSection, 12) }, (_, i) => `Bài ${lecturesPerSection + i + 1}: Các khái niệm quan trọng cần nắm vững, xây dựng giao diện / luồng xử lý cơ bản`)
-      },
-      {
-        title: `Phần 3: Tích hợp Hệ thống, Xử lý Bảo mật & Database`,
-        lectures: Array.from({ length: Math.min(lecturesPerSection, 12) }, (_, i) => `Bài ${lecturesPerSection * 2 + i + 1}: Thiết kế cơ sở dữ liệu, kết nối API, xử lý Authentication & Authorization`)
-      },
-      {
-        title: `Phần 4: Tối ưu hóa Hiệu năng & Triển khai Docker, Cloud`,
-        lectures: Array.from({ length: Math.min(lecturesPerSection, 12) }, (_, i) => `Bài ${lecturesPerSection * 3 + i + 1}: Dockerize ứng dụng, tối ưu hóa câu lệnh query, nén tài nguyên và deploy VPS`)
-      }
-    ].filter(section => section.lectures.length > 0);
-  };
-
-  const syllabus = getDynamicSyllabus();
+  const syllabusModules = course?.metadata?.modules || [];
+  const totalLessons = syllabusModules.reduce((acc: number, mod: any) => acc + (mod.lessons?.length || 0), 0);
 
   return (
     <div className="w-full bg-[#FAFBFD] min-h-screen py-8 px-4 md:px-8 font-sans overflow-x-hidden">
@@ -439,22 +408,24 @@ export default function CourseDetailPage() {
             </h1>
 
             <p className="text-white/85 text-sm md:text-base font-semibold max-w-3xl leading-relaxed mt-2">
-              {course.description || "Khám phá chương trình đào tạo chuyên sâu được xây dựng bởi các chuyên gia thực chiến hàng đầu. Tự học dễ dàng, bài bản và hiệu quả cùng Mentor giàu kinh nghiệm giúp bạn nhanh chóng làm chủ công nghệ thực tế."}
+              {course.description || "Khóa học chưa có mô tả chi tiết."}
             </p>
 
             <div className="flex flex-wrap items-center gap-6 mt-6 text-xs font-bold text-white/90">
               <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl">
-                <LuClock size={16} />
-                <span>{course.metadata?.durationWeeks || 8} tuần (tổng {course.metadata?.lectureCount || (course.price === 0 ? 12 : 32)} bài giảng)</span>
+                <LuBookOpen size={16} />
+                <span>{totalLessons} bài học</span>
               </span>
               <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl">
-                <LuBookOpen size={16} />
-                <span>Thời lượng: {Math.round((course.durationMinutes || 60) / 60)} giờ học thực chiến</span>
+                <LuClock size={16} />
+                <span>Thời lượng mỗi buổi: {course.durationMinutes} phút</span>
               </span>
-              <span className="flex items-center gap-2 bg-amber-400 text-[#0F172A] px-4 py-2 rounded-xl">
-                <LuStar size={14} className="fill-current text-[#0F172A]" />
-                <span>{course.rating > 0 ? course.rating.toFixed(1) : "4.9"}/5.0 Đánh giá tốt</span>
-              </span>
+              {course.metadata?.totalHours && (
+                <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl">
+                  <LuClock size={16} />
+                  <span>Tổng thời lượng: {course.metadata.totalHours} giờ học</span>
+                </span>
+              )}
             </div>
 
           </div>
@@ -466,27 +437,15 @@ export default function CourseDetailPage() {
           {/* Left Column: Course Detail Info & Tabs */}
           <div className="lg:col-span-8 flex flex-col gap-8">
 
-            {/* What you'll learn */}
+            {/* Giới thiệu khóa học */}
             <div className="bg-white border border-[#E2E8F0] p-8 rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
-              <h2 className="text-xl font-black text-[#0F172A] mb-6 tracking-tight flex items-center gap-2 font-[Montserrat]">
+              <h2 className="text-xl font-black text-[#0F172A] mb-4 tracking-tight flex items-center gap-2 font-[Montserrat]">
                 <LuGraduationCap size={22} className="text-[#2563eb]" />
-                <span>Nội dung bạn sẽ gặt hái được</span>
+                <span>Giới thiệu khóa học</span>
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  "Hiểu sâu sắc các kiến thức cốt lõi và tư duy thiết kế hệ thống.",
-                  "Thực hành xây dựng thành công dự án thực tế làm portfolio cực xịn.",
-                  "Nắm vững các phương pháp tối ưu hóa hiệu năng ứng dụng chuẩn doanh nghiệp.",
-                  "Làm chủ cách vận hành và triển khai dự án lên các nền tảng đám mây.",
-                  "Nhận sự cố vấn trực tiếp từ các chuyên gia hàng đầu trong ngành.",
-                  "Gia nhập cộng đồng Học Tự Thiện, kết nối và học hỏi không giới hạn."
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <LuCheck size={18} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-xs font-semibold text-[#475569] leading-relaxed">{item}</span>
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-[#475569] font-semibold leading-relaxed whitespace-pre-line">
+                {course.description || "Khóa học chưa có mô tả chi tiết từ Cố vấn."}
+              </p>
             </div>
 
             {/* Course Syllabus */}
@@ -497,27 +456,33 @@ export default function CourseDetailPage() {
               </h2>
 
               <div className="flex flex-col gap-4">
-                {syllabus.map((section, idx) => (
-                  <div key={idx} className="border border-slate-100 rounded-2xl overflow-hidden">
-                    <div className="bg-slate-50/70 p-4 border-b border-slate-100 flex justify-between items-center">
-                      <span className="text-sm font-black text-[#0F172A]">{section.title}</span>
-                      <span className="text-[11px] font-extrabold text-[#2563eb] bg-blue-50 px-2.5 py-1 rounded-md">
-                        {section.lectures.length} bài học
-                      </span>
+                {syllabusModules.length > 0 ? (
+                  syllabusModules.map((section: any, idx: number) => (
+                    <div key={idx} className="border border-slate-100 rounded-2xl overflow-hidden">
+                      <div className="bg-slate-50/70 p-4 border-b border-slate-100 flex justify-between items-center">
+                        <span className="text-sm font-black text-[#0F172A]">{section.title}</span>
+                        <span className="text-[11px] font-extrabold text-[#2563eb] bg-blue-50 px-2.5 py-1 rounded-md">
+                          {section.lessons?.length || 0} bài học
+                        </span>
+                      </div>
+                      <div className="p-4 bg-white flex flex-col gap-3">
+                        {section.lessons?.map((lecture: any, lIdx: number) => (
+                          <div key={lIdx} className="flex items-center justify-between text-xs font-semibold text-[#475569]">
+                            <span className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                              {lecture.title}
+                            </span>
+                            <span className="text-slate-400 text-[10px]">{lecture.duration || "Đang cập nhật"}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <div className="p-4 bg-white flex flex-col gap-3">
-                      {section.lectures.map((lecture, lIdx) => (
-                        <div key={lIdx} className="flex items-center justify-between text-xs font-semibold text-[#475569]">
-                          <span className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-                            {lecture}
-                          </span>
-                          <span className="text-slate-400 text-[10px]">Đang cập nhật</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400 font-semibold italic">
+                    Cố vấn chưa cập nhật chi tiết chương trình đào tạo cho khóa học này.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -527,19 +492,17 @@ export default function CourseDetailPage() {
                 <LuAward size={22} className="text-[#2563eb]" />
                 <span>Yêu cầu tiên quyết</span>
               </h2>
-              <ul className="list-disc pl-5 flex flex-col gap-2.5 text-xs font-semibold text-[#475569] leading-relaxed">
-                {course.prerequisites && course.prerequisites.length > 0 ? (
-                  course.prerequisites.map((req, idx) => (
+              {course.prerequisites && course.prerequisites.length > 0 ? (
+                <ul className="list-disc pl-5 flex flex-col gap-2.5 text-xs font-semibold text-[#475569] leading-relaxed">
+                  {course.prerequisites.map((req, idx) => (
                     <li key={idx}>{req}</li>
-                  ))
-                ) : (
-                  <>
-                    <li>Phù hợp với các bạn đã có kiến thức nền tảng cơ bản về lập trình nói chung.</li>
-                    <li>Có máy tính cá nhân kết nối Internet ổn định để thực hành gõ code trực tiếp.</li>
-                    <li>Đặc biệt cần có tinh thần chủ động, kiên trì tự học và tương tác cùng các Mentor.</li>
-                  </>
-                )}
-              </ul>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-slate-400 font-semibold italic">
+                  Khóa học này không yêu cầu đặc biệt về kiến thức tiên quyết.
+                </p>
+              )}
             </div>
 
           </div>
@@ -560,7 +523,7 @@ export default function CourseDetailPage() {
                   {course.price === 0 ? "100% MIỄN PHÍ" : `${course.price.toLocaleString("vi-VN")}đ`}
                 </span>
                 <span className="text-[11px] font-bold text-slate-400">
-                  {course.price === 0 ? "Chương trình học tập phi lợi nhuận vì cộng đồng" : "Học phí đã hỗ trợ 70% từ quỹ hỗ trợ cộng đồng"}
+                  {course.price === 0 ? "Chương trình học tập phi lợi nhuận vì cộng đồng" : "Học phí trọn khóa học"}
                 </span>
               </div>
 
@@ -570,22 +533,37 @@ export default function CourseDetailPage() {
               <div className="flex flex-col gap-4 text-xs font-semibold text-[#475569]">
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400">Hình thức học:</span>
-                  <span className="font-bold text-[#0F172A]">Online qua Zoom & Platform</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Chứng nhận hoàn thành:</span>
-                  <span className="font-bold text-[#0F172A] text-right flex items-center gap-1.5 justify-end">
-                    <LuAward size={14} className="text-[#2563eb]" />
-                    <span>Cấp chứng nhận Blockchain</span>
+                  <span className="font-bold text-[#0F172A]">
+                    {course.metadata?.format === 'online'
+                      ? 'Online'
+                      : course.metadata?.format === 'offline'
+                      ? 'Offline'
+                      : course.metadata?.format === 'hybrid'
+                      ? 'Hybrid (Kết hợp)'
+                      : course.metadata?.format || 'Chưa cập nhật'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Số lượng học viên:</span>
-                  <span className="font-bold text-[#0F172A]">250+ đăng ký học tập</span>
+                  <span className="text-slate-400">Cấp độ đào tạo:</span>
+                  <span className="font-bold text-[#0F172A]">
+                    {course.metadata?.level === 'beginner'
+                      ? 'Cơ bản (Beginner)'
+                      : course.metadata?.level === 'intermediate'
+                      ? 'Trung cấp (Intermediate)'
+                      : course.metadata?.level === 'advanced'
+                      ? 'Nâng cao (Advanced)'
+                      : course.metadata?.level || 'Chưa cập nhật'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Lịch khai giảng:</span>
-                  <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">Mở lớp liên tục</span>
+                  <span className="text-slate-400">Thời lượng mỗi buổi:</span>
+                  <span className="font-bold text-[#0F172A]">{course.durationMinutes} phút</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Tổng thời lượng:</span>
+                  <span className="font-bold text-[#0F172A]">
+                    {course.metadata?.totalHours ? `${course.metadata.totalHours} giờ` : 'Chưa cập nhật'}
+                  </span>
                 </div>
               </div>
 
@@ -629,23 +607,23 @@ export default function CourseDetailPage() {
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-blue-500 to-indigo-600 shadow-md">
                   <img
-                    src={mentorProfile?.user?.avatarUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"}
+                     src={mentorProfile?.user?.avatarUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"}
                     alt="Mentor avatar"
                     className="w-full h-full object-cover rounded-full border-2 border-white"
                   />
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <h4 className="text-base font-black text-[#0F172A] tracking-tight">
-                    {mentorProfile?.user?.name || "Mentor Học Tự Thiện"}
+                    {mentorProfile?.user?.name || "Cố vấn"}
                   </h4>
                   <span className="text-[11px] text-[#2563eb] font-bold">
-                    {mentorProfile?.jobTitle || "Chuyên gia Lập trình thực chiến"} {mentorProfile?.company ? `tại ${mentorProfile.company}` : ""}
+                    {mentorProfile?.jobTitle ? `${mentorProfile.jobTitle}${mentorProfile.company ? ` tại ${mentorProfile.company}` : ""}` : "Cố vấn Học Tự Thiện"}
                   </span>
                 </div>
               </div>
 
               <p className="text-xs text-[#64748b] leading-relaxed font-semibold">
-                {mentorProfile?.bio || "Chào mọi người, mình là mentor của Học Tự Thiện. Rất vui được đồng hành cùng các bạn chia sẻ tri thức cộng đồng."}
+                {mentorProfile?.bio || "Chưa cập nhật giới thiệu."}
               </p>
 
               {mentorProfile?.skills && mentorProfile.skills.length > 0 && (
@@ -663,11 +641,15 @@ export default function CourseDetailPage() {
               <div className="flex items-center justify-between text-xs font-bold text-[#475569]">
                 <span className="flex items-center gap-1">
                   <LuUsers size={14} className="text-[#2563eb]" />
-                  <span>{mentorProfile?.totalStudents || 250}+ học viên</span>
+                  <span>{mentorProfile?.totalStudents || 0} học viên</span>
                 </span>
                 <span className="flex items-center gap-1 text-emerald-600">
                   <LuAward size={14} />
-                  <span>{mentorProfile?.yearsOfExperience || 8} năm kinh nghiệm</span>
+                  <span>
+                    {mentorProfile?.yearsOfExperience !== undefined && mentorProfile?.yearsOfExperience !== null
+                      ? `${mentorProfile.yearsOfExperience} năm kinh nghiệm`
+                      : "Kinh nghiệm: Chưa cập nhật"}
+                  </span>
                 </span>
               </div>
             </div>

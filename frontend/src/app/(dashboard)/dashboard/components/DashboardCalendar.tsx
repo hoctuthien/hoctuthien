@@ -142,7 +142,7 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
       {/* Calendar Controls & Modes */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#F1F5F9] pb-5">
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider">LỊCH PHÂN BỔ THỜI GIAN THỰC</span>
+          <span className="text-[10px] font-black text-[#005BBF] uppercase tracking-wider">LỊCH PHÂN BỔ THỜI GIAN THỰC</span>
           <h2 className="text-xl font-black text-[#0F172A] font-[Montserrat] flex items-center gap-2">
             {viewMode === 'week' ? 'Lịch Trình Tuần Này' : `Lịch Tháng: ${currentMonthLabel}`}
           </h2>
@@ -154,7 +154,7 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
             <button
               onClick={() => setViewMode('week')}
               className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewMode === 'week' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewMode === 'week' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
               }`}
             >
               <LuCalendarRange size={14} />
@@ -163,7 +163,7 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
             <button
               onClick={() => setViewMode('month')}
               className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewMode === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewMode === 'month' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
               }`}
             >
               <LuCalendarDays size={14} />
@@ -181,7 +181,7 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
             </button>
             <button
               onClick={handleToday}
-              className="px-3 py-1 bg-white shadow-sm border border-slate-100 rounded-lg text-[10px] font-black text-blue-600 uppercase cursor-pointer"
+              className="px-3 py-1 bg-white shadow-sm border border-slate-100 rounded-lg text-[10px] font-black text-[#005BBF] uppercase cursor-pointer"
             >
               Hôm Nay
             </button>
@@ -207,14 +207,14 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
                 key={day.dateStr}
                 className={`flex flex-col rounded-2xl p-3 border transition-all duration-300 min-h-[170px] ${
                   isToday 
-                    ? 'bg-blue-50/40 border-blue-200 ring-2 ring-blue-100' 
+                    ? 'bg-[#DFEFFF]/20 border-[#005BBF]/30 ring-2 ring-[#DFEFFF]/55' 
                     : 'bg-[#F8FAFC]/55 border-[#E2E8F0] hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
                   <span className="text-[10px] font-black text-[#475569]">{day.dayName}</span>
                   <span className={`w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-extrabold ${
-                    isToday ? 'bg-blue-600 text-white shadow-md shadow-blue-500/10' : 'text-[#94A3B8]'
+                    isToday ? 'bg-[#005BBF] text-white shadow-md shadow-[#005BBF]/10' : 'text-[#94A3B8]'
                   }`}>
                     {day.date.getDate()}
                   </span>
@@ -224,16 +224,16 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
                 <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
                   {dayBookings.length > 0 ? (
                     dayBookings.map((slot, index) => {
-                      let statusColor = 'bg-amber-50 border-amber-100/70 text-amber-800 border-l-amber-500';
-                      if (slot.status === 'confirmed') statusColor = 'bg-emerald-50 border-emerald-100/70 text-emerald-800 border-l-emerald-500';
-                      else if (slot.status === 'completed') statusColor = 'bg-slate-50 border-slate-200/50 text-slate-500 border-l-slate-400';
-                      else if (slot.status === 'rescheduled') statusColor = 'bg-blue-50 border-blue-100/70 text-blue-800 border-l-blue-500';
+                      let statusColor = 'bg-amber-500 text-white hover:bg-amber-600 border-none';
+                      if (slot.status === 'confirmed') statusColor = 'bg-emerald-600 text-white hover:bg-emerald-700 border-none';
+                      else if (slot.status === 'completed') statusColor = 'bg-slate-400 text-white hover:bg-slate-500 border-none';
+                      else if (slot.status === 'rescheduled') statusColor = 'bg-[#005BBF] text-white hover:bg-[#004493] border-none';
 
                       return (
                         <div 
                           key={`${slot.id || 'slot'}-${index}`}
                           onClick={() => setSelectedSlot(slot)}
-                          className={`p-2.5 rounded-xl border border-l-4 flex flex-col gap-1 shadow-[0_2px_8px_rgba(0,0,0,0.01)] text-[10px] cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all ${statusColor}`}
+                          className={`p-2.5 rounded-xl flex flex-col gap-1 shadow-[0_2px_8px_rgba(0,0,0,0.01)] text-[10px] cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all ${statusColor}`}
                           title="Bấm để xem chi tiết buổi học"
                         >
                           <div className="flex items-center justify-between font-black">
@@ -242,10 +242,10 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
                               {slot.timeLabel}
                             </span>
                             {slot.googleMeetUrl && (
-                              <LuVideo size={11} className="text-blue-500 flex-shrink-0" />
+                              <LuVideo size={11} className="text-white/95 flex-shrink-0" />
                             )}
                           </div>
-                          <span className="font-extrabold line-clamp-2 leading-tight text-slate-800">{slot.courseTitle}</span>
+                          <span className="font-extrabold line-clamp-2 leading-tight text-white">{slot.courseTitle}</span>
                         </div>
                       );
                     })
@@ -287,14 +287,14 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
                   className={`flex flex-col border rounded-2xl p-2.5 min-h-[145px] transition-all duration-300 ${
                     cell.isCurrentMonth ? 'bg-white' : 'bg-slate-50/30 opacity-40'
                   } ${
-                    isToday ? 'border-blue-400 ring-2 ring-blue-50 bg-[#F4F9FF]/20' : 'border-[#E2E8F0] hover:border-slate-300 hover:shadow-sm'
+                    isToday ? 'border-[#005BBF]/30 ring-2 ring-[#DFEFFF]/55 bg-[#DFEFFF]/10' : 'border-[#E2E8F0] hover:border-slate-300 hover:shadow-sm'
                   }`}
                 >
                   {/* Cell Header */}
                   <div className="flex justify-end mb-1.5">
                     <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-black ${
                       isToday 
-                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/10' 
+                        ? 'bg-[#005BBF] text-white shadow-md shadow-[#005BBF]/15' 
                         : cell.isCurrentMonth ? 'text-slate-700' : 'text-slate-400'
                     }`}>
                       {cell.dayNumber}
@@ -304,19 +304,19 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
                   {/* Day's appointments list */}
                   <div className="flex-1 flex flex-col gap-1.5 overflow-y-auto max-h-[90px] [&::-webkit-scrollbar]:hidden">
                     {cellBookings.slice(0, 3).map((slot, index) => {
-                      let statusStyles = 'bg-amber-50 border-amber-100 text-amber-700 border-l-amber-500';
-                      if (slot.status === 'confirmed') statusStyles = 'bg-emerald-50 border-emerald-100 text-emerald-700 border-l-emerald-500';
-                      else if (slot.status === 'completed') statusStyles = 'bg-slate-50 border-slate-100 text-slate-500 border-l-slate-400';
-                      else if (slot.status === 'rescheduled') statusStyles = 'bg-blue-50 border-blue-100 text-blue-700 border-l-blue-500';
+                      let statusStyles = 'bg-amber-500 text-white border-none';
+                      if (slot.status === 'confirmed') statusStyles = 'bg-emerald-600 text-white border-none';
+                      else if (slot.status === 'completed') statusStyles = 'bg-slate-400 text-white border-none';
+                      else if (slot.status === 'rescheduled') statusStyles = 'bg-[#005BBF] text-white border-none';
 
                       return (
                         <div 
                           key={`${slot.id || 'cell-slot'}-${index}`}
                           onClick={() => setSelectedSlot(slot)}
-                          className={`px-2 py-1 rounded-lg text-[9px] font-black border border-l-3 truncate cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all ${statusStyles}`}
+                          className={`px-2 py-1 rounded-lg text-[9px] font-black truncate cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all ${statusStyles}`}
                           title={`${slot.timeLabel} - ${slot.courseTitle}`}
                         >
-                          <span className="font-extrabold mr-1 bg-white/60 px-1 rounded">{slot.timeLabel}</span>
+                          <span className="font-extrabold mr-1 bg-white/20 text-white px-1 rounded">{slot.timeLabel}</span>
                           <span>{slot.courseTitle}</span>
                         </div>
                       );
@@ -417,7 +417,7 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
                     onManageSlot(selectedSlot.id);
                     setSelectedSlot(null);
                   }}
-                  className="bg-indigo-50 hover:bg-[#F0F7FF] text-[#2563eb] border border-blue-200/60 font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer active:scale-[0.98]"
+                  className="bg-[#DFEFFF] hover:bg-[#DFEFFF]/80 text-[#005BBF] border border-[#005BBF]/20 font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer active:scale-[0.98]"
                 >
                   {isMentor ? 'Quản lý buổi học' : 'Hủy lịch học'}
                 </button>
@@ -427,7 +427,7 @@ export const DashboardCalendar: React.FC<DashboardCalendarProps> = ({
                   href={selectedSlot.googleMeetUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-2.5 px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md shadow-blue-500/10 active:scale-[0.98] cursor-pointer no-underline"
+                  className="bg-[#005BBF] hover:bg-[#004493] text-white font-extrabold text-xs py-2.5 px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md shadow-[#005BBF]/10 active:scale-[0.98] cursor-pointer no-underline"
                 >
                   <LuVideo size={14} />
                   <span>Vào phòng học</span>

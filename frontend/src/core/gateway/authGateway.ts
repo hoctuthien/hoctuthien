@@ -10,21 +10,36 @@ export const authGateway = {
    * Đăng ký tài khoản
    */
   async register(payload: RegisterRequest): Promise<{ user: UserProfile }> {
-    return httpClient.post<{ user: UserProfile }>('/v1/auths/register', payload);
+    const res = await httpClient.post<any>('/v1/auths/register', payload);
+    const user = res?.data?.[0]?.user || res?.user;
+    return { user };
   },
 
   /**
    * Đăng nhập thông qua BFF
    */
   async login(payload: LoginRequest): Promise<{ user: UserProfile }> {
-    return httpClient.post<{ user: UserProfile }>('/v1/auths/login', payload);
+    const res = await httpClient.post<any>('/v1/auths/login', payload);
+    const user = res?.data?.[0]?.user || res?.user;
+    return { user };
   },
 
   /**
    * Lấy thông tin user hiện tại
    */
   async getMe(): Promise<{ user: UserProfile | null }> {
-    return httpClient.get<{ user: UserProfile | null }>('/v1/users/me');
+    const res = await httpClient.get<any>('/v1/users/me');
+    let user: UserProfile | null = null;
+    if (res) {
+      if (Array.isArray(res.data)) {
+        user = res.data[0]?.user || null;
+      } else if (res.data && typeof res.data === 'object') {
+        user = res.data.user || null;
+      } else if (res.user) {
+        user = res.user;
+      }
+    }
+    return { user };
   },
 
   /**

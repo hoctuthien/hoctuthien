@@ -231,11 +231,19 @@ export class CourseBookingService {
       return;
     }
 
-    const dayOfWeek = meetingTime
-      .toLocaleDateString('en-US', { weekday: 'long' })
-      .toLowerCase();
-    const hours = meetingTime.getHours().toString().padStart(2, '0');
-    const minutes = meetingTime.getMinutes().toString().padStart(2, '0');
+    // Format meetingTime in Vietnam timezone (+07:00)
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    
+    const parts = formatter.formatToParts(meetingTime);
+    const dayOfWeek = (parts.find((p) => p.type === 'weekday')?.value || '').toLowerCase();
+    const hours = parts.find((p) => p.type === 'hour')?.value || '00';
+    const minutes = parts.find((p) => p.type === 'minute')?.value || '00';
     const timeStr = `${hours}:${minutes}`;
 
     const slots = metadata.time[dayOfWeek];

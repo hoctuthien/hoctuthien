@@ -394,7 +394,7 @@ export default function MyCoursesClient() {
             <button
               onClick={() => setViewType('list')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewType === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewType === 'list' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
               }`}
             >
               <span>Dạng Danh sách</span>
@@ -402,7 +402,7 @@ export default function MyCoursesClient() {
             <button
               onClick={() => setViewType('calendar')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewType === 'calendar' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewType === 'calendar' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
               }`}
             >
               <span>Dạng Lịch Tháng</span>
@@ -428,7 +428,7 @@ export default function MyCoursesClient() {
             {/* 1. Thống kê */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-blue-50 text-[#2563eb] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-[#DFEFFF] text-[#005BBF] rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuBookOpen size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
@@ -438,7 +438,7 @@ export default function MyCoursesClient() {
               </div>
 
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-amber-50 text-[#D97706] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-amber-50 text-amber-700 rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuCalendar size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
@@ -448,22 +448,22 @@ export default function MyCoursesClient() {
               </div>
 
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-emerald-50 text-[#10B981] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-[#89FA9B]/35 text-[#005320] rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuCheck size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">HOÀN THÀNH</span>
-                  <span className="text-xl font-black text-[#10B981]">{loading ? '...' : completedCount}</span>
+                  <span className="text-xl font-black text-[#005320]">{loading ? '...' : completedCount}</span>
                 </div>
               </div>
 
               <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
-                <div className="w-10 h-10 bg-rose-50 text-[#EF4444] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-rose-50 text-rose-700 rounded-xl flex items-center justify-center flex-shrink-0">
                   <LuX size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ HỦY</span>
-                  <span className="text-xl font-black text-[#EF4444]">{loading ? '...' : cancelledCount}</span>
+                  <span className="text-xl font-black text-rose-700">{loading ? '...' : cancelledCount}</span>
                 </div>
               </div>
             </div>
@@ -476,8 +476,8 @@ export default function MyCoursesClient() {
                   onClick={() => setActiveTab('all')}
                   className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                     activeTab === 'all'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Tất cả
@@ -486,8 +486,8 @@ export default function MyCoursesClient() {
                   onClick={() => setActiveTab('upcoming')}
                   className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                     activeTab === 'upcoming'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Lịch sắp tới
@@ -496,8 +496,8 @@ export default function MyCoursesClient() {
                   onClick={() => setActiveTab('completed')}
                   className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                     activeTab === 'completed'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Đã học
@@ -506,8 +506,8 @@ export default function MyCoursesClient() {
                   onClick={() => setActiveTab('cancelled')}
                   className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                     activeTab === 'cancelled'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-[#475569] hover:bg-slate-100'
+                      ? 'bg-[#005BBF] text-white shadow-sm'
+                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
                   }`}
                 >
                   Đã hủy
@@ -561,22 +561,22 @@ export default function MyCoursesClient() {
                   
                   // Status Badge logic
                   let statusLabel = 'Đang xử lý';
-                  let statusStyles = 'bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]';
+                  let statusStyles = 'bg-amber-500 text-white border-none';
                   if (booking.status === 'pending') {
                     statusLabel = 'Chưa thanh toán';
-                    statusStyles = 'bg-rose-50 text-rose-600 border-rose-100';
+                    statusStyles = 'bg-rose-500 text-white border-none';
                   } else if (booking.status === 'confirmed') {
                     statusLabel = 'Đã xác nhận';
-                    statusStyles = 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]';
+                    statusStyles = 'bg-emerald-600 text-white border-none';
                   } else if (booking.status === 'completed') {
                     statusLabel = 'Đã hoàn thành';
-                    statusStyles = 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]';
+                    statusStyles = 'bg-slate-400 text-white border-none';
                   } else if (booking.status === 'cancelled') {
                     statusLabel = 'Đã hủy';
-                    statusStyles = 'bg-[#FEF2F2] text-[#EF4444] border-[#FEE2E2]';
+                    statusStyles = 'bg-rose-500 text-white border-none';
                   } else if (booking.status === 'rescheduled') {
                     statusLabel = 'Đã đổi lịch';
-                    statusStyles = 'bg-blue-50 text-blue-600 border-blue-100';
+                    statusStyles = 'bg-[#005BBF] text-white border-none';
                   }
 
                   // Active Cancel/Modify states
@@ -676,7 +676,7 @@ export default function MyCoursesClient() {
                           {booking.status === 'pending' ? (
                             <button
                               onClick={() => handleOpenPayment(booking)}
-                              className="flex-1 text-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider shadow-md shadow-blue-500/10 transition-all cursor-pointer border-0"
+                              className="flex-1 text-center bg-gradient-to-r from-[#005BBF] to-[#004493] hover:from-[#004493] hover:to-[#002D62] text-white font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider shadow-md shadow-[#005BBF]/15 transition-all cursor-pointer border-0"
                             >
                               Thanh toán ngay
                             </button>
@@ -685,7 +685,7 @@ export default function MyCoursesClient() {
                               href={booking.googleMeetUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider no-underline shadow-md shadow-blue-500/10 transition-all cursor-pointer"
+                              className="flex-1 text-center bg-[#005BBF] hover:bg-[#004493] text-white font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider no-underline shadow-md shadow-[#005BBF]/10 transition-all cursor-pointer"
                             >
                               Vào phòng học (Google Meet)
                             </a>

@@ -2,6 +2,7 @@ import { MockCourse } from '@/shared/mocks/mentorCourses.mock';
 import { httpClient } from '../api/client';
 import { gql } from 'graphql-request';
 import { gqlClient } from '../api/graphql-client';
+import { authGateway } from './authGateway';
 
 const translateCourse = (course: any): MockCourse => {
   // Map backend status to frontend status
@@ -38,24 +39,30 @@ export const courseGateway = {
     console.log('[courseGateway] Executing getMyCourses()');
     try {
       // 1. Lấy thông tin tài khoản mentor hiện tại
-      console.log('[courseGateway] Fetching current mentor profile via GET /v1/users/me');
-      const me = await httpClient.get<any>('/v1/users/me');
+      console.log('[courseGateway] Fetching current mentor profile via authGateway.getMe');
+      const meRes = await authGateway.getMe();
+      const me = meRes.user;
+      if (!me) {
+        throw new Error('Không tìm thấy thông tin Mentor đăng nhập.');
+      }
       console.log('[courseGateway] Mentor profile fetched successfully:', me);
- 
+
       // 2. Lấy danh sách khóa học lọc theo mentorId
       console.log(`[courseGateway] Fetching courses for mentorId=${me.id} via GET /v1/courses?mentorId=${me.id}&limit=100`);
-      const response = await httpClient.get<{ items: any[] }>(`/v1/courses?mentorId=${me.id}&limit=100`);
+      const response = await httpClient.get<any>(`/v1/courses?mentorId=${me.id}&limit=100`);
       console.log('[courseGateway] Mentor courses fetched successfully:', response);
-      return (response.items || []).map(translateCourse);
+      const items = response?.data || [];
+      return items.map(translateCourse);
     } catch (error: any) {
       console.warn('[courseGateway] Failed to fetch mentor courses, fetching all public courses as fallback:', error);
- 
+
       // Fallback: Lấy toàn bộ khóa học công khai nếu chưa đăng nhập hoặc gặp lỗi
       console.log('[courseGateway] Executing fallback: Fetching public courses via GET /v1/courses?limit=100');
       try {
-        const response = await httpClient.get<{ items: any[] }>('/v1/courses?limit=100');
+        const response = await httpClient.get<any>('/v1/courses?limit=100');
         console.log('[courseGateway] Fallback public courses fetched successfully:', response);
-        return (response.items || []).map(translateCourse);
+        const items = response?.data || [];
+        return items.map(translateCourse);
       } catch (fallbackError: any) {
         console.error('[courseGateway] Fallback fetch failed:', fallbackError);
         throw fallbackError;
@@ -101,9 +108,10 @@ export const courseGateway = {
       // Fallback: Lấy toàn bộ khóa học công khai qua REST GET nếu GraphQL gặp lỗi
       console.log('[courseGateway] Fallback: Fetching public courses via REST GET /v1/courses?limit=100');
       try {
-        const restResponse = await httpClient.get<{ items: any[] }>('/v1/courses?limit=100');
+        const restResponse = await httpClient.get<any>('/v1/courses?limit=100');
         console.log('[courseGateway] Fallback REST public courses fetched successfully:', restResponse);
-        return (restResponse.items || []).map(translateCourse);
+        const items = restResponse?.data || [];
+        return items.map(translateCourse);
       } catch (restError) {
         console.error('[courseGateway] Fallback REST fetch also failed:', restError);
         throw error;
@@ -115,7 +123,7 @@ export const courseGateway = {
    * Lấy chi tiết khóa học theo ID từ backend (GraphQL)
    */
   async getCourseDetail(id: string): Promise<MockCourse | null> {
-    console.log(`[courseGateway] Executing getCourseDetail() calling GraphQL query "course" for ID: \${id}`);
+    console.log(`[courseGateway] Executing getCourseDetail() calling GraphQL query "course" for ID: ${id}`);
     try {
       const query = gql`
         query GetCourse($id: ID!) {
@@ -134,6 +142,8 @@ export const courseGateway = {
               name
               slug
             }
+            prerequisites
+            metadata
           }
         }
       `;
@@ -144,10 +154,11 @@ export const courseGateway = {
       console.error(`[courseGateway] Error in getCourseDetail() via GraphQL:`, error);
       
       // Fallback: Lấy chi tiết qua REST GET
-      console.log(`[courseGateway] Fallback: Fetching course detail via REST GET /v1/courses/\${id}`);
+      console.log(`[courseGateway] Fallback: Fetching course detail via REST GET /v1/courses/${id}`);
       try {
-        const response = await httpClient.get<any>(`/v1/courses/\${id}`);
-        return translateCourse(response);
+        const response = await httpClient.get<any>(`/v1/courses/${id}`);
+        const courseObj = response?.data?.[0] || response?.data || response;
+        return translateCourse(courseObj);
       } catch (restError) {
         console.error('[courseGateway] Fallback REST fetch failed:', restError);
         throw error;
@@ -166,19 +177,24 @@ export const courseGateway = {
 
     const body = {
       title: payload.title,
+      description: payload.description,
+      thumbnailUrl: payload.thumbnail,
       price: Number(payload.price),
-      durationMinutes: 60,
+      durationMinutes: payload.durationMinutes || 60,
+      prerequisites: payload.prerequisites || [],
       status,
       metadata: {
         categoryName: payload.category || 'Chưa phân loại',
         rating: 0,
         reviewsCount: 0,
         studentsCount: 0,
+        ...payload.metadata,
       },
     };
 
     const response = await httpClient.post<any>('/v1/courses', body);
-    return translateCourse(response);
+    const courseObj = response?.data?.[0] || response?.data || response;
+    return translateCourse(courseObj);
   },
 
   /**
@@ -187,7 +203,11 @@ export const courseGateway = {
   async updateCourse(id: string, payload: Partial<MockCourse>): Promise<MockCourse> {
     const body: any = {};
     if (payload.title !== undefined) body.title = payload.title;
+    if (payload.description !== undefined) body.description = payload.description;
+    if (payload.thumbnail !== undefined) body.thumbnailUrl = payload.thumbnail;
     if (payload.price !== undefined) body.price = Number(payload.price);
+    if (payload.durationMinutes !== undefined) body.durationMinutes = Number(payload.durationMinutes);
+    if (payload.prerequisites !== undefined) body.prerequisites = payload.prerequisites;
     if (payload.status !== undefined) {
       let status = 'DRAFT';
       if (payload.status === 'published') status = 'ACTIVE';
@@ -196,15 +216,18 @@ export const courseGateway = {
       body.status = status;
     }
 
-    // Nếu category được cập nhật, đảm bảo giữ các trường metadata cũ hoặc ghi đè
-    if (payload.category !== undefined) {
+    if (payload.category !== undefined || payload.metadata !== undefined) {
       body.metadata = {
-        categoryName: payload.category,
+        ...(payload.metadata || {}),
       };
+      if (payload.category !== undefined) {
+        body.metadata.categoryName = payload.category;
+      }
     }
 
     const response = await httpClient.patch<any>(`/v1/courses/${id}`, body);
-    return translateCourse(response);
+    const courseObj = response?.data?.[0] || response?.data || response;
+    return translateCourse(courseObj);
   },
 
   /**

@@ -11,6 +11,7 @@ import {
   LuSearch, 
   LuUser, 
   LuCalendar, 
+  LuCalendarDays,
   LuLogOut, 
   LuHouse, 
   LuMenu, 
@@ -53,13 +54,15 @@ export default function DashboardLayout({
   const sidebarItems: SidebarItem[] = isMentor 
     ? [
         { label: 'Bảng điều khiển', href: '/dashboard', icon: <LuLayers size={18} /> },
-        { label: 'Lịch dạy của tôi', href: '/mentor/bookings', icon: <LuCalendar size={18} /> },
+        { label: 'Lịch', href: '/calendar', icon: <LuCalendar size={18} /> },
+        { label: 'Lịch dạy của tôi', href: '/mentor/bookings', icon: <LuCalendarDays size={18} /> },
         { label: 'Khóa học đã tạo', href: '/mentor/courses', icon: <LuBookOpen size={18} /> },
         { label: 'Hồ sơ cá nhân', href: '/profile', icon: <LuUser size={18} /> },
       ]
     : [
         { label: 'Bảng điều khiển', href: '/dashboard', icon: <LuLayers size={18} /> },
-        { label: 'Lịch học của tôi', href: '/my-courses', icon: <LuCalendar size={18} /> },
+        { label: 'Lịch', href: '/calendar', icon: <LuCalendar size={18} /> },
+        { label: 'Lịch học của tôi', href: '/my-courses', icon: <LuCalendarDays size={18} /> },
         { label: 'Khám phá khóa học', href: '/courses', icon: <LuSearch size={18} /> },
         { label: 'Hồ sơ cá nhân', href: '/profile', icon: <LuUser size={18} /> },
       ];
@@ -73,7 +76,7 @@ export default function DashboardLayout({
       <div className="flex flex-col gap-6">
         {/* Brand Logo */}
         <div className={`flex items-center gap-3 border-b border-[#F1F5F9] pb-5 ${collapsed ? 'justify-center' : 'px-2'}`}>
-          <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-white text-base shadow-md shadow-blue-500/10">
+          <div className="w-10 h-10 bg-gradient-to-tr from-[#005BBF] to-[#004493] rounded-xl flex items-center justify-center flex-shrink-0 font-black text-white text-base shadow-md shadow-[#005BBF]/10">
             HT
           </div>
           {!collapsed && (
@@ -95,12 +98,12 @@ export default function DashboardLayout({
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black transition-all no-underline ${
                   isActive 
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/15' 
-                    : 'text-[#475569] hover:text-blue-600 hover:bg-[#F0F7FF]'
+                    ? 'bg-gradient-to-r from-[#005BBF] to-[#004493] text-white shadow-lg shadow-[#005BBF]/15' 
+                    : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/50'
                 } ${collapsed ? 'justify-center' : ''}`}
                 title={collapsed ? item.label : undefined}
               >
-                <div className={`${isActive ? 'text-white' : 'text-slate-500 group-hover:text-blue-600'}`}>
+                <div className={`${isActive ? 'text-white' : 'text-slate-500 group-hover:text-[#005BBF]'}`}>
                   {item.icon}
                 </div>
                 {!collapsed && <span>{item.label}</span>}

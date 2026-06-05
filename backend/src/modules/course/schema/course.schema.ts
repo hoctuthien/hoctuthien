@@ -20,8 +20,11 @@ export const courseSchema = z.object({
 
 export const createCourseSchema = z.object({
   title: z.string().min(1).max(255),
+  description: z.string().nullable().optional(),
+  thumbnailUrl: z.string().max(500).nullable().optional(),
   price: z.number().min(0),
   durationMinutes: z.number().min(15).optional(),
+  prerequisites: z.array(z.string()).optional(),
 
   // Logic Lịch Dạy (Slot) được bổ sung:
   metadata: z.record(z.string(), z.any()).optional(),

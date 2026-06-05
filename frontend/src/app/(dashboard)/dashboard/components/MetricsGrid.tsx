@@ -22,7 +22,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ isMentor, stat1, stat2
       
       {/* Stat 1 */}
       <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4 hover:shadow-md transition-all duration-300">
-        <div className="w-10 h-10 bg-blue-50 text-[#2563eb] rounded-xl flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 bg-[#DFEFFF] text-[#005BBF] rounded-xl flex items-center justify-center flex-shrink-0">
           {isMentor ? <LuLayers size={20} /> : <LuBookOpen size={20} />}
         </div>
         <div className="flex flex-col gap-0.5 min-w-0">
@@ -35,7 +35,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ isMentor, stat1, stat2
 
       {/* Stat 2 */}
       <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4 hover:shadow-md transition-all duration-300">
-        <div className="w-10 h-10 bg-amber-50 text-[#D97706] rounded-xl flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 bg-amber-50 text-amber-700 rounded-xl flex items-center justify-center flex-shrink-0">
           <LuCalendar size={20} />
         </div>
         <div className="flex flex-col gap-0.5 min-w-0">
@@ -46,7 +46,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ isMentor, stat1, stat2
 
       {/* Stat 3 */}
       <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4 hover:shadow-md transition-all duration-300">
-        <div className="w-10 h-10 bg-emerald-50 text-[#10B981] rounded-xl flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center flex-shrink-0">
           <LuCheck size={20} />
         </div>
         <div className="flex flex-col gap-0.5 min-w-0">
@@ -57,14 +57,14 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ isMentor, stat1, stat2
 
       {/* Stat 4 */}
       <div className="bg-white border border-[#E2E8F0] p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4 hover:shadow-md transition-all duration-300">
-        <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 bg-[#89FA9B]/35 text-[#005320] rounded-xl flex items-center justify-center flex-shrink-0">
           {isMentor ? <LuUsers size={20} /> : <LuClock size={20} />}
         </div>
         <div className="flex flex-col gap-0.5 min-w-0">
           <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">
             {isMentor ? 'HỌC VIÊN ĐANG GIẢNG DẠY' : 'SỐ GIỜ HỌC TÍCH LŨY'}
           </span>
-          <span className="text-xl font-black text-indigo-600">
+          <span className="text-xl font-black text-[#005BBF]">
             {isMentor ? stat4 : `${stat4}h`}
           </span>
         </div>

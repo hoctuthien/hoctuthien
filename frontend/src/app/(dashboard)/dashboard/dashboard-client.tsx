@@ -14,7 +14,6 @@ import {
 // Import SOLID Subcomponents
 import { WelcomeBanner } from './components/WelcomeBanner';
 import { MetricsGrid } from './components/MetricsGrid';
-import { DashboardCalendar, getLocalDateString } from './components/DashboardCalendar';
 import { CourseList } from './components/CourseList';
 import { UpcomingClassCard } from './components/UpcomingClassCard';
 
@@ -33,21 +32,10 @@ interface CourseItem {
   studentsCount?: number;
 }
 
-interface CalendarSlot {
-  id: string;
-  timeLabel: string;
-  dateStr: string;
-  courseTitle: string;
-  partnerName: string;
-  partnerAvatar?: string | null;
-  googleMeetUrl: string | null;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'rescheduled';
-}
 
 export default function DashboardClient() {
   const { data: session, status: authStatus } = useSession();
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const [isVerified, setIsVerified] = useState<boolean>(true);
   
   // Dashboard Metrics state
@@ -60,35 +48,6 @@ export default function DashboardClient() {
 
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [allBookings, setAllBookings] = useState<any[]>([]);
-  const [calendarSlots, setCalendarSlots] = useState<CalendarSlot[]>([]);
-  
-  // Calendar Week Offset state
-  const [weekOffset, setWeekOffset] = useState(0);
-  const [currentWeekDays, setCurrentWeekDays] = useState<{ dayName: string; date: Date; dateStr: string }[]>([]);
-
-  // Calculate current week dates dynamically based on weekOffset
-  useEffect(() => {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    const differenceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + differenceToMonday + weekOffset * 7);
-
-    const days = [];
-    const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
-    
-    for (let i = 0; i < 7; i++) {
-      const currentDay = new Date(monday);
-      currentDay.setDate(monday.getDate() + i);
-      const dateStr = getLocalDateString(currentDay);
-      days.push({
-        dayName: dayNames[i],
-        date: currentDay,
-        dateStr,
-      });
-    }
-    setCurrentWeekDays(days);
-  }, [weekOffset]);
 
   const loadDashboardData = async () => {
     if (!session) return;
@@ -153,23 +112,6 @@ export default function DashboardClient() {
         });
         setCourses(mappedCourses);
 
-        // Map Calendar slots for Mentor (with Date validity check)
-        const slots: CalendarSlot[] = bookings.map((b: any) => {
-          const mTime = b.meetingTime ? new Date(b.meetingTime) : null;
-          const isValid = mTime && !isNaN(mTime.getTime());
-          return {
-            id: b.id,
-            timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
-            dateStr: (isValid && mTime) ? getLocalDateString(mTime) : '',
-            courseTitle: b.course?.title || 'Khóa học',
-            partnerName: b.mentee?.name || 'Học viên',
-            partnerAvatar: b.mentee?.avatarUrl,
-            googleMeetUrl: b.googleMeetUrl,
-            status: b.status,
-          };
-        }).filter((s: CalendarSlot) => s.dateStr !== '');
-        setCalendarSlots(slots);
-
       } else {
         // Mentee / Student Dashboard Logic
         const upcomingCount = bookings.filter((b: any) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'rescheduled').length;
@@ -219,23 +161,6 @@ export default function DashboardClient() {
           };
         });
         setCourses(mappedCourses);
-
-        // Map Calendar slots for Mentee (with Date validity check)
-        const slots: CalendarSlot[] = bookings.map((b: any) => {
-          const mTime = b.meetingTime ? new Date(b.meetingTime) : null;
-          const isValid = mTime && !isNaN(mTime.getTime());
-          return {
-            id: b.id,
-            timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
-            dateStr: (isValid && mTime) ? getLocalDateString(mTime) : '',
-            courseTitle: b.course?.title || 'Khóa học',
-            partnerName: b.course?.mentor?.name || 'Cố vấn học tập',
-            partnerAvatar: b.course?.mentor?.avatarUrl,
-            googleMeetUrl: b.googleMeetUrl,
-            status: b.status,
-          };
-        }).filter((s: CalendarSlot) => s.dateStr !== '');
-        setCalendarSlots(slots);
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -396,54 +321,18 @@ export default function DashboardClient() {
           stat4={metrics.stat4} 
         />
 
-        {/* 2. Responsive Main Layout */}
-        {viewMode === 'month' ? (
-          <div className="flex flex-col gap-8 w-full">
-            {/* FULL-WIDTH MONTHLY CALENDAR GRID */}
-            <div className="w-full">
-              <DashboardCalendar 
-                currentWeekDays={currentWeekDays} 
-                calendarSlots={calendarSlots} 
-                isMentor={isMentor} 
-                setWeekOffset={setWeekOffset} 
-                weekOffset={weekOffset}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
-            </div>
-            
-            {/* Rest of items in columns below */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 flex flex-col gap-8">
-                <CourseList courses={courses} isMentor={isMentor} />
-              </div>
-              <div className="flex flex-col gap-8">
-                {rightSidebarContent}
-              </div>
-            </div>
+        {/* Main Dashboard Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Courses progress */}
+          <div className="lg:col-span-2 flex flex-col gap-8">
+            <CourseList courses={courses} isMentor={isMentor} />
           </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* 2/3 COLUMN WEEKLY CALENDAR & COURSES */}
-            <div className="lg:col-span-2 flex flex-col gap-8">
-              <DashboardCalendar 
-                currentWeekDays={currentWeekDays} 
-                calendarSlots={calendarSlots} 
-                isMentor={isMentor} 
-                setWeekOffset={setWeekOffset} 
-                weekOffset={weekOffset}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
-              <CourseList courses={courses} isMentor={isMentor} />
-            </div>
-            
-            {/* 1/3 COLUMN SIDEBAR */}
-            <div className="flex flex-col gap-8">
-              {rightSidebarContent}
-            </div>
+          
+          {/* Right Column - Sidebar info */}
+          <div className="flex flex-col gap-8">
+            {rightSidebarContent}
           </div>
-        )}
+        </div>
 
       </div>
     </div>

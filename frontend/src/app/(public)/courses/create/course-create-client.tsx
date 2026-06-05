@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Breadcrumb } from "@shared";
+import { courseGateway } from "@/core/gateway";
 import {
   LuArrowLeft,
   LuSparkles,
@@ -153,16 +154,35 @@ export default function CourseCreateClient() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
     setIsSubmitting(true);
-    // Simulate API registration request
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await courseGateway.createCourse({
+        title,
+        description: subtitle,
+        category,
+        price: isPaid ? Number(price) : 0,
+        status: 'published', // ACTIVE
+        thumbnail: currentThumb,
+        durationMinutes: 60, // Phút của một buổi học
+        prerequisites: [],
+        metadata: {
+          level,
+          totalHours: Number(duration),
+          format,
+          modules, // Lưu giáo trình
+        }
+      });
       setIsSuccess(true);
-    }, 1500);
+    } catch (error: any) {
+      console.error("Failed to create course:", error);
+      alert("Đã xảy ra lỗi khi tạo khóa học. Vui lòng kiểm tra lại quyền của Mentor (phải có profile được phê duyệt).");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFinishRedirect = () => {

@@ -31,7 +31,7 @@ export const CourseList: React.FC<CourseListProps> = ({ courses, isMentor }) => 
     <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-6 md:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider">TIẾN TRÌNH HỌC TẬP</span>
+          <span className="text-[10px] font-black text-[#005BBF] uppercase tracking-wider">TIẾN TRÌNH HỌC TẬP</span>
           <h2 className="text-xl font-black text-[#0F172A] font-[Montserrat]">
             {isMentor ? 'Khóa Học Tôi Đảm Nhận' : 'Khóa Học Đã Đăng Ký'}
           </h2>
@@ -63,11 +63,11 @@ export const CourseList: React.FC<CourseListProps> = ({ courses, isMentor }) => 
 
                 {/* Title, Mentor details */}
                 <div className="flex flex-col gap-1 min-w-0">
-                  <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest">
+                  <span className="text-[8px] font-black text-[#005BBF] uppercase tracking-widest">
                     {course.category || 'HỌC TẬP'}
                   </span>
                   <h3 
-                    className="text-xs font-black text-[#0f172a] line-clamp-2 leading-snug cursor-pointer hover:text-blue-600"
+                    className="text-xs font-black text-[#0f172a] line-clamp-2 leading-snug cursor-pointer hover:text-[#005BBF]"
                     onClick={() => window.location.href = `/courses/detail/${course.id}`}
                   >
                     {course.title}
@@ -90,12 +90,12 @@ export const CourseList: React.FC<CourseListProps> = ({ courses, isMentor }) => 
               <div className="mt-4 pt-3 border-t border-slate-200/50 flex flex-col gap-1.5">
                 <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
                   <span>Tiến độ bài học:</span>
-                  <span className="text-blue-600 font-extrabold">{course.progressPercent}%</span>
+                  <span className="text-[#005BBF] font-extrabold">{course.progressPercent}%</span>
                 </div>
                 
                 <div className="w-full bg-[#E2E8F0] h-1.5 rounded-full overflow-hidden">
                   <div 
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-[#005BBF] to-[#004493] h-full rounded-full transition-all duration-500"
                     style={{ width: `${course.progressPercent}%` }}
                   />
                 </div>
@@ -106,7 +106,7 @@ export const CourseList: React.FC<CourseListProps> = ({ courses, isMentor }) => 
                   </span>
                   <a 
                     href={`/courses/detail/${course.id}`}
-                    className="text-blue-600 hover:text-blue-700 font-black flex items-center gap-0.5 no-underline"
+                    className="text-[#005BBF] hover:text-[#004493] font-black flex items-center gap-0.5 no-underline"
                   >
                     Chi tiết khóa học
                     <LuArrowRight size={10} />
