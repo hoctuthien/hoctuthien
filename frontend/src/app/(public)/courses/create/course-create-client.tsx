@@ -141,13 +141,17 @@ export default function CourseCreateClient() {
 
   const handleCreateCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCatName.trim() || !newCatGroupId) return;
+    if (!newCatName.trim()) return;
 
     try {
       const newCat = await categoryGateway.createCategory({
         name: newCatName.trim(),
-        groupCategoryId: newCatGroupId,
+        // groupCategoryId optional - chỉ truyền nếu có
+        ...(newCatGroupId ? { groupCategoryId: newCatGroupId } : {}),
       });
+      if (!newCat || !newCat.id) {
+        throw new Error('Phản hồi từ server không hợp lệ');
+      }
       setCategories((prev) => [...prev, newCat]);
       setSelectedCategoryId(newCat.id);
       setCategory(newCat.name);
@@ -156,7 +160,7 @@ export default function CourseCreateClient() {
       alert("Đã tạo và chọn danh mục mới thành công!");
     } catch (err: any) {
       console.error("Failed to create category:", err);
-      alert("Tạo danh mục thất bại: " + (err.message || "Lỗi không xác định"));
+      alert("Tạo danh mục thất bại: " + (err?.error?.message || err?.message || "Lỗi không xác định"));
     }
   };
 
@@ -871,24 +875,27 @@ export default function CourseCreateClient() {
             </div>
             
             <form onSubmit={handleCreateCategorySubmit} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Chủ đề gốc (Group Category)</label>
-                <select
-                  value={newCatGroupId}
-                  onChange={(e) => setNewCatGroupId(e.target.value)}
-                  required
-                  className="w-full h-11 px-3 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#2563eb]"
-                >
-                  {groupCategories.map((group) => (
-                    <option key={group.id} value={group.id}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Chỉ hiển thị group select nếu có dữ liệu */}
+              {groupCategories.length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Chủ đề gốc (Group Category)</label>
+                  <select
+                    value={newCatGroupId}
+                    onChange={(e) => setNewCatGroupId(e.target.value)}
+                    className="w-full h-11 px-3 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#2563eb]"
+                  >
+                    <option value="">-- Không có nhóm --</option>
+                    {groupCategories.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Tên danh mục mới</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Tên danh mục mới <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   placeholder="Ví dụ: Lập trình Vue.js..."
