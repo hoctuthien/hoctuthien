@@ -8,9 +8,17 @@ import {
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { ERROR_CODES, ERROR_MESSAGES } from '../constants/error.constant';
+import { AppLogger } from '../logger/app-logger.service';
+import { correlationIdStorage } from '../logger/correlation-id.context';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new AppLogger();
+
+  constructor() {
+    this.logger.setContext(HttpExceptionFilter.name);
+  }
+
   catch(exception: unknown, host: ArgumentsHost) {
     if (host.getType<string>() === 'graphql') {
       throw exception;
@@ -18,7 +26,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request & { traceId?: string }>();
+    const request = ctx.getRequest<Request>();
+    
+    const store = correlationIdStorage.getStore();
+    const correlationId = store?.correlationId || null;
 
     let status =
       exception instanceof HttpException
@@ -86,8 +97,22 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }
     } else {
       // Log generic error here if needed
-      console.error(exception);
+      this.logger.error({ 
+        message: exception instanceof Error ? exception.message : String(exception),
+        stack: exception instanceof Error ? exception.stack : undefined,
+        url: request.originalUrl,
+        method: request.method
+      }, '[UnhandledException]');
     }
+
+    // Always log the final error response
+    this.logger.error({
+      statusCode: status,
+      errorCode: code,
+      errorMessage: message,
+      url: request.originalUrl,
+      method: request.method
+    }, '[ErrorResponse]');
 
     response.status(status).json({
       data: null,
@@ -95,7 +120,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       error: {
         code,
         message,
-        traceId: request.traceId || null,
+        correlationId,
         details: details || null,
       },
     });

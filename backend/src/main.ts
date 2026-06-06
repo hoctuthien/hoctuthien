@@ -8,10 +8,24 @@ import { ResponseTransformInterceptor } from './common/interceptors/response-tra
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { xss } from 'express-xss-sanitizer';
+import { AppLogger } from './common/logger/app-logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+  const appLogger = await app.resolve(AppLogger);
+  app.useLogger(appLogger);
+
   const config = app.get(ConfigService);
+  const logLevel = config.get('logLevel') || 'info';
+
+  if (logLevel !== 'info') {
+    appLogger.log(`Setting log level to ${logLevel}`, 'Bootstrap');
+    // Simplified logic: NestJS doesn't natively allow changing levels dynamically at runtime for ConsoleLogger
+    // without passing array of log levels, so we rely on custom logger logic if needed.
+  }
+
   const reflector = app.get(Reflector);
 
   // 1. Bảo mật Header với Helmet
@@ -75,10 +89,11 @@ async function bootstrap() {
 
   const port = config.get('port') || 5050;
   await app.listen(port);
-  console.log(
+  appLogger.log(
     `🚀 Application is running on: http://localhost:${port}/${prefix}`,
+    'Bootstrap'
   );
-  console.log(`👨‍ quản trị hệ thống tại: http://localhost:${port}/admin`);
+  appLogger.log(`👨‍ quản trị hệ thống tại: http://localhost:${port}/admin`, 'Bootstrap');
 }
 bootstrap();
 // test develop

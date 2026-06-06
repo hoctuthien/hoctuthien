@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
+import { AppLogger } from '../../../common/logger/app-logger.service';
 import { CourseRepository } from '../repositories/course.repository';
 import {
   CreateCourseInput,
@@ -32,9 +33,13 @@ export class CourseService {
   constructor(
     private readonly courseRepository: CourseRepository,
     private readonly dataSource: DataSource,
-  ) {}
+    private readonly logger: AppLogger,
+  ) {
+    this.logger.setContext(CourseService.name);
+  }
 
   async findAll(query: FindCoursesQuery, userRole?: string, userId?: string) {
+    this.logger.debug({ query, userRole, userId }, 'findAll -> entry');
     const { title, status, mentorId, groupCategoryId, groupCategorySlug, categoryId, categorySlug, page, limit } =
       findCoursesQuerySchema.parse(query);
 
@@ -95,12 +100,18 @@ export class CourseService {
   }
 
   async findOne(id: string) {
+    this.logger.debug({ courseId: id }, 'findOne -> entry');
     const course = await this.courseRepository.findById(id);
-    if (!course) throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
+    if (!course) {
+      this.logger.debug({ courseId: id, error: 'Not found' }, 'findOne -> error');
+      throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
+    }
+    this.logger.debug({ courseId: id, found: true }, 'findOne -> done');
     return courseSchema.parse(course);
   }
 
   async create(payload: CreateCourseInput, mentorId: string) {
+    this.logger.debug({ mentorId, title: payload.title }, 'create -> entry');
     const { durationMinutes, categoryIds, ...courseData } = payload;
     const duration = durationMinutes || 60;
 
@@ -151,6 +162,7 @@ export class CourseService {
   }
 
   async update(id: string, payload: UpdateCourseInput, mentorId: string) {
+    this.logger.debug({ courseId: id, mentorId }, 'update -> entry');
     const { categoryIds, durationMinutes, ...courseData } =
       updateCourseSchema.parse(payload);
 
@@ -210,6 +222,7 @@ export class CourseService {
     mentorId: string,
     status: CourseStatus.ACTIVE | CourseStatus.INACTIVE,
   ) {
+    this.logger.debug({ courseId: id, mentorId, status }, 'updateStatus -> entry');
     const course = await this.courseRepository.findById(id);
     if (!course) throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
 
@@ -229,6 +242,7 @@ export class CourseService {
   }
 
   async approve(id: string, payload: ApproveCourseInput) {
+    this.logger.debug({ courseId: id, payload }, 'approve -> entry');
     const parsed = approveCourseSchema.parse(payload);
 
     const course = await this.courseRepository.findById(id);
@@ -243,6 +257,7 @@ export class CourseService {
   }
 
   async remove(id: string, mentorId: string) {
+    this.logger.debug({ courseId: id, mentorId }, 'remove -> entry');
     const course = await this.courseRepository.findById(id);
     if (!course) throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
 
