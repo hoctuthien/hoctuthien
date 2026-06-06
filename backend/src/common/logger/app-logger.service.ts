@@ -3,7 +3,7 @@ import { correlationIdStorage } from './correlation-id.context';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class AppLogger extends ConsoleLogger {
-  private formatMessage(message: any, context?: string): any {
+  private buildLogPayload(message: any, context?: string): any {
     const store = correlationIdStorage.getStore();
     const correlationId = store?.correlationId || null;
 
@@ -50,43 +50,43 @@ export class AppLogger extends ConsoleLogger {
 
   log(message: any, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      console.log(JSON.stringify({ level: 'info', ...this.formatMessage(message, context) }));
+      console.log(JSON.stringify({ level: 'info', ...this.buildLogPayload(message, context) }));
     } else {
-      super.log(this.formatMessage(message, context), context);
+      super.log(this.buildLogPayload(message, context), context);
     }
   }
 
   error(message: any, stack?: string, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      const formatted = this.formatMessage(message, context);
+      const formatted = this.buildLogPayload(message, context);
       formatted.stack = stack || formatted.stack;
       console.error(JSON.stringify({ level: 'error', ...formatted }));
     } else {
-      super.error(this.formatMessage(message, context), stack, context);
+      super.error(this.buildLogPayload(message, context), stack, context);
     }
   }
 
   warn(message: any, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      console.warn(JSON.stringify({ level: 'warn', ...this.formatMessage(message, context) }));
+      console.warn(JSON.stringify({ level: 'warn', ...this.buildLogPayload(message, context) }));
     } else {
-      super.warn(this.formatMessage(message, context), context);
+      super.warn(this.buildLogPayload(message, context), context);
     }
   }
 
   debug(message: any, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      console.debug(JSON.stringify({ level: 'debug', ...this.formatMessage(message, context) }));
+      console.debug(JSON.stringify({ level: 'debug', ...this.buildLogPayload(message, context) }));
     } else {
-      super.debug(this.formatMessage(message, context), context);
+      super.debug(this.buildLogPayload(message, context), context);
     }
   }
 
   verbose(message: any, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      console.log(JSON.stringify({ level: 'verbose', ...this.formatMessage(message, context) }));
+      console.log(JSON.stringify({ level: 'verbose', ...this.buildLogPayload(message, context) }));
     } else {
-      super.verbose(this.formatMessage(message, context), context);
+      super.verbose(this.buildLogPayload(message, context), context);
     }
   }
 }
