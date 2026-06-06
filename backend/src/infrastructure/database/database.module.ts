@@ -21,7 +21,7 @@ import { ConfigService } from '@nestjs/config';
         entities: [__dirname + '/../../modules/**/*.entity{.ts,.js}'],
 
         synchronize: configService.get<boolean>('database.synchronize'), // Đọc từ biến môi trường
-        logging: true, // Bật để debug SQL
+        logging: configService.get<string>('logLevel') === 'debug', // Chỉ in câu lệnh SQL khi LOG_LEVEL=debug
         ssl: false, // Nếu DB server yêu cầu SSL thì mới để true
       }),
     }),

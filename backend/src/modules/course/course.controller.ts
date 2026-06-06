@@ -11,6 +11,7 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+import { AppLogger } from '../../common/logger/app-logger.service';
 import { CourseService } from './services/course.service';
 import {
   CreateCourseInput,
@@ -42,7 +43,12 @@ import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 @ApiTags('courses')
 @Controller('courses')
 export class CourseController {
-  constructor(private readonly courseService: CourseService) {}
+  constructor(
+    private readonly courseService: CourseService,
+    private readonly logger: AppLogger,
+  ) {
+    this.logger.setContext(CourseController.name);
+  }
 
   @Post()
   @ApiCreateCourseDoc()
@@ -53,6 +59,7 @@ export class CourseController {
     @Body() payload: CreateCourseInput,
     @User('id') mentorId: string,
   ) {
+    this.logger.log({ mentorId, title: payload.title }, 'Creating course');
     return await this.courseService.create(payload, mentorId);
   }
 
@@ -60,6 +67,7 @@ export class CourseController {
   @ApiFindAllCoursesDoc()
   @Public()
   findAll(@Query() query: FindCoursesQuery, @Req() req: any) {
+    this.logger.log({ query }, 'Finding all courses');
     let userRole: string | undefined = undefined;
     let userId: string | undefined = undefined;
     const authHeader = req.headers?.authorization;
@@ -94,6 +102,7 @@ export class CourseController {
   @ApiFindOneCourseDoc()
   @Public()
   findOne(@Param('id') id: string) {
+    this.logger.log({ courseId: id }, 'Finding course by id');
     return this.courseService.findOne(id);
   }
 
@@ -107,6 +116,7 @@ export class CourseController {
     @Body() payload: UpdateCourseInput,
     @User('id') mentorId: string,
   ) {
+    this.logger.log({ courseId: id, mentorId }, 'Updating course');
     return this.courseService.update(id, payload, mentorId);
   }
 
@@ -118,6 +128,7 @@ export class CourseController {
     @Body('status') status: any,
     @User('id') mentorId: string,
   ) {
+    this.logger.log({ courseId: id, mentorId, status }, 'Updating course status');
     return this.courseService.updateStatus(id, mentorId, status);
   }
 
@@ -130,6 +141,7 @@ export class CourseController {
     @Body() payload: ApproveCourseInput,
     @User('id') adminId: string,
   ) {
+    this.logger.log({ courseId: id, adminId, status: payload.status }, 'Approving course');
     return this.courseService.approve(id, { ...payload, approvedBy: adminId });
   }
 
@@ -138,6 +150,7 @@ export class CourseController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTOR)
   remove(@Param('id') id: string, @User('id') mentorId: string) {
+    this.logger.log({ courseId: id, mentorId }, 'Removing course');
     return this.courseService.remove(id, mentorId);
   }
 }

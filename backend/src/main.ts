@@ -8,10 +8,29 @@ import { ResponseTransformInterceptor } from './common/interceptors/response-tra
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { xss } from 'express-xss-sanitizer';
+import { AppLogger } from './common/logger/app-logger.service';
+
+import { LogLevel } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+  const appLogger = await app.resolve(AppLogger);
+  
   const config = app.get(ConfigService);
+  const logLevelStr = config.get('logLevel') || 'info';
+
+  // Chuyển đổi chuỗi logLevel thành mảng các mức log cho phép
+  let allowedLevels: LogLevel[] = ['log', 'error', 'warn']; // default cho 'info'
+  if (logLevelStr === 'debug') {
+    allowedLevels = ['log', 'error', 'warn', 'debug', 'verbose'];
+  }
+  
+  // Áp dụng giới hạn mức log cho logger
+  appLogger.setLogLevels(allowedLevels);
+  app.useLogger(appLogger);
+
   const reflector = app.get(Reflector);
 
   // 1. Bảo mật Header với Helmet
@@ -75,10 +94,11 @@ async function bootstrap() {
 
   const port = config.get('port') || 5050;
   await app.listen(port);
-  console.log(
+  appLogger.log(
     `🚀 Application is running on: http://localhost:${port}/${prefix}`,
+    'Bootstrap'
   );
-  console.log(`👨‍ quản trị hệ thống tại: http://localhost:${port}/admin`);
+  appLogger.log(`👨‍ quản trị hệ thống tại: http://localhost:${port}/admin`, 'Bootstrap');
 }
 bootstrap();
 // test develop

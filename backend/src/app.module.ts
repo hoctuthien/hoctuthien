@@ -27,7 +27,8 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { MediaModule } from './modules/media/media.module';
 import { PostModule } from './modules/post/post.module';
 import { TagModule } from './modules/tag/tag.module';
-import { TraceIdMiddleware } from './common/middlewares/trace-id.middleware';
+import { LoggerModule } from './common/logger/logger.module';
+import { CorrelationIdMiddleware } from './common/middlewares/correlation-id.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -97,6 +98,7 @@ import { join } from 'path';
     }),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
+    LoggerModule,
     DatabaseModule,
     RedisModule,
     AuthModule,
@@ -126,6 +128,6 @@ import { join } from 'path';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(TraceIdMiddleware).forRoutes('*');
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
   }
 }

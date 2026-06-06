@@ -1,10 +1,10 @@
 import {
   Injectable,
-  Logger,
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { AppLogger } from '../../../common/logger/app-logger.service';
 import { UserRepository } from '../repositories/user.repository';
 import {
   createUserSchema,
@@ -22,16 +22,21 @@ import {
 
 @Injectable()
 export class UserService {
-  private readonly logger = new Logger(UserService.name);
-
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly logger: AppLogger,
+  ) {
+    this.logger.setContext(UserService.name);
+  }
 
   async findAll() {
+    this.logger.debug({}, 'findAll -> entry');
     const users = await this.userRepository.findMany();
     return users.map((user) => publicUserSchema.parse(user));
   }
 
   async findOne(id: string) {
+    this.logger.debug({ userId: id }, 'findOne -> entry');
     const user = await this.userRepository.findById(id);
     if (!user)
       throw new NotFoundException('Không tìm thấy thông tin người dùng.');
@@ -39,6 +44,7 @@ export class UserService {
   }
 
   async getMe(id: string) {
+    this.logger.debug({ userId: id }, 'getMe -> entry');
     const user = await this.userRepository.findById(id);
 
     if (!user) {
@@ -55,12 +61,14 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
+    this.logger.debug({ email }, 'findByEmail -> entry');
     const user = await this.userRepository.findByEmail(email);
     // Trả về full schema (bao gồm passwordHash) vì chỉ dùng nội bộ cho auth
     return user ? userSchema.parse(user) : null;
   }
 
   async create(payload: CreateUserInput) {
+    this.logger.debug({ email: payload.email }, 'create -> entry');
     const parsed = createUserSchema.parse(payload);
 
     // Tự động hash mật khẩu nếu có
@@ -80,6 +88,7 @@ export class UserService {
     requestingUserId: string,
     requestingUserRole: string,
   ) {
+    this.logger.debug({ targetUserId: id, requestingUserId }, 'update -> entry');
     // Chỉ ADMIN hoặc chính user đó mới được cập nhật
     if (requestingUserRole !== Role.ADMIN && requestingUserId !== id) {
       throw new ForbiddenException(
@@ -102,6 +111,7 @@ export class UserService {
   }
 
   async remove(id: string) {
+    this.logger.debug({ userId: id }, 'remove -> entry');
     await this.userRepository.softDeleteById(id);
   }
 
@@ -110,6 +120,7 @@ export class UserService {
    * Đặt isVerified = true — FE/middleware dùng field này để cho phép truy cập đầy đủ.
    */
   async activateMentee(id: string): Promise<void> {
+    this.logger.debug({ userId: id }, 'activateMentee -> entry');
     const user = await this.userRepository.findById(id);
     if (!user)
       throw new NotFoundException('Không tìm thấy thông tin người dùng.');
@@ -125,7 +136,8 @@ export class UserService {
   @OnEvent(PAYMENT_SUCCESS_EVENT, { async: true })
   async handlePaymentSuccess(payload: PaymentSuccessPayload): Promise<void> {
     this.logger.log(
-      `[Event] Nhận payment.success: paymentId=${payload.paymentId}, userId=${payload.userId}, paymentMethod=${payload.paymentMethod}`,
+      { paymentId: payload.paymentId, userId: payload.userId, paymentMethod: payload.paymentMethod },
+      '[Event] Nhận payment.success',
     );
 
     // Chỉ kích hoạt tài khoản nếu loại payment là ACTIVATION
@@ -136,14 +148,15 @@ export class UserService {
     try {
       await this.activateMentee(payload.userId);
       this.logger.log(
-        `[Event] Kích hoạt thành công tài khoản Mentee: userId=${payload.userId}`,
+        { userId: payload.userId },
+        '[Event] Kích hoạt thành công tài khoản Mentee',
       );
     } catch (error) {
       // Ghi log lỗi nhưng KHÔNG re-throw — tránh crash event loop của các listener khác
       const message = error instanceof Error ? error.message : String(error);
       this.logger.error(
-        `[Event] Kích hoạt thất bại cho userId=${payload.userId}: ${message}`,
-        error instanceof Error ? error.stack : undefined,
+        { userId: payload.userId, errorMessage: message, stack: error instanceof Error ? error.stack : undefined },
+        '[Event] Kích hoạt thất bại cho userId',
       );
     }
   }
