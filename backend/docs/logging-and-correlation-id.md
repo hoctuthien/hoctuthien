@@ -97,3 +97,27 @@ Là một Backend Dev, bạn nhận được cái ID từ User báo cáo lên.
 1. Mở Terminal (nơi đang chạy `npm run start:dev`).
 2. Bấm `Ctrl + F` (hoặc dùng bộ lọc trên Kibana/Datadog) và paste cái ID `"req-9876-abcd-1234..."` vào.
 3. **BÙM!** Toàn bộ vết tích (stack trace, thông số gửi lên, bị chặn ở đâu) của đúng cái request xui xẻo đó hiện ra chi tiết, tách biệt hoàn toàn khỏi hàng tá request đang chạy mượt mà của những người khác. Sửa lỗi chỉ trong 1 nốt nhạc!
+
+---
+
+## 6. Cơ chế phân cấp Log (Log Level)
+
+Hệ thống hiện tại hỗ trợ cơ chế "bậc thang" để lọc các log không cần thiết tuỳ thuộc vào môi trường thông qua biến môi trường `LOG_LEVEL` trong file `.env`. Có 3 bậc chính từ cao xuống thấp:
+
+### 🔴 Mức 1: ERROR (`LOG_LEVEL=error`)
+- **Hiển thị:** Chỉ in ra các lỗi nghiêm trọng (Exception, chết DB).
+- **Trường hợp sử dụng:** Khi server đang chao đảo, bạn bị ngợp bởi quá nhiều log và chỉ muốn nhìn thấy nguyên nhân gây sập app. 
+- **Hiệu ứng:** Màn hình sẽ hoàn toàn tĩnh lặng cho đến khi có lỗi đỏ chót nổ ra.
+
+### 🟢 Mức 2: INFO (`LOG_LEVEL=info`) - *[MẶC ĐỊNH]*
+- **Hiển thị:** In ra `ERROR`, `WARN` và `INFO` (như có Request chạy tới, lưu User thành công).
+- **Trường hợp sử dụng:** Đây là cấu hình **bắt buộc** trên Production.
+- **Hiệu ứng:** Ẩn toàn bộ các log lặt vặt (như cron job quét mỗi 10 giây). Giúp tiết kiệm cực kỳ nhiều dung lượng lưu trữ trên AWS/Datadog và giữ cho màn hình gọn gàng. *Nếu trong `.env` bạn không cấu hình gì, hệ thống tự động chạy ở mức này.*
+
+### 🟣 Mức 3: DEBUG (`LOG_LEVEL=debug`)
+- **Hiển thị:** In ra **TẤT CẢ** mọi thứ, bao gồm cả `INFO`, `ERROR` và các dòng chi tiết `DEBUG`.
+- **Trường hợp sử dụng:** Dành riêng cho Developer lúc đang code hoặc đang truy vết tận gốc 1 bug hiểm hóc.
+- **Hiệu ứng:** Bạn sẽ thấy các tiến trình chạy ngầm (Cron job), các hàm gọi liên tục đều sẽ được in ra (thường là màu tím).
+
+**👉 Cách bật/tắt:**
+Mở file `.env`, thêm dòng `LOG_LEVEL=debug` (hoặc `info`) và gõ lại lệnh `npm run start:dev`. Dòng màu tím của Cron Job sẽ tự động hiện ra hoặc biến mất theo ý bạn muốn.

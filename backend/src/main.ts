@@ -10,21 +10,26 @@ import helmet from 'helmet';
 import { xss } from 'express-xss-sanitizer';
 import { AppLogger } from './common/logger/app-logger.service';
 
+import { LogLevel } from '@nestjs/common';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
   const appLogger = await app.resolve(AppLogger);
-  app.useLogger(appLogger);
-
+  
   const config = app.get(ConfigService);
-  const logLevel = config.get('logLevel') || 'info';
+  const logLevelStr = config.get('logLevel') || 'info';
 
-  if (logLevel !== 'info') {
-    appLogger.log(`Setting log level to ${logLevel}`, 'Bootstrap');
-    // Simplified logic: NestJS doesn't natively allow changing levels dynamically at runtime for ConsoleLogger
-    // without passing array of log levels, so we rely on custom logger logic if needed.
+  // Chuyển đổi chuỗi logLevel thành mảng các mức log cho phép
+  let allowedLevels: LogLevel[] = ['log', 'error', 'warn']; // default cho 'info'
+  if (logLevelStr === 'debug') {
+    allowedLevels = ['log', 'error', 'warn', 'debug', 'verbose'];
   }
+  
+  // Áp dụng giới hạn mức log cho logger
+  appLogger.setLogLevels(allowedLevels);
+  app.useLogger(appLogger);
 
   const reflector = app.get(Reflector);
 
