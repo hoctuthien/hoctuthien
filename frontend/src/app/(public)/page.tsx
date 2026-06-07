@@ -18,7 +18,7 @@ export default async function HomePage() {
   try {
     const [postsRes, mentorsRes] = await Promise.all([
       getPostsAction(),
-      mentorGateway.getAllMentorProfiles({ limit: 4 })
+      mentorGateway.getAllMentorProfiles({ limit: 12 })
     ]);
     posts = postsRes || [];
     mentors = mentorsRes?.data || [];
