@@ -24,7 +24,7 @@ const request = async <T>(
 ): Promise<T> => {
   try {
     const fn = (client as any)[method];
-    
+
     // Lấy token từ cache với fallback an toàn
     let token = cachedToken;
     if (!token && typeof window !== 'undefined') {

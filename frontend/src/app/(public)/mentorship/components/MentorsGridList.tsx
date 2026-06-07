@@ -19,12 +19,12 @@ export const MentorsGridList = async ({ searchParams }: MentorsGridListProps) =>
   const skills = searchParams.skills || undefined;
   const minExperience = searchParams.minExperience ? parseInt(searchParams.minExperience, 10) : undefined;
 
-  let mentorsRes = { data: [], meta: { total: 0, page: 1, limit: 12, totalPages: 0 } };
+  let mentorsRes = { data: [], meta: { total: 0, page: 1, limit: 9, totalPages: 0 } };
 
   try {
     mentorsRes = await mentorGateway.getAllMentorProfiles({
       page,
-      limit: 12,
+      limit: 9,
       search,
       skills,
       minExperience,

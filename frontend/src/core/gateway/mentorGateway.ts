@@ -24,6 +24,7 @@ export const mentorGateway = {
    * Lấy danh sách Mentor Profiles có phân trang, tìm kiếm, lọc (REST API)
    */
   async getAllMentorProfiles(params?: { page?: number; limit?: number; search?: string; skills?: string; minExperience?: number }): Promise<any> {
+    console.log(`[mentorGateway] Fetching mentor profiles with params:`, params);
     return httpClient.get('/v1/mentor-profiles', { params });
   },
 
