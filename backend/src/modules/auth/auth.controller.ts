@@ -9,6 +9,8 @@ import {
   Headers,
   Req,
   Res,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Request, Response } from 'express';
@@ -51,7 +53,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  @ApiLoginDoc()
+  @HttpCode(HttpStatus.OK)
   @ApiLoginDoc()
   async login(
     @Body() loginDto: LoginDto,
@@ -67,7 +69,7 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
-  @ApiRefreshTokensDoc()
+  @HttpCode(HttpStatus.OK)
   @ApiRefreshTokensDoc()
   async refresh(@Req() req: Request) {
     const refreshToken = req.cookies['refresh_token'];
@@ -76,6 +78,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(HttpStatus.OK)
   @ApiLogoutDoc()
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const accessToken = req.cookies['access_token'];
@@ -121,7 +124,7 @@ export class AuthController {
 
   @Public()
   @Post('google/token')
-  @ApiGoogleTokenLoginDoc()
+  @HttpCode(HttpStatus.OK)
   @ApiGoogleTokenLoginDoc()
   async googleTokenLogin(
     @Body() googleTokenDto: GoogleTokenDto,
