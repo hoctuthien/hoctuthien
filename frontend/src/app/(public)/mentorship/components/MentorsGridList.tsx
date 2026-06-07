@@ -19,23 +19,25 @@ export const MentorsGridList = async ({ searchParams }: MentorsGridListProps) =>
   const skills = searchParams.skills || undefined;
   const minExperience = searchParams.minExperience ? parseInt(searchParams.minExperience, 10) : undefined;
 
-  let mentorsRes = { data: [], meta: { total: 0, page: 1, limit: 9, totalPages: 0 } };
+  let mentorsData: any[] = [];
+  let meta = { total: 0, page: 1, limit: 9, totalPages: 0 };
 
   try {
-    mentorsRes = await mentorGateway.getAllMentorProfiles({
+    const res = await mentorGateway.getAllMentorProfiles({
       page,
       limit: 9,
       search,
       skills,
       minExperience,
     });
+    // res = { data: [...], meta: {...}, error: null }
+    mentorsData = res.data || [];
+    if (res.meta) meta = res.meta;
   } catch (error) {
     console.error("Error fetching public mentors:", error);
   }
-  console.log(mentorsRes.data)
-  const mentors = mentorsRes.data || [];
 
-  if (mentors.length === 0) {
+  if (mentorsData.length === 0) {
     return (
       <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
         <Icon name="Users" size={48} className="mx-auto text-slate-300 mb-4" />
@@ -48,16 +50,18 @@ export const MentorsGridList = async ({ searchParams }: MentorsGridListProps) =>
   return (
     <div className="space-y-10 animate-in fade-in duration-300">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {mentors.map((mentor: any) => (
+        {mentorsData.map((mentor: any) => (
           <MentorCard key={mentor.id} mentor={mentor} />
         ))}
       </div>
 
       <MentorshipPagination
-        meta={mentorsRes.meta}
+        meta={meta}
+        currentPage={page}
         searchParams={searchParams as any}
-        itemsLength={mentors.length}
+        itemsLength={mentorsData.length}
       />
     </div>
   );
 };
+
