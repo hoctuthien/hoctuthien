@@ -7,6 +7,7 @@ import {
   CreateMentorAvailabilityGqlInput,
   UpdateMentorAvailabilityGqlInput,
   UserGql,
+  PaginatedMentorAvailability,
 } from './types/mentor-availability.graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -14,6 +15,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { User } from '../../common/decorators/user.decorator';
 import { UserService } from '../user/services/user.service';
+import { MentorAvailabilityStatus } from '../../common/enums/mentor-availability-status.enum';
 
 @Resolver(() => MentorAvailability)
 export class MentorAvailabilityResolver {
@@ -35,11 +37,16 @@ export class MentorAvailabilityResolver {
    * @description Lấy danh sách tất cả các yêu cầu làm Mentor (Dành cho Admin duyệt)
    * @access Admin (Role.ADMIN)
    */
-  @Query(() => [MentorAvailability], { name: 'mentorAvailabilities' })
+  @Query(() => PaginatedMentorAvailability, { name: 'mentorAvailabilities' })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async findAll() {
-    return this.mentorAvailabilityService.findAll();
+  async findAll(
+    @Args('page', { type: () => Int, nullable: true }) page?: number,
+    @Args('limit', { type: () => Int, nullable: true }) limit?: number,
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('status', { type: () => MentorAvailabilityStatus, nullable: true }) status?: MentorAvailabilityStatus,
+  ) {
+    return this.mentorAvailabilityService.findAll({ page, limit, search, status });
   }
 
   /**

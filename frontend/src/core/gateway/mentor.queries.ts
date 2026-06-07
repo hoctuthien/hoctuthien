@@ -39,39 +39,47 @@ export const GET_MY_AVAILABILITIES_QUERY = gql`
 `;
 
 export const GET_ALL_AVAILABILITIES_QUERY = gql`
-  query GetAllMentorAvailabilities {
-    mentorAvailabilities {
-      id
-      mentorId
-      jobTitle
-      company
-      bio
-      linkedinUrl
-      yearsOfExperience
-      skills
-      isActive
-      status
-      note
-      metadata {
-        certificates {
-          name
-          issuedBy
-          imageUrl
-        }
-        degrees {
-          name
-          university
-          imageUrl
-        }
-      }
-      user {
+  query GetAllMentorAvailabilities($page: Int, $limit: Int, $search: String, $status: MentorAvailabilityStatus) {
+    mentorAvailabilities(page: $page, limit: $limit, search: $search, status: $status) {
+      items {
         id
-        name
-        email
-        avatarUrl
+        mentorId
+        jobTitle
+        company
+        bio
+        linkedinUrl
+        yearsOfExperience
+        skills
+        isActive
+        status
+        note
+        metadata {
+          certificates {
+            name
+            issuedBy
+            imageUrl
+          }
+          degrees {
+            name
+            university
+            imageUrl
+          }
+        }
+        user {
+          id
+          name
+          email
+          avatarUrl
+        }
+        createdAt
+        updatedAt
       }
-      createdAt
-      updatedAt
+      meta {
+        total
+        page
+        limit
+        totalPages
+      }
     }
   }
 `;
