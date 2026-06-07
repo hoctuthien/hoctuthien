@@ -9,7 +9,7 @@ export const mentorProfileSchema = z.object({
   linkedinUrl: z.string().max(500).nullable().optional(),
   yearsOfExperience: z.number().nullable().optional(),
   skills: z.array(z.string()).default([]),
-  averageRating: z.number().default(0),
+  averageRating: z.preprocess((val) => (val === null || val === undefined ? 0 : Number(val)), z.number()).default(0),
   totalStudents: z.number().default(0),
   isApproved: z.boolean().default(false),
   approvedBy: z.string().nullable().optional(),

@@ -115,6 +115,30 @@ export class CreateMentorAvailabilityResult {
   data: MentorAvailability;
 }
 
+@ObjectType()
+export class PaginatedMentorAvailabilityMeta {
+  @Field(() => Int)
+  total: number;
+
+  @Field(() => Int)
+  page: number;
+
+  @Field(() => Int)
+  limit: number;
+
+  @Field(() => Int)
+  totalPages: number;
+}
+
+@ObjectType()
+export class PaginatedMentorAvailability {
+  @Field(() => [MentorAvailability])
+  items: MentorAvailability[];
+
+  @Field(() => PaginatedMentorAvailabilityMeta)
+  meta: PaginatedMentorAvailabilityMeta;
+}
+
 @InputType()
 export class CertificateInput {
   @Field()

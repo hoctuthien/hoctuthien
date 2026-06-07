@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { MentorAvailabilityService } from './services/mentor-availability.service';
 import {
   CreateMentorAvailabilityDto,
   UpdateMentorAvailabilityDto,
+  FindAllMentorAvailabilitiesQueryDto,
 } from './dtos/mentor-availability.dto';
 import {
   MentorAvailabilityEmptyActionDto,
@@ -65,8 +67,8 @@ export class MentorAvailabilityController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiFindAllMentorAvailabilitiesDoc()
-  findAll() {
-    return this.mentorAvailabilityService.findAll();
+  findAll(@Query() query: FindAllMentorAvailabilitiesQueryDto) {
+    return this.mentorAvailabilityService.findAll(query);
   }
 
   /**

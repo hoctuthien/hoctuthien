@@ -14,7 +14,12 @@ export interface ApiResponse<T> {
 
 export const createHttpClient = (baseUrl: string, prefix: string = '') => {
   const request = async <T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> => {
-    let url = `${baseUrl.replace(/\/$/, '')}${prefix}${path.startsWith('/') ? path : `/${path}`}`;
+    let effectiveBaseUrl = baseUrl;
+    if (!effectiveBaseUrl && typeof window === 'undefined') {
+      effectiveBaseUrl = process.env.BACKEND_URL || 'http://localhost:5050';
+    }
+    let url = `${effectiveBaseUrl.replace(/\/$/, '')}${prefix}${path.startsWith('/') ? path : `/${path}`}`;
+    console.log(`[createHttpClient Debug] baseUrl: "${baseUrl}" | effectiveBaseUrl: "${effectiveBaseUrl}" | typeof window: "${typeof window}" | url: "${url}"`);
     if (options.params) {
       const searchParams = new URLSearchParams(options.params);
       url += `?${searchParams.toString()}`;
@@ -30,10 +35,15 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
     };
 
     try {
-      const response = await fetch(url, {
+      const fetchOptions: RequestInit = {
         ...options,
         headers,
-      });
+      };
+      if (typeof window === 'undefined' && !options.cache) {
+        fetchOptions.cache = 'no-store';
+      }
+
+      const response = await fetch(url, fetchOptions);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -63,9 +73,9 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
 
   return {
     get: <T>(path: string, options?: RequestOptions) => request<T>(path, { ...options, method: 'GET' }),
-    post: <T>(path: string, data?: any, options?: RequestOptions) => 
+    post: <T>(path: string, data?: any, options?: RequestOptions) =>
       request<T>(path, { ...options, method: 'POST', body: data ? JSON.stringify(data) : undefined }),
-    patch: <T>(path: string, data?: any, options?: RequestOptions) => 
+    patch: <T>(path: string, data?: any, options?: RequestOptions) =>
       request<T>(path, { ...options, method: 'PATCH', body: data ? JSON.stringify(data) : undefined }),
     delete: <T>(path: string, options?: RequestOptions) => request<T>(path, { ...options, method: 'DELETE' }),
   };

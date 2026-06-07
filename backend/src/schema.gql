@@ -132,6 +132,18 @@ type Mutation {
   updateMentorAvailabilityToInProgress(id: ID!): MentorAvailability!
 }
 
+type PaginatedMentorAvailability {
+  items: [MentorAvailability!]!
+  meta: PaginatedMentorAvailabilityMeta!
+}
+
+type PaginatedMentorAvailabilityMeta {
+  limit: Int!
+  page: Int!
+  total: Int!
+  totalPages: Int!
+}
+
 type Query {
   categories: [CategoryGql!]!
   category(id: String, slug: String): CategoryGql!
@@ -139,7 +151,7 @@ type Query {
   courses(categoryId: String, categorySlug: String, groupCategoryId: String, groupCategorySlug: String): [CourseGql!]!
   groupCategories: [GroupCategoryGql!]!
   groupCategory(id: ID!): GroupCategoryGql!
-  mentorAvailabilities: [MentorAvailability!]!
+  mentorAvailabilities(limit: Int, page: Int, search: String, status: MentorAvailabilityStatus): PaginatedMentorAvailability!
   mentorAvailability(id: ID!): MentorAvailability!
   myMentorAvailabilities: [MentorAvailability!]!
   myMentorAvailability(id: ID!): MentorAvailability!

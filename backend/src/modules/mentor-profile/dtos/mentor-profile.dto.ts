@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
@@ -8,7 +8,10 @@ import {
   IsEnum,
   IsUUID,
   Min,
+  IsInt,
+  Max,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { MentorProfileStatus } from '../enums/mentor-profile-status.enum';
 
 export class MentorProfileDto {
@@ -86,4 +89,38 @@ export class UpdateMentorProfileDto extends PartialType(
   @IsUUID()
   @IsOptional()
   approvedBy?: string;
+}
+
+export class FindAllMentorProfilesQueryDto {
+  @ApiPropertyOptional({ example: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ example: 10 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 10;
+
+  @ApiPropertyOptional({ example: 'John' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({ example: 'NestJS' })
+  @IsOptional()
+  @IsString()
+  skills?: string;
+
+  @ApiPropertyOptional({ example: 5 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  minExperience?: number;
 }

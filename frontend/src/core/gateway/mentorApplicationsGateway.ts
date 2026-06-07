@@ -9,8 +9,8 @@ export const mentorApplicationsGateway = {
   /**
    * Lấy danh sách tất cả yêu cầu đăng ký (Dành cho Admin - Sử dụng GraphQL Query)
    */
-  async getAllApplications(): Promise<any> {
-    const result = await gqlClient.request<any>(GET_ALL_AVAILABILITIES_QUERY);
+  async getAllApplications(params?: { page?: number; limit?: number; search?: string; status?: string }): Promise<any> {
+    const result = await gqlClient.request<any>(GET_ALL_AVAILABILITIES_QUERY, params);
     return result.mentorAvailabilities;
   },
 

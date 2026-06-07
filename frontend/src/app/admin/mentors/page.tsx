@@ -1,28 +1,50 @@
 import React from "react";
 import { MentorApplicationTable } from "./components/MentorApplicationTable";
-import { MOCK_MENTOR_APPLICATIONS } from "./mock-data/mentor-management.mock";
 import { getTranslations } from "next-intl/server";
-import {  Icon } from "@/core/ui";
+import { Icon } from "@/core/ui";
 import { cn } from "@/core/utils/cn";
 import { Card } from "@/core/ui/Card";
-
-
-
 import { mentorApplicationsGateway } from "@/core/gateway";
 
-export default async function MentorManagementPage() {
-  const t = await getTranslations("Admin.mentors");
+interface MentorManagementPageProps {
+  searchParams: Promise<{
+    page?: string;
+    limit?: string;
+    search?: string;
+    status?: string;
+  }>;
+}
 
-  let applications = [];
+export default async function MentorManagementPage({ searchParams }: MentorManagementPageProps) {
+  const t = await getTranslations("Admin.mentors");
+  const params = await searchParams;
+
+  const page = params.page ? parseInt(params.page, 10) : 1;
+  const limit = params.limit ? parseInt(params.limit, 10) : 10;
+  const search = params.search || undefined;
+  const status = params.status || undefined;
+
+  let applicationsRes = { items: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+  let allApplicationsRes = { items: [], meta: { total: 0 } };
+
   try {
-    applications = await mentorApplicationsGateway.getAllApplications();
+    const [paginated, all] = await Promise.all([
+      mentorApplicationsGateway.getAllApplications({ page, limit, search, status }),
+      mentorApplicationsGateway.getAllApplications({ limit: 10000 }),
+    ]);
+    applicationsRes = paginated;
+    allApplicationsRes = all;
   } catch (error) {
     console.error("Failed to fetch mentor applications:", error);
   }
 
-  const pendingCount = applications.filter((app: any) => app.status === "PENDING").length;
-  const approvedCount = applications.filter((app: any) => app.status === "APPROVED").length;
-  const totalCount = applications.length;
+  const applications = applicationsRes.items || [];
+  const meta = applicationsRes.meta;
+
+  const allApplications = allApplicationsRes.items || [];
+  const pendingCount = allApplications.filter((app: any) => app.status === "PENDING").length;
+  const approvedCount = allApplications.filter((app: any) => app.status === "APPROVED").length;
+  const totalCount = allApplications.length;
   const approvalRate = totalCount > 0 ? Math.round((approvedCount / totalCount) * 100) : 100;
 
   const stats = [
@@ -84,9 +106,8 @@ export default async function MentorManagementPage() {
 
       {/* Table Section */}
       <Card className="p-8 border-none shadow-sm">
-        <MentorApplicationTable initialData={applications} />
+        <MentorApplicationTable initialData={applications} meta={meta} />
       </Card>
     </div>
   );
 }
-
