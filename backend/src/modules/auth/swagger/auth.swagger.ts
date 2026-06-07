@@ -51,7 +51,7 @@ export const ApiLoginDoc = () => {
     }),
     ApiBody({ type: LoginDto }),
     ApiResponse({
-      status: 201,
+      status: 200,
       description:
         'Đăng nhập thành công. Tokens được trả về và lưu trong Cookie.',
       schema: {
@@ -91,7 +91,7 @@ export const ApiRefreshTokensDoc = () => {
       required: false,
     }),
     ApiResponse({
-      status: 201,
+      status: 200,
       description: 'Refresh thành công. Tokens mới được lưu vào Cookie.',
       schema: {
         type: 'object',
@@ -130,7 +130,7 @@ export const ApiLogoutDoc = () => {
       required: false,
     }),
     ApiResponse({
-      status: 201,
+      status: 200,
       description: 'Đăng xuất thành công. Cookies sẽ bị xóa.',
       schema: {
         type: 'object',
@@ -202,7 +202,7 @@ export const ApiGoogleTokenLoginDoc = () => {
     }),
     ApiBody({ type: GoogleTokenDto }),
     ApiResponse({
-      status: 201,
+      status: 200,
       description: 'Đăng nhập thành công. Tokens lưu vào Cookie.',
       schema: {
         type: 'object',
