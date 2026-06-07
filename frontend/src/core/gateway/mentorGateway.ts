@@ -21,6 +21,13 @@ export const mentorGateway = {
   },
 
   /**
+   * Lấy danh sách Mentor Profiles có phân trang, tìm kiếm, lọc (REST API)
+   */
+  async getAllMentorProfiles(params?: { page?: number; limit?: number; search?: string; skills?: string; minExperience?: number }): Promise<any> {
+    return httpClient.get('/v1/mentor-profiles', { params });
+  },
+
+  /**
    * Lấy thông tin Mentor Profile của một User cụ thể (REST API)
    */
   async getMentorProfileByUserId(userId: string): Promise<any> {

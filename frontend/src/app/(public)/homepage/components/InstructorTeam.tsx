@@ -5,18 +5,30 @@ import { Card } from '@/core/ui/Card';
 import { Icon } from '@/core/ui/Icon';
 import { Button } from '@/core/ui/Button';
 import { MOCK_INSTRUCTORS } from '@/shared/mocks/homepage.mock';
+import Link from 'next/link';
 
-export const InstructorTeam = () => {
+interface InstructorTeamProps {
+  initialMentors?: any[];
+}
+
+export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
   const t = useTranslations('Homepage');
 
-  const instructors = MOCK_INSTRUCTORS.map(ins => ({
-    name: ins.name,
-    role: ins.id === 'ins-1' ? t('mathExpert') :
-          ins.id === 'ins-2' ? t('scienceResearcher') :
-          ins.id === 'ins-3' ? t('globalHistorian') :
-          t('financialAnalyst'),
-    image: ins.avatarUrl || '/images/avatar_logo.png',
-  }));
+  const mentorsList = (initialMentors && initialMentors.length > 0)
+    ? initialMentors
+    : MOCK_INSTRUCTORS;
+
+  const instructors = mentorsList.map((ins) => {
+    const name = ins.user?.name || ins.name || "Mentor";
+    const role = ins.jobTitle || (
+      ins.id === 'ins-1' ? t('mathExpert') :
+      ins.id === 'ins-2' ? t('scienceResearcher') :
+      ins.id === 'ins-3' ? t('globalHistorian') :
+      t('financialAnalyst')
+    );
+    const image = ins.user?.avatarUrl || ins.avatarUrl || '/images/avatar_logo.png';
+    return { name, role, image };
+  });
 
   return (
     <section className="py-24 bg-white">
@@ -76,12 +88,14 @@ export const InstructorTeam = () => {
         </div>
 
         <div className="mt-16 flex justify-center">
-           <Button 
-            label={t('viewAllInstructors')} 
-            variant="primary" 
-            className="rounded-full px-10"
-            iconRight={<Icon name="ArrowRight" size={18} />}
-          />
+          <Link href="/mentorship" className="no-underline">
+            <Button 
+              label={t('viewAllInstructors')} 
+              variant="primary" 
+              className="rounded-full px-10"
+              iconRight={<Icon name="ArrowRight" size={18} />}
+            />
+          </Link>
         </div>
       </div>
     </section>

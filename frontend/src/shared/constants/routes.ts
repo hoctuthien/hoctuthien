@@ -20,7 +20,7 @@ export const DASHBOARD_ROUTES = [
 ] as const;
 
 /** Routes công khai cho user, nhưng admin không được vào */
-export const PUBLIC_USER_ROUTES = ["/", "/courses", "/posts", "/homepage"] as const;
+export const PUBLIC_USER_ROUTES = ["/", "/courses", "/posts", "/homepage", "/mentorship"] as const;
 
 /** Routes xác thực (login, register) */
 export const AUTH_ROUTES = ["/login", "/register"] as const;

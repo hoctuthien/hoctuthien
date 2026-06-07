@@ -16,9 +16,24 @@ export class MentorProfileService {
     private readonly mentorProfileRepository: MentorProfileRepository,
   ) {}
 
-  async findAll() {
-    const items = await this.mentorProfileRepository.findMany();
-    return items.map((item) => mentorProfileSchema.parse(item));
+  async findAll(query?: { page?: number; limit?: number; search?: string; skills?: string; minExperience?: number }) {
+    const page = query?.page || 1;
+    const limit = query?.limit || 10;
+
+    const [items, total] = await this.mentorProfileRepository.findActiveMentorsWithFilters({
+      page,
+      limit,
+      search: query?.search,
+      skills: query?.skills,
+      minExperience: query?.minExperience,
+    });
+
+    const { createPaginationMeta } = await import('../../../common/utils/pagination.util');
+
+    return {
+      items: items.map((item) => mentorProfileSchema.parse(item)),
+      meta: createPaginationMeta(total, page, limit),
+    };
   }
 
   async findOne(id: string) {
