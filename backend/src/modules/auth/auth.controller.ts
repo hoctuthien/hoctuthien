@@ -18,6 +18,8 @@ import { AuthService } from './services/auth.service';
 import { LoginDto, GoogleTokenDto, RegisterDto } from './dtos/auth.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
+import { RateLimitFail } from 'src/common/decorators/rate-limit-fail.decorator';
+import { RateLimitFailInterceptor } from 'src/common/interceptors/rate-limit-fail.interceptor';
 import { ApiTags } from '@nestjs/swagger';
 import {
   ApiRegisterDoc,
@@ -37,6 +39,8 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @UseInterceptors(RateLimitFailInterceptor)
+  @RateLimitFail({ type: 'register', limit: 3, ttl: 60, blockDuration: 60 })
   @ApiRegisterDoc()
   @ApiRegisterDoc()
   async register(
@@ -54,6 +58,8 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(RateLimitFailInterceptor)
+  @RateLimitFail({ type: 'login', limit: 5, ttl: 60, blockDuration: 60 })
   @ApiLoginDoc()
   async login(
     @Body() loginDto: LoginDto,
