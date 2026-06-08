@@ -224,13 +224,11 @@ export async function getCategoriesPaginatedAction(
     if (!res.ok) return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
     const result = await res.json();
     
-    // NestJS ResponseTransformInterceptor wraps under result.data[0]
-    const inner = result.data?.[0];
-    if (inner && Array.isArray(inner.data) && inner.meta) {
-      console.log("\x1b[36m[getCategoriesPaginatedAction] Server Response:\x1b[0m", JSON.stringify(inner, null, 2));
+    if (result && Array.isArray(result.data) && result.meta) {
+      console.log("\x1b[36m[getCategoriesPaginatedAction] Server Response:\x1b[0m", JSON.stringify(result, null, 2));
       return {
-        data: inner.data,
-        meta: inner.meta,
+        data: result.data,
+        meta: result.meta,
       };
     }
 

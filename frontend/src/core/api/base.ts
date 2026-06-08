@@ -47,12 +47,20 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        // Dùng warn thay vì error - caller có thể tự handle
-        console.warn(`[httpClient] ${response.status} from ${url}:`, errorData?.error?.message || response.statusText);
-        throw {
+        // Chuẩn hóa lỗi cho frontend: map message và meta sang error.message và error.code nếu cần
+        const normalizedError = {
           ...errorData,
+          error: errorData.error || {
+            code: errorData.meta?.code || errorData.code || 'UNKNOWN_ERROR',
+            message: errorData.message || response.statusText,
+            details: errorData.meta?.details || errorData.details || null,
+          },
+          message: errorData.message || response.statusText,
           status: response.status,
         };
+        // Dùng warn thay vì error - caller có thể tự handle
+        console.warn(`[httpClient] ${response.status} from ${url}:`, normalizedError.message);
+        throw normalizedError;
       }
 
       // Trả về cả data và headers

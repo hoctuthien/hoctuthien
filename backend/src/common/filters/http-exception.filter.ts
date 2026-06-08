@@ -115,11 +115,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }, '[ErrorResponse]');
 
     response.status(status).json({
-      data: null,
-      meta: null,
-      error: {
+      data: [],
+      message,
+      meta: {
         code,
-        message,
         correlationId,
         details: details || null,
       },
