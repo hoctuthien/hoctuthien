@@ -23,6 +23,11 @@ import { ConfigService } from '@nestjs/config';
         synchronize: configService.get<boolean>('database.synchronize'), // Đọc từ biến môi trường
         logging: configService.get<string>('logLevel') === 'debug', // Chỉ in câu lệnh SQL khi LOG_LEVEL=debug
         ssl: false, // Nếu DB server yêu cầu SSL thì mới để true
+        extra: {
+          max: 20, // Số lượng connection tối đa trong pool (mặc định là 10)
+          idleTimeoutMillis: 30000, // Thời gian (ms) đóng connection rảnh rỗi (mặc định 30s)
+          connectionTimeoutMillis: 2000, // Thời gian chờ (ms) tối đa để lấy connection từ pool (mặc định 0 - chờ vô hạn)
+        },
       }),
     }),
   ],
