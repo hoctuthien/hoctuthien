@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import { AppLogger } from '../../common/logger/app-logger.service';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './services/user.service';
 import { CreateUserInput, UpdateUserInput } from './types/user.types';
@@ -28,12 +29,18 @@ import {
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly logger: AppLogger,
+  ) {
+    this.logger.setContext(UserController.name);
+  }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiGetMeDoc()
   async getMe(@User('id') userId: string) {
+    this.logger.log({ userId }, 'Getting current user profile');
     const result = await this.userService.getMe(userId);
 
     return {
@@ -62,6 +69,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   create(@Body() payload: CreateUserInput) {
+    this.logger.log({ payload }, 'Creating new user');
     return this.userService.create(payload);
   }
 
@@ -70,6 +78,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   findAll() {
+    this.logger.log({}, 'Finding all users');
     return this.userService.findAll();
   }
 
@@ -78,6 +87,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   findOne(@Param('id') id: string) {
+    this.logger.log({ userId: id }, 'Finding user by id');
     return this.userService.findOne(id);
   }
 
@@ -91,6 +101,7 @@ export class UserController {
     @User('id') requestingUserId: string,
     @User('role') requestingUserRole: string,
   ) {
+    this.logger.log({ targetUserId: id, requestingUserId }, 'Updating user');
     return this.userService.update(
       id,
       payload,
@@ -104,6 +115,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
+    this.logger.log({ userId: id }, 'Removing user');
     return this.userService.remove(id);
   }
 }

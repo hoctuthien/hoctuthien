@@ -1,0 +1,179 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type CategoryGql {
+  groupCategory: GroupCategoryGql
+  iconUrl: String
+  id: ID!
+  name: String!
+  slug: String
+  status: String!
+}
+
+type Certificate {
+  imageUrl: String!
+  issuedBy: String
+  name: String!
+}
+
+input CertificateInput {
+  imageUrl: String!
+  issuedBy: String
+  name: String!
+}
+
+type CourseGql {
+  approvedBy: String
+  categories: [CategoryGql]
+  description: String
+  durationMinutes: Int!
+  id: ID!
+  mentorId: String!
+  metadata: JSON
+  prerequisites: [String]
+  price: Float!
+  status: String!
+  thumbnailUrl: String
+  title: String!
+}
+
+input CreateMentorAvailabilityGqlInput {
+  bio: String
+  company: String
+  jobTitle: String
+  linkedinUrl: String
+  metadata: MentorAvailabilityMetadataInput!
+  note: String
+  skills: [String!]
+  yearsOfExperience: Int
+}
+
+type CreateMentorAvailabilityResult {
+  data: MentorAvailability!
+  message: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Degree {
+  imageUrl: String!
+  name: String!
+  university: String
+}
+
+input DegreeInput {
+  imageUrl: String!
+  name: String!
+  university: String
+}
+
+type GroupCategoryGql {
+  categories: [CategoryGql]
+  id: ID!
+  name: String!
+  slug: String
+  status: String!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type MentorAvailability {
+  approvedBy: String
+  bio: String
+  company: String
+  createdAt: DateTime!
+  id: ID!
+  isActive: Boolean!
+  jobTitle: String
+  linkedinUrl: String
+  mentorId: String!
+  metadata: MentorAvailabilityMetadata!
+  note: String
+  skills: [String!]!
+  status: MentorAvailabilityStatus!
+  updatedAt: DateTime!
+  user: UserGql
+  yearsOfExperience: Int
+}
+
+type MentorAvailabilityMetadata {
+  certificates: [Certificate!]
+  degrees: [Degree!]
+}
+
+input MentorAvailabilityMetadataInput {
+  certificates: [CertificateInput!]!
+  degrees: [DegreeInput!]!
+}
+
+"""Trạng thái của đơn đăng ký làm Mentor"""
+enum MentorAvailabilityStatus {
+  APPROVED
+  CANCEL
+  IN_PROGRESS
+  PENDING
+  REJECTED
+}
+
+type Mutation {
+  approveMentorAvailability(id: ID!, note: String!): MentorAvailability!
+  cancelMentorAvailability(id: ID!): MentorAvailability!
+  createMentorAvailability(input: CreateMentorAvailabilityGqlInput!): CreateMentorAvailabilityResult!
+  rejectMentorAvailability(id: ID!, note: String!): MentorAvailability!
+  removeMentorAvailability(id: ID!): Boolean!
+  updateMentorAvailability(id: ID!, input: UpdateMentorAvailabilityGqlInput!): MentorAvailability!
+  updateMentorAvailabilityToInProgress(id: ID!): MentorAvailability!
+}
+
+type PaginatedMentorAvailability {
+  items: [MentorAvailability!]!
+  meta: PaginatedMentorAvailabilityMeta!
+}
+
+type PaginatedMentorAvailabilityMeta {
+  limit: Int!
+  page: Int!
+  total: Int!
+  totalPages: Int!
+}
+
+type Query {
+  categories: [CategoryGql!]!
+  category(id: String, slug: String): CategoryGql!
+  course(id: ID!): CourseGql!
+  courses(categoryId: String, categorySlug: String, groupCategoryId: String, groupCategorySlug: String): [CourseGql!]!
+  groupCategories: [GroupCategoryGql!]!
+  groupCategory(id: ID!): GroupCategoryGql!
+  mentorAvailabilities(limit: Int, page: Int, search: String, status: MentorAvailabilityStatus): PaginatedMentorAvailability!
+  mentorAvailability(id: ID!): MentorAvailability!
+  myMentorAvailabilities: [MentorAvailability!]!
+  myMentorAvailability(id: ID!): MentorAvailability!
+}
+
+input UpdateMentorAvailabilityGqlInput {
+  approvedBy: String
+  bio: String
+  company: String
+  isActive: Boolean
+  jobTitle: String
+  linkedinUrl: String
+  metadata: MentorAvailabilityMetadataInput
+  note: String
+  skills: [String!]
+  status: MentorAvailabilityStatus
+  yearsOfExperience: Int
+}
+
+type UserGql {
+  avatarUrl: String
+  email: String!
+  id: ID!
+  name: String!
+}

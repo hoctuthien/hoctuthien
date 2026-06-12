@@ -8,8 +8,9 @@ import {
   Delete,
   Query,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CourseBookingService } from './services/course-booking.service';
 import {
   CreateCourseBookingInput,
@@ -56,6 +57,28 @@ export class CourseBookingController {
     @User('role') userRole: string,
   ) {
     return this.courseBookingService.findAll(query, userId, userRole);
+  }
+
+  @Get('check-conflict')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kiểm tra trùng lịch học (MENTEE)' })
+  @ApiQuery({ name: 'meetingTime', required: true, type: String, example: '2026-06-01T09:00:00.000Z' })
+  @ApiQuery({ name: 'courseId', required: true, type: String, example: 'course-uuid' })
+  @ApiResponse({ status: 200, description: 'Kiểm tra trùng lịch thành công' })
+  @UseGuards(JwtAuthGuard)
+  async checkConflict(
+    @Query('meetingTime') meetingTime: string,
+    @Query('courseId') courseId: string,
+    @User('id') menteeId: string,
+  ) {
+    if (!meetingTime || !courseId) {
+      throw new BadRequestException('meetingTime và courseId là bắt buộc.');
+    }
+    const parsedDate = new Date(meetingTime);
+    if (isNaN(parsedDate.getTime())) {
+      throw new BadRequestException('meetingTime không đúng định dạng.');
+    }
+    return this.courseBookingService.checkConflict(parsedDate, courseId, menteeId);
   }
 
   @Get(':id')

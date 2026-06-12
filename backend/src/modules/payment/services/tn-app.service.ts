@@ -5,7 +5,20 @@ import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { toVNDateString } from '../payment.utils';
 
-// ─── Interfaces ──────────────────────────────────────────────────────────────
+/**
+ * Parse transactionTime từ TN App API sang Date UTC.
+ *
+ * API thực tế trả về ISO-like "2026-05-20T17:21:00" (không có timezone) → giờ VN (UTC+7).
+ * Test mock dùng "YYYY-MM-DD HH:mm:ss" → cần hỗ trợ cả hai format.
+ */
+function parseTxTime(txTime: string): Date {
+  const normalized = txTime.replace(' ', 'T');
+  const withOffset =
+    normalized.includes('+') || normalized.endsWith('Z')
+      ? normalized
+      : `${normalized}+07:00`;
+  return new Date(withOffset);
+}
 
 export interface TNTransaction {
   id: string;
@@ -30,12 +43,26 @@ export interface TNTransactionPayload {
   totalDebit: number;
 }
 
+/** Wrapper ngoài cùng mà TN App API thực tế trả về */
+export interface TNApiWrapper {
+  status: number;
+  code: string;
+  error: string;
+  codes: unknown;
+  data: TNTransactionPayload;
+}
+
 export interface TNTransactionResponse {
   status: number;
   data: TNTransactionPayload;
 }
 
-// ─── Service ──────────────────────────────────────────────────────────────────
+export interface FindTransactionResult {
+  found: boolean;
+  transaction: TNTransaction | null;
+  rawResponse?: string;
+  error?: string;
+}
 
 @Injectable()
 export class TnAppService {
@@ -46,82 +73,122 @@ export class TnAppService {
     private readonly configService: ConfigService,
   ) {}
 
+  // ─── Dùng bởi Cron Job ─────────────────────────────────────────────────────
   /**
-   * Lấy toàn bộ giao dịch CREDIT trong khoảng [fromDate, toDate] từ TN App.
+   * Fetch tất cả giao dịch CREDIT trong khoảng [fromDate, toDate] từ TN App.
+   * Cron job gọi 1 lần duy nhất rồi match locally trong RAM — tránh N+1 API call.
    *
-   * Loop qua tất cả các trang (hasNextPage) để đảm bảo không bỏ sót giao dịch.
-   * Chỉ giữ lại giao dịch type === 'CREDIT' vì chúng ta chỉ quan tâm đến tiền vào.
-   *
-   * @returns Mảng TNTransaction CREDIT đã gom từ tất cả các trang. Trả về [] nếu lỗi.
+   * @returns Mảng TNTransaction CREDIT. Trả mảng rỗng nếu lỗi hoặc không có tx.
    */
-  async fetchLatestBatch(fromDate: Date, toDate: Date): Promise<TNTransaction[]> {
+  async fetchLatestBatch(
+    fromDate: Date,
+    toDate: Date,
+  ): Promise<TNTransaction[]> {
     const baseUrl = this.configService.get<string>('tnApp.baseUrl');
     const accountNo = this.configService.get<string>('tnApp.accountNo');
 
     const from = toVNDateString(fromDate);
     const to = toVNDateString(toDate);
 
-    const allTransactions: TNTransaction[] = [];
-    let pageNumber = 1;
+    const url =
+      `${baseUrl}/bank-account-transaction/${accountNo}/transactionsV2` +
+      `?fromDate=${from}&toDate=${to}&keyword=&pageNumber=1&pageSize=50`;
 
-    do {
-      const url =
-        `${baseUrl}/bank-account-transaction/${accountNo}/transactionsV2` +
-        `?fromDate=${from}&toDate=${to}&keyword=&pageNumber=${pageNumber}&pageSize=50`;
-
-      try {
-        // TN App trả về dạng wrapped: { status: number, data: TNTransactionPayload }
-        // Generic type phải là TNTransactionResponse, sau đó unwrap .data.data
-        const response: AxiosResponse<TNTransactionResponse> = await firstValueFrom(
-          this.httpService.get<TNTransactionResponse>(url, {
+    try {
+      const response: AxiosResponse<TNApiWrapper> =
+        await firstValueFrom(
+          this.httpService.get<TNApiWrapper>(url, {
             headers: { 'Content-Type': 'application/json' },
           }),
         );
 
-        if (response.status !== 200) {
-          this.logger.warn(
-            `[TnApp] HTTP ${response.status} tại page ${pageNumber}. Dừng fetch.`,
-          );
-          break;
-        }
-
-        // response.data       → TNTransactionResponse  { status, data }
-        // response.data.data  → TNTransactionPayload   { transactions[], hasNextPage, ... }
-        const payload = response.data?.data;
-
-        // Guard: nếu API trả về shape không mong đợi thì dừng, không crash cron
-        if (!payload || !Array.isArray(payload.transactions)) {
-          this.logger.warn(
-            `[TnApp] Response page ${pageNumber} có shape không hợp lệ. Dừng fetch.`,
-          );
-          break;
-        }
-
-        const creditOnly = payload.transactions.filter((tx) => tx.type === 'CREDIT');
-        allTransactions.push(...creditOnly);
-
-        this.logger.debug(
-          `[TnApp] Page ${pageNumber}: ${payload.transactions.length} tx, ` +
-            `${creditOnly.length} CREDIT, hasNextPage=${payload.hasNextPage}`,
+      if (response.status !== 200) {
+        this.logger.warn(
+          `[TnApp] fetchLatestBatch HTTP ${response.status}`,
         );
-
-        if (!payload.hasNextPage) break;
-        pageNumber++;
-      } catch (error) {
-        // Bắt lỗi network hoặc timeout ở từng trang riêng lẻ.
-        // Không re-throw để tránh crash cron job — cron sẽ retry ở lần chạy tiếp theo.
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        this.logger.error(
-          `[TnApp] Lỗi khi fetch page ${pageNumber}: ${message}`,
-        );
-        break;
+        return [];
       }
-    } while (true);
 
-    this.logger.log(
-      `[TnApp] Fetch hoàn tất: ${allTransactions.length} CREDIT tx từ ${from} → ${to}`,
-    );
+      // API trả về: { status, data: { transactions: [...] } }
+      const transactions = response.data?.data?.transactions;
+      if (!Array.isArray(transactions)) {
+        this.logger.warn(
+          `[TnApp] fetchLatestBatch: data.transactions không phải mảng. ` +
+          `Payload nhận được: ${JSON.stringify(response.data).slice(0, 300)}`,
+        );
+        return [];
+      }
+      return transactions.filter((tx) => tx.type === 'CREDIT');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`[TnApp] fetchLatestBatch lỗi: ${message}`);
+      return [];
+    }
+  }
 
-    return allTransactions;
+  // ─── Dùng bởi API thủ công ─────────────────────────────────────────────────
+  /**
+   * Tìm 1 giao dịch CREDIT cụ thể khớp shortCode + amount.
+   * Dùng khi user bấm nút "Tôi đã chuyển khoản".
+   */
+  async findTransactionByCode(
+    shortCode: string,
+    fromDate: Date,
+    expectedAmount: number,
+  ): Promise<FindTransactionResult> {
+    const baseUrl = this.configService.get<string>('tnApp.baseUrl');
+    const accountNo = this.configService.get<string>('tnApp.accountNo');
+
+    const from = toVNDateString(fromDate);
+    const to = toVNDateString(new Date());
+
+    const url =
+      `${baseUrl}/bank-account-transaction/${accountNo}/transactionsV2` +
+      `?fromDate=${from}&toDate=${to}&keyword=&pageNumber=1&pageSize=50`;
+
+    let rawResponse = '';
+
+    try {
+      const response: AxiosResponse<TNApiWrapper> =
+        await firstValueFrom(
+          this.httpService.get<TNApiWrapper>(url, {
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        );
+
+      if (response.status !== 200) {
+        this.logger.warn(`[TnApp] findTransactionByCode HTTP ${response.status}`);
+        return { found: false, transaction: null, error: `HTTP ${response.status}`, rawResponse };
+      }
+
+      // API trả về: { status, data: { transactions: [...] } }
+      const payload = response.data?.data;
+      rawResponse = JSON.stringify(payload).slice(0, 2000);
+
+      if (!payload?.transactions || !Array.isArray(payload.transactions)) {
+        this.logger.warn(`[TnApp] Không có trường transactions trong response`);
+        return { found: false, transaction: null, rawResponse };
+      }
+
+      const match = payload.transactions.find(
+        (tx) =>
+          tx.type === 'CREDIT' &&
+          tx.narrative.toUpperCase().includes(shortCode.toUpperCase()) &&
+          tx.transactionAmount >= expectedAmount,
+      );
+
+      if (match && parseTxTime(match.transactionTime) >= fromDate) {
+        this.logger.log(
+          `[TnApp] Tìm thấy giao dịch khớp: ${match.id} — ${match.narrative}`,
+        );
+        return { found: true, transaction: match, rawResponse };
+      }
+
+      return { found: false, transaction: null, rawResponse };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`[TnApp] findTransactionByCode lỗi: ${message}`);
+      return { found: false, transaction: null, error: message };
+    }
   }
 }

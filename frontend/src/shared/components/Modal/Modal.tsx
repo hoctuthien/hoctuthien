@@ -40,7 +40,7 @@ export const Modal = ({
   if (!mounted || !isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6">
 
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"

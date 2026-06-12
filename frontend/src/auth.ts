@@ -5,6 +5,7 @@ import Google from "next-auth/providers/google";
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5050";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET || "fallback-secret-for-development-only-12345678",
   trustHost: true,
   providers: [
     Google({
@@ -71,7 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             });
             const responseData = await res.json();
             const actualData = responseData.data?.[0];
-            
+
             if (actualData) {
               return {
                 ...token,

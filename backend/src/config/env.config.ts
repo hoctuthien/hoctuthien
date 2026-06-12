@@ -1,6 +1,7 @@
 export default () => ({
   environment: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '3000', 10),
+  logLevel: process.env.LOG_LEVEL || 'info',
   apiPrefix: process.env.API_PREFIX || '/api/v1',
   database: {
     url: process.env.DATABASE_URL,

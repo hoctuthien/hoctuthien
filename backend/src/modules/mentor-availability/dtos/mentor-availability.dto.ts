@@ -7,6 +7,9 @@ import {
   IsEnum,
   IsBoolean,
   ValidateNested,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { MentorAvailabilityStatus } from '../../../common/enums/mentor-availability-status.enum';
@@ -112,4 +115,31 @@ export class UpdateMentorAvailabilityDto extends PartialType(CreateMentorAvailab
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+}
+
+export class FindAllMentorAvailabilitiesQueryDto {
+  @ApiPropertyOptional({ example: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ example: 10 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 10;
+
+  @ApiPropertyOptional({ example: 'John' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({ enum: MentorAvailabilityStatus })
+  @IsOptional()
+  @IsEnum(MentorAvailabilityStatus)
+  status?: MentorAvailabilityStatus;
 }

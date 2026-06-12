@@ -9,6 +9,8 @@ import {
   Headers,
   Req,
   Res,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Request, Response } from 'express';
@@ -16,6 +18,8 @@ import { AuthService } from './services/auth.service';
 import { LoginDto, GoogleTokenDto, RegisterDto } from './dtos/auth.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
+import { RateLimitFail } from 'src/common/decorators/rate-limit-fail.decorator';
+import { RateLimitFailInterceptor } from 'src/common/interceptors/rate-limit-fail.interceptor';
 import { ApiTags } from '@nestjs/swagger';
 import {
   ApiRegisterDoc,
@@ -35,6 +39,8 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @UseInterceptors(RateLimitFailInterceptor)
+  @RateLimitFail({ type: 'register', limit: 3, ttl: 60, blockDuration: 60 })
   @ApiRegisterDoc()
   @ApiRegisterDoc()
   async register(
@@ -51,7 +57,9 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  @ApiLoginDoc()
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(RateLimitFailInterceptor)
+  @RateLimitFail({ type: 'login', limit: 5, ttl: 60, blockDuration: 60 })
   @ApiLoginDoc()
   async login(
     @Body() loginDto: LoginDto,
@@ -67,7 +75,7 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
-  @ApiRefreshTokensDoc()
+  @HttpCode(HttpStatus.OK)
   @ApiRefreshTokensDoc()
   async refresh(@Req() req: Request) {
     const refreshToken = req.cookies['refresh_token'];
@@ -76,6 +84,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(HttpStatus.OK)
   @ApiLogoutDoc()
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const accessToken = req.cookies['access_token'];
@@ -121,7 +130,7 @@ export class AuthController {
 
   @Public()
   @Post('google/token')
-  @ApiGoogleTokenLoginDoc()
+  @HttpCode(HttpStatus.OK)
   @ApiGoogleTokenLoginDoc()
   async googleTokenLogin(
     @Body() googleTokenDto: GoogleTokenDto,

@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { MentorAvailabilityService } from './services/mentor-availability.service';
 import {
   CreateMentorAvailabilityDto,
   UpdateMentorAvailabilityDto,
+  FindAllMentorAvailabilitiesQueryDto,
 } from './dtos/mentor-availability.dto';
 import {
   MentorAvailabilityEmptyActionDto,
@@ -65,8 +67,8 @@ export class MentorAvailabilityController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiFindAllMentorAvailabilitiesDoc()
-  findAll() {
-    return this.mentorAvailabilityService.findAll();
+  findAll(@Query() query: FindAllMentorAvailabilitiesQueryDto) {
+    return this.mentorAvailabilityService.findAll(query);
   }
 
   /**
@@ -106,9 +108,11 @@ export class MentorAvailabilityController {
 
   /**
    * @description Cập nhật thông tin yêu cầu làm Mentor
-   * @access Chưa phân quyền (Cần xem xét bổ sung Guard)
+   * @access Admin (Role.ADMIN) hoặc Mentee (Role.MENTEE)
    */
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MENTEE)
   update(
     @Param('id') id: string,
     @Body() payload: UpdateMentorAvailabilityDto,
@@ -182,9 +186,11 @@ export class MentorAvailabilityController {
 
   /**
    * @description Xóa yêu cầu làm Mentor
-   * @access Chưa phân quyền (Cần xem xét bổ sung Guard)
+   * @access Admin (Role.ADMIN)
    */
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
     return this.mentorAvailabilityService.remove(id);
   }

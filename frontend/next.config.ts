@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "xsgames.co",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
   async rewrites() {
@@ -34,6 +38,10 @@ const nextConfig: NextConfig = {
         {
           source: '/api/:path*',
           destination: `${backendUrl}/api/:path*`,
+        },
+        {
+          source: '/graphql',
+          destination: `${backendUrl}/graphql`,
         },
       ],
     };

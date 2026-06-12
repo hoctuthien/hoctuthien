@@ -19,19 +19,21 @@ import {
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(private readonly categoryRepository: CategoryRepository) { }
 
   async findAll(query: FindCategoriesQuery) {
-    const { name, slug, status, page, limit } =
+    const { name, slug, status, groupCategoryId, page, limit } =
       findCategoriesQuerySchema.parse(query);
 
     const where: Record<string, any> = {};
     if (name) where['name'] = ILike(`%${name}%`);
     if (slug) where['slug'] = ILike(`%${slug}%`);
     if (status) where['status'] = status;
+    if (groupCategoryId) where['groupCategoryId'] = groupCategoryId;
 
     const [items, total] = await this.categoryRepository.findManyWithCount({
       where,
+      relations: ['groupCategory'],
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
@@ -48,8 +50,18 @@ export class CategoryService {
     };
   }
 
-  async findOne(id: string) {
-    const item = await this.categoryRepository.findById(id);
+  async findOne(id: string, slug?: string) {
+    const where: Record<string, any> = {};
+    if (id) {
+      where['id'] = id;
+    } else if (slug) {
+      where['slug'] = slug;
+    } else {
+      throw new NotFoundException('Category not found');
+    }
+    const item = await this.categoryRepository.findOne(where, {
+      relations: ['groupCategory'],
+    });
     if (!item) throw new NotFoundException('Category not found');
     return categorySchema.parse(item);
   }

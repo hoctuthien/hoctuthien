@@ -21,6 +21,7 @@ import { MentorAvailabilityEntity } from '../entities/mentor-availability.entity
 import { UserEntity, UserRole } from '../../user/entities/user.entity';
 import { MentorProfileEntity } from '../../mentor-profile/entities/mentor-profile.entity';
 import { MentorProfileStatus } from '../../mentor-profile/enums/mentor-profile-status.enum';
+import { createPaginationMeta } from '../../../common/utils/pagination.util';
 
 @Injectable()
 export class MentorAvailabilityService {
@@ -29,9 +30,35 @@ export class MentorAvailabilityService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll() {
-    const items = await this.mentorAvailabilityRepository.findMany();
-    return items.map((item) => mentorAvailabilitySchema.parse(item));
+  async findAll(query?: { page?: number; limit?: number; search?: string; status?: MentorAvailabilityStatus }) {
+    const page = query?.page || 1;
+    const limit = query?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const qb = this.mentorAvailabilityRepository.createQueryBuilder('ma');
+    qb.leftJoinAndSelect('ma.mentor', 'mentor');
+
+    if (query?.status) {
+      qb.andWhere('ma.status = :status', { status: query.status });
+    }
+
+    if (query?.search) {
+      qb.andWhere(
+        '(mentor.name ILIKE :search OR mentor.email ILIKE :search OR ma.jobTitle ILIKE :search OR ma.company ILIKE :search)',
+        { search: `%${query.search}%` },
+      );
+    }
+
+    qb.orderBy('ma.createdAt', 'DESC');
+    qb.skip(skip);
+    qb.take(limit);
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      items: items.map((item) => mentorAvailabilitySchema.parse(item)),
+      meta: createPaginationMeta(total, page, limit),
+    };
   }
 
   async findByMentorId(mentorId: string) {

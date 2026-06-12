@@ -1,0 +1,272 @@
+# Hướng dẫn tích hợp FE — Luồng Kích Hoạt Tài Khoản Mentee
+
+> **Base URL:** `http://localhost:3000` (dev) / `https://api.yourdomain.com` (prod)  
+> **Auth:** Tất cả endpoint đều yêu cầu `Authorization: Bearer <access_token>` (JWT).
+
+---
+
+## Tổng quan luồng
+
+```
+FE                          Backend                        TN App API
+ |                              |                               |
+ |--- POST /activation/generate-qr -->                          |
+ |<--- { paymentId, qrUrl, transactionCode, expiredAt } --------|
+ |                              |                               |
+ |  [Hiển thị QR cho user]      |                               |
+ |                              |                               |
+ |  [User mở app ngân hàng,     |                               |
+ |   scan QR hoặc CK thủ công]  |                               |
+ |                              |   (Background: Cron 60s)      |
+ |                              |-----> fetchLatestBatch ------>|
+ |                              |<----- [danh sách tx] ---------|
+ |                              |  [Nếu match → tự kích hoạt]   |
+ |                              |                               |
+ |-- POST /activation/verify -->|                               |
+ |   (User bấm "Tôi đã CK")     |----> findTransactionByCode -->|
+ |                              |<----- [found/not found] ------|
+ |<-- { activated, message } ---|                               |
+ |                              |                               |
+ |  [Nếu activated=true]        |                               |
+ |  → Chuyển sang màn hình      |                               |
+ |    thành công / reload user  |                               |
+```
+
+---
+
+## Các trạng thái payment
+
+| Status | Ý nghĩa |
+|--------|---------|
+| `pending` | QR vừa tạo, đang chờ user chuyển khoản |
+| `success` | Đã xác minh thành công, user được kích hoạt |
+| `expired` | QR hết hạn (sau 15 phút không thanh toán) |
+
+---
+
+## Bước 1 — Tạo QR kích hoạt
+
+### Request
+
+```http
+POST /payments/activation/generate-qr
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{}
+```
+
+> Body rỗng `{}`. Không cần truyền thêm gì. `amount` lấy từ SystemConfig backend, `userId` lấy từ JWT token.
+
+### Response `201 Created`
+
+```json
+{
+  "paymentId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "amount": 5000,
+  "transactionCode": "KICHHOAT user123ABC456",
+  "qrUrl": "https://img.vietqr.io/image/...",
+  "expiredAt": "2026-05-20T11:15:00.000Z"
+}
+```
+
+| Field | Mô tả |
+|-------|-------|
+| `paymentId` | UUID dùng cho bước verify — **lưu lại** |
+| `amount` | Số tiền cần chuyển (VND) |
+| `transactionCode` | Nội dung chuyển khoản bắt buộc — hiển thị cho user copy |
+| `qrUrl` | URL ảnh QR VietQR — embed trực tiếp vào `<img src="">` |
+| `expiredAt` | Thời điểm QR hết hạn (ISO 8601 UTC) |
+
+### Lưu ý FE
+
+- **Gọi API này 1 lần** khi user vào trang kích hoạt. Nếu đã có QR còn hạn, backend tự trả về QR cũ — không tạo mới.
+- Tính countdown từ `expiredAt`: `Math.max(0, new Date(expiredAt) - Date.now())`.
+- Khi countdown = 0 → hiển thị nút "Tạo QR mới" và gọi lại API này.
+
+### Errors
+
+| Status | Xử lý |
+|--------|-------|
+| `401` | Token hết hạn → redirect về login |
+
+---
+
+## Bước 2 — Hiển thị QR và hướng dẫn user
+
+FE hiển thị:
+1. **Ảnh QR** từ `qrUrl`
+2. **Nội dung CK** (`transactionCode`) — có nút copy
+3. **Số tiền** (`amount`) format VND
+4. **Countdown** đến `expiredAt`
+5. **Nút "Tôi đã chuyển khoản"** → kích hoạt Bước 3
+
+> ⚠️ Nhắc user: nội dung chuyển khoản **phải chứa đúng** `transactionCode`, nếu không backend không match được.
+
+---
+
+## Bước 3 — Xác minh thanh toán
+
+### Request
+
+```http
+POST /payments/activation/verify
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "paymentId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}
+```
+
+### Response `201 Created` — 3 kịch bản
+
+#### ✅ Kích hoạt thành công
+
+```json
+{
+  "activated": true,
+  "message": "Tài khoản đã được kích hoạt thành công."
+}
+```
+
+**→ FE:** Reload user profile (để lấy `isVerified = true`), chuyển sang màn hình thành công.
+
+---
+
+#### ⏳ Chưa tìm thấy giao dịch
+
+```json
+{
+  "activated": false,
+  "message": "Không tìm thấy giao dịch khớp. Vui lòng thử lại sau."
+}
+```
+
+**→ FE:** Hiển thị thông báo, cho phép user bấm lại sau 5-10 giây. Giao dịch ngân hàng thường mất 30s - 2 phút để xuất hiện.
+
+---
+
+#### 🔄 Hệ thống đang xử lý (Cron Job đang giữ lock)
+
+```json
+{
+  "activated": false,
+  "message": "Hệ thống đang xử lý giao dịch của bạn. Vui lòng thử lại sau vài giây."
+}
+```
+
+**→ FE:** Thử lại sau 3 giây. Đây là trường hợp cron job đang tự động xử lý thanh toán này.
+
+### Errors
+
+| Status | Nguyên nhân | Xử lý FE |
+|--------|------------|----------|
+| `401` | Token hết hạn | Redirect login |
+| `403` | `paymentId` không thuộc user này | Hiện thông báo lỗi, không cho retry |
+| `404` | `paymentId` không tồn tại | Hiện lỗi "payment không tồn tại" |
+| `422` | QR đã hết hạn | Hiện nút "Tạo QR mới", gọi lại Bước 1 |
+| `503` | TN App API tạm lỗi | Hiện "Dịch vụ đang bận, thử lại sau ít phút" |
+
+---
+
+## Chiến lược retry cho FE (khuyến nghị)
+
+```
+User bấm "Tôi đã chuyển khoản"
+  → Gọi POST /activation/verify
+  → activated = true  →  Thành công ✅
+  → activated = false →  Hiện "Chưa tìm thấy"
+                         + nút "Thử lại" (cooldown 5s)
+                         + Tối đa 3 lần retry thủ công
+  → HTTP 422           →  QR hết hạn → tạo QR mới
+  → HTTP 503           →  Thông báo lỗi hệ thống
+```
+
+> **Không nên** auto-poll liên tục. Cron job chạy mỗi 60s sẽ tự kích hoạt nếu có giao dịch. FE chỉ cần retry khi user chủ động bấm.
+
+---
+
+## API kiểm tra trạng thái payment (tuỳ chọn)
+
+Nếu FE muốn check trạng thái sau khi trang reload (ví dụ: user quay lại sau khi cron job đã kích hoạt):
+
+### Request
+
+```http
+GET /payments/{paymentId}
+Authorization: Bearer <access_token>
+```
+
+### Response `200 OK`
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "userId": "123456789",
+  "amount": "5000.00",
+  "currency": "VND",
+  "paymentMethod": "activation",
+  "status": "success",
+  "transactionId": "2057044026149859328",
+  "description": "KICHHOAT user123ABC456",
+  "expiredAt": "2026-05-20T11:15:00.000Z",
+  "paidAt": "2026-05-20T10:21:00.000Z",
+  "vietqrQrDataUrl": "https://img.vietqr.io/...",
+  "vietqrPayload": { "transactionCode": "KICHHOAT user123ABC456" },
+  "createdAt": "2026-05-20T11:00:00.000Z",
+  "updatedAt": "2026-05-20T10:21:05.000Z"
+}
+```
+
+Kiểm tra `status`:
+- `"pending"` → Chưa xác minh
+- `"success"` → Đã kích hoạt
+- `"expired"` → Hết hạn, cần tạo QR mới
+
+---
+
+## Sơ đồ luồng đầy đủ (mermaid)
+
+```mermaid
+flowchart TD
+    A([User vào trang Kích Hoạt]) --> B[POST /activation/generate-qr]
+    B --> C{QR còn hạn?}
+    C -- Có --> D[Trả về QR cũ]
+    C -- Không --> E[Tạo QR mới]
+    D & E --> F[Hiển thị QR + transactionCode + countdown]
+
+    F --> G[User mở app ngân hàng & chuyển khoản]
+    G --> H[User bấm Tôi đã chuyển khoản]
+    H --> I[POST /activation/verify]
+
+    I --> J{activated?}
+    J -- true --> K[✅ Kích hoạt thành công\nReload user profile]
+    J -- false, message chứa 'đang xử lý' --> L[⏳ Thử lại sau 3s]
+    J -- false, message chứa 'Không tìm thấy' --> M[❌ Hiện thông báo\nNút Thử lại cooldown 5s]
+    L & M --> I
+
+    I --> N{HTTP Error?}
+    N -- 422 --> O[QR hết hạn\nNút Tạo QR mới]
+    N -- 503 --> P[Hệ thống lỗi\nThử lại sau]
+    N -- 401 --> Q[Redirect Login]
+    O --> B
+
+    subgraph Background
+        R[Cron Job mỗi 60s] --> S[Fetch TN App API]
+        S --> T{Match payment?}
+        T -- Có --> U[Update DB SUCCESS\nKích hoạt user]
+    end
+```
+
+---
+
+## Checklist tích hợp FE
+
+- [ ] Lưu `paymentId` từ response của `generate-qr` vào state
+- [ ] Embed `qrUrl` vào `<img>` tag
+- [ ] Hiển thị `transactionCode` với nút copy
+- [ ] Hiện countdown đến `expiredAt`, khi hết → disable QR + nút "Tạo QR mới"
+- [ ] Xử lý đủ 3 trạng thái `activated = false` khác nhau
+- [ ] Reload user profile sau khi `activated = true`
+- [ ] Xử lý đủ các HTTP error codes: 401, 403, 404, 422, 503

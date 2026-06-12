@@ -60,6 +60,7 @@ export const HeroSection = () => {
                   src="/images/avatar_main.png"
                   alt="Student Learning"
                   fill
+                  priority
                   className="object-cover"
                 />
               </div>

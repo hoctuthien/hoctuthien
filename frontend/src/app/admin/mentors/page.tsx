@@ -1,37 +1,73 @@
 import React from "react";
 import { MentorApplicationTable } from "./components/MentorApplicationTable";
-import { MOCK_MENTOR_APPLICATIONS } from "./mock-data/mentor-management.mock";
 import { getTranslations } from "next-intl/server";
-import {  Icon } from "@/core/ui";
+import { Icon } from "@/core/ui";
 import { cn } from "@/core/utils/cn";
 import { Card } from "@/core/ui/Card";
+import { mentorApplicationsGateway } from "@/core/gateway";
 
+interface MentorManagementPageProps {
+  searchParams: Promise<{
+    page?: string;
+    limit?: string;
+    search?: string;
+    status?: string;
+  }>;
+}
 
-
-export default async function MentorManagementPage() {
+export default async function MentorManagementPage({ searchParams }: MentorManagementPageProps) {
   const t = await getTranslations("Admin.mentors");
+  const params = await searchParams;
+
+  const page = params.page ? parseInt(params.page, 10) : 1;
+  const limit = params.limit ? parseInt(params.limit, 10) : 10;
+  const search = params.search || undefined;
+  const status = params.status || undefined;
+
+  let applicationsRes = { items: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+  let allApplicationsRes = { items: [], meta: { total: 0 } };
+
+  try {
+    const [paginated, all] = await Promise.all([
+      mentorApplicationsGateway.getAllApplications({ page, limit, search, status }),
+      mentorApplicationsGateway.getAllApplications({ limit: 10000 }),
+    ]);
+    applicationsRes = paginated;
+    allApplicationsRes = all;
+  } catch (error) {
+    console.error("Failed to fetch mentor applications:", error);
+  }
+
+  const applications = applicationsRes.items || [];
+  const meta = applicationsRes.meta;
+
+  const allApplications = allApplicationsRes.items || [];
+  const pendingCount = allApplications.filter((app: any) => app.status === "PENDING").length;
+  const approvedCount = allApplications.filter((app: any) => app.status === "APPROVED").length;
+  const totalCount = allApplications.length;
+  const approvalRate = totalCount > 0 ? Math.round((approvedCount / totalCount) * 100) : 100;
 
   const stats = [
     { 
       label: "PENDING APPLICATIONS", 
-      value: "12", 
-      trend: "+2 today", 
+      value: pendingCount.toString(), 
+      trend: `+${pendingCount} pending`, 
       icon: "ClipboardList", 
       color: "text-blue-600", 
       bg: "bg-blue-50" 
     },
     { 
-      label: "TOTAL MENTORS", 
-      value: "145", 
-      trend: "Active Network", 
+      label: "TOTAL APPLICATIONS", 
+      value: totalCount.toString(), 
+      trend: "All-time submissions", 
       icon: "ShieldCheck", 
       color: "text-emerald-600", 
       bg: "bg-emerald-50" 
     },
     { 
       label: "APPROVAL RATE", 
-      value: "88%", 
-      trend: "High Quality", 
+      value: `${approvalRate}%`, 
+      trend: `${approvedCount} approved`, 
       icon: "PieChart", 
       color: "text-amber-600", 
       bg: "bg-amber-50" 
@@ -70,9 +106,8 @@ export default async function MentorManagementPage() {
 
       {/* Table Section */}
       <Card className="p-8 border-none shadow-sm">
-        <MentorApplicationTable initialData={MOCK_MENTOR_APPLICATIONS} />
+        <MentorApplicationTable initialData={applications} meta={meta} />
       </Card>
     </div>
   );
 }
-

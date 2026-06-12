@@ -8,6 +8,8 @@ import { getPostAction } from "@/app/admin/posts/actions/posts";
 import { PostContent } from "./components/PostContent";
 import { auth } from "@/auth";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Helper to extract clean text from BlockNote JSON string/array for SEO description
  */

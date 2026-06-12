@@ -6,12 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
+import { Public } from '../../common/decorators/public.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { MentorProfileService } from './services/mentor-profile.service';
 import {
   CreateMentorProfileDto,
   UpdateMentorProfileDto,
+  FindAllMentorProfilesQueryDto,
 } from './dtos/mentor-profile.dto';
 import {
   ApiCreateMentorProfileDoc,
@@ -25,7 +28,7 @@ import {
 @ApiTags('Mentor Profiles')
 @Controller('mentor-profiles')
 export class MentorProfileController {
-  constructor(private readonly mentorProfileService: MentorProfileService) {}
+  constructor(private readonly mentorProfileService: MentorProfileService) { }
 
   @Post()
   @ApiCreateMentorProfileDoc()
@@ -35,18 +38,21 @@ export class MentorProfileController {
 
   @Get()
   @ApiFindAllMentorProfilesDoc()
-  findAll() {
-    return this.mentorProfileService.findAll();
+  @Public()
+  findAll(@Query() query: FindAllMentorProfilesQueryDto) {
+    return this.mentorProfileService.findAll(query);
   }
 
   @Get('user/:userId')
   @ApiFindMentorProfileByUserIdDoc()
+  @Public()
   findByUserId(@Param('userId') userId: string) {
     return this.mentorProfileService.findByUserId(userId);
   }
 
   @Get(':id')
   @ApiFindOneMentorProfileDoc()
+  @Public()
   findOne(@Param('id') id: string) {
     return this.mentorProfileService.findOne(id);
   }

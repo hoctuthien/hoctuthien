@@ -33,6 +33,7 @@
     "loading": "Đang tải...",
     "profile": "Trang cá nhân",
     "myCourses": "Khóa học của tôi",
+    "createdCourses": "Khóa học đã tạo",
     "signOut": "Đăng xuất"
   },
 
@@ -260,7 +261,28 @@
       "export": "Xuất file",
       "viewDetails": "Xem chi tiết",
       "approve": "Phê duyệt",
-      "reject": "Từ chối"
+      "reject": "Từ chối",
+      "detailTitle": "Chi tiết đơn đăng ký",
+      "backToList": "Quay lại danh sách",
+      "notFoundTitle": "Không tìm thấy đơn đăng ký",
+      "notFoundDesc": "Đơn đăng ký không tồn tại hoặc đã bị xóa khỏi hệ thống.",
+      "loadError": "Không thể tải thông tin đơn đăng ký.",
+      "statusPending": "Đang chờ duyệt",
+      "statusInProgress": "Đang xử lý",
+      "statusApproved": "Đã phê duyệt",
+      "statusRejected": "Đã từ chối",
+      "statusCancelled": "Đã hủy bỏ",
+      "noNoteMessage": "Không có ghi chú bổ sung nào từ ứng viên.",
+      "noDegreesMessage": "Chưa khai báo bằng cấp học thuật.",
+      "noCertificatesMessage": "Chưa có chứng chỉ chuyên môn nào được thêm.",
+      "viewVerificationDegree": "Xem bằng cấp xác minh",
+      "viewVerificationCert": "Xem ảnh chứng chỉ",
+      "viewLinkedin": "Xem LinkedIn ứng viên",
+      "sendEmail": "Gửi Email trao đổi",
+      "appliedOn": "Đăng ký vào ngày",
+      "noSkillsMessage": "Chưa khai báo kỹ năng nào.",
+      "yearsCount": "{count} năm",
+      "yearsCountAbbrev": "{count} năm kn."
     },
     "sidebar": {
       "main": "Chính",
@@ -284,5 +306,15 @@
       "settings": "Cài đặt hệ thống",
       "signOut": "Đăng xuất"
     }
+  },
+  "ImageUploader": {
+    "label": "Hình ảnh xác thực",
+    "placeholder": "Kéo thả hình ảnh vào đây",
+    "subPlaceholder": "hoặc click để chọn tệp từ máy tính",
+    "uploading": "Đang tải lên cloud...",
+    "viewOriginal": "Xem ảnh gốc",
+    "delete": "Xóa ảnh",
+    "onlyImagesError": "Chỉ chấp nhận tệp tin định dạng hình ảnh!",
+    "uploadFailedError": "Tải lên tệp tin thất bại. Vui lòng kiểm tra định dạng tệp."
   }
 }

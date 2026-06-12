@@ -1,15 +1,19 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { UserPayload } from '../types/user-payload.type';
-// Import interface vừa tạo
 
 export const User = createParamDecorator(
-  // data chỉ được phép là một trong các key của UserPayload
   (data: keyof UserPayload | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
+    let request;
+    if (ctx.getType<string>() === 'graphql') {
+      const gqlCtx = GqlExecutionContext.create(ctx);
+      request = gqlCtx.getContext().req;
+    } else {
+      request = ctx.switchToHttp().getRequest();
+    }
 
-    const user: UserPayload = request.user;
+    const user: UserPayload = request?.user;
 
-    // Nếu truyền @User('email') -> data = 'email' -> trả về user['email']
     return data ? user?.[data] : user;
   },
 );

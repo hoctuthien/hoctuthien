@@ -6,16 +6,32 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { ERROR_CODES, ERROR_MESSAGES } from '../constants/error.constant';
+import { AppLogger } from '../logger/app-logger.service';
+import { correlationIdStorage } from '../logger/correlation-id.context';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new AppLogger();
+
+  constructor() {
+    this.logger.setContext(HttpExceptionFilter.name);
+  }
+
   catch(exception: unknown, host: ArgumentsHost) {
+    if (host.getType<string>() === 'graphql') {
+      throw exception;
+    }
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request & { traceId?: string }>();
+    const request = ctx.getRequest<Request>();
+    
+    const store = correlationIdStorage.getStore();
+    const correlationId = store?.correlationId || null;
 
-    const status =
+    let status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -24,22 +40,32 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message: string = ERROR_MESSAGES.INTERNAL_SERVER_ERROR;
     let details: any = undefined;
 
-    if (exception instanceof HttpException) {
+    if (exception instanceof ZodError) {
+      status = HttpStatus.BAD_REQUEST;
+      code = ERROR_CODES.VALIDATION_FAILED;
+      message = ERROR_MESSAGES.VALIDATION_FAILED;
+      
+      // Chuyển đổi ZodError thành Object mapping lỗi field-by-field tương tự Class-Validator
+      details = exception.issues.reduce((acc: Record<string, string>, err) => {
+        const field = err.path.join('.') || 'body';
+        acc[field] = err.message;
+        return acc;
+      }, {} as Record<string, string>);
+    } else if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse() as any;
-      const exceptionMessage =
-        typeof exceptionResponse === 'object'
-          ? exceptionResponse.message || exceptionResponse
-          : exceptionResponse;
+      
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        details = exceptionResponse;
+        message = exceptionResponse.message || ERROR_MESSAGES.VALIDATION_FAILED;
+      } else {
+        details = { message: exceptionResponse };
+        message = exceptionResponse || ERROR_MESSAGES.VALIDATION_FAILED;
+      }
 
+      const exceptionMessage = message;
       const actualMessage = Array.isArray(exceptionMessage)
         ? exceptionMessage[0]
         : exceptionMessage;
-
-      // Mặc định details sẽ là một Object để FE luôn xử lý đồng nhất
-      details =
-        typeof exceptionMessage === 'object'
-          ? exceptionMessage
-          : { message: exceptionMessage };
 
       switch (status) {
         case HttpStatus.BAD_REQUEST:
@@ -71,18 +97,32 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }
     } else {
       // Log generic error here if needed
-      console.error(exception);
+      this.logger.error({ 
+        message: exception instanceof Error ? exception.message : String(exception),
+        stack: exception instanceof Error ? exception.stack : undefined,
+        url: request.originalUrl,
+        method: request.method
+      }, '[UnhandledException]');
     }
 
+    // Always log the final error response
+    this.logger.error({
+      statusCode: status,
+      errorCode: code,
+      errorMessage: message,
+      url: request.originalUrl,
+      method: request.method
+    }, '[ErrorResponse]');
+
     response.status(status).json({
-      data: null,
-      meta: null,
-      error: {
+      data: [],
+      message,
+      meta: {
         code,
-        message,
-        traceId: request.traceId || null,
+        correlationId,
         details: details || null,
       },
     });
   }
 }
+

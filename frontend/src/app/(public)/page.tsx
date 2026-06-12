@@ -8,13 +8,22 @@ import { Testimonials } from './homepage/components/Testimonials';
 import { BecomeMentorSection } from './homepage/components/BecomeMentorSection';
 import { Newsletter } from './homepage/components/Newsletter';
 import { getPostsAction } from '@/app/admin/posts/actions/posts';
+import { mentorGateway } from '@/core/gateway';
+
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   let posts: any[] = [];
+  let mentors: any[] = [];
   try {
-    posts = await getPostsAction();
+    const [postsRes, mentorsRes] = await Promise.all([
+      getPostsAction(),
+      mentorGateway.getAllMentorProfiles({ limit: 12 })
+    ]);
+    posts = postsRes || [];
+    mentors = mentorsRes?.data || [];
   } catch (error) {
-    console.error("Error fetching posts for homepage:", error);
+    console.error("Error fetching data for homepage:", error);
   }
 
   // Filter only published posts
@@ -25,7 +34,7 @@ export default async function HomePage() {
       <HeroSection />
       <FeaturesSection />
       <CourseCategories />
-      <InstructorTeam />
+      <InstructorTeam initialMentors={mentors} />
       <PostsCarousel initialPosts={publishedPosts} />
       <Testimonials />
       <BecomeMentorSection />

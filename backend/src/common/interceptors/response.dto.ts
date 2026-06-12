@@ -32,9 +32,9 @@ export class ApiResponseDto<T = any> {
   @ApiProperty()
   data: T | null;
 
+  @ApiProperty({ example: '' })
+  message: string;
+
   @ApiProperty({ type: PaginationMetaDto, required: false })
   meta: PaginationMetaDto | Record<string, any> | null;
-
-  @ApiProperty({ type: ApiErrorDto, required: false, nullable: true })
-  error: ApiErrorDto | null;
 }

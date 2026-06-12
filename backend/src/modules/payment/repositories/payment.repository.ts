@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository } from 'typeorm';
 import { BaseRepository } from '../../../common/repositories/base.repository';
 import { PaymentEntity, PaymentType } from '../entities/payment.entity';
 import { PaymentStatus } from '../../../common/enums/database.enum';
@@ -33,10 +33,9 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
   }
 
   // Bulk-expire tất cả payment PENDING đã quá expiredAt — có thể gọi từ cron job
-  async expireStaleActivations(): Promise<number> {
+  async expireStalePayments(): Promise<number> {
     const result = await this.repo.update(
       {
-        paymentMethod: PaymentType.ACTIVATION,
         status: PaymentStatus.PENDING,
         expiredAt: LessThan(new Date()),
       },
@@ -45,14 +44,21 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
     return result.affected ?? 0;
   }
 
-  // Lấy tất cả payment PENDING chưa hết hạn — cron job dùng để đối soát hàng loạt
-  async findAllPendingActive(): Promise<PaymentEntity[]> {
+  /**
+   * Lấy tất cả payment PENDING + chưa hết hạn.
+   * Dùng bởi Cron job để đối soát với TN App.
+   *
+   * @param limit Giới hạn số records (mặc định 20 — đủ cho MVP)
+   * @returns Mảng PaymentEntity, cũ nhất trước (FIFO)
+   */
+  async findAllPendingActive(limit = 20): Promise<PaymentEntity[]> {
     return this.repo.find({
       where: {
-        paymentMethod: PaymentType.ACTIVATION,
         status: PaymentStatus.PENDING,
+        expiredAt: MoreThan(new Date()),
       },
       order: { createdAt: 'ASC' },
+      take: limit,
     });
   }
 }

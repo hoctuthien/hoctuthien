@@ -19,21 +19,21 @@ export const MentorCard: React.FC<MentorCardProps> = ({
   onProfile,
 }) => {
   return (
-    <div className="bg-white rounded-[24px] p-7 shadow-[0_12px_30px_rgba(0,0,0,0.06)] max-w-[340px] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.1)] select-none border border-white/50">
+    <div className="w-full bg-white rounded-[24px] p-7 shadow-[0_12px_30px_rgba(0,0,0,0.06)] max-w-[340px] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.1)] select-none border border-white/50">
       <div className="flex items-center gap-4 mb-5">
         <Avatar
           src={avatarSrc}
-          className="w-16 h-16 rounded-xl border-none shadow-sm"
+          className="w-16 h-16 rounded-xl border-none shadow-sm flex-shrink-0"
         />
-        <div className="flex flex-col gap-0.5">
-          <h4 className="text-[18px] font-bold text-[#1e293b] m-0 leading-tight tracking-tight">
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <h4 className="text-[18px] font-bold text-[#1e293b] m-0 leading-tight tracking-tight break-words">
             {name}
           </h4>
-          <p className="text-[13px] text-[#64748b] m-0 font-medium">{title}</p>
+          <p className="text-[13px] text-[#64748b] m-0 font-medium break-words">{title}</p>
         </div>
       </div>
 
-      <p className="text-[14px] leading-relaxed text-[#475569] mb-7 font-normal">
+      <p className="text-[14px] leading-relaxed text-[#475569] mb-7 font-normal break-words">
         {description}
       </p>
 
