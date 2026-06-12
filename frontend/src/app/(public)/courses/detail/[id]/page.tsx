@@ -262,6 +262,29 @@ export default function CourseDetailPage() {
     }
   }, [bookingDate, course]);
 
+  // Tự động tìm ngày gần nhất có lịch dạy của cố vấn
+  useEffect(() => {
+    if (course?.metadata?.time) {
+      let foundDateStr = "";
+      for (let i = 1; i <= 14; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const dayOfWeek = d.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+        const slots = course.metadata.time[dayOfWeek];
+        if (slots && Array.isArray(slots) && slots.length > 0) {
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, "0");
+          const dd = String(d.getDate()).padStart(2, "0");
+          foundDateStr = `${yyyy}-${mm}-${dd}`;
+          break;
+        }
+      }
+      if (foundDateStr) {
+        setBookingDate(foundDateStr);
+      }
+    }
+  }, [course]);
+
   useEffect(() => {
     if (!id) return;
 
@@ -344,6 +367,27 @@ export default function CourseDetailPage() {
     if (session.user?.role !== "mentee") {
       alert("Tài khoản của bạn không phải là Học viên (Mentee). Chỉ học viên mới được quyền đăng ký học khóa học.");
       return;
+    }
+
+    // Tự động tìm ngày gần nhất có lịch dạy của cố vấn
+    if (course?.metadata?.time) {
+      let foundDateStr = "";
+      for (let i = 1; i <= 14; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const dayOfWeek = d.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+        const slots = course.metadata.time[dayOfWeek];
+        if (slots && Array.isArray(slots) && slots.length > 0) {
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, "0");
+          const dd = String(d.getDate()).padStart(2, "0");
+          foundDateStr = `${yyyy}-${mm}-${dd}`;
+          break;
+        }
+      }
+      if (foundDateStr) {
+        setBookingDate(foundDateStr);
+      }
     }
 
     setIsBookingModalOpen(true);
