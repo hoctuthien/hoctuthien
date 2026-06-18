@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { xss } from 'express-xss-sanitizer';
 import { AppLogger } from './common/logger/app-logger.service';
+import { StartupSeedService } from './infrastructure/bootstrap/startup-seed.service';
 
 import { LogLevel } from '@nestjs/common';
 
@@ -91,6 +92,9 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ResponseTransformInterceptor(reflector));
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  const startupSeedService = app.get(StartupSeedService);
+  await startupSeedService.runIfNeeded();
 
   const port = config.get('port') || 5050;
   await app.listen(port);
