@@ -9,18 +9,26 @@ export const mentorProfileSchema = z.object({
   linkedinUrl: z.string().max(500).nullable().optional(),
   yearsOfExperience: z.number().nullable().optional(),
   skills: z.array(z.string()).default([]),
-  averageRating: z.preprocess((val) => (val === null || val === undefined ? 0 : Number(val)), z.number()).default(0),
+  averageRating: z
+    .preprocess(
+      (val) => (val === null || val === undefined ? 0 : Number(val)),
+      z.number(),
+    )
+    .default(0),
   totalStudents: z.number().default(0),
   isApproved: z.boolean().default(false),
   approvedBy: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.any()).default({}),
   status: z.string().max(50).default('PENDING'),
-  user: z.object({
-    id: z.string(),
-    name: z.string(),
-    email: z.string().email(),
-    avatarUrl: z.string().nullable().optional(),
-  }).nullable().optional(),
+  user: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string().email(),
+      avatarUrl: z.string().nullable().optional(),
+    })
+    .nullable()
+    .optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable().optional(),

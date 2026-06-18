@@ -38,7 +38,9 @@ export class MentorProfileRepository extends BaseRepository<MentorProfileEntity>
 
     if (query.skills) {
       // Vì skills là kiểu JSONB array, ta có thể so sánh dạng text
-      qb.andWhere('mp.skills::text ILIKE :skills', { skills: `%${query.skills}%` });
+      qb.andWhere('mp.skills::text ILIKE :skills', {
+        skills: `%${query.skills}%`,
+      });
     }
 
     if (query.minExperience !== undefined) {

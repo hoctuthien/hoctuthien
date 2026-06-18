@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Icon } from '@/core/ui/Icon';
-import { apiService } from '@/core/api/base';
+import { httpClient } from '@/core/api/client';
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -53,12 +53,12 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
     debounceRef.current = setTimeout(async () => {
       try {
         const [coursesRes, mentorsRes] = await Promise.all([
-          apiService.get<any>('/courses', { params: { title: trimmed, limit: '5' } }),
-          apiService.get<any>('/mentor-profiles', { params: { search: trimmed, limit: '5' } })
+          httpClient.get<any>('/v1/courses', { params: { title: trimmed, limit: '5' } }),
+          httpClient.get<any>('/v1/mentor-profiles', { params: { search: trimmed, limit: '5' } })
         ]);
 
-        setCourses(coursesRes.data?.data || []);
-        setMentors(mentorsRes.data?.data || []);
+        setCourses(coursesRes?.data || []);
+        setMentors(mentorsRes?.data || []);
       } catch (err) {
         console.error('Failed to search:', err);
       } finally {

@@ -40,8 +40,17 @@ export class CourseService {
 
   async findAll(query: FindCoursesQuery, userRole?: string, userId?: string) {
     this.logger.debug({ query, userRole, userId }, 'findAll -> entry');
-    const { title, status, mentorId, groupCategoryId, groupCategorySlug, categoryId, categorySlug, page, limit } =
-      findCoursesQuerySchema.parse(query);
+    const {
+      title,
+      status,
+      mentorId,
+      groupCategoryId,
+      groupCategorySlug,
+      categoryId,
+      categorySlug,
+      page,
+      limit,
+    } = findCoursesQuerySchema.parse(query);
 
     const where: Record<string, any> = {};
     if (title) where['title'] = ILike(`%${title}%`);
@@ -51,21 +60,26 @@ export class CourseService {
     if (groupCategoryId || groupCategorySlug || categoryId || categorySlug) {
       const categoryWhere: Record<string, any> = {};
       if (groupCategoryId) categoryWhere['groupCategoryId'] = groupCategoryId;
-      if (groupCategorySlug) categoryWhere['groupCategory'] = { slug: groupCategorySlug };
+      if (groupCategorySlug)
+        categoryWhere['groupCategory'] = { slug: groupCategorySlug };
       if (categoryId) categoryWhere['id'] = categoryId;
       if (categorySlug) categoryWhere['slug'] = categorySlug;
 
-      const categories = await this.dataSource.getRepository(CategoryEntity).find({
-        where: categoryWhere,
-        select: ['id'],
-      });
+      const categories = await this.dataSource
+        .getRepository(CategoryEntity)
+        .find({
+          where: categoryWhere,
+          select: ['id'],
+        });
       const categoryIds = categories.map((c) => c.id);
 
       if (categoryIds.length > 0) {
-        const courseCategories = await this.dataSource.getRepository(CourseCategoryEntity).find({
-          where: { categoryId: In(categoryIds) },
-          select: ['courseId'],
-        });
+        const courseCategories = await this.dataSource
+          .getRepository(CourseCategoryEntity)
+          .find({
+            where: { categoryId: In(categoryIds) },
+            select: ['courseId'],
+          });
         const courseIds = courseCategories.map((cc) => cc.courseId);
 
         if (courseIds.length > 0) {
@@ -103,7 +117,10 @@ export class CourseService {
     this.logger.debug({ courseId: id }, 'findOne -> entry');
     const course = await this.courseRepository.findById(id);
     if (!course) {
-      this.logger.debug({ courseId: id, error: 'Not found' }, 'findOne -> error');
+      this.logger.debug(
+        { courseId: id, error: 'Not found' },
+        'findOne -> error',
+      );
       throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
     }
     this.logger.debug({ courseId: id, found: true }, 'findOne -> done');
@@ -222,7 +239,10 @@ export class CourseService {
     mentorId: string,
     status: CourseStatus.ACTIVE | CourseStatus.INACTIVE,
   ) {
-    this.logger.debug({ courseId: id, mentorId, status }, 'updateStatus -> entry');
+    this.logger.debug(
+      { courseId: id, mentorId, status },
+      'updateStatus -> entry',
+    );
     const course = await this.courseRepository.findById(id);
     if (!course) throw new NotFoundException(COURSE_MESSAGES.COURSE_NOT_FOUND);
 

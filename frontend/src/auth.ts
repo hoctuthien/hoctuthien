@@ -22,13 +22,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
+          let deviceId: string | undefined;
+          try {
+            const { cookies } = require("next/headers");
+            const cookieStore = await cookies();
+            deviceId = cookieStore.get("device_id")?.value;
+          } catch (e) {
+            // Ignored
+          }
+
+          const headers: Record<string, string> = {
+            "Content-Type": "application/json",
+          };
+          if (deviceId) {
+            headers["x-device-id"] = deviceId;
+          }
+
           const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/auths/login`, {
             method: "POST",
             body: JSON.stringify({
               email: credentials.email,
               password: credentials.password,
             }),
-            headers: { "Content-Type": "application/json" },
+            headers,
           });
 
           if (!res.ok) {
@@ -49,6 +65,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               role: actualData.user.role,
               accessToken: actualData.access_token,
               refreshToken: actualData.refresh_token,
+              deviceId: deviceId || "unknown",
             };
           }
           return null;
@@ -65,10 +82,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user && account) {
         if (account.provider === "google") {
           try {
+            let deviceId: string | undefined;
+            try {
+              const { cookies } = require("next/headers");
+              const cookieStore = await cookies();
+              deviceId = cookieStore.get("device_id")?.value;
+            } catch (e) {
+              // Ignored
+            }
+
+            const headers: Record<string, string> = {
+              "Content-Type": "application/json",
+            };
+            if (deviceId) {
+              headers["x-device-id"] = deviceId;
+            }
+
             const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/auths/google/token`, {
               method: "POST",
               body: JSON.stringify({ token: account.id_token }),
-              headers: { "Content-Type": "application/json" },
+              headers,
             });
             const responseData = await res.json();
             const actualData = responseData.data?.[0];
@@ -80,6 +113,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 role: actualData.user.role,
                 accessToken: actualData.access_token,
                 refreshToken: actualData.refresh_token,
+                deviceId: deviceId || "unknown",
                 accessTokenExpires: Date.now() + 14 * 60 * 1000, // 14 phút
               };
             }
@@ -94,6 +128,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: (user as any).role,
           accessToken: (user as any).accessToken,
           refreshToken: (user as any).refreshToken,
+          deviceId: (user as any).deviceId || "unknown",
           accessTokenExpires: Date.now() + 14 * 60 * 1000, // 14 phút
         };
       }
@@ -133,12 +168,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
  */
 async function refreshAccessToken(token: any) {
   try {
+    let deviceId = token.deviceId;
+    if (!deviceId) {
+      try {
+        const { cookies } = require("next/headers");
+        const cookieStore = await cookies();
+        deviceId = cookieStore.get("device_id")?.value;
+      } catch (e) {
+        // Ignored
+      }
+    }
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Cookie: `refresh_token=${token.refreshToken}`,
+    };
+
+    if (deviceId) {
+      headers["x-device-id"] = deviceId;
+    }
+
     const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/auths/refresh`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `refresh_token=${token.refreshToken}`,
-      },
+      headers,
     });
 
     const responseData = await res.json();
@@ -154,6 +206,7 @@ async function refreshAccessToken(token: any) {
       ...token,
       accessToken: actualData.access_token,
       refreshToken: actualData.refresh_token,
+      deviceId: deviceId || token.deviceId || "unknown",
       accessTokenExpires: Date.now() + 14 * 60 * 1000,
     };
   } catch (error) {

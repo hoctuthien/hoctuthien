@@ -13,8 +13,11 @@ import { CategoryModule } from '../category/category.module';
     forwardRef(() => CategoryModule),
   ],
   controllers: [GroupCategoryController],
-  providers: [GroupCategoryService, GroupCategoryRepository, GroupCategoryResolver],
+  providers: [
+    GroupCategoryService,
+    GroupCategoryRepository,
+    GroupCategoryResolver,
+  ],
   exports: [GroupCategoryService, GroupCategoryRepository, TypeOrmModule],
 })
 export class GroupCategoryModule {}
-

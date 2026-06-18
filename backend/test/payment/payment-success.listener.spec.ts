@@ -133,7 +133,9 @@ describe('PaymentSuccessListener', () => {
      */
     it('TC-206: không được throw khi DB báo type violation', async () => {
       const qb = makeQb({
-        rejectWith: Object.assign(new Error('invalid input'), { code: '22P02' }),
+        rejectWith: Object.assign(new Error('invalid input'), {
+          code: '22P02',
+        }),
       });
       dataSource.createQueryBuilder.mockReturnValue(qb);
 
@@ -159,7 +161,9 @@ describe('PaymentSuccessListener', () => {
      * TC-208: DB timeout → không crash
      */
     it('TC-208: không được throw khi DB query timeout', async () => {
-      const qb = makeQb({ rejectWith: new Error('Query timeout after 30000ms') });
+      const qb = makeQb({
+        rejectWith: new Error('Query timeout after 30000ms'),
+      });
       dataSource.createQueryBuilder.mockReturnValue(qb);
 
       await expect(

@@ -14,9 +14,10 @@ import {
 export const ApiCreateMentorProfileDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Tạo hồ sơ mentor mới',
-      description: 'Lưu ý: Hồ sơ này thường được tạo tự động khi đơn đăng ký (MentorAvailability) được phê duyệt.' 
+      description:
+        'Lưu ý: Hồ sơ này thường được tạo tự động khi đơn đăng ký (MentorAvailability) được phê duyệt.',
     }),
     ApiBody({ type: CreateMentorProfileDto }),
     ApiResponse({ status: 201, description: 'Tạo hồ sơ thành công' }),
@@ -55,9 +56,10 @@ export const ApiFindMentorProfileByUserIdDoc = () => {
 export const ApiUpdateMentorProfileDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Cập nhật hồ sơ mentor',
-      description: 'Cập nhật các thông tin chuyên môn, bio, kỹ năng của mentor.' 
+      description:
+        'Cập nhật các thông tin chuyên môn, bio, kỹ năng của mentor.',
     }),
     ApiParam({ name: 'id', description: 'ID của hồ sơ mentor' }),
     ApiBody({ type: UpdateMentorProfileDto }),

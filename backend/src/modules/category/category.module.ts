@@ -17,4 +17,3 @@ import { GroupCategoryModule } from '../group-category/group-category.module';
   exports: [CategoryService, CategoryRepository],
 })
 export class CategoryModule {}
-

@@ -27,7 +27,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    
+
     const store = correlationIdStorage.getStore();
     const correlationId = store?.correlationId || null;
 
@@ -44,16 +44,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status = HttpStatus.BAD_REQUEST;
       code = ERROR_CODES.VALIDATION_FAILED;
       message = ERROR_MESSAGES.VALIDATION_FAILED;
-      
+
       // Chuyển đổi ZodError thành Object mapping lỗi field-by-field tương tự Class-Validator
-      details = exception.issues.reduce((acc: Record<string, string>, err) => {
-        const field = err.path.join('.') || 'body';
-        acc[field] = err.message;
-        return acc;
-      }, {} as Record<string, string>);
+      details = exception.issues.reduce(
+        (acc: Record<string, string>, err) => {
+          const field = err.path.join('.') || 'body';
+          acc[field] = err.message;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
     } else if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse() as any;
-      
+
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         details = exceptionResponse;
         message = exceptionResponse.message || ERROR_MESSAGES.VALIDATION_FAILED;
@@ -97,22 +100,29 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }
     } else {
       // Log generic error here if needed
-      this.logger.error({ 
-        message: exception instanceof Error ? exception.message : String(exception),
-        stack: exception instanceof Error ? exception.stack : undefined,
-        url: request.originalUrl,
-        method: request.method
-      }, '[UnhandledException]');
+      this.logger.error(
+        {
+          message:
+            exception instanceof Error ? exception.message : String(exception),
+          stack: exception instanceof Error ? exception.stack : undefined,
+          url: request.originalUrl,
+          method: request.method,
+        },
+        '[UnhandledException]',
+      );
     }
 
     // Always log the final error response
-    this.logger.error({
-      statusCode: status,
-      errorCode: code,
-      errorMessage: message,
-      url: request.originalUrl,
-      method: request.method
-    }, '[ErrorResponse]');
+    this.logger.error(
+      {
+        statusCode: status,
+        errorCode: code,
+        errorMessage: message,
+        url: request.originalUrl,
+        method: request.method,
+      },
+      '[ErrorResponse]',
+    );
 
     response.status(status).json({
       data: [],
@@ -125,4 +135,3 @@ export class HttpExceptionFilter implements ExceptionFilter {
     });
   }
 }
-

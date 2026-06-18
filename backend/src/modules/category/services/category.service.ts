@@ -19,7 +19,7 @@ import {
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) { }
+  constructor(private readonly categoryRepository: CategoryRepository) {}
 
   async findAll(query: FindCategoriesQuery) {
     const { name, slug, status, groupCategoryId, page, limit } =

@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { 
-  IsString, 
-  IsNotEmpty, 
-  IsOptional, 
-  IsEnum, 
-  IsUUID, 
-  IsObject 
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsUUID,
+  IsObject,
 } from 'class-validator';
 import { PostStatus } from '../enums/post-status.enum';
 
@@ -24,10 +24,10 @@ export class CreatePostDto {
   @IsOptional()
   summary?: string;
 
-  @ApiPropertyOptional({ 
-    description: 'Trạng thái bài viết', 
-    enum: PostStatus, 
-    default: PostStatus.DRAFT 
+  @ApiPropertyOptional({
+    description: 'Trạng thái bài viết',
+    enum: PostStatus,
+    default: PostStatus.DRAFT,
   })
   @IsEnum(PostStatus)
   @IsOptional()
@@ -38,7 +38,9 @@ export class CreatePostDto {
   @IsOptional()
   categoryId?: string;
 
-  @ApiPropertyOptional({ description: 'Dữ liệu metadata (thumbnail, SEO tags, v.v)' })
+  @ApiPropertyOptional({
+    description: 'Dữ liệu metadata (thumbnail, SEO tags, v.v)',
+  })
   @IsObject()
   @IsOptional()
   metadata?: Record<string, any>;

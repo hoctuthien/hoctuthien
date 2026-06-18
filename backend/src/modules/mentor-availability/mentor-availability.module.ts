@@ -23,4 +23,3 @@ import { UserModule } from '../user/user.module';
   exports: [MentorAvailabilityService, MentorAvailabilityRepository],
 })
 export class MentorAvailabilityModule {}
-

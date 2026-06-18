@@ -1,4 +1,11 @@
-import { Resolver, Query, Args, ID, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Args,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { CourseService } from '../services/course.service';
 import { CourseGql } from '../types/course.graphql';
 import { CategoryGql } from '../../category/types/category.graphql';
@@ -15,10 +22,14 @@ export class CourseResolver {
   @Query(() => [CourseGql], { name: 'courses' })
   @Public()
   async getCourses(
-    @Args('groupCategoryId', { type: () => String, nullable: true }) groupCategoryId?: string,
-    @Args('groupCategorySlug', { type: () => String, nullable: true }) groupCategorySlug?: string,
-    @Args('categoryId', { type: () => String, nullable: true }) categoryId?: string,
-    @Args('categorySlug', { type: () => String, nullable: true }) categorySlug?: string,
+    @Args('groupCategoryId', { type: () => String, nullable: true })
+    groupCategoryId?: string,
+    @Args('groupCategorySlug', { type: () => String, nullable: true })
+    groupCategorySlug?: string,
+    @Args('categoryId', { type: () => String, nullable: true })
+    categoryId?: string,
+    @Args('categorySlug', { type: () => String, nullable: true })
+    categorySlug?: string,
   ) {
     const result = await this.courseService.findAll({
       page: 1,

@@ -177,7 +177,6 @@ export const ApiUpdateCategoryDoc = () => {
           iconUrl: { type: 'string', maxLength: 500, nullable: true },
           metadata: { type: 'object' },
           status: { type: 'string', example: 'ACTIVE' },
-
         },
       },
     }),

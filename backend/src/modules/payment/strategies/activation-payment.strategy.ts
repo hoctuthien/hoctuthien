@@ -18,10 +18,15 @@ export class ActivationPaymentStrategy implements PaymentStrategy {
     private readonly dataSource: DataSource,
   ) {}
 
-  async resolveAmount(referenceId: string, customAmount?: number): Promise<number> {
+  async resolveAmount(
+    referenceId: string,
+    customAmount?: number,
+  ): Promise<number> {
     let amount = ACTIVATION_FEE_DEFAULT;
     try {
-      const config = await this.systemConfigService.findByKey(ACTIVATION_FEE_CONFIG_KEY);
+      const config = await this.systemConfigService.findByKey(
+        ACTIVATION_FEE_CONFIG_KEY,
+      );
       if (config && typeof config.configValue === 'number') {
         amount = config.configValue;
       }

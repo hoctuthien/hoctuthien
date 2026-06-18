@@ -128,7 +128,10 @@ export class CourseController {
     @Body('status') status: any,
     @User('id') mentorId: string,
   ) {
-    this.logger.log({ courseId: id, mentorId, status }, 'Updating course status');
+    this.logger.log(
+      { courseId: id, mentorId, status },
+      'Updating course status',
+    );
     return this.courseService.updateStatus(id, mentorId, status);
   }
 
@@ -141,7 +144,10 @@ export class CourseController {
     @Body() payload: ApproveCourseInput,
     @User('id') adminId: string,
   ) {
-    this.logger.log({ courseId: id, adminId, status: payload.status }, 'Approving course');
+    this.logger.log(
+      { courseId: id, adminId, status: payload.status },
+      'Approving course',
+    );
     return this.courseService.approve(id, { ...payload, approvedBy: adminId });
   }
 

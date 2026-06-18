@@ -34,7 +34,10 @@ export class PaymentController {
       'Tạo hoặc lấy lại mã QR VietQR để mentee thanh toán phí kích hoạt. ' +
       'Nếu đã có QR còn hạn → trả về QR cũ. QR hết hạn sau 15 phút.',
   })
-  @ApiBody({ type: GenerateActivationQrDto, description: 'Body rỗng — không cần truyền gì.' })
+  @ApiBody({
+    type: GenerateActivationQrDto,
+    description: 'Body rỗng — không cần truyền gì.',
+  })
   @ApiResponse({
     status: 201,
     description: 'QR tạo thành công hoặc trả về QR còn hạn.',
@@ -64,7 +67,11 @@ export class PaymentController {
     summary: 'Lấy thông tin chi tiết một payment',
     description: 'Tra cứu trạng thái hoặc chi tiết của một payment record.',
   })
-  @ApiParam({ name: 'id', description: 'UUID của payment', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID của payment',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
   @ApiResponse({
     status: 200,
     description: 'Trả về payment entity.',
@@ -111,24 +118,43 @@ export class PaymentController {
       oneOf: [
         {
           title: 'Đã kích hoạt thành công',
-          example: { activated: true, message: 'Tài khoản đã được kích hoạt thành công.' },
+          example: {
+            activated: true,
+            message: 'Tài khoản đã được kích hoạt thành công.',
+          },
         },
         {
           title: 'Chưa tìm thấy giao dịch',
-          example: { activated: false, message: 'Không tìm thấy giao dịch khớp. Vui lòng thử lại sau.' },
+          example: {
+            activated: false,
+            message: 'Không tìm thấy giao dịch khớp. Vui lòng thử lại sau.',
+          },
         },
         {
           title: 'Cron đang xử lý',
-          example: { activated: false, message: 'Hệ thống đang xử lý giao dịch của bạn. Vui lòng thử lại sau vài giây.' },
+          example: {
+            activated: false,
+            message:
+              'Hệ thống đang xử lý giao dịch của bạn. Vui lòng thử lại sau vài giây.',
+          },
         },
       ],
     },
   })
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập.' })
-  @ApiResponse({ status: 403, description: 'Không có quyền xác minh payment này.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Không có quyền xác minh payment này.',
+  })
   @ApiResponse({ status: 404, description: 'Không tìm thấy payment.' })
-  @ApiResponse({ status: 422, description: 'Mã QR đã hết hạn — cần tạo QR mới.' })
-  @ApiResponse({ status: 503, description: 'TN App API tạm thời không khả dụng. Thử lại sau.' })
+  @ApiResponse({
+    status: 422,
+    description: 'Mã QR đã hết hạn — cần tạo QR mới.',
+  })
+  @ApiResponse({
+    status: 503,
+    description: 'TN App API tạm thời không khả dụng. Thử lại sau.',
+  })
   @UseGuards(JwtAuthGuard)
   @Post('activation/verify')
   @ApiVerifyActivationPaymentDoc()
@@ -142,7 +168,8 @@ export class PaymentController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Tạo mã QR thanh toán chung',
-    description: 'Sinh QR VietQR để thanh toán động cho bất kỳ nghiệp vụ nào (activation, course_booking, donation).',
+    description:
+      'Sinh QR VietQR để thanh toán động cho bất kỳ nghiệp vụ nào (activation, course_booking, donation).',
   })
   @ApiResponse({ status: 201, description: 'QR tạo thành công.' })
   @UseGuards(JwtAuthGuard)
@@ -162,7 +189,8 @@ export class PaymentController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Xác minh thanh toán chung',
-    description: 'Xác thực thanh toán và kích hoạt nghiệp vụ tương ứng thông qua Strategy Pattern.',
+    description:
+      'Xác thực thanh toán và kích hoạt nghiệp vụ tương ứng thông qua Strategy Pattern.',
   })
   @ApiResponse({ status: 201, description: 'Kết quả xác minh.' })
   @UseGuards(JwtAuthGuard)

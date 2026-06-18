@@ -1,4 +1,13 @@
-import { Resolver, Query, Mutation, Args, ID, Int, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ID,
+  Int,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { MentorAvailabilityService } from './services/mentor-availability.service';
 import {
@@ -44,9 +53,15 @@ export class MentorAvailabilityResolver {
     @Args('page', { type: () => Int, nullable: true }) page?: number,
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
     @Args('search', { type: () => String, nullable: true }) search?: string,
-    @Args('status', { type: () => MentorAvailabilityStatus, nullable: true }) status?: MentorAvailabilityStatus,
+    @Args('status', { type: () => MentorAvailabilityStatus, nullable: true })
+    status?: MentorAvailabilityStatus,
   ) {
-    return this.mentorAvailabilityService.findAll({ page, limit, search, status });
+    return this.mentorAvailabilityService.findAll({
+      page,
+      limit,
+      search,
+      status,
+    });
   }
 
   /**
@@ -89,7 +104,9 @@ export class MentorAvailabilityResolver {
    * @description Đăng ký/Tạo mới yêu cầu làm Mentor (Mentee gửi yêu cầu)
    * @access Mentee (Role.MENTEE)
    */
-  @Mutation(() => CreateMentorAvailabilityResult, { name: 'createMentorAvailability' })
+  @Mutation(() => CreateMentorAvailabilityResult, {
+    name: 'createMentorAvailability',
+  })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MENTEE)
   async create(
@@ -117,7 +134,9 @@ export class MentorAvailabilityResolver {
    * @description Chuyển trạng thái yêu cầu sang Đang xử lý (In Progress)
    * @access Admin (Role.ADMIN)
    */
-  @Mutation(() => MentorAvailability, { name: 'updateMentorAvailabilityToInProgress' })
+  @Mutation(() => MentorAvailability, {
+    name: 'updateMentorAvailabilityToInProgress',
+  })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async updateToInProgress(

@@ -10,7 +10,13 @@ import {
   UseGuards,
   BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CourseBookingService } from './services/course-booking.service';
 import {
   CreateCourseBookingInput,
@@ -62,8 +68,18 @@ export class CourseBookingController {
   @Get('check-conflict')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Kiểm tra trùng lịch học (MENTEE)' })
-  @ApiQuery({ name: 'meetingTime', required: true, type: String, example: '2026-06-01T09:00:00.000Z' })
-  @ApiQuery({ name: 'courseId', required: true, type: String, example: 'course-uuid' })
+  @ApiQuery({
+    name: 'meetingTime',
+    required: true,
+    type: String,
+    example: '2026-06-01T09:00:00.000Z',
+  })
+  @ApiQuery({
+    name: 'courseId',
+    required: true,
+    type: String,
+    example: 'course-uuid',
+  })
   @ApiResponse({ status: 200, description: 'Kiểm tra trùng lịch thành công' })
   @UseGuards(JwtAuthGuard)
   async checkConflict(
@@ -78,7 +94,11 @@ export class CourseBookingController {
     if (isNaN(parsedDate.getTime())) {
       throw new BadRequestException('meetingTime không đúng định dạng.');
     }
-    return this.courseBookingService.checkConflict(parsedDate, courseId, menteeId);
+    return this.courseBookingService.checkConflict(
+      parsedDate,
+      courseId,
+      menteeId,
+    );
   }
 
   @Get(':id')

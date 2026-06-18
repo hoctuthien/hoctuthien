@@ -26,7 +26,11 @@ export interface PaginatedResult<T> {
 /**
  * Helper tạo metadata phân trang chuẩn hóa
  */
-export function createPaginationMeta(total: number, page: number, limit: number) {
+export function createPaginationMeta(
+  total: number,
+  page: number,
+  limit: number,
+) {
   return {
     total,
     page,

@@ -51,7 +51,11 @@ export class PostEntity extends BaseEntity {
   @JoinColumn({ name: 'cover_image_id' })
   coverImage: MediaEntity | null;
 
-  @Column({ name: 'published_at', type: 'timestamp with time zone', nullable: true })
+  @Column({
+    name: 'published_at',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
   publishedAt: Date | null;
 
   @Column({ type: 'jsonb', default: {} })

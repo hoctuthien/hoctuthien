@@ -62,7 +62,8 @@ export class PostService {
   }
 
   async findAll(query?: FindAllPostsDto): Promise<PostEntity[]> {
-    const qb = this.postRepository.createQueryBuilder('post')
+    const qb = this.postRepository
+      .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .leftJoinAndSelect('post.category', 'category')
       .leftJoinAndSelect('post.coverImage', 'coverImage')
@@ -71,30 +72,35 @@ export class PostService {
       .orderBy('post.createdAt', 'DESC');
 
     if (query?.categoryId) {
-      qb.andWhere('post.categoryId = :categoryId', { categoryId: query.categoryId });
+      qb.andWhere('post.categoryId = :categoryId', {
+        categoryId: query.categoryId,
+      });
     }
-    
+
     if (query?.categorySlug) {
-      qb.andWhere('category.slug = :categorySlug', { categorySlug: query.categorySlug });
+      qb.andWhere('category.slug = :categorySlug', {
+        categorySlug: query.categorySlug,
+      });
     }
 
     if (query?.tagId || query?.tagSlug) {
       // Sử dụng subquery để tìm các bài viết có tag tương ứng
       qb.andWhere((qbSub) => {
-        const subQuery = qbSub.subQuery()
+        const subQuery = qbSub
+          .subQuery()
           .select('pt.post_id')
           .from('post_tags', 'pt')
           .innerJoin('tags', 't', 't.id = pt.tag_id');
-        
+
         if (query.tagId) {
           subQuery.where('t.id = :tagId', { tagId: query.tagId });
         } else if (query.tagSlug) {
           subQuery.where('t.slug = :tagSlug', { tagSlug: query.tagSlug });
         }
-        
+
         return 'post.id IN ' + subQuery.getQuery();
       });
-      
+
       // Đặt parameter cho subquery vì subQuery.where không tự động bind vào qb chính trong một số trường hợp
       if (query.tagId) qb.setParameter('tagId', query.tagId);
       if (query.tagSlug) qb.setParameter('tagSlug', query.tagSlug);
@@ -108,20 +114,32 @@ export class PostService {
   }
 
   async findOne(id: string): Promise<PostEntity> {
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        id,
+      );
     let post: PostEntity | null = null;
 
     if (isUuid) {
       post = await this.postRepository.findById(id, {
-        relations: ['author', 'category', 'coverImage', 'postTags', 'postTags.tag'],
+        relations: [
+          'author',
+          'category',
+          'coverImage',
+          'postTags',
+          'postTags.tag',
+        ],
       });
     } else {
-      post = await this.postRepository.findOne(
-        { slug: id } as any,
-        {
-          relations: ['author', 'category', 'coverImage', 'postTags', 'postTags.tag'],
-        },
-      );
+      post = await this.postRepository.findOne({ slug: id } as any, {
+        relations: [
+          'author',
+          'category',
+          'coverImage',
+          'postTags',
+          'postTags.tag',
+        ],
+      });
     }
 
     if (!post) {
@@ -131,10 +149,7 @@ export class PostService {
     return post;
   }
 
-  async update(
-    id: string,
-    data: DeepPartial<PostEntity>,
-  ): Promise<PostEntity> {
+  async update(id: string, data: DeepPartial<PostEntity>): Promise<PostEntity> {
     const post = await this.postRepository.findByIdOrFail(id, 'Post not found');
 
     // Nếu title thay đổi thì cập nhật slug
@@ -144,7 +159,10 @@ export class PostService {
     }
 
     // Auto-set publishedAt khi chuyển sang published
-    if (data.status === PostStatus.PUBLISHED && post.status !== PostStatus.PUBLISHED) {
+    if (
+      data.status === PostStatus.PUBLISHED &&
+      post.status !== PostStatus.PUBLISHED
+    ) {
       data.publishedAt = new Date();
     }
 

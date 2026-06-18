@@ -16,7 +16,12 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './services/media.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { ApiUploadMediaDoc } from './swagger/media.swagger';
 import { User } from '../../common/decorators/user.decorator';
 

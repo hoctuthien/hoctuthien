@@ -2,7 +2,7 @@ import { PaymentEntity } from '../entities/payment.entity';
 
 export interface PaymentStrategy {
   paymentType: string;
-  
+
   /**
    * Tính toán hoặc lấy số tiền yêu cầu thanh toán.
    */

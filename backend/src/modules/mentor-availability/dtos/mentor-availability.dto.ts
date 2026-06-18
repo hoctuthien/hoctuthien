@@ -100,7 +100,9 @@ export class CreateMentorAvailabilityDto {
   note?: string;
 }
 
-export class UpdateMentorAvailabilityDto extends PartialType(CreateMentorAvailabilityDto) {
+export class UpdateMentorAvailabilityDto extends PartialType(
+  CreateMentorAvailabilityDto,
+) {
   @ApiPropertyOptional({ enum: MentorAvailabilityStatus })
   @IsEnum(MentorAvailabilityStatus)
   @IsOptional()

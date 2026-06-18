@@ -64,6 +64,26 @@ export class UserController {
     };
   }
 
+  @Patch('me')
+  @UseGuards(JwtAuthGuard)
+  async updateMe(
+    @User('id') userId: string,
+    @User('role') userRole: string,
+    @Body() payload: UpdateUserInput,
+  ) {
+    this.logger.log({ userId }, 'Updating current user profile');
+    const updatedUser = await this.userService.update(
+      userId,
+      payload,
+      userId,
+      userRole,
+    );
+    return {
+      message: 'Cập nhật thông tin cá nhân thành công.',
+      user: updatedUser,
+    };
+  }
+
   @Post()
   @ApiCreateUserDoc()
   @UseGuards(JwtAuthGuard, RolesGuard)

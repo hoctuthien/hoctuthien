@@ -117,7 +117,9 @@ describe('MentorAvailabilityService - Mentor Application Flow', () => {
         applicationId,
         adminId,
       );
-      expect(inProgressResult.status).toBe(MentorAvailabilityStatus.IN_PROGRESS);
+      expect(inProgressResult.status).toBe(
+        MentorAvailabilityStatus.IN_PROGRESS,
+      );
       expect(inProgressResult.approvedBy).toBe(adminId);
 
       // --- BƯỚC 3: PHÊ DUYỆT (APPROVE) ---
@@ -137,7 +139,9 @@ describe('MentorAvailabilityService - Mentor Application Flow', () => {
         .mockResolvedValueOnce(mockProfile); // 3. Tìm Profile (không thấy)
 
       (manager.create as jest.Mock).mockReturnValue({ userId: menteeId }); // Tạo profile mới
-      (manager.save as jest.Mock).mockImplementation((entityClass, entity) => entity);
+      (manager.save as jest.Mock).mockImplementation(
+        (entityClass, entity) => entity,
+      );
 
       const approveResult = await service.approve(
         applicationId,
@@ -207,7 +211,10 @@ describe('MentorAvailabilityService - Mentor Application Flow', () => {
         updatedAt: new Date(),
       });
 
-      const createResult = await service.create(specificCandidateId, createPayload);
+      const createResult = await service.create(
+        specificCandidateId,
+        createPayload,
+      );
       expect(createResult.data.status).toBe(MentorAvailabilityStatus.PENDING);
       expect(createResult.data.mentorId).toBe(specificCandidateId);
 
@@ -231,7 +238,9 @@ describe('MentorAvailabilityService - Mentor Application Flow', () => {
         specificAppId,
         specificAdminId,
       );
-      expect(inProgressResult.status).toBe(MentorAvailabilityStatus.IN_PROGRESS);
+      expect(inProgressResult.status).toBe(
+        MentorAvailabilityStatus.IN_PROGRESS,
+      );
       expect(inProgressResult.approvedBy).toBe(specificAdminId);
 
       // --- 3. Approve application by Admin (Promote to Mentor) ---
@@ -247,11 +256,15 @@ describe('MentorAvailabilityService - Mentor Application Flow', () => {
 
       (manager.findOne as jest.Mock)
         .mockResolvedValueOnce(inProgressApp) // Find application
-        .mockResolvedValueOnce(mockUser)       // Find User to change role
-        .mockResolvedValueOnce(mockProfile);   // Find profile (returns null)
+        .mockResolvedValueOnce(mockUser) // Find User to change role
+        .mockResolvedValueOnce(mockProfile); // Find profile (returns null)
 
-      (manager.create as jest.Mock).mockReturnValue({ userId: specificCandidateId });
-      (manager.save as jest.Mock).mockImplementation((entityClass, entity) => entity);
+      (manager.create as jest.Mock).mockReturnValue({
+        userId: specificCandidateId,
+      });
+      (manager.save as jest.Mock).mockImplementation(
+        (entityClass, entity) => entity,
+      );
 
       const approveResult = await service.approve(
         specificAppId,
@@ -297,4 +310,3 @@ describe('MentorAvailabilityService - Mentor Application Flow', () => {
     });
   });
 });
-

@@ -88,7 +88,10 @@ export class UserService {
     requestingUserId: string,
     requestingUserRole: string,
   ) {
-    this.logger.debug({ targetUserId: id, requestingUserId }, 'update -> entry');
+    this.logger.debug(
+      { targetUserId: id, requestingUserId },
+      'update -> entry',
+    );
     // Chỉ ADMIN hoặc chính user đó mới được cập nhật
     if (requestingUserRole !== Role.ADMIN && requestingUserId !== id) {
       throw new ForbiddenException(
@@ -136,7 +139,11 @@ export class UserService {
   @OnEvent(PAYMENT_SUCCESS_EVENT, { async: true })
   async handlePaymentSuccess(payload: PaymentSuccessPayload): Promise<void> {
     this.logger.log(
-      { paymentId: payload.paymentId, userId: payload.userId, paymentMethod: payload.paymentMethod },
+      {
+        paymentId: payload.paymentId,
+        userId: payload.userId,
+        paymentMethod: payload.paymentMethod,
+      },
       '[Event] Nhận payment.success',
     );
 
@@ -155,7 +162,11 @@ export class UserService {
       // Ghi log lỗi nhưng KHÔNG re-throw — tránh crash event loop của các listener khác
       const message = error instanceof Error ? error.message : String(error);
       this.logger.error(
-        { userId: payload.userId, errorMessage: message, stack: error instanceof Error ? error.stack : undefined },
+        {
+          userId: payload.userId,
+          errorMessage: message,
+          stack: error instanceof Error ? error.stack : undefined,
+        },
         '[Event] Kích hoạt thất bại cho userId',
       );
     }

@@ -181,22 +181,78 @@ export class AuthService implements IAuthService {
 
   async refreshTokens(refreshToken: string, deviceId: string) {
     try {
+      console.log('[refreshTokens Debug] Input deviceId:', deviceId);
       const payload = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
       });
+      console.log('[refreshTokens Debug] Decoded payload:', payload);
 
-      const session = await this.userSessionService.findOneBy({
-        refreshToken,
-        deviceName: deviceId,
-        status: 'active',
+      // Find session including soft-deleted ones to prevent race conditions during concurrent NextAuth updates
+      const session = await this.sessionRepository.findOne({
+        where: { refreshToken },
+        withDeleted: true,
       });
+      console.log(
+        '[refreshTokens Debug] Matched session in DB (withDeleted):',
+        session,
+      );
 
       if (!session) {
+        console.warn('[refreshTokens Debug] Session not found for token');
         throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
       }
 
-      // Rotation: Revoke old session
-      await this.userSessionService.remove(session.id);
+      // Check if session is soft-deleted (which means it was rotated)
+      if (session.deletedAt) {
+        const deletedTime = new Date(session.deletedAt).getTime();
+        const now = Date.now();
+        const gracePeriodMs = 30 * 1000; // 30 seconds grace period
+        if (now - deletedTime > gracePeriodMs) {
+          console.warn(
+            '[refreshTokens Debug] Revoked token reuse detected outside grace period.',
+          );
+          throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
+        }
+        console.log(
+          '[refreshTokens Debug] Revoked token used within grace period.',
+        );
+      } else {
+        if (session.status !== 'active') {
+          console.warn(
+            '[refreshTokens Debug] Session status is not active:',
+            session.status,
+          );
+          throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
+        }
+      }
+
+      const expectedDevice = deviceId || payload.deviceId || 'unknown';
+      const sessionDevice = session.deviceName || 'unknown';
+      console.log(
+        '[refreshTokens Debug] sessionDevice:',
+        sessionDevice,
+        '| expectedDevice:',
+        expectedDevice,
+      );
+
+      if (
+        sessionDevice !== expectedDevice &&
+        sessionDevice !== 'unknown' &&
+        expectedDevice !== 'unknown'
+      ) {
+        console.warn(
+          '[refreshTokens Debug] Device verification failed. sessionDevice:',
+          sessionDevice,
+          'expectedDevice:',
+          expectedDevice,
+        );
+        throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
+      }
+
+      // Rotation: Revoke old session (only if it wasn't already deleted)
+      if (!session.deletedAt) {
+        await this.userSessionService.remove(session.id);
+      }
 
       // Generate new tokens
       const user = await this.userRepository.findOne({
@@ -209,7 +265,7 @@ export class AuthService implements IAuthService {
         sub: user.id,
         email: user.email,
         role: user.role,
-        deviceId,
+        deviceId: expectedDevice,
       };
       const tokens = await this.generateTokens(newPayload);
 
@@ -221,7 +277,7 @@ export class AuthService implements IAuthService {
         userId: user.id,
         refreshToken: tokens.refresh_token,
         refreshTokenExpiresAt: expiresAt,
-        deviceName: deviceId,
+        deviceName: expectedDevice,
       });
 
       return {

@@ -1,9 +1,9 @@
 import { SetMetadata } from '@nestjs/common';
 
 export interface RateLimitFailOptions {
-  type: string;          // E.g., 'login' | 'register'
-  limit: number;         // Maximum allowed failures
-  ttl: number;           // Track duration in seconds (e.g., 60)
+  type: string; // E.g., 'login' | 'register'
+  limit: number; // Maximum allowed failures
+  ttl: number; // Track duration in seconds (e.g., 60)
   blockDuration: number; // Block duration in seconds (e.g., 60)
 }
 
