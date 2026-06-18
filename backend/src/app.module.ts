@@ -34,6 +34,7 @@ import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { StartupSeedService } from './infrastructure/bootstrap/startup-seed.service';
 
 @Module({
   imports: [
@@ -124,7 +125,7 @@ import { join } from 'path';
     TagModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, StartupSeedService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

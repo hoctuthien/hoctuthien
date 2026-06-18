@@ -4,6 +4,29 @@ import Google from "next-auth/providers/google";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5050";
 
+type BackendAuthPayload = {
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  access_token?: string;
+  refresh_token?: string;
+};
+
+function extractAuthPayload(responseData: any): BackendAuthPayload | null {
+  const payload = Array.isArray(responseData?.data)
+    ? responseData.data[0]
+    : responseData?.data ?? responseData;
+
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  return payload as BackendAuthPayload;
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET || "fallback-secret-for-development-only-12345678",
   trustHost: true,
@@ -55,7 +78,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           const responseData = await res.json();
-          const actualData = responseData.data?.[0];
+          const actualData = extractAuthPayload(responseData);
 
           if (actualData?.user) {
             return {
@@ -104,9 +127,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               headers,
             });
             const responseData = await res.json();
-            const actualData = responseData.data?.[0];
+            const actualData = extractAuthPayload(responseData);
 
-            if (actualData) {
+            if (actualData?.user) {
               return {
                 ...token,
                 id: actualData.user.id,
@@ -168,6 +191,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
  */
 async function refreshAccessToken(token: any) {
   try {
+    if (!token.refreshToken) {
+      return {
+        ...token,
+        error: "RefreshAccessTokenError",
+      };
+    }
+
     let deviceId = token.deviceId;
     if (!deviceId) {
       try {
@@ -179,9 +209,14 @@ async function refreshAccessToken(token: any) {
       }
     }
 
+    const cookieParts = [`refresh_token=${token.refreshToken}`];
+    if (deviceId) {
+      cookieParts.push(`device_id=${deviceId}`);
+    }
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      Cookie: `refresh_token=${token.refreshToken}`,
+      Cookie: cookieParts.join("; "),
     };
 
     if (deviceId) {
@@ -191,15 +226,21 @@ async function refreshAccessToken(token: any) {
     const res = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/api/v1/auths/refresh`, {
       method: "POST",
       headers,
+      cache: "no-store",
     });
 
-    const responseData = await res.json();
+    const responseData = await res.json().catch(() => null);
+    const actualData = extractAuthPayload(responseData);
 
-    // Lấy data từ response (hỗ trợ cả dạng mảng và object)
-    const actualData = responseData.data?.[0] || responseData;
-
-    if (!res.ok || !actualData) {
-      throw new Error(JSON.stringify(responseData));
+    if (!res.ok || !actualData?.access_token || !actualData?.refresh_token) {
+      console.error("[NextAuth] Refresh token response error:", {
+        status: res.status,
+        responseData,
+      });
+      return {
+        ...token,
+        error: "RefreshAccessTokenError",
+      };
     }
 
     return {
@@ -208,6 +249,7 @@ async function refreshAccessToken(token: any) {
       refreshToken: actualData.refresh_token,
       deviceId: deviceId || token.deviceId || "unknown",
       accessTokenExpires: Date.now() + 14 * 60 * 1000,
+      error: undefined,
     };
   } catch (error) {
     console.error("[NextAuth] Error refreshing access token:", error);
