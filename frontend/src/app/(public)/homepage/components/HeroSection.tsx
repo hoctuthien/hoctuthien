@@ -60,6 +60,7 @@ export const HeroSection = () => {
                   src="/images/avatar_main.png"
                   alt="Student Learning"
                   fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                   className="object-cover"
                 />

@@ -1,4 +1,11 @@
-import { Resolver, Query, Args, ID, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Args,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { GroupCategoryService } from '../services/group-category.service';
 import { GroupCategoryGql } from '../types/group-category.graphql';
 import { CategoryGql } from '../../category/types/category.graphql';
@@ -15,7 +22,10 @@ export class GroupCategoryResolver {
   @Query(() => [GroupCategoryGql], { name: 'groupCategories' })
   @Public()
   async getGroupCategories() {
-    const result = await this.groupCategoryService.findAll({ page: 1, limit: 100 });
+    const result = await this.groupCategoryService.findAll({
+      page: 1,
+      limit: 100,
+    });
     return result.data;
   }
 

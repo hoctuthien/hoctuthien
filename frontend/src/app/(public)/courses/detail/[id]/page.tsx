@@ -730,10 +730,14 @@ function BookingModal({ isOpen, onClose, course }: BookingModalProps) {
         throw new Error("Không thể khởi tạo đăng ký khóa học.");
       }
 
-      // Tạo mã QR thanh toán chung cho course_booking
-      const qr = await paymentGateway.generateGenericQr('course_booking', booking.id);
-      setQrData({ ...qr, referenceId: booking.id });
-      setPaymentStep('payment_pending');
+      if (course.price === 0) {
+        setPaymentStep('success');
+      } else {
+        // Tạo mã QR thanh toán chung cho course_booking
+        const qr = await paymentGateway.generateGenericQr('course_booking', booking.id);
+        setQrData({ ...qr, referenceId: booking.id });
+        setPaymentStep('payment_pending');
+      }
       setVerifyStatus('idle');
       setVerifyMessage(null);
     } catch (err: any) {

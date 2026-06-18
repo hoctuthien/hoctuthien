@@ -16,4 +16,3 @@ export interface IPaymentService {
     paymentId: string,
   ): Promise<{ activated: boolean; message: string }>;
 }
-

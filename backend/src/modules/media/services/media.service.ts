@@ -112,7 +112,10 @@ export class MediaService {
   async remove(id: string) {
     const media = await this.mediaRepository.findOne({ where: { id } });
     if (!media) {
-      throw new HttpException('Không tìm thấy tệp tin media', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Không tìm thấy tệp tin media',
+        HttpStatus.NOT_FOUND,
+      );
     }
     await this.mediaRepository.remove(media);
     return { success: true };

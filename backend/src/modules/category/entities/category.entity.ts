@@ -33,4 +33,3 @@ export class CategoryEntity extends BaseEntity {
   @JoinColumn({ name: 'group_category_id' })
   groupCategory: GroupCategoryEntity;
 }
-

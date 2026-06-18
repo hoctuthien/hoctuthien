@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Breadcrumb, EmptyState, Modal } from '@shared';
-import { courseBookingGateway } from '@/core/gateway';
+import { courseBookingGateway, penaltyTicketGateway } from '@/core/gateway';
 import { Button } from '@/core/ui';
 import { 
   LuCalendar, 
@@ -60,6 +60,14 @@ export default function MentorBookingsClient() {
   const [newStatus, setNewStatus] = useState<'pending' | 'confirmed' | 'completed' | 'cancelled' | 'rescheduled'>('confirmed');
   const [cancellationReason, setCancellationReason] = useState('');
   const [submittingEdit, setSubmittingEdit] = useState(false);
+
+  // Report Absence Modal States
+  const [reportBooking, setReportBooking] = useState<BookingRelation | null>(null);
+  const [reportReason, setReportReason] = useState('');
+  const [evidenceUrl, setEvidenceUrl] = useState('');
+  const [submittingReport, setSubmittingReport] = useState(false);
+  const [reportedBookingIds, setReportedBookingIds] = useState<string[]>([]);
+
 
   // Calendar States
   const [viewType, setViewType] = useState<'list' | 'calendar'>('list');
@@ -200,6 +208,47 @@ export default function MentorBookingsClient() {
       setSubmittingEdit(false);
     }
   };
+
+  const handleReportSubmit = async () => {
+    if (!reportBooking || !reportReason.trim()) return;
+    try {
+      setSubmittingReport(true);
+      const menteeId = reportBooking.menteeId || reportBooking.mentee?.id;
+      if (!menteeId) {
+        alert("Không tìm thấy thông tin Học viên để báo cáo.");
+        return;
+      }
+
+      const payload: any = {
+        userId: menteeId,
+        reason: reportReason.trim(),
+        metadata: {
+          bookingId: reportBooking.id,
+          courseId: reportBooking.courseId,
+          meetingTime: reportBooking.meetingTime,
+          reporterRole: 'mentor',
+        },
+      };
+
+      if (evidenceUrl.trim()) {
+        payload.evidenceUrl = evidenceUrl.trim();
+      }
+
+      await penaltyTicketGateway.createPenaltyTicket(payload);
+
+      setReportedBookingIds((prev) => [...prev, reportBooking.id]);
+      alert("Gửi báo cáo vắng mặt thành công! Ban quản trị sẽ sớm xem xét báo cáo này.");
+      setReportBooking(null);
+      setReportReason('');
+      setEvidenceUrl('');
+    } catch (err: any) {
+      console.error('Failed to submit report:', err);
+      alert(err.message || 'Gửi báo cáo thất bại, vui lòng thử lại.');
+    } finally {
+      setSubmittingReport(false);
+    }
+  };
+
 
   // Filter Bookings logic
   const filteredBookings = bookings.filter((b) => {
@@ -428,6 +477,7 @@ export default function MentorBookingsClient() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredBookings.map((booking, index) => {
                   const meetingDate = new Date(booking.meetingTime);
+                  const isPast = meetingDate < new Date();
                   
                   // Status Styling logic
                   let statusLabel = 'Đang xử lý';
@@ -555,40 +605,60 @@ export default function MentorBookingsClient() {
                       </div>
 
                       {/* Actions buttons */}
-                      {(canConfirm || canComplete) && (
-                        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-50 w-full">
-                          {canConfirm && (
-                            <>
-                              <button
-                                onClick={() => handleOpenEdit(booking)}
-                                className="flex-1 bg-white border border-[#CBD5E1] text-[#475569] hover:bg-slate-50 font-black text-[11px] py-3 rounded-xl uppercase tracking-wider text-center cursor-pointer transition-all"
-                              >
-                                Thêm link phòng học
-                              </button>
-                              <button
-                                onClick={() => handleQuickConfirm(booking.id)}
-                                className="flex-1 bg-[#005BBF] hover:bg-[#004493] text-white font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider text-center shadow-md shadow-[#005BBF]/10 transition-all cursor-pointer"
-                              >
-                                Xác nhận lịch học
-                              </button>
-                            </>
+                      {(canConfirm || canComplete || (isPast && (booking.status === 'confirmed' || booking.status === 'rescheduled'))) && (
+                        <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-slate-50 w-full">
+                          {isPast && (booking.status === 'confirmed' || booking.status === 'rescheduled') && (
+                            <button
+                              type="button"
+                              onClick={() => setReportBooking(booking)}
+                              disabled={reportedBookingIds.includes(booking.id)}
+                              className={`w-full text-center font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider transition-all cursor-pointer border flex items-center justify-center gap-1.5 ${
+                                reportedBookingIds.includes(booking.id)
+                                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                                  : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200 shadow-sm'
+                              }`}
+                            >
+                              <LuTriangleAlert size={14} />
+                              <span>{reportedBookingIds.includes(booking.id) ? 'Đã báo cáo học viên vắng mặt' : 'Báo cáo học viên vắng mặt'}</span>
+                            </button>
                           )}
 
-                          {canComplete && (
-                            <>
-                              <button
-                                onClick={() => handleOpenEdit(booking)}
-                                className="flex-1 bg-white border border-[#CBD5E1] text-[#475569] hover:bg-slate-50 font-black text-[11px] py-3 rounded-xl uppercase tracking-wider text-center cursor-pointer transition-all"
-                              >
-                                Đổi giờ học / Hủy lịch
-                              </button>
-                              <button
-                                onClick={() => handleQuickComplete(booking.id)}
-                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider text-center shadow-md shadow-emerald-500/10 transition-all cursor-pointer"
-                              >
-                                Hoàn thành buổi học
-                              </button>
-                            </>
+                          {(canConfirm || canComplete) && (
+                            <div className="flex items-center gap-2 w-full">
+                              {canConfirm && (
+                                <>
+                                  <button
+                                    onClick={() => handleOpenEdit(booking)}
+                                    className="flex-1 bg-white border border-[#CBD5E1] text-[#475569] hover:bg-slate-50 font-black text-[11px] py-3 rounded-xl uppercase tracking-wider text-center cursor-pointer transition-all"
+                                  >
+                                    Thêm link phòng học
+                                  </button>
+                                  <button
+                                    onClick={() => handleQuickConfirm(booking.id)}
+                                    className="flex-1 bg-[#005BBF] hover:bg-[#004493] text-white font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider text-center shadow-md shadow-[#005BBF]/10 transition-all cursor-pointer"
+                                  >
+                                    Xác nhận lịch học
+                                  </button>
+                                </>
+                              )}
+
+                              {canComplete && (
+                                <>
+                                  <button
+                                    onClick={() => handleOpenEdit(booking)}
+                                    className="flex-1 bg-white border border-[#CBD5E1] text-[#475569] hover:bg-slate-50 font-black text-[11px] py-3 rounded-xl uppercase tracking-wider text-center cursor-pointer transition-all"
+                                  >
+                                    Đổi giờ / Hủy lịch
+                                  </button>
+                                  <button
+                                    onClick={() => handleQuickComplete(booking.id)}
+                                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider text-center shadow-md shadow-emerald-500/10 transition-all cursor-pointer"
+                                  >
+                                    Hoàn thành buổi học
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           )}
                         </div>
                       )}
@@ -695,6 +765,76 @@ export default function MentorBookingsClient() {
               </div>
             </div>
           )}
+        </Modal>
+
+        {/* Report Absence Modal */}
+        <Modal
+          isOpen={reportBooking !== null}
+          onClose={() => {
+            setReportBooking(null);
+            setReportReason('');
+            setEvidenceUrl('');
+          }}
+          title="Báo cáo vắng mặt / Vi phạm"
+          containerClassName="max-w-md"
+          className="p-8 pt-0 font-sans"
+        >
+          <div className="flex flex-col gap-4 py-2">
+            <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 text-xs text-amber-800 leading-relaxed font-semibold">
+              <LuTriangleAlert size={24} className="text-amber-600 flex-shrink-0" />
+              <p>
+                Báo cáo này sẽ được gửi tới Ban quản trị để xử lý vi phạm. Vui lòng điền chi tiết lý do và cung cấp bằng chứng (ảnh chụp màn hình, link drive bằng chứng...) để được hỗ trợ tốt nhất.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Lý do báo cáo *:</label>
+              <textarea
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                placeholder="Ví dụ: Đến giờ học nhưng Học viên không online, tôi đã đợi 15 phút nhưng không thể liên lạc..."
+                className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[90px] transition-colors resize-none font-semibold leading-relaxed"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Link bằng chứng (hình ảnh, Drive,...) [Không bắt buộc]:</label>
+              <input
+                type="url"
+                value={evidenceUrl}
+                onChange={(e) => setEvidenceUrl(e.target.value)}
+                placeholder="https://imgur.com/... hoặc https://drive.google.com/..."
+                className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs transition-colors font-semibold"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-2">
+              <button
+                onClick={() => {
+                  setReportBooking(null);
+                  setReportReason('');
+                  setEvidenceUrl('');
+                }}
+                className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleReportSubmit}
+                disabled={submittingReport || !reportReason.trim()}
+                className="bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs py-2.5 px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md shadow-amber-500/10 active:scale-[0.98] min-w-[120px] cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {submittingReport ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <LuTriangleAlert size={12} />
+                    <span>Gửi báo cáo</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </Modal>
 
       </div>

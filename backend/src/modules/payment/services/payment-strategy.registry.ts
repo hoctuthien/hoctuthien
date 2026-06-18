@@ -18,7 +18,9 @@ export class PaymentStrategyRegistry {
   get(paymentType: string): PaymentStrategy {
     const strategy = this.strategies.get(paymentType);
     if (!strategy) {
-      throw new BadRequestException(`Không hỗ trợ loại thanh toán: ${paymentType}`);
+      throw new BadRequestException(
+        `Không hỗ trợ loại thanh toán: ${paymentType}`,
+      );
     }
     return strategy;
   }

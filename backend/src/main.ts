@@ -17,7 +17,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
   const appLogger = await app.resolve(AppLogger);
-  
+
   const config = app.get(ConfigService);
   const logLevelStr = config.get('logLevel') || 'info';
 
@@ -26,7 +26,7 @@ async function bootstrap() {
   if (logLevelStr === 'debug') {
     allowedLevels = ['log', 'error', 'warn', 'debug', 'verbose'];
   }
-  
+
   // Áp dụng giới hạn mức log cho logger
   appLogger.setLogLevels(allowedLevels);
   app.useLogger(appLogger);
@@ -96,9 +96,12 @@ async function bootstrap() {
   await app.listen(port);
   appLogger.log(
     `🚀 Application is running on: http://localhost:${port}/${prefix}`,
-    'Bootstrap'
+    'Bootstrap',
   );
-  appLogger.log(`👨‍ quản trị hệ thống tại: http://localhost:${port}/admin`, 'Bootstrap');
+  appLogger.log(
+    `👨‍ quản trị hệ thống tại: http://localhost:${port}/admin`,
+    'Bootstrap',
+  );
 }
 bootstrap();
 // test develop

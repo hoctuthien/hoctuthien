@@ -43,7 +43,14 @@ export const mentorGateway = {
    * Lấy thông tin Mentor Profile của một User cụ thể (REST API)
    */
   async getMentorProfileByUserId(userId: string): Promise<any> {
-    console.log(`[mentorGateway] Fetching mentor profile for userId=\${userId} via GET /v1/mentor-profiles/user/\${userId}`);
-    return httpClient.get(`/v1/mentor-profiles/user/\${userId}`);
+    console.log(`[mentorGateway] Fetching mentor profile for userId=${userId} via GET /v1/mentor-profiles/user/${userId}`);
+    return httpClient.get(`/v1/mentor-profiles/user/${userId}`);
+  },
+
+  /**
+   * Cập nhật thông tin hồ sơ giảng dạy (Mentor Profile)
+   */
+  async updateMentorProfileMe(payload: any): Promise<any> {
+    return httpClient.patch('/v1/mentor-profiles/me', payload);
   },
 };

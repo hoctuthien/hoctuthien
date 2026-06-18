@@ -50,7 +50,12 @@ export class AppLogger extends ConsoleLogger {
 
   log(message: any, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      console.log(JSON.stringify({ level: 'info', ...this.buildLogPayload(message, context) }));
+      console.log(
+        JSON.stringify({
+          level: 'info',
+          ...this.buildLogPayload(message, context),
+        }),
+      );
     } else {
       super.log(this.buildLogPayload(message, context), context);
     }
@@ -68,7 +73,12 @@ export class AppLogger extends ConsoleLogger {
 
   warn(message: any, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      console.warn(JSON.stringify({ level: 'warn', ...this.buildLogPayload(message, context) }));
+      console.warn(
+        JSON.stringify({
+          level: 'warn',
+          ...this.buildLogPayload(message, context),
+        }),
+      );
     } else {
       super.warn(this.buildLogPayload(message, context), context);
     }
@@ -76,7 +86,12 @@ export class AppLogger extends ConsoleLogger {
 
   debug(message: any, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      console.debug(JSON.stringify({ level: 'debug', ...this.buildLogPayload(message, context) }));
+      console.debug(
+        JSON.stringify({
+          level: 'debug',
+          ...this.buildLogPayload(message, context),
+        }),
+      );
     } else {
       super.debug(this.buildLogPayload(message, context), context);
     }
@@ -84,7 +99,12 @@ export class AppLogger extends ConsoleLogger {
 
   verbose(message: any, context?: string) {
     if (process.env.NODE_ENV === 'production') {
-      console.log(JSON.stringify({ level: 'verbose', ...this.buildLogPayload(message, context) }));
+      console.log(
+        JSON.stringify({
+          level: 'verbose',
+          ...this.buildLogPayload(message, context),
+        }),
+      );
     } else {
       super.verbose(this.buildLogPayload(message, context), context);
     }

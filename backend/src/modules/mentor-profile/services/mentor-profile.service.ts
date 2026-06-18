@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { MentorProfileRepository } from '../repositories/mentor-profile.repository';
 import {
   createMentorProfileSchema,
@@ -9,6 +9,7 @@ import {
   CreateMentorProfileDto,
   UpdateMentorProfileDto,
 } from '../dtos/mentor-profile.dto';
+import { Role } from '../../../common/enums/role.enum';
 
 @Injectable()
 export class MentorProfileService {
@@ -16,19 +17,27 @@ export class MentorProfileService {
     private readonly mentorProfileRepository: MentorProfileRepository,
   ) {}
 
-  async findAll(query?: { page?: number; limit?: number; search?: string; skills?: string; minExperience?: number }) {
+  async findAll(query?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    skills?: string;
+    minExperience?: number;
+  }) {
     const page = query?.page || 1;
     const limit = query?.limit || 10;
 
-    const [items, total] = await this.mentorProfileRepository.findActiveMentorsWithFilters({
-      page,
-      limit,
-      search: query?.search,
-      skills: query?.skills,
-      minExperience: query?.minExperience,
-    });
+    const [items, total] =
+      await this.mentorProfileRepository.findActiveMentorsWithFilters({
+        page,
+        limit,
+        search: query?.search,
+        skills: query?.skills,
+        minExperience: query?.minExperience,
+      });
 
-    const { createPaginationMeta } = await import('../../../common/utils/pagination.util');
+    const { createPaginationMeta } =
+      await import('../../../common/utils/pagination.util');
 
     return {
       items: items.map((item) => mentorProfileSchema.parse(item)),
@@ -43,7 +52,10 @@ export class MentorProfileService {
   }
 
   async findByUserId(userId: string) {
-    const item = await this.mentorProfileRepository.findOne({ userId }, { relations: ['user'] });
+    const item = await this.mentorProfileRepository.findOne(
+      { userId },
+      { relations: ['user'] },
+    );
     if (!item)
       throw new NotFoundException('Mentor profile not found for this user');
     return mentorProfileSchema.parse(item);
@@ -55,8 +67,33 @@ export class MentorProfileService {
     return mentorProfileSchema.parse(created);
   }
 
-  async update(id: string, payload: UpdateMentorProfileDto) {
+  async update(
+    id: string,
+    payload: UpdateMentorProfileDto,
+    requestingUserId?: string,
+    requestingUserRole?: string,
+  ) {
+    const profile = await this.mentorProfileRepository.findById(id);
+    if (!profile) throw new NotFoundException('Mentor profile not found');
+
+    if (requestingUserRole && requestingUserId) {
+      if (requestingUserRole !== Role.ADMIN && profile.userId !== requestingUserId) {
+        throw new ForbiddenException(
+          'Bạn không có quyền cập nhật hồ sơ của người khác.',
+        );
+      }
+    }
+
     const parsed = updateMentorProfileSchema.parse(payload);
+
+    if (requestingUserRole && requestingUserRole !== Role.ADMIN) {
+      delete (parsed as any).isApproved;
+      delete (parsed as any).approvedBy;
+      delete (parsed as any).averageRating;
+      delete (parsed as any).totalStudents;
+      delete (parsed as any).status;
+    }
+
     const updated = await this.mentorProfileRepository.updateById(id, parsed);
     return mentorProfileSchema.parse(updated);
   }

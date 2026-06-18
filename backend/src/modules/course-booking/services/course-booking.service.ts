@@ -127,7 +127,9 @@ export class CourseBookingService {
     const duration = course.durationMinutes || 60;
 
     const proposedStart = new Date(meetingTime);
-    const proposedEnd = new Date(proposedStart.getTime() + duration * 60 * 1000);
+    const proposedEnd = new Date(
+      proposedStart.getTime() + duration * 60 * 1000,
+    );
 
     // 1. Check Mentee conflicts
     const menteeBookings = await this.courseBookingRepository.findMany({
@@ -141,7 +143,9 @@ export class CourseBookingService {
     for (const booking of menteeBookings) {
       const bookingStart = new Date(booking.meetingTime);
       const bookingDuration = booking.course?.durationMinutes || 60;
-      const bookingEnd = new Date(bookingStart.getTime() + bookingDuration * 60 * 1000);
+      const bookingEnd = new Date(
+        bookingStart.getTime() + bookingDuration * 60 * 1000,
+      );
 
       if (proposedStart < bookingEnd && bookingStart < proposedEnd) {
         return {
@@ -160,18 +164,18 @@ export class CourseBookingService {
     const mentorCourseIds = mentorCourses.map((c) => c.id);
 
     if (mentorCourseIds.length > 0) {
-      const [mentorBookings] = await this.courseBookingRepository.findByCourseIds(
-        mentorCourseIds,
-        {
+      const [mentorBookings] =
+        await this.courseBookingRepository.findByCourseIds(mentorCourseIds, {
           where: { status: Not(BookingStatus.CANCELLED) },
           relations: ['course'],
-        },
-      );
+        });
 
       for (const booking of mentorBookings) {
         const bookingStart = new Date(booking.meetingTime);
         const bookingDuration = booking.course?.durationMinutes || 60;
-        const bookingEnd = new Date(bookingStart.getTime() + bookingDuration * 60 * 1000);
+        const bookingEnd = new Date(
+          bookingStart.getTime() + bookingDuration * 60 * 1000,
+        );
 
         if (proposedStart < bookingEnd && bookingStart < proposedEnd) {
           return {
@@ -199,7 +203,11 @@ export class CourseBookingService {
     this.validateMeetingTime(parsed.meetingTime, course.metadata);
 
     // Kiểm tra trùng lịch
-    const conflictCheck = await this.checkConflict(parsed.meetingTime, parsed.courseId, menteeId);
+    const conflictCheck = await this.checkConflict(
+      parsed.meetingTime,
+      parsed.courseId,
+      menteeId,
+    );
     if (conflictCheck.hasConflict) {
       throw new BadRequestException(conflictCheck.message);
     }
@@ -216,11 +224,14 @@ export class CourseBookingService {
       );
     }
 
-    // Tạo booking với trạng thái PENDING chờ thanh toán
+    // Tạo booking với trạng thái PENDING chờ thanh toán, hoặc CONFIRMED nếu là khóa học miễn phí
     const created = await this.courseBookingRepository.createAndSave({
       ...parsed,
       menteeId,
-      status: BookingStatus.PENDING,
+      status:
+        Number(course.price) === 0
+          ? BookingStatus.CONFIRMED
+          : BookingStatus.PENDING,
     });
     return courseBookingSchema.parse(created);
   }
@@ -239,9 +250,11 @@ export class CourseBookingService {
       minute: '2-digit',
       hour12: false,
     });
-    
+
     const parts = formatter.formatToParts(meetingTime);
-    const dayOfWeek = (parts.find((p) => p.type === 'weekday')?.value || '').toLowerCase();
+    const dayOfWeek = (
+      parts.find((p) => p.type === 'weekday')?.value || ''
+    ).toLowerCase();
     const hours = parts.find((p) => p.type === 'hour')?.value || '00';
     const minutes = parts.find((p) => p.type === 'minute')?.value || '00';
     const timeStr = `${hours}:${minutes}`;

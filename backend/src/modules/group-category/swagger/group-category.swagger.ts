@@ -48,7 +48,11 @@ export const ApiCreateGroupCategoryDoc = () => {
         type: 'object',
         required: ['name'],
         properties: {
-          name: { type: 'string', maxLength: 255, example: 'Công nghệ thông tin' },
+          name: {
+            type: 'string',
+            maxLength: 255,
+            example: 'Công nghệ thông tin',
+          },
           slug: {
             type: 'string',
             maxLength: 255,
@@ -83,7 +87,8 @@ export const ApiCreateGroupCategoryDoc = () => {
 export const ApiFindAllGroupCategoriesDoc = () => {
   return applyDecorators(
     ApiOperation({
-      summary: 'Lấy danh sách nhóm danh mục (có tìm kiếm & phân trang & kèm categories con)',
+      summary:
+        'Lấy danh sách nhóm danh mục (có tìm kiếm & phân trang & kèm categories con)',
     }),
     ApiQuery({
       name: 'name',
@@ -147,7 +152,9 @@ export const ApiFindAllGroupCategoriesDoc = () => {
 
 export const ApiFindOneGroupCategoryDoc = () => {
   return applyDecorators(
-    ApiOperation({ summary: 'Lấy chi tiết nhóm danh mục theo id (kèm categories con)' }),
+    ApiOperation({
+      summary: 'Lấy chi tiết nhóm danh mục theo id (kèm categories con)',
+    }),
     ApiParam({
       name: 'id',
       description: 'ID của nhóm danh mục (UUID)',

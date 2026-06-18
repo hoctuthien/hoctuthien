@@ -39,7 +39,6 @@ import {
 @ApiTags('Mentor Availabilities (Applications)')
 @Controller('mentor-availabilities')
 export class MentorAvailabilityController {
-
   constructor(
     private readonly mentorAvailabilityService: MentorAvailabilityService,
   ) {}

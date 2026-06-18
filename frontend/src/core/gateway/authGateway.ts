@@ -48,4 +48,11 @@ export const authGateway = {
   async logout(): Promise<void> {
     return httpClient.post('/v1/auths/logout');
   },
+
+  /**
+   * Cập nhật thông tin cá nhân
+   */
+  async updateMe(payload: any): Promise<any> {
+    return httpClient.patch('/v1/users/me', payload);
+  },
 };

@@ -2,7 +2,10 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PaymentStrategy } from '../../payment/interfaces/payment-strategy.interface';
 import { PaymentEntity } from '../../payment/entities/payment.entity';
-import { CourseBookingEntity, BookingStatus } from '../entities/course-booking.entity';
+import {
+  CourseBookingEntity,
+  BookingStatus,
+} from '../entities/course-booking.entity';
 import { CourseEntity } from '../../course/entities/course.entity';
 
 @Injectable()
@@ -12,10 +15,15 @@ export class CourseBookingPaymentStrategy implements PaymentStrategy {
 
   constructor(private readonly dataSource: DataSource) {}
 
-  async resolveAmount(referenceId: string, customAmount?: number): Promise<number> {
-    const booking = await this.dataSource.getRepository(CourseBookingEntity).findOne({
-      where: { id: referenceId },
-    });
+  async resolveAmount(
+    referenceId: string,
+    customAmount?: number,
+  ): Promise<number> {
+    const booking = await this.dataSource
+      .getRepository(CourseBookingEntity)
+      .findOne({
+        where: { id: referenceId },
+      });
     if (!booking) {
       throw new NotFoundException('Không tìm thấy thông tin đăng ký khóa học.');
     }

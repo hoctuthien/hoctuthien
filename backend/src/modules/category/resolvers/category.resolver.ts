@@ -1,4 +1,11 @@
-import { Resolver, Query, Args, ID, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Args,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { CategoryService } from '../services/category.service';
 import { CategoryGql } from '../types/category.graphql';
 import { GroupCategoryGql } from '../../group-category/types/group-category.graphql';

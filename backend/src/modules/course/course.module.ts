@@ -18,4 +18,3 @@ import { CourseCategoryModule } from '../course-category/course-category.module'
   exports: [CourseService, CourseRepository],
 })
 export class CourseModule {}
-

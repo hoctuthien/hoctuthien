@@ -121,13 +121,16 @@ describe('Mentor Onboarding Flow (E2E)', () => {
         console.error('Response:', JSON.stringify(response.body, null, 2));
       }
       expect(response.status).toBe(201);
-      adminAccessToken = response.body.access_token || response.body.accessToken;
+      adminAccessToken =
+        response.body.access_token || response.body.accessToken;
       expect(adminAccessToken).toBeDefined();
     });
 
     it('should move application to in-progress', async () => {
       const response = await supertest(app.getHttpServer())
-        .patch(`${apiPrefix}/mentor-availabilities/${applicationId}/in-progress`)
+        .patch(
+          `${apiPrefix}/mentor-availabilities/${applicationId}/in-progress`,
+        )
         .set('Authorization', `Bearer ${adminAccessToken}`)
         .send({});
 
@@ -156,27 +159,41 @@ describe('Mentor Onboarding Flow (E2E)', () => {
           password: testUser.password,
         });
 
-      if (response.status !== 201 || response.body.user.role !== UserRole.MENTOR) {
+      if (
+        response.status !== 201 ||
+        response.body.user.role !== UserRole.MENTOR
+      ) {
         console.log('--- DEBUG INFO ---');
         console.log('Login Response Status:', response.status);
-        console.log('Login Response Body:', JSON.stringify(response.body, null, 2));
-        
+        console.log(
+          'Login Response Body:',
+          JSON.stringify(response.body, null, 2),
+        );
+
         // Also check application status directly as admin
         const adminLogin = await supertest(app.getHttpServer())
           .post(`${apiPrefix}/auths/login`)
           .send(adminCredentials);
-        
+
         const appDetail = await supertest(app.getHttpServer())
           .get(`${apiPrefix}/mentor-availabilities/${applicationId}`)
-          .set('Authorization', `Bearer ${adminLogin.body.access_token || adminLogin.body.accessToken}`);
-          
-        console.log('Application Detail:', JSON.stringify(appDetail.body, null, 2));
+          .set(
+            'Authorization',
+            `Bearer ${adminLogin.body.access_token || adminLogin.body.accessToken}`,
+          );
+
+        console.log(
+          'Application Detail:',
+          JSON.stringify(appDetail.body, null, 2),
+        );
         console.log('--- END DEBUG INFO ---');
       }
 
       expect(response.status).toBe(201);
       expect(response.body.user.role).toBe(UserRole.MENTOR);
-      console.log(`User ${testUser.email} role verified as: ${response.body.user.role}`);
+      console.log(
+        `User ${testUser.email} role verified as: ${response.body.user.role}`,
+      );
     });
   });
 });

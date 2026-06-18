@@ -9,7 +9,10 @@
  *  C. findTransactionByCode — Error & Edge cases (TC-315 → TC-318)
  */
 
-import { TnAppService, TNTransaction } from '../../src/modules/payment/services/tn-app.service';
+import {
+  TnAppService,
+  TNTransaction,
+} from '../../src/modules/payment/services/tn-app.service';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { of, throwError } from 'rxjs';
@@ -35,7 +38,10 @@ function makeTx(overrides: Partial<TNTransaction> = {}): TNTransaction {
   };
 }
 
-function makeAxiosResponse(transactions: TNTransaction[], status = 200): AxiosResponse<any> {
+function makeAxiosResponse(
+  transactions: TNTransaction[],
+  status = 200,
+): AxiosResponse<any> {
   return {
     status,
     data: {
@@ -206,7 +212,11 @@ describe('TnAppService', () => {
       });
       httpService.get.mockReturnValue(of(makeAxiosResponse([tx])));
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.found).toBe(true);
       expect(result.transaction).toBeDefined();
@@ -223,7 +233,11 @@ describe('TnAppService', () => {
       });
       httpService.get.mockReturnValue(of(makeAxiosResponse([tx])));
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.found).toBe(false);
     });
@@ -239,7 +253,11 @@ describe('TnAppService', () => {
       });
       httpService.get.mockReturnValue(of(makeAxiosResponse([tx])));
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.found).toBe(false);
     });
@@ -255,7 +273,11 @@ describe('TnAppService', () => {
       });
       httpService.get.mockReturnValue(of(makeAxiosResponse([tx])));
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.found).toBe(false);
     });
@@ -274,7 +296,11 @@ describe('TnAppService', () => {
       });
       httpService.get.mockReturnValue(of(makeAxiosResponse([tx])));
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.found).toBe(false);
     });
@@ -283,13 +309,23 @@ describe('TnAppService', () => {
      * TC-313: Nhiều giao dịch, chỉ 1 khớp → trả về đúng giao dịch đó
      */
     it('TC-313: nên trả về đúng giao dịch khớp khi có nhiều giao dịch', async () => {
-      const matching = makeTx({ id: 'match-tx', narrative: 'KICHHOAT USER-001ABC' });
-      const notMatching = makeTx({ id: 'other-tx', narrative: 'THANH TOAN KHAC' });
+      const matching = makeTx({
+        id: 'match-tx',
+        narrative: 'KICHHOAT USER-001ABC',
+      });
+      const notMatching = makeTx({
+        id: 'other-tx',
+        narrative: 'THANH TOAN KHAC',
+      });
       httpService.get.mockReturnValue(
         of(makeAxiosResponse([notMatching, matching])),
       );
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.found).toBe(true);
       expect(result.transaction?.id).toBe('match-tx');
@@ -334,7 +370,11 @@ describe('TnAppService', () => {
         throwError(() => new Error('Connection refused')),
       );
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.found).toBe(false);
       expect(result.transaction).toBeNull();
@@ -348,7 +388,11 @@ describe('TnAppService', () => {
     it('TC-316: nên trả về found=false và error khi HTTP status != 200', async () => {
       httpService.get.mockReturnValue(of(makeAxiosResponse([], 500)));
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.found).toBe(false);
       expect(result.error).toBeDefined();
@@ -360,7 +404,11 @@ describe('TnAppService', () => {
     it('TC-317: nên set rawResponse khi API trả về 200 (dù không match)', async () => {
       httpService.get.mockReturnValue(of(makeAxiosResponse([])));
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       expect(result.rawResponse).toBeDefined();
     });
@@ -375,7 +423,11 @@ describe('TnAppService', () => {
       );
       httpService.get.mockReturnValue(of(makeAxiosResponse(manyTx)));
 
-      const result = await service.findTransactionByCode(shortCode, fromDate, amount);
+      const result = await service.findTransactionByCode(
+        shortCode,
+        fromDate,
+        amount,
+      );
 
       if (result.rawResponse) {
         expect(result.rawResponse.length).toBeLessThanOrEqual(2000);

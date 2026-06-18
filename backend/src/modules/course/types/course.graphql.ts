@@ -40,4 +40,3 @@ export class CourseGql {
   @Field(() => GraphQLJSON, { nullable: true })
   metadata?: any;
 }
-

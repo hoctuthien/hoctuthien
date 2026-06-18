@@ -30,7 +30,12 @@ export class MentorAvailabilityService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(query?: { page?: number; limit?: number; search?: string; status?: MentorAvailabilityStatus }) {
+  async findAll(query?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: MentorAvailabilityStatus;
+  }) {
     const page = query?.page || 1;
     const limit = query?.limit || 10;
     const skip = (page - 1) * limit;
@@ -246,7 +251,6 @@ export class MentorAvailabilityService {
       return mentorAvailabilitySchema.parse(updated);
     });
   }
-
 
   async reject(id: string, adminId: string, note: string) {
     return this.dataSource.transaction(async (manager) => {

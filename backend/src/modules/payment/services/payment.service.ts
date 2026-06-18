@@ -41,7 +41,7 @@ export class PaymentService {
     private readonly eventEmitter: EventEmitter2,
     private readonly paymentStrategyRegistry: PaymentStrategyRegistry,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
-  ) { }
+  ) {}
 
   async findOne(id: string): Promise<PaymentEntity> {
     return this.paymentRepository.findByIdOrFail(
@@ -75,11 +75,15 @@ export class PaymentService {
     });
 
     if (existing) {
-      const isStillValid = existing.expiredAt && existing.expiredAt > new Date();
+      const isStillValid =
+        existing.expiredAt && existing.expiredAt > new Date();
       if (isStillValid) {
-        const matchesDescription = existing.description?.startsWith(descriptionPrefix);
+        const matchesDescription =
+          existing.description?.startsWith(descriptionPrefix);
         if (matchesDescription) {
-          this.logger.log(`User ${userId} đã có hóa đơn PENDING cho ${paymentType} còn hạn.`);
+          this.logger.log(
+            `User ${userId} đã có hóa đơn PENDING cho ${paymentType} còn hạn.`,
+          );
           return {
             paymentId: existing.id,
             amount: Number(existing.amount),
@@ -89,14 +93,19 @@ export class PaymentService {
           };
         }
       }
-      this.logger.log(`Hóa đơn PENDING ${existing.id} đã hết hạn. Chuyển sang EXPIRED.`);
+      this.logger.log(
+        `Hóa đơn PENDING ${existing.id} đã hết hạn. Chuyển sang EXPIRED.`,
+      );
       await this.paymentRepository.expirePayment(existing.id);
     }
 
     let transactionCode = '';
     let isUnique = false;
     while (!isUnique) {
-      const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const randomStr = Math.random()
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase();
       transactionCode = `${descriptionPrefix} HTT${randomStr}`;
       const exists = await this.paymentRepository.exists({
         description: transactionCode,
@@ -281,7 +290,9 @@ export class PaymentService {
       );
 
       // Kích hoạt nghiệp vụ cụ thể qua Strategy
-      const strategy = this.paymentStrategyRegistry.get(payment.paymentMethod || PaymentType.ACTIVATION);
+      const strategy = this.paymentStrategyRegistry.get(
+        payment.paymentMethod || PaymentType.ACTIVATION,
+      );
       await strategy.onSuccess(payment);
 
       // Emit event để tương thích ngược với các listener hiện tại
@@ -297,7 +308,7 @@ export class PaymentService {
         message: ErrorMessage[ErrorCode.PAYMENT_VERIFY_SUCCESS],
       };
     } finally {
-      await this.redis.del(lockKey).catch(() => { });
+      await this.redis.del(lockKey).catch(() => {});
     }
   }
 

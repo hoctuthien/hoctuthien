@@ -1,12 +1,143 @@
 'use client';
 
-import { authGateway } from '@/core/gateway/authGateway';
+import React, { useState, useEffect } from 'react';
+import { authGateway, mentorGateway } from '@/core/gateway';
 import { useRouter } from 'next/navigation';
-
 import { signOut } from 'next-auth/react';
+import {
+  LuUser,
+  LuPhone,
+  LuImage,
+  LuCalendar,
+  LuGlobe,
+  LuCheck,
+  LuLinkedin,
+  LuBriefcase,
+  LuBookOpen,
+  LuLogOut,
+  LuTriangleAlert,
+  LuRefreshCw
+} from 'react-icons/lu';
 
 export function ProfileClient({ user }: { user: any }) {
   const router = useRouter();
+  
+  // Navigation tabs for Mentor
+  const [activeTab, setActiveTab] = useState<'personal' | 'teaching'>('personal');
+
+  // Personal Info Form States
+  const [name, setName] = useState(user.name || '');
+  const [phone, setPhone] = useState(user.phone || '');
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || '');
+  const [dayOfBirth, setDayOfBirth] = useState(user.dayOfBirth ? user.dayOfBirth.substring(0, 10) : '');
+  const [gender, setGender] = useState(user.gender || 'other');
+  const [timezone, setTimezone] = useState(user.timezone || 'Asia/Ho_Chi_Minh');
+
+  // Mentor Info Form States
+  const [mentorProfile, setMentorProfile] = useState<any>(null);
+  const [loadingMentor, setLoadingMentor] = useState(false);
+  const [jobTitle, setJobTitle] = useState('');
+  const [company, setCompany] = useState('');
+  const [bio, setBio] = useState('');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [yearsOfExperience, setYearsOfExperience] = useState<number | ''>('');
+  const [skills, setSkills] = useState('');
+
+  // Status & UI States
+  const [submittingUser, setSubmittingUser] = useState(false);
+  const [submittingMentor, setSubmittingMentor] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Fetch Mentor Profile if role is mentor
+  useEffect(() => {
+    if (user.role === 'mentor') {
+      const fetchMentor = async () => {
+        try {
+          setLoadingMentor(true);
+          const res = await mentorGateway.getMentorProfileByUserId(user.id);
+          if (res) {
+            setMentorProfile(res);
+            setJobTitle(res.jobTitle || '');
+            setCompany(res.company || '');
+            setBio(res.bio || '');
+            setLinkedinUrl(res.linkedinUrl || '');
+            setYearsOfExperience(res.yearsOfExperience != null ? res.yearsOfExperience : '');
+            setSkills(Array.isArray(res.skills) ? res.skills.join(', ') : '');
+          }
+        } catch (error) {
+          console.error('Không thể tải thông tin hồ sơ cố vấn:', error);
+        } finally {
+          setLoadingMentor(false);
+        }
+      };
+      fetchMentor();
+    }
+  }, [user]);
+
+  // Flash Message display helper
+  const showMessage = (type: 'success' | 'error', text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => {
+      setMessage(null);
+    }, 4000);
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSubmittingUser(true);
+      setMessage(null);
+
+      const payload = {
+        name: name.trim(),
+        phone: phone.trim() || null,
+        avatarUrl: avatarUrl.trim() || null,
+        dayOfBirth: dayOfBirth ? new Date(dayOfBirth).toISOString() : null,
+        gender,
+        timezone,
+      };
+
+      await authGateway.updateMe(payload);
+      showMessage('success', 'Cập nhật thông tin cá nhân thành công! Thay đổi sẽ hiển thị đầy đủ sau khi tải lại trang.');
+      router.refresh();
+    } catch (error: any) {
+      console.error('Update personal info failed:', error);
+      showMessage('error', error?.message || 'Cập nhật thông tin cá nhân thất bại. Vui lòng kiểm tra lại.');
+    } finally {
+      setSubmittingUser(false);
+    }
+  };
+
+  const handleUpdateMentor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSubmittingMentor(true);
+      setMessage(null);
+
+      const skillsArray = skills
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      const payload = {
+        jobTitle: jobTitle.trim() || null,
+        company: company.trim() || null,
+        bio: bio.trim() || null,
+        linkedinUrl: linkedinUrl.trim() || null,
+        yearsOfExperience: yearsOfExperience !== '' ? Number(yearsOfExperience) : null,
+        skills: skillsArray,
+      };
+
+      await mentorGateway.updateMentorProfileMe(payload);
+      showMessage('success', 'Cập nhật hồ sơ giảng dạy (Mentor) thành công!');
+    } catch (error: any) {
+      console.error('Update mentor profile failed:', error);
+      showMessage('error', error?.message || 'Cập nhật hồ sơ giảng dạy thất bại. Vui lòng kiểm tra lại.');
+    } finally {
+      setSubmittingMentor(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await authGateway.logout();
@@ -17,40 +148,352 @@ export function ProfileClient({ user }: { user: any }) {
     }
   };
 
-  return (
-    <div className="max-w-2xl mx-auto p-10">
-      <h1 className="text-3xl font-bold mb-6">Thông tin cá nhân</h1>
-      
-      <div className="bg-white shadow rounded-lg p-6 space-y-4">
-        <div className="flex items-center space-x-4">
-          <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-2xl font-bold">
-            {user.name?.charAt(0)}
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold">{user.name}</h2>
-            <p className="text-gray-500">{user.email}</p>
-          </div>
-        </div>
+  const isMentor = user.role === 'mentor';
 
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-          <div>
-            <label className="text-sm text-gray-500">Vai trò</label>
-            <p className="font-medium capitalize">{user.role}</p>
+  return (
+    <div className="max-w-4xl mx-auto p-4 md:p-8 font-sans">
+      {/* Header section with User Profile Card */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 md:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
+        {/* Subtle background decoration */}
+        <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-xl"></div>
+        <div className="absolute left-1/3 bottom-0 w-48 h-48 bg-indigo-500/10 rounded-full -ml-20 -mb-20 blur-2xl"></div>
+
+        <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
+          <div className="w-24 h-24 rounded-2xl border-4 border-white/20 overflow-hidden bg-white/10 flex items-center justify-center text-4xl font-bold flex-shrink-0 shadow-lg">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+            ) : (
+              name?.charAt(0).toUpperCase()
+            )}
           </div>
-          <div>
-            <label className="text-sm text-gray-500">ID người dùng</label>
-            <p className="font-medium text-xs">{user.id}</p>
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="text-2xl md:text-3xl font-black font-[Montserrat] tracking-tight">{name || 'Người dùng'}</h1>
+            <p className="text-white/80 text-sm mt-1">{user.email}</p>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-3">
+              <span className="bg-white/20 text-white font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md">
+                Vai trò: {user.role === 'mentor' ? 'Cố vấn (Mentor)' : user.role === 'admin' ? 'Quản trị viên' : 'Học viên (Mentee)'}
+              </span>
+              {isMentor && mentorProfile && (
+                <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md ${
+                  mentorProfile.status === 'approved' 
+                    ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-500/20' 
+                    : 'bg-amber-500/30 text-amber-200 border border-amber-500/20'
+                }`}>
+                  Trạng thái hồ sơ: {mentorProfile.status === 'approved' ? 'Đã duyệt' : 'Chờ duyệt'}
+                </span>
+              )}
+            </div>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-black text-xs px-5 py-3 rounded-2xl border border-white/10 transition-all cursor-pointer backdrop-blur-md active:scale-95"
+          >
+            <LuLogOut size={14} />
+            <span>Đăng xuất</span>
+          </button>
         </div>
       </div>
 
-      <div className="mt-6">
-        <button
-          onClick={handleLogout}
-          className="w-full bg-red-50 text-red-600 hover:bg-red-100 font-semibold py-3 px-6 rounded-lg transition-colors border border-red-200"
-        >
-          Đăng xuất
-        </button>
+      {/* Toast Flash Message */}
+      {message && (
+        <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-2xl border shadow-lg flex items-start gap-3 max-w-md animate-in slide-in-from-bottom duration-300 ${
+          message.type === 'success'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+            : 'bg-rose-50 border-rose-200 text-rose-800'
+        }`}>
+          <div className="mt-0.5">
+            {message.type === 'success' ? (
+              <LuCheck size={18} className="text-emerald-600" />
+            ) : (
+              <LuTriangleAlert size={18} className="text-rose-600" />
+            )}
+          </div>
+          <div className="flex-1">
+            <h4 className="text-xs font-black uppercase tracking-wider mb-0.5">
+              {message.type === 'success' ? 'Thành công' : 'Lỗi hệ thống'}
+            </h4>
+            <p className="text-xs font-semibold leading-relaxed">{message.text}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Tabs Navigation for Mentors */}
+      {isMentor && (
+        <div className="flex border-b border-[#E2E8F0] mb-8 bg-[#F8FAFC] p-1.5 rounded-2xl gap-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab('personal')}
+            className={`flex-1 py-3 px-6 text-xs font-black tracking-wide rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer border-0 ${
+              activeTab === 'personal'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100/50'
+            }`}
+          >
+            <LuUser size={16} />
+            <span>Thông tin cá nhân</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('teaching')}
+            className={`flex-1 py-3 px-6 text-xs font-black tracking-wide rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer border-0 ${
+              activeTab === 'teaching'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100/50'
+            }`}
+          >
+            <LuBriefcase size={16} />
+            <span>Hồ sơ giảng dạy (Mentor)</span>
+          </button>
+        </div>
+      )}
+
+      {/* Form Content container */}
+      <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-6 md:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.005)]">
+        {activeTab === 'personal' ? (
+          <form onSubmit={handleUpdateUser} className="space-y-6">
+            <h3 className="text-lg font-black text-[#0F172A] font-[Montserrat] mb-2 tracking-tight">
+              Cập nhật Thông tin cá nhân
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Full Name */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <LuUser size={14} className="text-slate-400" />
+                  <span>Họ và tên *</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ví dụ: Nguyễn Văn A"
+                  className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                />
+              </div>
+
+              {/* Phone number */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <LuPhone size={14} className="text-slate-400" />
+                  <span>Số điện thoại</span>
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Ví dụ: 0987654321"
+                  className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                />
+              </div>
+
+              {/* Day of birth */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <LuCalendar size={14} className="text-slate-400" />
+                  <span>Ngày sinh</span>
+                </label>
+                <input
+                  type="date"
+                  value={dayOfBirth}
+                  onChange={(e) => setDayOfBirth(e.target.value)}
+                  className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                />
+              </div>
+
+              {/* Gender selector */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <LuUser size={14} className="text-slate-400" />
+                  <span>Giới tính</span>
+                </label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors cursor-pointer"
+                >
+                  <option value="male">Nam</option>
+                  <option value="female">Nữ</option>
+                  <option value="other">Khác</option>
+                </select>
+              </div>
+
+              {/* Timezone */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <LuGlobe size={14} className="text-slate-400" />
+                  <span>Múi giờ</span>
+                </label>
+                <input
+                  type="text"
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  placeholder="Ví dụ: Asia/Ho_Chi_Minh"
+                  className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                />
+              </div>
+
+              {/* Avatar URL */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <LuImage size={14} className="text-slate-400" />
+                  <span>Đường dẫn ảnh đại diện (URL)</span>
+                </label>
+                <input
+                  type="url"
+                  value={avatarUrl}
+                  onChange={(e) => setAvatarUrl(e.target.value)}
+                  placeholder="https://example.com/avatar.jpg"
+                  className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end mt-4 pt-4 border-t border-[#E2E8F0]">
+              <button
+                type="submit"
+                disabled={submittingUser}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-3 px-8 rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/10 active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {submittingUser ? (
+                  <LuRefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <LuCheck size={14} />
+                    <span>Lưu thay đổi</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={handleUpdateMentor} className="space-y-6">
+            <h3 className="text-lg font-black text-[#0F172A] font-[Montserrat] mb-2 tracking-tight">
+              Cập nhật Hồ sơ Cố vấn (Mentor Profile)
+            </h3>
+
+            {loadingMentor ? (
+              <div className="py-8 flex flex-col items-center justify-center text-slate-400 gap-2">
+                <LuRefreshCw size={32} className="animate-spin text-blue-500" />
+                <span className="text-xs font-semibold">Đang tải hồ sơ giảng dạy...</span>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Job Title */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <LuBriefcase size={14} className="text-slate-400" />
+                      <span>Chức danh công việc / Vị trí</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={jobTitle}
+                      onChange={(e) => setJobTitle(e.target.value)}
+                      placeholder="Ví dụ: Senior Software Engineer"
+                      className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                    />
+                  </div>
+
+                  {/* Company */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <LuBriefcase size={14} className="text-slate-400" />
+                      <span>Công ty / Tổ chức</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      placeholder="Ví dụ: Google Vietnam"
+                      className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                    />
+                  </div>
+
+                  {/* Years of Experience */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <LuCalendar size={14} className="text-slate-400" />
+                      <span>Số năm kinh nghiệm</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={yearsOfExperience}
+                      onChange={(e) => setYearsOfExperience(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder="Ví dụ: 5"
+                      className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                    />
+                  </div>
+
+                  {/* LinkedIn URL */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <LuLinkedin size={14} className="text-slate-400" />
+                      <span>Đường dẫn LinkedIn (URL)</span>
+                    </label>
+                    <input
+                      type="url"
+                      value={linkedinUrl}
+                      onChange={(e) => setLinkedinUrl(e.target.value)}
+                      placeholder="https://linkedin.com/in/username"
+                      className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {/* Skills array as text input */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <LuBookOpen size={14} className="text-slate-400" />
+                    <span>Kỹ năng giảng dạy (Phân cách bằng dấu phẩy)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={skills}
+                    onChange={(e) => setSkills(e.target.value)}
+                    placeholder="Ví dụ: NestJS, React, TypeScript, Docker"
+                    className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
+                  />
+                  <span className="text-[10px] text-slate-400 font-semibold italic mt-0.5">
+                    * Các kỹ năng sẽ được hiển thị trên trang danh sách để học viên tìm kiếm.
+                  </span>
+                </div>
+
+                {/* Bio text */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <LuUser size={14} className="text-slate-400" />
+                    <span>Giới thiệu bản thân (Bio)</span>
+                  </label>
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Mô tả kinh nghiệm, phương pháp giảng dạy hoặc mong muốn hỗ trợ học viên..."
+                    className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors min-h-[120px] resize-none leading-relaxed"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end mt-4 pt-4 border-t border-[#E2E8F0]">
+                  <button
+                    type="submit"
+                    disabled={submittingMentor}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-3 px-8 rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/10 active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    {submittingMentor ? (
+                      <LuRefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <LuCheck size={14} />
+                        <span>Cập nhật hồ sơ</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );

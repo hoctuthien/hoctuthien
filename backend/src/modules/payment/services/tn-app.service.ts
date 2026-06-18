@@ -95,17 +95,14 @@ export class TnAppService {
       `?fromDate=${from}&toDate=${to}&keyword=&pageNumber=1&pageSize=50`;
 
     try {
-      const response: AxiosResponse<TNApiWrapper> =
-        await firstValueFrom(
-          this.httpService.get<TNApiWrapper>(url, {
-            headers: { 'Content-Type': 'application/json' },
-          }),
-        );
+      const response: AxiosResponse<TNApiWrapper> = await firstValueFrom(
+        this.httpService.get<TNApiWrapper>(url, {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
 
       if (response.status !== 200) {
-        this.logger.warn(
-          `[TnApp] fetchLatestBatch HTTP ${response.status}`,
-        );
+        this.logger.warn(`[TnApp] fetchLatestBatch HTTP ${response.status}`);
         return [];
       }
 
@@ -114,7 +111,7 @@ export class TnAppService {
       if (!Array.isArray(transactions)) {
         this.logger.warn(
           `[TnApp] fetchLatestBatch: data.transactions không phải mảng. ` +
-          `Payload nhận được: ${JSON.stringify(response.data).slice(0, 300)}`,
+            `Payload nhận được: ${JSON.stringify(response.data).slice(0, 300)}`,
         );
         return [];
       }
@@ -149,16 +146,22 @@ export class TnAppService {
     let rawResponse = '';
 
     try {
-      const response: AxiosResponse<TNApiWrapper> =
-        await firstValueFrom(
-          this.httpService.get<TNApiWrapper>(url, {
-            headers: { 'Content-Type': 'application/json' },
-          }),
-        );
+      const response: AxiosResponse<TNApiWrapper> = await firstValueFrom(
+        this.httpService.get<TNApiWrapper>(url, {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
 
       if (response.status !== 200) {
-        this.logger.warn(`[TnApp] findTransactionByCode HTTP ${response.status}`);
-        return { found: false, transaction: null, error: `HTTP ${response.status}`, rawResponse };
+        this.logger.warn(
+          `[TnApp] findTransactionByCode HTTP ${response.status}`,
+        );
+        return {
+          found: false,
+          transaction: null,
+          error: `HTTP ${response.status}`,
+          rawResponse,
+        };
       }
 
       // API trả về: { status, data: { transactions: [...] } }

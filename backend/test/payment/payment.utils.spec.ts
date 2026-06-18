@@ -8,7 +8,10 @@
  *  B. toVNDateString — chuyển Date UTC thành chuỗi ngày VN YYYY-MM-DD (TC-411 → TC-420)
  */
 
-import { parseVNTime, toVNDateString } from '../../src/modules/payment/payment.utils';
+import {
+  parseVNTime,
+  toVNDateString,
+} from '../../src/modules/payment/payment.utils';
 
 // ─── UTC+7 offset hằng số ─────────────────────────────────────────────────────
 const VN_OFFSET_MS = 7 * 60 * 60 * 1000; // 25_200_000 ms
@@ -16,13 +19,11 @@ const VN_OFFSET_MS = 7 * 60 * 60 * 1000; // 25_200_000 ms
 // ─── Test Suite ───────────────────────────────────────────────────────────────
 
 describe('payment.utils', () => {
-
   // ═══════════════════════════════════════════════════════════════════════════
   // A. parseVNTime
   // ═══════════════════════════════════════════════════════════════════════════
 
   describe('parseVNTime', () => {
-
     /**
      * TC-401: Parse chuỗi VN time "YYYY-MM-DD HH:mm:ss" → đúng UTC Date
      * VN 09:05:00 (UTC+7) → UTC 02:05:00
@@ -66,7 +67,9 @@ describe('payment.utils', () => {
      */
     it('TC-405: thời gian UTC phải chênh lệch đúng -7 giờ so với VN time', () => {
       const vnHour = 14; // 14:00:00 VN
-      const result = parseVNTime(`2026-05-20 ${vnHour.toString().padStart(2, '0')}:00:00`);
+      const result = parseVNTime(
+        `2026-05-20 ${vnHour.toString().padStart(2, '0')}:00:00`,
+      );
 
       expect(result.getUTCHours()).toBe(vnHour - 7);
     });
@@ -127,7 +130,6 @@ describe('payment.utils', () => {
   // ═══════════════════════════════════════════════════════════════════════════
 
   describe('toVNDateString', () => {
-
     /**
      * TC-411: UTC ngày thì giờ VN cùng ngày → YYYY-MM-DD đúng
      * 2026-05-20T10:00:00Z → VN 17:00:00 cùng ngày → "2026-05-20"

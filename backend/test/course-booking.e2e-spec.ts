@@ -65,8 +65,9 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const loginRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/login`)
         .send({ email: testMentee.email, password: testMentee.password });
-      expect(loginRes.status).toBe(201);
-      menteeAccessToken = loginRes.body.access_token || loginRes.body.accessToken;
+      expect(loginRes.status).toBe(200);
+      menteeAccessToken =
+        loginRes.body.access_token || loginRes.body.accessToken;
       expect(menteeAccessToken).toBeDefined();
     });
 
@@ -81,8 +82,9 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const loginRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/login`)
         .send({ email: testMentor.email, password: testMentor.password });
-      expect(loginRes.status).toBe(201);
-      const tempAccessToken = loginRes.body.access_token || loginRes.body.accessToken;
+      expect(loginRes.status).toBe(200);
+      const tempAccessToken =
+        loginRes.body.access_token || loginRes.body.accessToken;
 
       // 3. Create mentor application
       const appData = {
@@ -92,7 +94,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
         yearsOfExperience: 8,
         skills: ['TypeScript', 'Testing'],
         linkedinUrl: 'https://linkedin.com/in/test-booking-mentor',
-        metadata: { certificates: [], degrees: [] }
+        metadata: { certificates: [], degrees: [] },
       };
 
       const mentorAppRes = await supertest(app.getHttpServer())
@@ -106,17 +108,22 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const adminLoginRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/login`)
         .send(adminCredentials);
-      expect(adminLoginRes.status).toBe(201);
-      adminAccessToken = adminLoginRes.body.access_token || adminLoginRes.body.accessToken;
+      expect(adminLoginRes.status).toBe(200);
+      adminAccessToken =
+        adminLoginRes.body.access_token || adminLoginRes.body.accessToken;
 
       // 5. Admin Approve
       await supertest(app.getHttpServer())
-        .patch(`${apiPrefix}/mentor-availabilities/${mentorApplicationId}/in-progress`)
+        .patch(
+          `${apiPrefix}/mentor-availabilities/${mentorApplicationId}/in-progress`,
+        )
         .set('Authorization', `Bearer ${adminAccessToken}`)
         .send({});
 
       await supertest(app.getHttpServer())
-        .patch(`${apiPrefix}/mentor-availabilities/${mentorApplicationId}/approved`)
+        .patch(
+          `${apiPrefix}/mentor-availabilities/${mentorApplicationId}/approved`,
+        )
         .set('Authorization', `Bearer ${adminAccessToken}`)
         .send({ note: 'Approved' });
 
@@ -124,9 +131,10 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const mentorLoginRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/login`)
         .send({ email: testMentor.email, password: testMentor.password });
-      expect(mentorLoginRes.status).toBe(201);
+      expect(mentorLoginRes.status).toBe(200);
       expect(mentorLoginRes.body.user.role).toBe(UserRole.MENTOR);
-      mentorAccessToken = mentorLoginRes.body.access_token || mentorLoginRes.body.accessToken;
+      mentorAccessToken =
+        mentorLoginRes.body.access_token || mentorLoginRes.body.accessToken;
       mentorId = mentorLoginRes.body.user.id;
     });
 
@@ -135,7 +143,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const catRes = await supertest(app.getHttpServer())
         .get(`${apiPrefix}/categories?limit=1`)
         .set('Authorization', `Bearer ${adminAccessToken}`);
-      
+
       const cats = catRes.body?.data || [];
       if (cats.length > 0) {
         categoryId = cats[0].id;
@@ -161,7 +169,8 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
         categoryIds: [categoryId],
         price: 0,
         status: 'ACTIVE',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop',
+        thumbnailUrl:
+          'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop',
         durationMinutes: 60,
         prerequisites: [],
         metadata: {
@@ -170,9 +179,9 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
           format: 'online',
           time: {
             monday: ['09:00-10:30', '15:30-17:00'], // Available slots on Monday
-            friday: ['14:00-15:30']                 // Available slot on Friday
-          }
-        }
+            friday: ['14:00-15:30'], // Available slot on Friday
+          },
+        },
       };
 
       const courseRes = await supertest(app.getHttpServer())
@@ -190,7 +199,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const getRes = await supertest(app.getHttpServer())
         .get(`${apiPrefix}/courses`)
         .query({ limit: 100 });
-      
+
       expect(getRes.status).toBe(200);
       const items = getRes.body.items || [];
       const createdCourse = items.find((c: any) => c.id === courseId);
@@ -208,7 +217,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const bookingPayload = {
         courseId,
         meetingTime: meetingTime.toISOString(),
-        notesForMentor: 'I want to study test validations.'
+        notesForMentor: 'I want to study test validations.',
       };
 
       const bookingRes = await supertest(app.getHttpServer())
@@ -218,7 +227,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
 
       expect(bookingRes.status).toBe(201);
       expect(bookingRes.body.id).toBeDefined();
-      expect(bookingRes.body.status).toBe('pending'); // PENDING awaiting payment verification
+      expect(bookingRes.body.status).toBe('confirmed'); // CONFIRMED because price is 0 (free)
     });
 
     it('should fail to book if the slot falls on a day when mentor is not available', async () => {
@@ -229,7 +238,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const bookingPayload = {
         courseId,
         meetingTime: meetingTime.toISOString(),
-        notesForMentor: 'This should fail'
+        notesForMentor: 'This should fail',
       };
 
       const bookingRes = await supertest(app.getHttpServer())
@@ -238,7 +247,9 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
         .send(bookingPayload);
 
       expect(bookingRes.status).toBe(400);
-      expect(bookingRes.body.message).toContain('Mentor không rảnh vào thứ tuesday');
+      expect(bookingRes.body.message).toContain(
+        'Mentor không rảnh vào thứ tuesday',
+      );
     });
 
     it('should fail to book if the time is outside of the free schedule slots', async () => {
@@ -249,7 +260,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const bookingPayload = {
         courseId,
         meetingTime: meetingTime.toISOString(),
-        notesForMentor: 'This should fail'
+        notesForMentor: 'This should fail',
       };
 
       const bookingRes = await supertest(app.getHttpServer())
@@ -258,7 +269,9 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
         .send(bookingPayload);
 
       expect(bookingRes.status).toBe(400);
-      expect(bookingRes.body.message).toContain('không nằm trong khung giờ rảnh của Mentor');
+      expect(bookingRes.body.message).toContain(
+        'không nằm trong khung giờ rảnh của Mentor',
+      );
     });
 
     it('should fail if another active booking already exists for this course', async () => {
@@ -268,7 +281,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       const bookingPayload = {
         courseId,
         meetingTime: meetingTime.toISOString(),
-        notesForMentor: 'Double booking test'
+        notesForMentor: 'Double booking test',
       };
 
       const bookingRes = await supertest(app.getHttpServer())
@@ -277,7 +290,9 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
         .send(bookingPayload);
 
       expect(bookingRes.status).toBe(400);
-      expect(bookingRes.body.message).toContain('đã có học viên đăng ký và đang hoạt động');
+      expect(bookingRes.body.message).toContain(
+        'đã có học viên đăng ký và đang hoạt động',
+      );
     });
   });
 });

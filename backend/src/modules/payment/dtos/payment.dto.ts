@@ -27,7 +27,8 @@ export class VerifyActivationPaymentDto {
  */
 export class GeneratePaymentQrDto {
   @ApiProperty({
-    description: 'Loại hình thanh toán (ví dụ: activation, course_booking, donation)',
+    description:
+      'Loại hình thanh toán (ví dụ: activation, course_booking, donation)',
     example: 'course_booking',
   })
   @IsString()

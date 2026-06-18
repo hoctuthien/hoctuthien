@@ -34,21 +34,34 @@ export class ResponseTransformInterceptor implements NestInterceptor {
       map((data) => {
         // Nếu data đã theo chuẩn pagination (có items/data và meta)
         if (data && typeof data === 'object' && 'meta' in data) {
-          const items = 'items' in data ? data.items : ('data' in data ? data.data : []);
+          const items =
+            'items' in data ? data.items : 'data' in data ? data.data : [];
           return {
-            data: Array.isArray(items) ? items : items !== undefined && items !== null ? [items] : [],
+            data: Array.isArray(items)
+              ? items
+              : items !== undefined && items !== null
+                ? [items]
+                : [],
             message: (data as any).message || '',
             meta: data.meta || {},
           };
         }
 
         // Nếu data có cấu trúc message hoặc data
-        if (data && typeof data === 'object' && ('message' in data || 'data' in data)) {
+        if (
+          data &&
+          typeof data === 'object' &&
+          ('message' in data || 'data' in data)
+        ) {
           const resData = 'data' in data ? data.data : data;
           const resMsg = 'message' in data ? data.message : '';
           const resMeta = 'meta' in data ? data.meta : {};
           return {
-            data: Array.isArray(resData) ? resData : resData !== undefined && resData !== null ? [resData] : [],
+            data: Array.isArray(resData)
+              ? resData
+              : resData !== undefined && resData !== null
+                ? [resData]
+                : [],
             message: resMsg || '',
             meta: resMeta || {},
           };
@@ -56,7 +69,11 @@ export class ResponseTransformInterceptor implements NestInterceptor {
 
         // Trường hợp data thông thường
         return {
-          data: Array.isArray(data) ? data : data !== undefined && data !== null ? [data] : [],
+          data: Array.isArray(data)
+            ? data
+            : data !== undefined && data !== null
+              ? [data]
+              : [],
           message: '',
           meta: {},
         };

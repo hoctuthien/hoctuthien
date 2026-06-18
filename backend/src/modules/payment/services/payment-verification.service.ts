@@ -81,8 +81,7 @@ export class PaymentVerificationService {
     await this.updateLastSyncTime(transactions);
 
     // Bước 5: Query DB lấy tất cả payment đang chờ xác nhận
-    const pendingPayments =
-      await this.paymentRepository.findAllPendingActive();
+    const pendingPayments = await this.paymentRepository.findAllPendingActive();
     if (!pendingPayments.length) {
       this.logger.debug('[Cron] Không có payment PENDING. Kết thúc.');
       return;
@@ -199,7 +198,9 @@ export class PaymentVerificationService {
     } catch (strategyError) {
       this.logger.error(
         `[Cron] Lỗi khi chạy onSuccess strategy cho payment ${payment.id}: ${
-          strategyError instanceof Error ? strategyError.message : String(strategyError)
+          strategyError instanceof Error
+            ? strategyError.message
+            : String(strategyError)
         }`,
         strategyError instanceof Error ? strategyError.stack : undefined,
       );

@@ -25,12 +25,18 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DataSource } from 'typeorm';
 import { PaymentService } from '../../src/modules/payment/services/payment.service';
 import { PaymentRepository } from '../../src/modules/payment/repositories/payment.repository';
-import { PaymentEntity, PaymentType } from '../../src/modules/payment/entities/payment.entity';
+import {
+  PaymentEntity,
+  PaymentType,
+} from '../../src/modules/payment/entities/payment.entity';
 import { PaymentStatus } from '../../src/common/enums/database.enum';
 import { SystemConfigService } from '../../src/modules/system-config/services/system-config.service';
 import { VietqrService } from '../../src/modules/payment/services/vietqr.service';
 import { TnAppService } from '../../src/modules/payment/services/tn-app.service';
-import { ErrorCode, ErrorMessage } from '../../src/common/enums/error-code.enum';
+import {
+  ErrorCode,
+  ErrorMessage,
+} from '../../src/common/enums/error-code.enum';
 import { PAYMENT_SUCCESS_EVENT } from '../../src/modules/payment/events/payment.events';
 import { PAYMENT_LOCK_PREFIX } from '../../src/modules/payment/services/payment-verification.service';
 import { PaymentStrategyRegistry } from '../../src/modules/payment/services/payment-strategy.registry';
@@ -141,9 +147,11 @@ describe('PaymentService — verifyActivationPayment', () => {
     dataSource = {
       transaction: jest
         .fn()
-        .mockImplementation(async (cb: (manager: typeof mockManager) => Promise<void>) => {
-          await cb(mockManager);
-        }),
+        .mockImplementation(
+          async (cb: (manager: typeof mockManager) => Promise<void>) => {
+            await cb(mockManager);
+          },
+        ),
     } as unknown as jest.Mocked<DataSource>;
 
     eventEmitter = {
@@ -230,7 +238,9 @@ describe('PaymentService — verifyActivationPayment', () => {
         makePayment({ userId: OTHER_USER_ID }),
       );
 
-      await service.verifyActivationPayment(USER_ID, PAYMENT_ID).catch(() => {});
+      await service
+        .verifyActivationPayment(USER_ID, PAYMENT_ID)
+        .catch(() => {});
 
       expect(paymentRepository.findByIdOrFail).toHaveBeenCalledWith(
         PAYMENT_ID,
@@ -246,7 +256,9 @@ describe('PaymentService — verifyActivationPayment', () => {
         makePayment({ userId: OTHER_USER_ID }),
       );
 
-      await service.verifyActivationPayment(USER_ID, PAYMENT_ID).catch(() => {});
+      await service
+        .verifyActivationPayment(USER_ID, PAYMENT_ID)
+        .catch(() => {});
 
       expect(redis.set).not.toHaveBeenCalled();
       expect(tnAppService.findTransactionByCode).not.toHaveBeenCalled();
@@ -460,7 +472,9 @@ describe('PaymentService — verifyActivationPayment', () => {
       const result = await service.verifyActivationPayment(USER_ID, PAYMENT_ID);
 
       expect(result.activated).toBe(false);
-      expect(result.message).toBe(ErrorMessage[ErrorCode.PAYMENT_VERIFY_NOT_FOUND]);
+      expect(result.message).toBe(
+        ErrorMessage[ErrorCode.PAYMENT_VERIFY_NOT_FOUND],
+      );
     });
 
     /**
@@ -555,7 +569,9 @@ describe('PaymentService — verifyActivationPayment', () => {
         error: 'Service down',
       });
 
-      await service.verifyActivationPayment(USER_ID, PAYMENT_ID).catch(() => {});
+      await service
+        .verifyActivationPayment(USER_ID, PAYMENT_ID)
+        .catch(() => {});
 
       expect(eventEmitter.emit).not.toHaveBeenCalled();
     });
@@ -595,7 +611,9 @@ describe('PaymentService — verifyActivationPayment', () => {
         error: 'Timeout',
       });
 
-      await service.verifyActivationPayment(USER_ID, PAYMENT_ID).catch(() => {});
+      await service
+        .verifyActivationPayment(USER_ID, PAYMENT_ID)
+        .catch(() => {});
 
       expect(redis.del).toHaveBeenCalledWith(LOCK_KEY);
     });
@@ -612,7 +630,9 @@ describe('PaymentService — verifyActivationPayment', () => {
         .fn()
         .mockRejectedValue(new Error('DB connection lost'));
 
-      await service.verifyActivationPayment(USER_ID, PAYMENT_ID).catch(() => {});
+      await service
+        .verifyActivationPayment(USER_ID, PAYMENT_ID)
+        .catch(() => {});
 
       expect(redis.del).toHaveBeenCalledWith(LOCK_KEY);
     });

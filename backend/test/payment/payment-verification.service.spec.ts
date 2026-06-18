@@ -16,10 +16,19 @@
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DataSource } from 'typeorm';
-import { PaymentVerificationService, PAYMENT_LOCK_PREFIX } from '../../src/modules/payment/services/payment-verification.service';
-import { TnAppService, TNTransaction } from '../../src/modules/payment/services/tn-app.service';
+import {
+  PaymentVerificationService,
+  PAYMENT_LOCK_PREFIX,
+} from '../../src/modules/payment/services/payment-verification.service';
+import {
+  TnAppService,
+  TNTransaction,
+} from '../../src/modules/payment/services/tn-app.service';
 import { PaymentRepository } from '../../src/modules/payment/repositories/payment.repository';
-import { PaymentEntity, PaymentType } from '../../src/modules/payment/entities/payment.entity';
+import {
+  PaymentEntity,
+  PaymentType,
+} from '../../src/modules/payment/entities/payment.entity';
 import { PaymentStatus } from '../../src/common/enums/database.enum';
 import { PAYMENT_SUCCESS_EVENT } from '../../src/modules/payment/events/payment.events';
 import { PaymentStrategyRegistry } from '../../src/modules/payment/services/payment-strategy.registry';
@@ -566,7 +575,9 @@ describe('PaymentVerificationService', () => {
      * TC-126: PG 23505 → không emit event (giao dịch đã được xử lý bởi process khác)
      */
     it('TC-126: không được emit event khi bị PG 23505 (giao dịch đã xử lý)', async () => {
-      const pgError = Object.assign(new Error('duplicate key'), { code: '23505' });
+      const pgError = Object.assign(new Error('duplicate key'), {
+        code: '23505',
+      });
       const qb = makeMockQb({ rejectWith: pgError });
       dataSource.createQueryBuilder.mockReturnValue(qb as any);
 
@@ -579,7 +590,9 @@ describe('PaymentVerificationService', () => {
      * TC-127: PG 23505 → vẫn release lock
      */
     it('TC-127: phải release Redis lock dù bị PG 23505', async () => {
-      const pgError = Object.assign(new Error('duplicate key'), { code: '23505' });
+      const pgError = Object.assign(new Error('duplicate key'), {
+        code: '23505',
+      });
       const qb = makeMockQb({ rejectWith: pgError });
       dataSource.createQueryBuilder.mockReturnValue(qb as any);
 

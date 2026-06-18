@@ -11,21 +11,26 @@ import {
 export const ApiCreateMentorAvailabilityDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Gửi đơn đăng ký làm Mentor',
-      description: 'Mentee gửi đơn đăng ký với đầy đủ thông tin chuyên môn và bằng cấp.' 
+      description:
+        'Mentee gửi đơn đăng ký với đầy đủ thông tin chuyên môn và bằng cấp.',
     }),
     ApiResponse({ status: 201, description: 'Gửi đơn thành công' }),
-    ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ hoặc đã có đơn đang chờ' }),
+    ApiResponse({
+      status: 400,
+      description: 'Dữ liệu không hợp lệ hoặc đã có đơn đang chờ',
+    }),
   );
 };
 
 export const ApiFindAllMentorAvailabilitiesDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Lấy danh sách tất cả các đơn đăng ký (Admin)',
-      description: 'Dành cho Admin để xem và quản lý tất cả các đơn đăng ký trong hệ thống.' 
+      description:
+        'Dành cho Admin để xem và quản lý tất cả các đơn đăng ký trong hệ thống.',
     }),
     ApiResponse({ status: 200, description: 'Lấy danh sách thành công' }),
   );
@@ -34,9 +39,10 @@ export const ApiFindAllMentorAvailabilitiesDoc = () => {
 export const ApiFindMyMentorAvailabilitiesDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Lấy danh sách đơn đăng ký của bản thân',
-      description: 'Người dùng xem lại lịch sử các đơn đăng ký làm mentor của mình.' 
+      description:
+        'Người dùng xem lại lịch sử các đơn đăng ký làm mentor của mình.',
     }),
     ApiResponse({ status: 200, description: 'Lấy danh sách thành công' }),
   );
@@ -55,9 +61,9 @@ export const ApiFindOneMentorAvailabilityDoc = () => {
 export const ApiUpdateToInProgressDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Admin tiếp nhận đơn (Chuyển sang In Progress)',
-      description: 'Đánh dấu đơn đang được Admin xử lý.' 
+      description: 'Đánh dấu đơn đang được Admin xử lý.',
     }),
     ApiParam({ name: 'id', description: 'ID của đơn đăng ký' }),
     ApiResponse({ status: 200, description: 'Cập nhật thành công' }),
@@ -67,9 +73,10 @@ export const ApiUpdateToInProgressDoc = () => {
 export const ApiApproveMentorAvailabilityDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ 
+    ApiOperation({
       summary: 'Phê duyệt đơn đăng ký làm Mentor',
-      description: 'Khi phê duyệt: \n1. Đơn chuyển sang APPROVED. \n2. Role của User đổi thành MENTOR. \n3. Mentor Profile được tự động tạo/cập nhật và đặt trạng thái ACTIVE.' 
+      description:
+        'Khi phê duyệt: \n1. Đơn chuyển sang APPROVED. \n2. Role của User đổi thành MENTOR. \n3. Mentor Profile được tự động tạo/cập nhật và đặt trạng thái ACTIVE.',
     }),
     ApiParam({ name: 'id', description: 'ID của đơn đăng ký' }),
     ApiResponse({ status: 200, description: 'Phê duyệt thành công' }),

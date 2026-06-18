@@ -8,7 +8,12 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { PostService } from './services/post.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -48,7 +53,10 @@ export class PostController {
   @Get(':id')
   @Public()
   @ApiOperation({ summary: 'Lấy thông tin chi tiết một bài viết' })
-  @ApiResponse({ status: 200, description: 'Trả về thông tin chi tiết bài viết.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Trả về thông tin chi tiết bài viết.',
+  })
   @ApiResponse({ status: 404, description: 'Không tìm thấy bài viết.' })
   findOne(@Param('id') id: string) {
     return this.postService.findOne(id);

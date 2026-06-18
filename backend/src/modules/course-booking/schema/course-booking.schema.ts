@@ -16,28 +16,34 @@ export const courseBookingSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   deletedAt: z.coerce.date().nullable().optional(),
-  
+
   // Relations mapped optionally
-  course: z.object({
-    id: z.string(),
-    title: z.string(),
-    thumbnailUrl: z.string().nullable().optional(),
-    price: z.coerce.number().optional(),
-    mentorId: z.string().optional(),
-    mentor: z.object({
+  course: z
+    .object({
+      id: z.string(),
+      title: z.string(),
+      thumbnailUrl: z.string().nullable().optional(),
+      price: z.coerce.number().optional(),
+      mentorId: z.string().optional(),
+      mentor: z
+        .object({
+          id: z.string(),
+          name: z.string(),
+          email: z.string().optional(),
+          avatarUrl: z.string().nullable().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+
+  mentee: z
+    .object({
       id: z.string(),
       name: z.string(),
       email: z.string().optional(),
       avatarUrl: z.string().nullable().optional(),
-    }).optional(),
-  }).optional(),
-  
-  mentee: z.object({
-    id: z.string(),
-    name: z.string(),
-    email: z.string().optional(),
-    avatarUrl: z.string().nullable().optional(),
-  }).optional(),
+    })
+    .optional(),
 });
 
 // menteeId lấy từ JWT, không cho client tự truyền
