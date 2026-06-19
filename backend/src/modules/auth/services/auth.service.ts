@@ -46,8 +46,9 @@ export class AuthService implements IAuthService {
     refreshToken: string,
     deviceId?: string,
   ) {
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // Mặc định 7 ngày
+    const expiresAt = this.calculateExpirationDate(
+      process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+    );
 
     const session = this.sessionRepository.create({
       userId,
@@ -213,7 +214,10 @@ export class AuthService implements IAuthService {
 
       // Check if session is soft-deleted (which means it was rotated)
       if (session.deletedAt) {
-        const deletedTime = new Date(session.deletedAt).getTime();
+        // Adjust for timezone offset parsing shift since deletedAt column in BaseEntity
+        // doesn't have timezone specification (defaults to timestamp without time zone)
+        const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+        const deletedTime = new Date(session.deletedAt).getTime() - timezoneOffsetMs;
         const now = Date.now();
         const gracePeriodMs = 30 * 1000; // 30 seconds grace period
         if (now - deletedTime > gracePeriodMs) {
@@ -278,16 +282,7 @@ export class AuthService implements IAuthService {
       };
       const tokens = await this.generateTokens(newPayload);
 
-      // Create new session
-      const expiresAt = this.calculateExpirationDate(
-        process.env.JWT_REFRESH_EXPIRES_IN || '7d',
-      );
-      await this.userSessionService.create({
-        userId: user.id,
-        refreshToken: tokens.refresh_token,
-        refreshTokenExpiresAt: expiresAt,
-        deviceName: expectedDevice,
-      });
+
 
       return {
         user: {
