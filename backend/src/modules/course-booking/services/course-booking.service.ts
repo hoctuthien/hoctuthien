@@ -24,6 +24,7 @@ import {
 import { Role } from '../../../common/enums/role.enum';
 import { CourseRepository } from '../../course/repositories/course.repository';
 import { MailService } from '../../mail/services/mail.service';
+import { NotificationService } from '../../notification/services/notification.service';
 
 @Injectable()
 export class CourseBookingService {
@@ -33,6 +34,7 @@ export class CourseBookingService {
     private readonly courseBookingRepository: CourseBookingRepository,
     private readonly courseRepository: CourseRepository,
     private readonly mailService: MailService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async findAll(
@@ -240,6 +242,7 @@ export class CourseBookingService {
     });
 
     void this.sendBookingNotificationEmails(created.id).catch(() => undefined);
+    void this.sendBookingNotifications(created.id).catch(() => undefined);
 
     return courseBookingSchema.parse(created);
   }
@@ -296,6 +299,82 @@ export class CourseBookingService {
             `Failed to send booking email to mentor ${booking.course.mentor.email}: ${err?.message || err}`,
           );
         });
+    }
+  }
+
+  async sendBookingNotifications(bookingId: string, isPaymentSuccess = false) {
+    const booking = await this.courseBookingRepository.findById(bookingId, {
+      relations: ['course', 'course.mentor', 'mentee'],
+    });
+
+    if (!booking || !booking.course) {
+      return;
+    }
+
+    const isPending = booking.status === BookingStatus.PENDING;
+
+    // 1. Notification for Mentee
+    try {
+      let menteeTitle = 'Đăng ký buổi học thành công';
+      let menteeContent = `Bạn đã đăng ký thành công buổi học cho khóa “${booking.course.title}”.`;
+
+      if (isPaymentSuccess) {
+        menteeTitle = 'Thanh toán lịch học thành công';
+        menteeContent = `Thanh toán cho buổi học của khóa “${booking.course.title}” đã được xác nhận. Lịch học của bạn đã được chuyển sang trạng thái đã xác nhận.`;
+      } else if (isPending) {
+        menteeTitle = 'Đăng ký buổi học thành công - Chờ thanh toán';
+        menteeContent = `Bạn đã đăng ký buổi học cho khóa “${booking.course.title}” thành công. Vui lòng hoàn tất thanh toán để giữ chỗ.`;
+      }
+
+      await this.notificationService.create({
+        userId: booking.menteeId,
+        title: menteeTitle,
+        content: menteeContent,
+        type: 'course_booking',
+        actionLink: '/my-courses',
+        payload: {
+          bookingId: booking.id,
+          courseId: booking.courseId,
+          status: booking.status,
+        },
+      });
+    } catch (err: any) {
+      this.logger.error(
+        `Failed to create booking notification for mentee ${booking.menteeId}: ${err?.message || err}`,
+      );
+    }
+
+    // 2. Notification for Mentor
+    if (booking.course.mentorId) {
+      try {
+        let mentorTitle = 'Có lịch học mới đã xác nhận';
+        let mentorContent = `Học viên ${booking.mentee?.name || 'Học viên'} đã đăng ký thành công một buổi học cho khóa học “${booking.course.title}” của bạn.`;
+
+        if (isPaymentSuccess) {
+          mentorTitle = 'Lịch học mới đã được thanh toán';
+          mentorContent = `Học viên ${booking.mentee?.name || 'Học viên'} đã thanh toán thành công buổi học của khóa “${booking.course.title}”. Lịch học đã được xác nhận.`;
+        } else if (isPending) {
+          mentorTitle = 'Có yêu cầu đăng ký buổi học mới';
+          mentorContent = `Học viên ${booking.mentee?.name || 'Học viên'} đã đăng ký một buổi học mới cho khóa học “${booking.course.title}” của bạn (Chờ thanh toán).`;
+        }
+
+        await this.notificationService.create({
+          userId: booking.course.mentorId,
+          title: mentorTitle,
+          content: mentorContent,
+          type: 'course_booking',
+          actionLink: '/mentor/bookings',
+          payload: {
+            bookingId: booking.id,
+            courseId: booking.courseId,
+            status: booking.status,
+          },
+        });
+      } catch (err: any) {
+        this.logger.error(
+          `Failed to create booking notification for mentor ${booking.course.mentorId}: ${err?.message || err}`,
+        );
+      }
     }
   }
 

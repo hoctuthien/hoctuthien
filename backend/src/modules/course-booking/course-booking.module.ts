@@ -9,6 +9,7 @@ import { PaymentModule } from '../payment/payment.module';
 import { PaymentStrategyRegistry } from '../payment/services/payment-strategy.registry';
 import { CourseBookingPaymentStrategy } from './strategies/course-booking-payment.strategy';
 import { MailModule } from '../mail/mail.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MailModule } from '../mail/mail.module';
     CourseModule, // import để dùng CourseRepository kiểm tra ownership
     PaymentModule, // import để dùng PaymentStrategyRegistry và tích hợp thanh toán
     MailModule,
+    NotificationModule,
   ],
   controllers: [CourseBookingController],
   providers: [

@@ -36,6 +36,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { StartupSeedService } from './infrastructure/bootstrap/startup-seed.service';
 import { MailModule } from './modules/mail/mail.module';
+import { BugReportModule } from './modules/bug-report/bug-report.module';
 
 @Module({
   imports: [
@@ -125,6 +126,7 @@ import { MailModule } from './modules/mail/mail.module';
     PostModule,
     TagModule,
     MailModule,
+    BugReportModule,
   ],
   controllers: [AppController],
   providers: [AppService, StartupSeedService],

@@ -86,6 +86,14 @@ export class CourseBookingPaymentStrategy implements PaymentStrategy {
               `Failed to send post-payment notification emails for booking ${booking.id}: ${err?.message || err}`,
             );
           });
+
+        void this.courseBookingService
+          .sendBookingNotifications(booking.id, true)
+          .catch((err) => {
+            this.logger.error(
+              `Failed to send post-payment in-app notifications for booking ${booking.id}: ${err?.message || err}`,
+            );
+          });
       }
     } catch (error: any) {
       this.logger.error(
