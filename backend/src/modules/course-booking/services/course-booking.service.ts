@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { Not } from 'typeorm';
 import { CourseBookingRepository } from '../repositories/course-booking.repository';
@@ -22,12 +23,16 @@ import {
 } from '../types/course-booking.types';
 import { Role } from '../../../common/enums/role.enum';
 import { CourseRepository } from '../../course/repositories/course.repository';
+import { MailService } from '../../mail/services/mail.service';
 
 @Injectable()
 export class CourseBookingService {
+  private readonly logger = new Logger(CourseBookingService.name);
+
   constructor(
     private readonly courseBookingRepository: CourseBookingRepository,
     private readonly courseRepository: CourseRepository,
+    private readonly mailService: MailService,
   ) {}
 
   async findAll(
@@ -233,7 +238,65 @@ export class CourseBookingService {
           ? BookingStatus.CONFIRMED
           : BookingStatus.PENDING,
     });
+
+    void this.sendBookingNotificationEmails(created.id).catch(() => undefined);
+
     return courseBookingSchema.parse(created);
+  }
+
+  async sendBookingNotificationEmails(bookingId: string) {
+    const booking = await this.courseBookingRepository.findById(bookingId, {
+      relations: ['course', 'course.mentor', 'mentee'],
+    });
+
+    if (!booking || !booking.course) {
+      return;
+    }
+
+    const meetingTimeLabel = new Intl.DateTimeFormat('vi-VN', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+      dateStyle: 'full',
+      timeStyle: 'short',
+    }).format(new Date(booking.meetingTime));
+
+    const status =
+      booking.status === BookingStatus.CONFIRMED ? 'confirmed' : 'pending';
+
+    // 1. Send email to Mentee
+    if (booking.mentee?.email) {
+      await this.mailService
+        .sendCourseBookingEmail({
+          to: booking.mentee.email,
+          recipientName: booking.mentee.name || 'bạn',
+          courseTitle: booking.course.title,
+          mentorName: booking.course.mentor?.name,
+          meetingTimeLabel,
+          status,
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Failed to send booking email to mentee ${booking.mentee.email}: ${err?.message || err}`,
+          );
+        });
+    }
+
+    // 2. Send email to Mentor
+    if (booking.course.mentor?.email) {
+      await this.mailService
+        .sendMentorBookingNotificationEmail({
+          to: booking.course.mentor.email,
+          recipientName: booking.course.mentor.name || 'Cố vấn',
+          menteeName: booking.mentee?.name || 'Học viên',
+          courseTitle: booking.course.title,
+          meetingTimeLabel,
+          status,
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Failed to send booking email to mentor ${booking.course.mentor.email}: ${err?.message || err}`,
+          );
+        });
+    }
   }
 
   private validateMeetingTime(meetingTime: Date, metadata: any) {

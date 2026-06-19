@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PassportModule } from '@nestjs/passport';
 import { APP_GUARD } from '@nestjs/core';
 import { UserSessionModule } from '../user-session/user-session.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UserSessionModule } from '../user-session/user-session.module';
     RedisModule,
     PassportModule,
     UserSessionModule,
+    MailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

@@ -14,6 +14,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { ConfigService } from '@nestjs/config';
 import { UserSessionService } from '../../user-session/services/user-session.service';
 import { ConflictException } from '@nestjs/common';
+import { MailService } from '../../mail/services/mail.service';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -32,6 +33,7 @@ export class AuthService implements IAuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly userSessionService: UserSessionService,
+    private readonly mailService: MailService,
   ) {
     this.googleClient = new OAuth2Client(
       this.configService.get<string>('google.clientId') ||
@@ -131,6 +133,13 @@ export class AuthService implements IAuthService {
       deviceId,
     };
     const tokens = await this.generateTokens(payload);
+
+    void this.mailService
+      .sendRegistrationEmail({
+        to: user.email,
+        recipientName: user.name,
+      })
+      .catch(() => undefined);
 
     return {
       user: {

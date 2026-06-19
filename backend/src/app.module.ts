@@ -35,6 +35,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { StartupSeedService } from './infrastructure/bootstrap/startup-seed.service';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -123,6 +124,7 @@ import { StartupSeedService } from './infrastructure/bootstrap/startup-seed.serv
     MediaModule,
     PostModule,
     TagModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService, StartupSeedService],

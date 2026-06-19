@@ -7,13 +7,17 @@ import {
   BookingStatus,
 } from '../entities/course-booking.entity';
 import { CourseEntity } from '../../course/entities/course.entity';
+import { CourseBookingService } from '../services/course-booking.service';
 
 @Injectable()
 export class CourseBookingPaymentStrategy implements PaymentStrategy {
   private readonly logger = new Logger(CourseBookingPaymentStrategy.name);
   readonly paymentType = 'course_booking';
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly courseBookingService: CourseBookingService,
+  ) {}
 
   async resolveAmount(
     referenceId: string,
@@ -66,5 +70,27 @@ export class CourseBookingPaymentStrategy implements PaymentStrategy {
     this.logger.log(
       `[CourseBookingStrategy] Thanh toán thành công! Đã xác nhận Booking liên kết với Payment ${payment.id}`,
     );
+
+    try {
+      const booking = await this.dataSource
+        .getRepository(CourseBookingEntity)
+        .findOne({
+          where: { paymentId: payment.id },
+        });
+
+      if (booking) {
+        void this.courseBookingService
+          .sendBookingNotificationEmails(booking.id)
+          .catch((err) => {
+            this.logger.error(
+              `Failed to send post-payment notification emails for booking ${booking.id}: ${err?.message || err}`,
+            );
+          });
+      }
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to fetch booking for payment ${payment.id} notification: ${error?.message || error}`,
+      );
+    }
   }
 }
