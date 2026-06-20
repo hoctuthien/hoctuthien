@@ -208,7 +208,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["UserController_updateMe"];
         trace?: never;
     };
     "/api/v1/users": {
@@ -284,6 +284,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mentor-profiles/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["MentorProfileController_updateMe"];
         trace?: never;
     };
     "/api/v1/mentor-profiles/{id}": {
@@ -719,6 +735,170 @@ export interface paths {
         patch: operations["CourseBookingController_updateByMentee"];
         trace?: never;
     };
+    "/api/v1/payments/activation/generate-qr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tạo mã QR kích hoạt tài khoản
+         * @description Tạo hoặc lấy lại mã QR VietQR để mentee thanh toán phí kích hoạt. Nếu đã có QR còn hạn → trả về QR cũ. QR hết hạn sau 15 phút.
+         */
+        post: operations["PaymentController_generateActivationQr"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/payments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lấy thông tin chi tiết một payment
+         * @description Tra cứu trạng thái hoặc chi tiết của một payment record.
+         */
+        get: operations["PaymentController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/payments/activation/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Xác minh thanh toán kích hoạt
+         * @description User bấm "Tôi đã chuyển khoản" → backend gọi TN App API kiểm tra giao dịch. Có Redis distributed lock để chống race condition với cron job tự động. Gọi API này sau khi đã chuyển khoản với đúng nội dung transactionCode.
+         */
+        post: operations["PaymentController_verifyActivationPayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/payments/generate-qr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tạo mã QR thanh toán chung
+         * @description Sinh QR VietQR để thanh toán động cho bất kỳ nghiệp vụ nào (activation, course_booking, donation).
+         */
+        post: operations["PaymentController_generateGenericQr"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/payments/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Xác minh thanh toán chung
+         * @description Xác thực thanh toán và kích hoạt nghiệp vụ tương ứng thông qua Strategy Pattern.
+         */
+        post: operations["PaymentController_verifyGenericPayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system-configs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SystemConfigController_findAll"];
+        put?: never;
+        post: operations["SystemConfigController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system-configs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SystemConfigController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["SystemConfigController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["SystemConfigController_update"];
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NotificationController_findAll"];
+        put?: never;
+        post: operations["NotificationController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NotificationController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["NotificationController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["NotificationController_update"];
+        trace?: never;
+    };
     "/api/v1/course-reviews": {
         parameters: {
             query?: never;
@@ -781,98 +961,6 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["UserReviewController_update"];
-        trace?: never;
-    };
-    "/api/v1/payments/activation/generate-qr": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Tạo mã QR kích hoạt tài khoản
-         * @description Tạo hoặc lấy lại mã QR VietQR để mentee thanh toán phí kích hoạt. Nếu đã có QR còn hạn → trả về QR cũ. QR hết hạn sau 15 phút.
-         */
-        post: operations["PaymentController_generateActivationQr"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/payments/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Lấy thông tin chi tiết một payment
-         * @description Tra cứu trạng thái hoặc chi tiết của một payment record.
-         */
-        get: operations["PaymentController_findOne"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/payments/activation/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Xác minh thanh toán kích hoạt
-         * @description User bấm "Tôi đã chuyển khoản" → backend gọi TN App API kiểm tra giao dịch. Có Redis distributed lock để chống race condition với cron job tự động. Gọi API này sau khi đã chuyển khoản với đúng nội dung transactionCode.
-         */
-        post: operations["PaymentController_verifyActivationPayment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/system-configs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["SystemConfigController_findAll"];
-        put?: never;
-        post: operations["SystemConfigController_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/system-configs/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["SystemConfigController_findOne"];
-        put?: never;
-        post?: never;
-        delete: operations["SystemConfigController_remove"];
-        options?: never;
-        head?: never;
-        patch: operations["SystemConfigController_update"];
         trace?: never;
     };
     "/api/v1/penalty-tickets": {
@@ -969,38 +1057,6 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["MessageController_update"];
-        trace?: never;
-    };
-    "/api/v1/notifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["NotificationController_findAll"];
-        put?: never;
-        post: operations["NotificationController_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/notifications/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["NotificationController_findOne"];
-        put?: never;
-        post?: never;
-        delete: operations["NotificationController_remove"];
-        options?: never;
-        head?: never;
-        patch: operations["NotificationController_update"];
         trace?: never;
     };
     "/api/v1/media/upload": {
@@ -1121,6 +1177,47 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["TagController_update"];
+        trace?: never;
+    };
+    "/api/v1/bug-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lấy danh sách báo cáo lỗi
+         * @description - **ADMIN**: xem toàn bộ báo cáo lỗi của hệ thống.
+         *     - **USER/MENTOR/MENTEE**: chỉ xem được các báo cáo lỗi của chính mình gửi.
+         */
+        get: operations["BugReportController_findAll"];
+        put?: never;
+        /** Gửi báo cáo lỗi mới (Bất kỳ user đã đăng nhập) */
+        post: operations["BugReportController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bug-reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xem chi tiết báo cáo lỗi (Admin hoặc người tạo) */
+        get: operations["BugReportController_findOne"];
+        put?: never;
+        post?: never;
+        /** Xóa mềm báo cáo lỗi (ADMIN) */
+        delete: operations["BugReportController_remove"];
+        options?: never;
+        head?: never;
+        /** Cập nhật trạng thái / mức độ nghiêm trọng của báo cáo lỗi (ADMIN) */
+        patch: operations["BugReportController_update"];
         trace?: never;
     };
 }
@@ -1495,6 +1592,30 @@ export interface components {
              */
             paymentId: string;
         };
+        GeneratePaymentQrDto: {
+            /**
+             * @description Loại hình thanh toán (ví dụ: activation, course_booking, donation)
+             * @example course_booking
+             */
+            paymentType: string;
+            /**
+             * @description ID thực thể nghiệp vụ tham chiếu (ví dụ: bookingId, userId)
+             * @example 6c99612d-25f0-49c3-813c-0e2e4877fb9
+             */
+            referenceId: string;
+            /**
+             * @description Số tiền tùy chọn (đối với quyên góp hoặc nhập tay)
+             * @example 50000
+             */
+            amount?: number;
+        };
+        VerifyPaymentDto: {
+            /**
+             * @description ID của payment record
+             * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
+             */
+            paymentId: string;
+        };
         CreatePostDto: {
             /** @description Tiêu đề của bài viết */
             title: string;
@@ -1655,12 +1776,8 @@ export interface operations {
             };
         };
         responses: {
-            /**
-             * @description Đăng nhập thành công. Tokens được trả về và lưu trong Cookie.
-             *
-             *     Đăng nhập thành công. Tokens được trả về và lưu trong Cookie.
-             */
-            201: {
+            /** @description Đăng nhập thành công. Tokens được trả về và lưu trong Cookie. */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1680,11 +1797,7 @@ export interface operations {
                     };
                 };
             };
-            /**
-             * @description Email hoặc mật khẩu không chính xác
-             *
-             *     Email hoặc mật khẩu không chính xác
-             */
+            /** @description Email hoặc mật khẩu không chính xác */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1705,12 +1818,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /**
-             * @description Refresh thành công. Tokens mới được lưu vào Cookie.
-             *
-             *     Refresh thành công. Tokens mới được lưu vào Cookie.
-             */
-            201: {
+            /** @description Refresh thành công. Tokens mới được lưu vào Cookie. */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1728,11 +1837,7 @@ export interface operations {
                     };
                 };
             };
-            /**
-             * @description Refresh token không hợp lệ hoặc hết hạn
-             *
-             *     Refresh token không hợp lệ hoặc hết hạn
-             */
+            /** @description Refresh token không hợp lệ hoặc hết hạn */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1754,7 +1859,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Đăng xuất thành công. Cookies sẽ bị xóa. */
-            201: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1860,12 +1965,8 @@ export interface operations {
             };
         };
         responses: {
-            /**
-             * @description Đăng nhập thành công. Tokens lưu vào Cookie.
-             *
-             *     Đăng nhập thành công. Tokens lưu vào Cookie.
-             */
-            201: {
+            /** @description Đăng nhập thành công. Tokens lưu vào Cookie. */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1884,11 +1985,7 @@ export interface operations {
                     };
                 };
             };
-            /**
-             * @description Google Token không hợp lệ
-             *
-             *     Google Token không hợp lệ
-             */
+            /** @description Google Token không hợp lệ */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2067,6 +2164,23 @@ export interface operations {
             };
             /** @description Không tìm thấy user */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UserController_updateMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2320,7 +2434,13 @@ export interface operations {
     };
     MentorProfileController_findAll: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                skills?: string;
+                minExperience?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2386,6 +2506,27 @@ export interface operations {
             };
             /** @description Không tìm thấy hồ sơ */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorProfileController_updateMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMentorProfileDto"];
+            };
+        };
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2483,7 +2624,12 @@ export interface operations {
     };
     MentorAvailabilityController_findAll: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                status?: "PENDING" | "IN_PROGRESS" | "APPROVED" | "REJECTED" | "CANCEL";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4453,188 +4599,6 @@ export interface operations {
             };
         };
     };
-    CourseReviewController_findAll: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CourseReviewController_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CourseReviewController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CourseReviewController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CourseReviewController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UserReviewController_findAll: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UserReviewController_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UserReviewController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UserReviewController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UserReviewController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     PaymentController_generateActivationQr: {
         parameters: {
             query?: never;
@@ -4844,6 +4808,50 @@ export interface operations {
             };
         };
     };
+    PaymentController_generateGenericQr: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GeneratePaymentQrDto"];
+            };
+        };
+        responses: {
+            /** @description QR tạo thành công. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PaymentController_verifyGenericPayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyPaymentDto"];
+            };
+        };
+        responses: {
+            /** @description Kết quả xác minh. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     SystemConfigController_findAll: {
         parameters: {
             query?: never;
@@ -4917,6 +4925,279 @@ export interface operations {
         };
     };
     SystemConfigController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseReviewController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseReviewController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseReviewController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseReviewController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseReviewController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UserReviewController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UserReviewController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UserReviewController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UserReviewController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UserReviewController_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5192,97 +5473,6 @@ export interface operations {
         };
     };
     MessageController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    NotificationController_findAll: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    NotificationController_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    NotificationController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    NotificationController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    NotificationController_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5643,6 +5833,411 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TagEntity"];
                 };
+            };
+        };
+    };
+    BugReportController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lấy danh sách báo cáo lỗi thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example d1981223-1c39-4d2b-aa90-b1836c1cf4c9 */
+                            id?: string;
+                            /** @example user-uuid-123 */
+                            userId?: string | null;
+                            /** @example Nút đăng nhập bị lỗi */
+                            title?: string;
+                            /** @example Khi click vào nút đăng nhập, màn hình bị đơ. */
+                            description?: string;
+                            /**
+                             * @example 1. Truy cập trang chủ
+                             *     2. Click Đăng nhập
+                             */
+                            stepsToReproduce?: string | null;
+                            /**
+                             * @example medium
+                             * @enum {string}
+                             */
+                            severity?: "low" | "medium" | "high" | "critical";
+                            /**
+                             * @example open
+                             * @enum {string}
+                             */
+                            status?: "open" | "in_progress" | "resolved" | "closed";
+                            /**
+                             * @example {
+                             *       "browser": "Chrome",
+                             *       "os": "Windows 11"
+                             *     }
+                             */
+                            deviceInfo?: Record<string, never> | null;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        /** @example  */
+                        message?: string;
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BugReportController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @example Nút đăng nhập bị lỗi */
+                    title: string;
+                    /** @example Khi click vào nút đăng nhập, màn hình bị đơ. */
+                    description: string;
+                    /**
+                     * @example 1. Truy cập trang chủ
+                     *     2. Click Đăng nhập
+                     */
+                    stepsToReproduce?: string;
+                    /**
+                     * @example medium
+                     * @enum {string}
+                     */
+                    severity?: "low" | "medium" | "high" | "critical";
+                    /**
+                     * @example {
+                     *       "browser": "Chrome",
+                     *       "os": "Windows 11"
+                     *     }
+                     */
+                    deviceInfo?: Record<string, never>;
+                };
+            };
+        };
+        responses: {
+            /** @description Gửi báo cáo lỗi thành công */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example d1981223-1c39-4d2b-aa90-b1836c1cf4c9 */
+                            id?: string;
+                            /** @example user-uuid-123 */
+                            userId?: string | null;
+                            /** @example Nút đăng nhập bị lỗi */
+                            title?: string;
+                            /** @example Khi click vào nút đăng nhập, màn hình bị đơ. */
+                            description?: string;
+                            /**
+                             * @example 1. Truy cập trang chủ
+                             *     2. Click Đăng nhập
+                             */
+                            stepsToReproduce?: string | null;
+                            /**
+                             * @example medium
+                             * @enum {string}
+                             */
+                            severity?: "low" | "medium" | "high" | "critical";
+                            /**
+                             * @example open
+                             * @enum {string}
+                             */
+                            status?: "open" | "in_progress" | "resolved" | "closed";
+                            /**
+                             * @example {
+                             *       "browser": "Chrome",
+                             *       "os": "Windows 11"
+                             *     }
+                             */
+                            deviceInfo?: Record<string, never> | null;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        /** @example  */
+                        message?: string;
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                    };
+                };
+            };
+            /** @description Dữ liệu đầu vào không hợp lệ */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BugReportController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của báo cáo lỗi */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lấy chi tiết thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example d1981223-1c39-4d2b-aa90-b1836c1cf4c9 */
+                            id?: string;
+                            /** @example user-uuid-123 */
+                            userId?: string | null;
+                            /** @example Nút đăng nhập bị lỗi */
+                            title?: string;
+                            /** @example Khi click vào nút đăng nhập, màn hình bị đơ. */
+                            description?: string;
+                            /**
+                             * @example 1. Truy cập trang chủ
+                             *     2. Click Đăng nhập
+                             */
+                            stepsToReproduce?: string | null;
+                            /**
+                             * @example medium
+                             * @enum {string}
+                             */
+                            severity?: "low" | "medium" | "high" | "critical";
+                            /**
+                             * @example open
+                             * @enum {string}
+                             */
+                            status?: "open" | "in_progress" | "resolved" | "closed";
+                            /**
+                             * @example {
+                             *       "browser": "Chrome",
+                             *       "os": "Windows 11"
+                             *     }
+                             */
+                            deviceInfo?: Record<string, never> | null;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        /** @example  */
+                        message?: string;
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền truy cập báo cáo lỗi này */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy báo cáo lỗi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BugReportController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của báo cáo lỗi */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Xóa báo cáo lỗi thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example [] */
+                        data?: Record<string, never>[];
+                        /** @example  */
+                        message?: string;
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền ADMIN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy báo cáo lỗi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BugReportController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID của báo cáo lỗi */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @example in_progress
+                     * @enum {string}
+                     */
+                    status?: "open" | "in_progress" | "resolved" | "closed";
+                    /**
+                     * @example critical
+                     * @enum {string}
+                     */
+                    severity?: "low" | "medium" | "high" | "critical";
+                };
+            };
+        };
+        responses: {
+            /** @description Cập nhật thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example d1981223-1c39-4d2b-aa90-b1836c1cf4c9 */
+                            id?: string;
+                            /** @example user-uuid-123 */
+                            userId?: string | null;
+                            /** @example Nút đăng nhập bị lỗi */
+                            title?: string;
+                            /** @example Khi click vào nút đăng nhập, màn hình bị đơ. */
+                            description?: string;
+                            /**
+                             * @example 1. Truy cập trang chủ
+                             *     2. Click Đăng nhập
+                             */
+                            stepsToReproduce?: string | null;
+                            /**
+                             * @example medium
+                             * @enum {string}
+                             */
+                            severity?: "low" | "medium" | "high" | "critical";
+                            /**
+                             * @example open
+                             * @enum {string}
+                             */
+                            status?: "open" | "in_progress" | "resolved" | "closed";
+                            /**
+                             * @example {
+                             *       "browser": "Chrome",
+                             *       "os": "Windows 11"
+                             *     }
+                             */
+                            deviceInfo?: Record<string, never> | null;
+                            /** Format: date-time */
+                            createdAt?: string;
+                            /** Format: date-time */
+                            updatedAt?: string;
+                        }[];
+                        /** @example  */
+                        message?: string;
+                        /** @example {} */
+                        meta?: Record<string, never>;
+                    };
+                };
+            };
+            /** @description Chưa đăng nhập */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không có quyền ADMIN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Không tìm thấy báo cáo lỗi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

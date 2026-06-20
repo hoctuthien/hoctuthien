@@ -17,8 +17,10 @@ import {
   LuMenu, 
   LuX,
   LuChevronLeft,
-  LuChevronRight
+  LuChevronRight,
+  LuBug
 } from 'react-icons/lu';
+import { ReportBugModal } from '@/shared/components/ReportBugModal';
 
 interface SidebarItem {
   label: string;
@@ -36,6 +38,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [bugReportOpen, setBugReportOpen] = useState(false);
 
   if (status === 'loading') {
     return (
@@ -115,6 +118,16 @@ export default function DashboardLayout({
 
       {/* Footer / Exit Links */}
       <div className="flex flex-col gap-1.5 border-t border-[#F1F5F9] pt-4">
+        {/* Report Bug Button */}
+        <button
+          onClick={() => setBugReportOpen(true)}
+          className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black text-amber-600 hover:text-white hover:bg-amber-500 transition-all cursor-pointer text-left border-0 bg-transparent ${collapsed ? 'justify-center' : ''}`}
+          title={collapsed ? 'Báo lỗi' : undefined}
+        >
+          <LuBug size={18} />
+          {!collapsed && <span>Báo lỗi</span>}
+        </button>
+
         <Link 
           href="/" 
           className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black text-[#475569] hover:text-blue-600 hover:bg-[#F0F7FF] no-underline ${collapsed ? 'justify-center' : ''}`}
@@ -220,6 +233,9 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
+
+      {/* Report Bug Modal */}
+      <ReportBugModal isOpen={bugReportOpen} onClose={() => setBugReportOpen(false)} />
     </div>
   );
 }
