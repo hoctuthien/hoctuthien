@@ -4,7 +4,7 @@ import type { operations } from '@/core/types/api.generated';
 
 // Trích xuất type User trực tiếp từ schema của API
 type UserProfile = NonNullable<
-  operations['AuthController_login']['responses'][201]['content']['application/json']['user']
+  operations['AuthController_login']['responses'][200]['content']['application/json']['user']
 >;
 
 interface UserState {
