@@ -216,8 +216,7 @@ export default function ActivationClient({ initialQrData }: ActivationClientProp
   }
 
   return (
-    <div className="w-full bg-[#FAFBFD] min-h-screen py-10 px-4 md:px-8 font-sans">
-      <div className="max-w-4xl mx-auto flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-6 font-sans">
         
         {/* Page Header */}
         <div className="text-center md:text-left flex flex-col gap-1 mb-2">
@@ -271,6 +270,5 @@ export default function ActivationClient({ initialQrData }: ActivationClientProp
         />
 
       </div>
-    </div>
   );
 }
