@@ -6,3 +6,4 @@ export * from './courseBookingGateway';
 export * from './paymentGateway';
 export * from './categoryGateway';
 export * from './penaltyTicketGateway';
+export * from './bugReportGateway';
