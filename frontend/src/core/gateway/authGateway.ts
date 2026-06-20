@@ -3,7 +3,7 @@ import type { operations } from '../types/api.generated';
 
 type LoginRequest = operations['AuthController_login']['requestBody']['content']['application/json'];
 type RegisterRequest = operations['AuthController_register']['requestBody']['content']['application/json'];
-type UserProfile = NonNullable<operations['AuthController_login']['responses'][201]['content']['application/json']['user']>;
+type UserProfile = NonNullable<operations['AuthController_login']['responses'][200]['content']['application/json']['user']>;
 
 export const authGateway = {
   /**
