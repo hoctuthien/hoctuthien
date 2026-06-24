@@ -79,6 +79,42 @@ export class MailService {
     });
   }
 
+  getAdminEmail(): string {
+    return this.fromEmail || 'hoctuthien@gmail.com';
+  }
+
+  async sendPaymentTransactionEmail(input: {
+    to: string;
+    paymentType: string;
+    amount: number;
+    transactionCode: string;
+    qrUrl: string;
+  }) {
+    const subject = `Giao dịch phát sinh: ${input.paymentType.toUpperCase()} - ${input.transactionCode}`;
+    const intro = `Hệ thống vừa phát sinh một yêu cầu thanh toán mới.`;
+    const summary = `
+      Loại giao dịch: ${input.paymentType.toUpperCase()} <br/>
+      Mã chuyển khoản (Nội dung CK): <strong>${input.transactionCode}</strong> <br/>
+      Số tiền: <strong>${input.amount.toLocaleString('vi-VN')} VND</strong> <br/>
+      Link QR: <a href="${input.qrUrl}">${input.qrUrl}</a>
+    `;
+
+    await this.sendMail({
+      to: input.to,
+      subject,
+      text: `${intro}\n\nLoại giao dịch: ${input.paymentType}\nMã chuyển khoản: ${input.transactionCode}\nSố tiền: ${input.amount} VND\nQR URL: ${input.qrUrl}`,
+      html: buildCourseBookingEmailTemplate({
+        recipientName: 'Ban quản trị',
+        courseTitle: `Giao dịch ${input.paymentType.toUpperCase()}`,
+        mentorName: `Nội dung: ${input.transactionCode}`,
+        meetingTimeLabel: `Số tiền: ${input.amount.toLocaleString('vi-VN')}đ`,
+        status: 'pending',
+        frontendBaseUrl: this.frontendBaseUrl,
+        logoUrl: this.getLogoUrl(),
+      }).html,
+    });
+  }
+
   async sendRegistrationEmail(input: RegistrationMailInput) {
     const template = buildRegistrationEmailTemplate({
       recipientName: input.recipientName,

@@ -17,6 +17,7 @@ import { tnAppConfig } from '../../config/tn-app.config';
 import { SystemConfigModule } from '../system-config/system-config.module';
 import { PaymentStrategyRegistry } from './services/payment-strategy.registry';
 import { ActivationPaymentStrategy } from './strategies/activation-payment.strategy';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ActivationPaymentStrategy } from './strategies/activation-payment.strat
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     SystemConfigModule,
+    MailModule,
   ],
   controllers: [PaymentController],
   providers: [

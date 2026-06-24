@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { handleRefreshTokenError, runGuards } from "@/core/lib/guards";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const session = await auth();
   const { nextUrl } = req;
   const pathname = nextUrl.pathname;

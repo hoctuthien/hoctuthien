@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { CourseStatus } from '../enums/course-status.enum';
 import { COURSE_MESSAGES } from '../../../common/constants/message.constant';
+import { AppLogger } from '../../../common/logger/app-logger.service';
 
 describe('CourseService', () => {
   let service: CourseService;
@@ -61,6 +62,15 @@ describe('CourseService', () => {
         {
           provide: DataSource,
           useValue: mockDataSource,
+        },
+        {
+          provide: AppLogger,
+          useValue: {
+            setContext: jest.fn(),
+            debug: jest.fn(),
+            log: jest.fn(),
+            error: jest.fn(),
+          },
         },
       ],
     }).compile();

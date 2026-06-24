@@ -24,6 +24,7 @@ import {
   PaymentSuccessPayload,
 } from '../events/payment.events';
 import { PaymentStrategyRegistry } from './payment-strategy.registry';
+import { MailService } from '../../mail/services/mail.service';
 
 // Lock TTL: 20 giây — đồng bộ với PaymentVerificationService
 const LOCK_TTL_MS = 20_000;
@@ -40,6 +41,7 @@ export class PaymentService {
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2,
     private readonly paymentStrategyRegistry: PaymentStrategyRegistry,
+    private readonly mailService: MailService,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) {}
 
@@ -142,6 +144,22 @@ export class PaymentService {
     this.logger.log(
       `Tạo QR ${paymentType} thành công cho user ${userId}: ${transactionCode}`,
     );
+
+    // Gửi email báo cáo mã giao dịch (VietQR) cho Ban quản trị
+    const adminEmail = this.mailService.getAdminEmail();
+    void this.mailService
+      .sendPaymentTransactionEmail({
+        to: adminEmail,
+        paymentType,
+        amount,
+        transactionCode,
+        qrUrl,
+      })
+      .catch((err) => {
+        this.logger.error(
+          `Failed to send transaction email to admin: ${err?.message || err}`,
+        );
+      });
 
     return {
       paymentId: payment.id,

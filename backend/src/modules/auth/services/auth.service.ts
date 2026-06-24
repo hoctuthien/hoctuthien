@@ -106,9 +106,15 @@ export class AuthService implements IAuthService {
 
     const existingUser = await this.userRepository.findOne({
       where: { email },
+      withDeleted: true,
     });
     if (existingUser) {
-      throw new ConflictException(AUTH_MESSAGES.EMAIL_ALREADY_EXISTS);
+      if (existingUser.deletedAt) {
+        // Tài khoản đã bị xóa (soft deleted), tiến hành xóa hoàn toàn để đăng ký mới
+        await this.userRepository.delete(existingUser.id);
+      } else {
+        throw new ConflictException(AUTH_MESSAGES.EMAIL_ALREADY_EXISTS);
+      }
     }
 
     const salt = await bcrypt.genSalt();
@@ -141,6 +147,16 @@ export class AuthService implements IAuthService {
         recipientName: user.name,
       })
       .catch(() => undefined);
+
+    const adminEmail = this.mailService.getAdminEmail();
+    if (adminEmail && adminEmail !== user.email) {
+      void this.mailService
+        .sendRegistrationEmail({
+          to: adminEmail,
+          recipientName: `Ban quản trị (Đăng ký mới: ${user.name})`,
+        })
+        .catch(() => undefined);
+    }
 
     return {
       user: {

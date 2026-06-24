@@ -300,6 +300,25 @@ export class CourseBookingService {
           );
         });
     }
+
+    // 3. Send copy of booking email to the administrator
+    const adminEmail = this.mailService.getAdminEmail();
+    if (adminEmail) {
+      await this.mailService
+        .sendCourseBookingEmail({
+          to: adminEmail,
+          recipientName: `Ban quản trị (Đặt bởi học viên ${booking.mentee?.name || 'Học viên'})`,
+          courseTitle: booking.course.title,
+          mentorName: booking.course.mentor?.name,
+          meetingTimeLabel,
+          status,
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Failed to send booking copy to admin: ${err?.message || err}`,
+          );
+        });
+    }
   }
 
   async sendBookingNotifications(bookingId: string, isPaymentSuccess = false) {

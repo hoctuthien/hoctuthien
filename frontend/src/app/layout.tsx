@@ -78,7 +78,10 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <Providers>
-            <AuthProvider session={session}>{children}</AuthProvider>
+            <AuthProvider session={session}>
+              <DeviceInitializer />
+              {children}
+            </AuthProvider>
           </Providers>
         </NextIntlClientProvider>
       </body>
