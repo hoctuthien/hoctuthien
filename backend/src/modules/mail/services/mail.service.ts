@@ -5,6 +5,7 @@ import {
   buildCourseBookingEmailTemplate,
   buildRegistrationEmailTemplate,
   buildMentorBookingNotificationEmailTemplate,
+  buildMentorApprovalEmailTemplate,
   MentorBookingEmailInput,
 } from '../templates/mail.templates';
 
@@ -137,6 +138,28 @@ export class MailService {
       mentorName: input.mentorName,
       meetingTimeLabel: input.meetingTimeLabel,
       status: input.status,
+      frontendBaseUrl: this.frontendBaseUrl,
+      logoUrl: this.getLogoUrl(),
+    });
+
+    await this.sendMail({
+      to: input.to,
+      subject: template.subject,
+      text: template.text,
+      html: template.html,
+    });
+  }
+
+  async sendMentorApprovalEmail(input: {
+    to: string;
+    recipientName: string;
+    approved: boolean;
+    rejectReason?: string | null;
+  }) {
+    const template = buildMentorApprovalEmailTemplate({
+      recipientName: input.recipientName,
+      approved: input.approved,
+      rejectReason: input.rejectReason,
       frontendBaseUrl: this.frontendBaseUrl,
       logoUrl: this.getLogoUrl(),
     });

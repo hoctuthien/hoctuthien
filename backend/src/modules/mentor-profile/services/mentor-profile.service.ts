@@ -10,11 +10,14 @@ import {
   UpdateMentorProfileDto,
 } from '../dtos/mentor-profile.dto';
 import { Role } from '../../../common/enums/role.enum';
+import { MailService } from '../../mail/services/mail.service';
+import { MentorProfileStatus } from '../enums/mentor-profile-status.enum';
 
 @Injectable()
 export class MentorProfileService {
   constructor(
     private readonly mentorProfileRepository: MentorProfileRepository,
+    private readonly mailService: MailService,
   ) {}
 
   async findAll(query?: {
@@ -95,6 +98,29 @@ export class MentorProfileService {
     }
 
     const updated = await this.mentorProfileRepository.updateById(id, parsed);
+
+    // Gửi email thông báo nếu admin thay đổi status approved/rejected
+    if (requestingUserRole === Role.ADMIN) {
+      const becameApproved = parsed.status === MentorProfileStatus.ACTIVE && !profile.isApproved && parsed.isApproved;
+      const becameRejected = parsed.status === MentorProfileStatus.REJECTED;
+
+      if (becameApproved || becameRejected) {
+        const mentorUser = await this.mentorProfileRepository.findById(id, {
+          relations: ['user'],
+        });
+        if (mentorUser?.user?.email) {
+          void this.mailService
+            .sendMentorApprovalEmail({
+              to: mentorUser.user.email,
+              recipientName: mentorUser.user.name,
+              approved: becameApproved,
+              rejectReason: null,
+            })
+            .catch(() => undefined);
+        }
+      }
+    }
+
     return mentorProfileSchema.parse(updated);
   }
 

@@ -5,6 +5,7 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Not } from 'typeorm';
 import { CourseBookingRepository } from '../repositories/course-booking.repository';
 import { BookingStatus } from '../entities/course-booking.entity';
@@ -25,6 +26,10 @@ import { Role } from '../../../common/enums/role.enum';
 import { CourseRepository } from '../../course/repositories/course.repository';
 import { MailService } from '../../mail/services/mail.service';
 import { NotificationService } from '../../notification/services/notification.service';
+import {
+  BOOKING_COMPLETED_EVENT,
+  BookingCompletedPayload,
+} from '../events/course-booking.events';
 
 @Injectable()
 export class CourseBookingService {
@@ -35,6 +40,7 @@ export class CourseBookingService {
     private readonly courseRepository: CourseRepository,
     private readonly mailService: MailService,
     private readonly notificationService: NotificationService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findAll(
@@ -472,6 +478,12 @@ export class CourseBookingService {
       throw new ForbiddenException('Bạn không có quyền cập nhật booking này.');
     }
 
+    if (item.meetingTime < new Date()) {
+      throw new BadRequestException(
+        'Không thể hủy buổi học đã diễn ra hoặc đã qua thời gian.',
+      );
+    }
+
     const parsed = updateCourseBookingByMenteeSchema.parse(payload);
     const updated = await this.courseBookingRepository.updateById(id, parsed);
     return courseBookingSchema.parse(updated);
@@ -498,6 +510,18 @@ export class CourseBookingService {
 
     const parsed = updateCourseBookingSchema.parse(payload);
     const updated = await this.courseBookingRepository.updateById(id, parsed);
+
+    if (parsed.status === BookingStatus.COMPLETED) {
+      const course = await this.courseRepository.findById(item.courseId);
+      const payload: BookingCompletedPayload = {
+        bookingId: updated.id,
+        menteeId: updated.menteeId,
+        mentorId: course?.mentorId,
+        courseId: updated.courseId,
+      };
+      this.eventEmitter.emit(BOOKING_COMPLETED_EVENT, payload);
+    }
+
     return courseBookingSchema.parse(updated);
   }
 

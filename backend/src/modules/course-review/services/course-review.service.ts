@@ -1,6 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
 import { CourseReviewRepository } from '../repositories/course-review.repository';
 import { CourseBookingRepository } from '../../course-booking/repositories/course-booking.repository';
+import { CourseRepository } from '../../course/repositories/course.repository';
+import { MentorProfileRepository } from '../../mentor-profile/repositories/mentor-profile.repository';
 import { BookingStatus } from '../../course-booking/entities/course-booking.entity';
 import {
   createCourseReviewSchema,
@@ -14,9 +16,13 @@ import {
 
 @Injectable()
 export class CourseReviewService {
+  private readonly logger = new Logger(CourseReviewService.name);
+
   constructor(
     private readonly courseReviewRepository: CourseReviewRepository,
     private readonly courseBookingRepository: CourseBookingRepository,
+    private readonly courseRepository: CourseRepository,
+    private readonly mentorProfileRepository: MentorProfileRepository,
   ) {}
 
   async findAll() {
@@ -61,7 +67,28 @@ export class CourseReviewService {
 
     const parsed = createCourseReviewSchema.parse(payload);
     const created = await this.courseReviewRepository.createAndSave(parsed);
+
+    void this.updateMentorRatingStats(booking.courseId).catch((err) => {
+      this.logger.error(`Failed to update mentor rating stats: ${err?.message}`);
+    });
+
     return courseReviewSchema.parse(created);
+  }
+
+  private async updateMentorRatingStats(courseId: string) {
+    const course = await this.courseRepository.findById(courseId);
+    if (!course?.mentorId) return;
+
+    const mentorProfile = await this.mentorProfileRepository.findOne({ userId: course.mentorId });
+    if (!mentorProfile) return;
+
+    const { avg, count } = await this.courseReviewRepository.getAverageRatingForCourse(courseId);
+    const roundedAvg = Math.round(avg * 100) / 100;
+
+    await this.mentorProfileRepository.updateById(mentorProfile.id, {
+      averageRating: roundedAvg,
+      totalStudents: count,
+    } as any);
   }
 
   async update(id: string, payload: UpdateCourseReviewInput, reviewerId: string) {

@@ -18,6 +18,7 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: { isCollapsed: boolean; 
     { label: t("mentors"), href: "/admin/mentors", icon: "ClipboardList" },
     { label: t("users"), href: "/admin/users", icon: "ShieldCheck" },
     { label: t("courses"), href: "/admin/courses", icon: "BookOpen" },
+    { label: "Chiến dịch", href: "/admin/campaigns", icon: "Target" },
     { label: t("penaltyTickets"), href: "/admin/penalty-tickets", icon: "AlertTriangle" },
     { label: t("bugReports"), href: "/admin/bug-reports", icon: "Bug" },
     { label: t("posts"), href: "/admin/posts", icon: "FileText" },

@@ -126,6 +126,39 @@ export function buildCourseBookingEmailTemplate(input: CourseBookingEmailInput) 
   };
 }
 
+export type MentorApprovalEmailInput = {
+  recipientName: string;
+  approved: boolean;
+  rejectReason?: string | null;
+  frontendBaseUrl: string;
+  logoUrl?: string | null;
+};
+
+export function buildMentorApprovalEmailTemplate(input: MentorApprovalEmailInput) {
+  const dashboardUrl = `${trimTrailingSlash(input.frontendBaseUrl)}/dashboard`;
+  const intro = input.approved
+    ? `Xin chúc mừng ${input.recipientName}! Hồ sơ Cố vấn (Mentor) của bạn đã được Ban quản trị phê duyệt.`
+    : `Xin chào ${input.recipientName}, hồ sơ đăng ký Cố vấn (Mentor) của bạn chưa được phê duyệt lần này.`;
+  const summary = input.approved
+    ? 'Bạn đã có thể tạo khóa học và bắt đầu nhận đăng ký buổi học từ các học viên. Hãy truy cập bảng điều khiển để bắt đầu.'
+    : `${input.rejectReason ? `Lý do: ${input.rejectReason}. ` : ''}Bạn có thể bổ sung thông tin hồ sơ và gửi lại đơn đăng ký Cố vấn.`;
+
+  return {
+    subject: input.approved
+      ? 'Hồ sơ Cố vấn đã được phê duyệt'
+      : 'Thông báo kết quả xét duyệt hồ sơ Cố vấn',
+    text: `${intro}\n\n${summary}\n\nTruy cập: ${dashboardUrl}`,
+    html: renderEmailLayout({
+      title: input.approved ? 'Hồ sơ Cố vấn đã được phê duyệt' : 'Kết quả xét duyệt hồ sơ',
+      intro,
+      summary,
+      ctaLabel: input.approved ? 'Vào bảng điều khiển' : 'Cập nhật hồ sơ',
+      ctaUrl: dashboardUrl,
+      logoUrl: input.logoUrl,
+    }),
+  };
+}
+
 export type MentorBookingEmailInput = {
   recipientName: string;
   menteeName: string;

@@ -30,6 +30,10 @@ export const MentorCard = ({ mentor }: MentorCardProps) => {
   const router = useRouter();
 
   const handleNavigate = () => {
+    router.push(`/mentors/${mentor.id}`);
+  };
+
+  const handleViewCourses = () => {
     router.push(`/courses?mentorId=${mentor.userId}`);
   };
 
@@ -40,7 +44,7 @@ export const MentorCard = ({ mentor }: MentorCardProps) => {
         title={mentor.jobTitle + (mentor.company ? ` at ${mentor.company}` : "")}
         description={mentor.bio || "No description provided."}
         avatarSrc={mentor.user?.avatarUrl || "/images/avatar_logo.png"}
-        onConnect={handleNavigate}
+        onConnect={handleViewCourses}
         onProfile={handleNavigate}
       />
     </div>

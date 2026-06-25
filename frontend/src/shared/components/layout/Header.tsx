@@ -24,7 +24,9 @@ const navLinks = [
   { label: 'home', href: '/' },
   { label: 'courses', href: '/courses' },
   { label: 'mentorship', href: '/mentorship' },
-  { label: 'aboutUs', href: '/about-us' },
+  { label: 'campaigns', href: '/campaigns' },
+  { label: 'leaderboard', href: '/leaderboard' },
+  { label: 'transparency', href: '/transparency' },
 ];
 
 export const Header = () => {

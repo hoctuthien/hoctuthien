@@ -48,6 +48,16 @@ export function ProfileClient({ user }: { user: any }) {
   const [submittingMentor, setSubmittingMentor] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Badges
+  const [badges, setBadges] = useState<any[]>([]);
+  useEffect(() => {
+    import('@/core/api/client').then(({ httpClient }) => {
+      httpClient.get('/v1/badges/my')
+        .then((res: any) => setBadges(Array.isArray(res) ? res : []))
+        .catch(() => setBadges([]));
+    });
+  }, []);
+
   // Fetch Mentor Profile if role is mentor
   useEffect(() => {
     if (user.role === 'mentor') {
@@ -493,6 +503,25 @@ export function ProfileClient({ user }: { user: any }) {
               </div>
             )}
           </form>
+        )}
+
+        {/* Badges Section */}
+        {badges.length > 0 && (
+          <div className="mt-6 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">Huy hiệu của bạn</h2>
+            <div className="flex flex-wrap gap-3">
+              {badges.map((ub: any) => (
+                <div
+                  key={ub.id}
+                  className="flex items-center gap-2 bg-amber-50 border border-amber-100 px-3 py-2 rounded-xl"
+                  title={ub.badge?.description || ''}
+                >
+                  <span className="text-lg">🏅</span>
+                  <span className="text-xs font-bold text-amber-800">{ub.badge?.name || 'Huy hiệu'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>

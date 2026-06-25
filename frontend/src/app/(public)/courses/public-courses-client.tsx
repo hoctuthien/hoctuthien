@@ -49,6 +49,7 @@ export default function PublicCoursesClient() {
   const [academicLevel, setAcademicLevel] = useState("");
   const [durationFilter, setDurationFilter] = useState("");
   const [formatFilter, setFormatFilter] = useState("");
+  const [priceFilter, setPriceFilter] = useState<"" | "free" | "paid">(""); // NEW
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["publicCourses"],
@@ -65,7 +66,8 @@ export default function PublicCoursesClient() {
     selectedTag !== "All Topics" ||
     academicLevel !== "" ||
     durationFilter !== "" ||
-    formatFilter !== "";
+    formatFilter !== "" ||
+    priceFilter !== "";
 
   const clearAllFilters = () => {
     setSearchQuery("");
@@ -73,6 +75,7 @@ export default function PublicCoursesClient() {
     setAcademicLevel("");
     setDurationFilter("");
     setFormatFilter("");
+    setPriceFilter("");
   };
 
   const filteredCourses = allCourses.filter((course: any) => {
@@ -103,7 +106,12 @@ export default function PublicCoursesClient() {
     const durGroup = hours <= 1 ? "short" : hours <= 3 ? "medium" : "long";
     const matchDuration = durationFilter === "" || durGroup === durationFilter;
 
-    return matchSearch && matchTag && matchLevel && matchFormat && matchDuration;
+    const matchPrice =
+      priceFilter === "" ||
+      (priceFilter === "free" && Number(course.price) === 0) ||
+      (priceFilter === "paid" && Number(course.price) > 0);
+
+    return matchSearch && matchTag && matchLevel && matchFormat && matchDuration && matchPrice;
   });
 
   return (
@@ -130,6 +138,24 @@ export default function PublicCoursesClient() {
           isFilterActive={isFilterActive}
           clearAllFilters={clearAllFilters}
         />
+
+        {/* 2b. Price filter */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Học phí:</span>
+          {(["", "free", "paid"] as const).map((val) => (
+            <button
+              key={val}
+              onClick={() => setPriceFilter(val)}
+              className={`px-4 py-1.5 rounded-xl text-xs font-black border transition-all cursor-pointer ${
+                priceFilter === val
+                  ? "bg-[#005BBF] text-white border-[#005BBF]"
+                  : "bg-white text-slate-500 border-slate-200 hover:border-[#005BBF] hover:text-[#005BBF]"
+              }`}
+            >
+              {val === "" ? "Tất cả" : val === "free" ? "Miễn phí" : "Có phí"}
+            </button>
+          ))}
+        </div>
 
         {/* 3. Course Grid */}
         <div className="flex flex-col gap-5">

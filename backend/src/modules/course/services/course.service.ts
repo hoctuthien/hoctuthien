@@ -48,6 +48,8 @@ export class CourseService {
       groupCategorySlug,
       categoryId,
       categorySlug,
+      isFree,
+      sortBy,
       page,
       limit,
     } = findCoursesQuerySchema.parse(query);
@@ -102,13 +104,21 @@ export class CourseService {
 
     const [items, total] = await this.courseRepository.findManyWithCount({
       where,
-      order: { createdAt: 'DESC' },
+      order: sortBy === 'newest' || !sortBy ? { createdAt: 'DESC' } : { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });
 
+    let results = items.map((course) => courseSchema.parse(course));
+
+    if (isFree === true) {
+      results = results.filter((c) => Number(c.price) === 0);
+    } else if (isFree === false) {
+      results = results.filter((c) => Number(c.price) > 0);
+    }
+
     return {
-      items: items.map((course) => courseSchema.parse(course)),
+      items: results,
       meta: createPaginationMeta(total, page, limit),
     };
   }
