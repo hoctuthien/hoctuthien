@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Breadcrumb, EmptyState, Modal } from '@shared';
-import { courseBookingGateway, paymentGateway, penaltyTicketGateway } from '@/core/gateway';
+import { courseBookingGateway, paymentGateway, penaltyTicketGateway, reviewGateway } from '@/core/gateway';
 import { Button } from '@/core/ui';
 import { 
   LuBookOpen, 
@@ -19,7 +19,8 @@ import {
   LuTrash2,
   LuCopy,
   LuRefreshCw,
-  LuInfo
+  LuInfo,
+  LuStar
 } from 'react-icons/lu';
 import { useSession } from 'next-auth/react';
 import { DashboardCalendar, getLocalDateString } from '../dashboard/components/DashboardCalendar';
@@ -72,8 +73,17 @@ export default function MyCoursesClient() {
   const [reportBooking, setReportBooking] = useState<BookingRelation | null>(null);
   const [reportReason, setReportReason] = useState('');
   const [evidenceUrl, setEvidenceUrl] = useState('');
-  const [submittingReport, setSubmittingReport] = useState(false);
   const [reportedBookingIds, setReportedBookingIds] = useState<string[]>([]);
+  const [submittingReport, setSubmittingReport] = useState(false);
+
+  // Mentee Review Modal States
+  const [reviewBooking, setReviewBooking] = useState<BookingRelation | null>(null);
+  const [courseRating, setCourseRating] = useState(5);
+  const [courseComment, setCourseComment] = useState('');
+  const [mentorRating, setMentorRating] = useState(5);
+  const [mentorComment, setMentorComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewedBookingIds, setReviewedBookingIds] = useState<string[]>([]);
 
   // Trạng thái tích hợp thanh toán khóa học
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -327,6 +337,60 @@ export default function MyCoursesClient() {
       fetchBookings();
     }
   }, [status]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('reviewed_booking_ids');
+    if (saved) {
+      try {
+        setReviewedBookingIds(JSON.parse(saved));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
+
+  const handleReviewSubmit = async () => {
+    if (!reviewBooking) return;
+    try {
+      setSubmittingReview(true);
+      
+      // 1. Submit Course Review
+      await reviewGateway.createCourseReview({
+        courseBookingId: reviewBooking.id,
+        courseId: reviewBooking.courseId,
+        rating: courseRating,
+        comment: courseComment.trim() || undefined,
+      });
+
+      // 2. Submit Mentor (User) Review
+      const mentorId = reviewBooking.course?.mentor?.id;
+      if (mentorId) {
+        await reviewGateway.createUserReview({
+          courseBookingId: reviewBooking.id,
+          reviewedId: mentorId,
+          rating: mentorRating,
+          comment: mentorComment.trim() || undefined,
+        });
+      }
+
+      // Save to local storage
+      const nextReviewed = [...reviewedBookingIds, reviewBooking.id];
+      setReviewedBookingIds(nextReviewed);
+      localStorage.setItem('reviewed_booking_ids', JSON.stringify(nextReviewed));
+
+      alert('Cảm ơn bạn đã gửi đánh giá buổi học!');
+      setReviewBooking(null);
+      setCourseRating(5);
+      setCourseComment('');
+      setMentorRating(5);
+      setMentorComment('');
+    } catch (err: any) {
+      console.error('Failed to submit reviews:', err);
+      alert(err.response?.data?.message || err.message || 'Gửi đánh giá thất bại, vui lòng thử lại.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   const handleCancelBooking = async () => {
     if (!cancelBookingId || !cancelReason.trim()) return;
@@ -720,8 +784,24 @@ export default function MyCoursesClient() {
                       </div>
 
                       {/* Actions buttons */}
-                      {(isCancellable || (isPast && (booking.status === 'confirmed' || booking.status === 'rescheduled'))) && (
+                      {(isCancellable || booking.status === 'completed' || (isPast && (booking.status === 'confirmed' || booking.status === 'rescheduled'))) && (
                         <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-50">
+                          {booking.status === 'completed' && (
+                            <button
+                              type="button"
+                              onClick={() => setReviewBooking(booking)}
+                              disabled={reviewedBookingIds.includes(booking.id)}
+                              className={`flex-1 text-center font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider transition-all cursor-pointer border flex items-center justify-center gap-1.5 ${
+                                reviewedBookingIds.includes(booking.id)
+                                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                                  : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-sm shadow-emerald-500/10'
+                              }`}
+                            >
+                              <LuStar size={14} className={reviewedBookingIds.includes(booking.id) ? 'text-slate-400' : 'text-emerald-100'} />
+                              <span>{reviewedBookingIds.includes(booking.id) ? 'Đã đánh giá' : 'Đánh giá buổi học'}</span>
+                            </button>
+                          )}
+
                           {isPast && (booking.status === 'confirmed' || booking.status === 'rescheduled') && (
                             <button
                               type="button"
@@ -1072,6 +1152,112 @@ export default function MyCoursesClient() {
                   <>
                     <LuTriangleAlert size={12} />
                     <span>Gửi báo cáo</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Mentee Review Modal */}
+        <Modal
+          isOpen={reviewBooking !== null}
+          onClose={() => {
+            setReviewBooking(null);
+            setCourseRating(5);
+            setCourseComment('');
+            setMentorRating(5);
+            setMentorComment('');
+          }}
+          title="Đánh giá buổi học"
+          containerClassName="max-w-md"
+          className="p-8 pt-0 font-sans"
+        >
+          <div className="flex flex-col gap-5 py-2">
+            <p className="text-slate-500 text-xs font-semibold">
+              Hãy chia sẻ trải nghiệm học tập của bạn để giúp hệ thống ngày một tốt hơn và lan tỏa tri thức cộng đồng nhé!
+            </p>
+
+            {/* 1. Course Review */}
+            <div className="flex flex-col gap-2 border-b border-slate-100 pb-4">
+              <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                1. Đánh giá Khóa học: <span className="text-blue-600">"{reviewBooking?.course?.title}"</span>
+              </label>
+              <div className="flex items-center gap-1 my-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setCourseRating(star)}
+                    className="p-1 text-2xl focus:outline-none transition-colors cursor-pointer bg-transparent border-none"
+                  >
+                    <LuStar
+                      className={star <= courseRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+                      size={24}
+                    />
+                  </button>
+                ))}
+              </div>
+              <textarea
+                value={courseComment}
+                onChange={(e) => setCourseComment(e.target.value)}
+                placeholder="Nhận xét của bạn về nội dung bài giảng, kiến thức thu nhận được..."
+                className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[70px] transition-colors resize-none font-semibold leading-relaxed"
+              />
+            </div>
+
+            {/* 2. Mentor Review */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                2. Đánh giá Cố vấn: <span className="text-emerald-700">"{reviewBooking?.course?.mentor?.name}"</span>
+              </label>
+              <div className="flex items-center gap-1 my-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setMentorRating(star)}
+                    className="p-1 text-2xl focus:outline-none transition-colors cursor-pointer bg-transparent border-none"
+                  >
+                    <LuStar
+                      className={star <= mentorRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+                      size={24}
+                    />
+                  </button>
+                ))}
+              </div>
+              <textarea
+                value={mentorComment}
+                onChange={(e) => setMentorComment(e.target.value)}
+                placeholder="Nhận xét về thái độ giảng dạy, phương pháp truyền đạt của Cố vấn..."
+                className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[70px] transition-colors resize-none font-semibold leading-relaxed"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-2 border-t border-slate-100 pt-4">
+              <button
+                onClick={() => {
+                  setReviewBooking(null);
+                  setCourseRating(5);
+                  setCourseComment('');
+                  setMentorRating(5);
+                  setMentorComment('');
+                }}
+                className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleReviewSubmit}
+                disabled={submittingReview}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-500/10 active:scale-[0.98] min-w-[120px] cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {submittingReview ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <LuCheck size={12} />
+                    <span>Gửi đánh giá</span>
                   </>
                 )}
               </button>
