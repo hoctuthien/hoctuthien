@@ -333,8 +333,7 @@ export default function MentorBookingsClient() {
   ];
 
   return (
-    <div className="w-full bg-[#FAFBFD] min-h-screen py-8 px-4 md:px-8 font-sans">
-      <div className="max-w-7xl mx-auto flex flex-col gap-8">
+    <div className="w-full flex flex-col gap-8 font-sans">
         
         {/* Title & Breadcrumbs */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -985,6 +984,5 @@ export default function MentorBookingsClient() {
         </Modal>
 
       </div>
-    </div>
   );
 }

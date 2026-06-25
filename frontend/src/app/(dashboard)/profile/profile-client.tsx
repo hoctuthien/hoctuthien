@@ -161,7 +161,7 @@ export function ProfileClient({ user }: { user: any }) {
   const isMentor = user.role === 'mentor';
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8 font-sans">
+    <div className="w-full font-sans">
       {/* Header section with User Profile Card */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 md:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
         {/* Subtle background decoration */}
