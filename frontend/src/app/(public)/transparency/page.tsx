@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { LuTrendingUp, LuDollarSign, LuCheckCircle } from "react-icons/lu";
+import { LuTrendingUp, LuDollarSign, LuCheck } from "react-icons/lu";
 import { apiService } from "@/core/api/base";
 import { Breadcrumb } from "@shared";
 
@@ -95,7 +95,7 @@ export default function TransparencyPage() {
                 {
                   label: "Giao dịch thành công",
                   value: data.totalCompleted.toString(),
-                  icon: LuCheckCircle,
+                  icon: LuCheck,
                   color: "text-emerald-600",
                   bg: "bg-emerald-50",
                 },
