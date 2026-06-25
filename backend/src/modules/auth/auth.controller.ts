@@ -42,7 +42,6 @@ export class AuthController {
   @UseInterceptors(RateLimitFailInterceptor)
   @RateLimitFail({ type: 'register', limit: 3, ttl: 60, blockDuration: 60 })
   @ApiRegisterDoc()
-  @ApiRegisterDoc()
   async register(
     @Body() registerDto: RegisterDto,
     @Ip() ip: string,
@@ -122,7 +121,6 @@ export class AuthController {
   @Get('google/callback')
   @ApiGoogleAuthCallbackDoc()
   @UseGuards(GoogleAuthGuard)
-  @ApiGoogleAuthCallbackDoc()
   async googleAuthRedirect(@Req() req: any) {
     const deviceId = req.cookies['device_id'] || req.headers['x-device-id'];
     return this.authService.validateGoogleUser(req.user, deviceId as string);
