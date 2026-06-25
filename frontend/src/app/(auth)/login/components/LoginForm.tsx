@@ -15,9 +15,50 @@ import {
   type LoginFormData,
 } from "@/app/(auth)/login/login.schema";
 import { signIn } from "next-auth/react";
+import { ensureDeviceId } from "@/shared/utils/device";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+
+async function signInWithCredentials(email: string, password: string) {
+  ensureDeviceId();
+
+  const csrfResponse = await fetch("/api/auth/csrf", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  if (!csrfResponse.ok) {
+    throw new Error("Unable to fetch CSRF token");
+  }
+
+  const { csrfToken } = await csrfResponse.json();
+  const callbackUrl = window.location.origin;
+  const response = await fetch("/api/auth/callback/credentials", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-Auth-Return-Redirect": "1",
+    },
+    body: new URLSearchParams({
+      email,
+      password,
+      csrfToken,
+      callbackUrl,
+    }),
+    credentials: "same-origin",
+  });
+
+  const data = await response.json().catch(() => ({}));
+  const url = typeof data.url === "string" ? data.url : callbackUrl;
+  const error = new URL(url, window.location.origin).searchParams.get("error");
+
+  return {
+    ok: response.ok && !error,
+    error,
+    status: response.status,
+  };
+}
 
 export function LoginForm() {
   const t = useTranslations("Auth");
@@ -60,11 +101,7 @@ export function LoginForm() {
 
     try {
       console.log("[LoginForm] Submitting login...");
-      const result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
+      const result = await signInWithCredentials(data.email, data.password);
 
       if (!result || result.error) {
         setGeneralError(tError("invalidCredentials"));
@@ -77,7 +114,7 @@ export function LoginForm() {
         router.push(redirectUrl);
         router.refresh();
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("[LoginForm] Submit Error:", error);
       setGeneralError(tError("invalidCredentials"));
     } finally {
@@ -89,6 +126,7 @@ export function LoginForm() {
     setIsGoogleLoading(true);
     try {
       // Với Google, chúng ta để Middleware xử lý redirect dựa trên role ở trang callback
+      ensureDeviceId();
       await signIn("google", { callbackUrl: "/admin/dashboard" });
     } catch (error) {
       console.error("Google login failed:", error);

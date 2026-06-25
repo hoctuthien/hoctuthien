@@ -3,35 +3,91 @@
 import React, { useEffect, useState } from "react";
 import { LuTrendingUp, LuDollarSign, LuCheck } from "react-icons/lu";
 import { apiService } from "@/core/api/base";
+import { formatCurrency as formatVndCurrency } from "@/shared/utils/format";
 import { Breadcrumb } from "@shared";
+
+interface MonthlyStat {
+  month: string;
+  amount: number;
+}
+
+interface RecentPayment {
+  id: string;
+  amount: number;
+  currency: string;
+  paidAt: string | null;
+  description: string | null;
+}
 
 interface TransparencyData {
   totalRaised: number;
   totalCompleted: number;
-  monthlyStats: { month: string; amount: number }[];
-  recentPayments: { id: string; amount: number; currency: string; paidAt: string | null; description: string | null }[];
+  monthlyStats: MonthlyStat[];
+  recentPayments: RecentPayment[];
 }
 
-function formatCurrency(amount: number) {
-  return amount.toLocaleString("vi-VN") + "đ";
+function toFiniteNumber(value: unknown) {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount : 0;
 }
 
-function MonthlyBarChart({ data }: { data: { month: string; amount: number }[] }) {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object";
+}
+
+function formatCurrency(amount: unknown) {
+  return formatVndCurrency(toFiniteNumber(amount));
+}
+
+function unwrapTransparencyResponse(response: unknown): unknown {
+  const raw = isRecord(response) && "data" in response ? response.data : response;
+  const rawData = isRecord(raw) ? raw.data : undefined;
+  const nested = Array.isArray(rawData) ? rawData[0] : rawData;
+  return nested ?? raw;
+}
+
+function normalizeTransparencyData(response: unknown): TransparencyData {
+  const raw = unwrapTransparencyResponse(response);
+  const monthlyStats = isRecord(raw) && Array.isArray(raw.monthlyStats) ? raw.monthlyStats : [];
+  const recentPayments = isRecord(raw) && Array.isArray(raw.recentPayments) ? raw.recentPayments : [];
+
+  return {
+    totalRaised: toFiniteNumber(isRecord(raw) ? raw.totalRaised : undefined),
+    totalCompleted: toFiniteNumber(isRecord(raw) ? raw.totalCompleted : undefined),
+    monthlyStats: monthlyStats.map((item) => ({
+      month: String(isRecord(item) ? (item.month ?? "") : ""),
+      amount: toFiniteNumber(isRecord(item) ? item.amount : undefined),
+    })),
+    recentPayments: recentPayments.map((payment, index) => ({
+      id: String(isRecord(payment) ? (payment.id ?? `payment-${index}`) : `payment-${index}`),
+      amount: toFiniteNumber(isRecord(payment) ? payment.amount : undefined),
+      currency: String(isRecord(payment) ? (payment.currency ?? "VND") : "VND"),
+      paidAt: isRecord(payment) && typeof payment.paidAt === "string" ? payment.paidAt : null,
+      description: isRecord(payment) && typeof payment.description === "string" ? payment.description : null,
+    })),
+  };
+}
+
+function MonthlyBarChart({ data }: { data: MonthlyStat[] }) {
   if (!data || data.length === 0) {
     return <div className="flex items-center justify-center h-full text-sm text-slate-400">Chưa có dữ liệu</div>;
   }
+
   const max = Math.max(...data.map((d) => d.amount), 1);
+
   return (
     <div className="flex items-end gap-2 h-full w-full px-2 pb-2 pt-2">
-      {data.map((d) => {
-        const pct = (d.amount / max) * 100;
+      {data.map((d, index) => {
+        const amount = toFiniteNumber(d.amount);
+        const pct = (amount / max) * 100;
+
         return (
-          <div key={d.month} className="flex flex-col items-center gap-1 flex-1 min-w-0">
+          <div key={`${d.month}-${index}`} className="flex flex-col items-center gap-1 flex-1 min-w-0">
             <span className="text-[9px] font-bold text-slate-500 hidden md:block truncate w-full text-center">
-              {formatCurrency(d.amount)}
+              {formatCurrency(amount)}
             </span>
             <div
-              title={`${d.month}: ${formatCurrency(d.amount)}`}
+              title={`${d.month}: ${formatCurrency(amount)}`}
               className="w-full rounded-t-lg bg-gradient-to-t from-blue-600 to-blue-400 transition-all duration-700 hover:from-blue-700 hover:to-blue-500 cursor-default"
               style={{ height: `${Math.max(pct, 4)}%` }}
             />
@@ -54,8 +110,8 @@ export default function TransparencyPage() {
 
   useEffect(() => {
     apiService
-      .get<any>("/admin/transparency")
-      .then((res) => setData(res.data))
+      .get<unknown>("/admin/transparency", { cache: "no-store" })
+      .then((res) => setData(normalizeTransparencyData(res)))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, []);
@@ -82,7 +138,6 @@ export default function TransparencyPage() {
           </div>
         ) : (
           <>
-            {/* Key stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[
                 {
@@ -122,7 +177,6 @@ export default function TransparencyPage() {
               ))}
             </div>
 
-            {/* Monthly chart */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">
                 Quyên góp theo tháng (12 tháng gần nhất)
@@ -132,7 +186,6 @@ export default function TransparencyPage() {
               </div>
             </div>
 
-            {/* Recent payments */}
             {data.recentPayments.length > 0 && (
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                 <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">
@@ -157,13 +210,13 @@ export default function TransparencyPage() {
                       {data.recentPayments.map((p) => (
                         <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                           <td className="py-3 pr-4 text-slate-500 font-semibold">
-                            {p.paidAt ? new Date(p.paidAt).toLocaleDateString("vi-VN") : "—"}
+                            {p.paidAt ? new Date(p.paidAt).toLocaleDateString("vi-VN") : "-"}
                           </td>
                           <td className="py-3 pr-4 text-right font-black text-emerald-700">
-                            {formatCurrency(Number(p.amount))}
+                            {formatCurrency(p.amount)}
                           </td>
                           <td className="py-3 text-slate-500 font-semibold truncate max-w-[200px]">
-                            {p.description || "—"}
+                            {p.description || "-"}
                           </td>
                         </tr>
                       ))}

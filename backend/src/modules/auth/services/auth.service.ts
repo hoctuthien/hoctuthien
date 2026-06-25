@@ -41,6 +41,15 @@ export class AuthService implements IAuthService {
     );
   }
 
+  private requireDeviceId(deviceId?: string | null) {
+    const normalized = typeof deviceId === 'string' ? deviceId.trim() : '';
+    if (!normalized || normalized === 'unknown') {
+      throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
+    }
+
+    return normalized;
+  }
+
   private async createSession(
     userId: string,
     refreshToken: string,
@@ -53,7 +62,7 @@ export class AuthService implements IAuthService {
     const session = this.sessionRepository.create({
       userId,
       refreshToken,
-      deviceName: deviceId || 'unknown',
+      deviceName: this.requireDeviceId(deviceId),
       refreshTokenExpiresAt: expiresAt,
       lastUsedAt: new Date(),
       status: 'active',
@@ -102,7 +111,7 @@ export class AuthService implements IAuthService {
     requestInfo?: { ip?: string; deviceId?: string },
   ) {
     const { email, password, name, phone, dayOfBirth, gender } = registerDto;
-    const deviceId = requestInfo?.deviceId;
+    const deviceId = this.requireDeviceId(requestInfo?.deviceId);
 
     const existingUser = await this.userRepository.findOne({
       where: { email },
@@ -174,7 +183,7 @@ export class AuthService implements IAuthService {
     requestInfo?: { ip?: string; userAgent?: string; deviceId?: string },
   ) {
     const { email, password } = loginDto;
-    const deviceId = requestInfo?.deviceId;
+    const deviceId = this.requireDeviceId(requestInfo?.deviceId);
 
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user || !user.passwordHash) {
@@ -207,7 +216,8 @@ export class AuthService implements IAuthService {
 
   async refreshTokens(refreshToken: string, deviceId: string) {
     try {
-      console.log('[refreshTokens Debug] Input deviceId:', deviceId);
+      const requestDevice = this.requireDeviceId(deviceId);
+      console.log('[refreshTokens Debug] Input deviceId:', requestDevice);
       const payload = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
       });
@@ -255,25 +265,25 @@ export class AuthService implements IAuthService {
         }
       }
 
-      const expectedDevice = deviceId || payload.deviceId || 'unknown';
-      const sessionDevice = session.deviceName || 'unknown';
+      const tokenDevice = this.requireDeviceId(payload.deviceId);
+      const sessionDevice = this.requireDeviceId(session.deviceName);
       console.log(
         '[refreshTokens Debug] sessionDevice:',
         sessionDevice,
-        '| expectedDevice:',
-        expectedDevice,
+        '| tokenDevice:',
+        tokenDevice,
+        '| requestDevice:',
+        requestDevice,
       );
 
-      if (
-        sessionDevice !== expectedDevice &&
-        sessionDevice !== 'unknown' &&
-        expectedDevice !== 'unknown'
-      ) {
+      if (sessionDevice !== requestDevice || tokenDevice !== requestDevice) {
         console.warn(
           '[refreshTokens Debug] Device verification failed. sessionDevice:',
           sessionDevice,
-          'expectedDevice:',
-          expectedDevice,
+          'tokenDevice:',
+          tokenDevice,
+          'requestDevice:',
+          requestDevice,
         );
         throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
       }
@@ -294,7 +304,7 @@ export class AuthService implements IAuthService {
         sub: user.id,
         email: user.email,
         role: user.role,
-        deviceId: expectedDevice,
+        deviceId: requestDevice,
       };
       const tokens = await this.generateTokens(newPayload);
 
@@ -372,6 +382,7 @@ export class AuthService implements IAuthService {
 
   async validateGoogleUser(googleUser: any, deviceId?: string) {
     const { googleId, email, name, avatarUrl } = googleUser;
+    const currentDeviceId = this.requireDeviceId(deviceId);
 
     let user = await this.userRepository.findOne({
       where: [{ googleId }, { email }],
@@ -397,7 +408,7 @@ export class AuthService implements IAuthService {
       sub: user.id,
       email: user.email,
       role: user.role,
-      deviceId,
+      deviceId: currentDeviceId,
     };
     const tokens = await this.generateTokens(payload);
 

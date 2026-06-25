@@ -17,6 +17,7 @@ import {
 import { authGateway } from "@/core/gateway/authGateway";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { ensureDeviceId } from "@/shared/utils/device";
 
 export function RegisterForm() {
   const t = useTranslations("Auth");
@@ -53,6 +54,7 @@ export function RegisterForm() {
 
     try {
       // Gọi API đăng ký
+      ensureDeviceId();
       await authGateway.register({
         name: data.name,
         email: data.email,
@@ -95,6 +97,7 @@ export function RegisterForm() {
     const callbackUrl = searchParams.get("callbackUrl") || "/";
 
     try {
+      ensureDeviceId();
       await signIn(provider, { callbackUrl });
     } catch (error) {
       console.error(`${provider} login failed:`, error);

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Icon } from "@/core/ui";
+import { Icon, type IconName } from "@/core/ui";
 import { Card } from "@/core/ui/Card";
 import { httpClient } from "@/core/api/client";
 
@@ -17,6 +17,14 @@ interface DashboardStats {
   cancelledBookings: number;
   totalDonations: number;
   monthlyStats: { month: string; amount: number }[];
+}
+
+interface StatCard {
+  label: string;
+  value: string;
+  icon: IconName;
+  color: string;
+  bg: string;
 }
 
 function formatCurrency(amount: number) {
@@ -62,7 +70,7 @@ export default function AdminDashboardClient() {
       .finally(() => setLoading(false));
   }, []);
 
-  const statCards = stats
+  const statCards: StatCard[] = stats
     ? [
         { label: "Tổng người dùng", value: stats.totalUsers.toLocaleString(), icon: "Users", color: "text-blue-600", bg: "bg-blue-50" },
         { label: "Chờ duyệt Mentor", value: stats.pendingMentors.toString(), icon: "Clock", color: "text-amber-600", bg: "bg-amber-50" },
@@ -85,7 +93,9 @@ export default function AdminDashboardClient() {
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
-            <Card key={i} padding="lg" className="border-none shadow-sm animate-pulse h-20 bg-slate-100" />
+            <Card key={i} padding="lg" className="border-none shadow-sm animate-pulse h-20 bg-slate-100">
+              <span className="sr-only">Loading</span>
+            </Card>
           ))}
         </div>
       )}
@@ -97,7 +107,7 @@ export default function AdminDashboardClient() {
               <Card key={stat.label} padding="lg" className="border-none shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3">
                   <div className={`${stat.bg} ${stat.color} p-2.5 rounded-xl flex-shrink-0`}>
-                    <Icon name={stat.icon as any} size={20} />
+                    <Icon name={stat.icon} size={20} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-text-muted mb-1 truncate">{stat.label}</p>
