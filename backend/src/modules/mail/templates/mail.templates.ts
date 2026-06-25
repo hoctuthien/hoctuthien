@@ -55,7 +55,16 @@ function renderEmailLayout(input: MailLayoutInput) {
 
   return `<!DOCTYPE html>
 <html lang="vi">
-  <body style="margin:0;padding:24px;background:#f3f7fb;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
+  <head>
+    <meta charset="UTF-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      body, table, td, div, a {
+        font-family: 'Montserrat', Arial, Helvetica, sans-serif !important;
+      }
+    </style>
+  </head>
+  <body style="margin:0;padding:24px;background:#f3f7fb;font-family:'Montserrat',Arial,Helvetica,sans-serif;color:#0f172a;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;">
       <tr>
         <td style="padding:32px 32px 24px;background:linear-gradient(135deg,#eff6ff 0%,#ffffff 100%);text-align:center;">
@@ -197,4 +206,3 @@ export function buildMentorBookingNotificationEmailTemplate(input: MentorBooking
     }),
   };
 }
-

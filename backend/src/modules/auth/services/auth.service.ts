@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -18,6 +18,7 @@ import { MailService } from '../../mail/services/mail.service';
 
 @Injectable()
 export class AuthService implements IAuthService {
+  private readonly logger = new Logger(AuthService.name);
   private googleClient: OAuth2Client;
 
   constructor(
@@ -155,7 +156,11 @@ export class AuthService implements IAuthService {
         to: user.email,
         recipientName: user.name,
       })
-      .catch(() => undefined);
+      .catch((err) => {
+        this.logger.error(
+          `Failed to send registration email to ${user.email}: ${err?.message || err}`,
+        );
+      });
 
     const adminEmail = this.mailService.getAdminEmail();
     if (adminEmail && adminEmail !== user.email) {
@@ -164,7 +169,11 @@ export class AuthService implements IAuthService {
           to: adminEmail,
           recipientName: `Ban quản trị (Đăng ký mới: ${user.name})`,
         })
-        .catch(() => undefined);
+        .catch((err) => {
+          this.logger.error(
+            `Failed to send registration email to admin ${adminEmail}: ${err?.message || err}`,
+          );
+        });
     }
 
     return {
