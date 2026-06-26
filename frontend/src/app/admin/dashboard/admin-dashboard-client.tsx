@@ -64,8 +64,11 @@ export default function AdminDashboardClient() {
 
   useEffect(() => {
     httpClient
-      .get<DashboardStats>("/v1/admin/stats")
-      .then((res) => setStats(res))
+      .get<any>("/v1/admin/stats")
+      .then((res) => {
+        const statsData = res?.data?.[0] || (Array.isArray(res) ? res[0] : res);
+        setStats((statsData as DashboardStats) || null);
+      })
       .catch(() => setStats(null))
       .finally(() => setLoading(false));
   }, []);
