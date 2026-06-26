@@ -49,6 +49,18 @@ export const authGateway = {
     return httpClient.post('/v1/auths/logout');
   },
 
+  async forgotPassword(payload: { email: string }): Promise<{ message?: string }> {
+    return httpClient.post('/v1/auths/forgot-password', payload);
+  },
+
+  async resetPassword(payload: {
+    email: string;
+    otp: string;
+    newPassword: string;
+  }): Promise<{ message?: string }> {
+    return httpClient.post('/v1/auths/reset-password', payload);
+  },
+
   /**
    * Cập nhật thông tin cá nhân
    */

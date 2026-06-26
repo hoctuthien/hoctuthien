@@ -14,6 +14,14 @@ type RegistrationEmailInput = {
   logoUrl?: string | null;
 };
 
+type PasswordResetOtpEmailInput = {
+  recipientName: string;
+  otp: string;
+  expiresInMinutes: number;
+  frontendBaseUrl: string;
+  logoUrl?: string | null;
+};
+
 type CourseBookingEmailInput = {
   recipientName: string;
   courseTitle: string;
@@ -47,7 +55,8 @@ function renderEmailLayout(input: MailLayoutInput) {
   const ctaLabel = input.ctaLabel ? escapeHtml(input.ctaLabel) : null;
   const ctaUrl = input.ctaUrl ? escapeHtml(input.ctaUrl) : null;
   const footerText = escapeHtml(
-    input.footerText || 'Bạn nhận được email này vì đã tương tác với hệ thống Học Từ Thiện.',
+    input.footerText ||
+      'Bạn nhận được email này vì đã tương tác với hệ thống Học Từ Thiện.',
   );
   const logoHtml = input.logoUrl
     ? `<img src="${escapeHtml(input.logoUrl)}" alt="${brandName}" style="display:block;max-width:160px;width:160px;height:auto;margin:0 auto 16px;" />`
@@ -107,10 +116,37 @@ export function buildRegistrationEmailTemplate(input: RegistrationEmailInput) {
   };
 }
 
-export function buildCourseBookingEmailTemplate(input: CourseBookingEmailInput) {
+export function buildPasswordResetOtpEmailTemplate(
+  input: PasswordResetOtpEmailInput,
+) {
+  const resetUrl = `${trimTrailingSlash(input.frontendBaseUrl)}/forgot-password`;
+  const intro = `Xin chào ${input.recipientName}, đây là mã OTP để đặt lại mật khẩu tài khoản ${brandName} của bạn.`;
+  const summary = `Mã OTP của bạn là: ${input.otp}. Mã này có hiệu lực trong ${input.expiresInMinutes} phút. Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.`;
+
+  return {
+    subject: 'Mã OTP đặt lại mật khẩu Học Từ Thiện',
+    text: `${intro}\n\n${summary}\n\nTrang đặt lại mật khẩu: ${resetUrl}`,
+    html: renderEmailLayout({
+      title: 'Mã OTP đặt lại mật khẩu',
+      intro,
+      summary,
+      ctaLabel: 'Mở trang đặt lại mật khẩu',
+      ctaUrl: resetUrl,
+      logoUrl: input.logoUrl,
+      footerText:
+        'Vì lý do bảo mật, mã OTP chỉ dùng được một lần và mã mới sẽ thay thế mã cũ.',
+    }),
+  };
+}
+
+export function buildCourseBookingEmailTemplate(
+  input: CourseBookingEmailInput,
+) {
   const bookingUrl = `${trimTrailingSlash(input.frontendBaseUrl)}/my-courses`;
   const isPending = input.status === 'pending';
-  const statusLabel = isPending ? 'đã được ghi nhận và đang chờ thanh toán' : 'đã được xác nhận thành công';
+  const statusLabel = isPending
+    ? 'đã được ghi nhận và đang chờ thanh toán'
+    : 'đã được xác nhận thành công';
   const mentorLine = input.mentorName
     ? `Cố vấn phụ trách: ${input.mentorName}. `
     : '';
@@ -143,7 +179,9 @@ export type MentorApprovalEmailInput = {
   logoUrl?: string | null;
 };
 
-export function buildMentorApprovalEmailTemplate(input: MentorApprovalEmailInput) {
+export function buildMentorApprovalEmailTemplate(
+  input: MentorApprovalEmailInput,
+) {
   const dashboardUrl = `${trimTrailingSlash(input.frontendBaseUrl)}/dashboard`;
   const intro = input.approved
     ? `Xin chúc mừng ${input.recipientName}! Hồ sơ Cố vấn (Mentor) của bạn đã được Ban quản trị phê duyệt.`
@@ -158,7 +196,9 @@ export function buildMentorApprovalEmailTemplate(input: MentorApprovalEmailInput
       : 'Thông báo kết quả xét duyệt hồ sơ Cố vấn',
     text: `${intro}\n\n${summary}\n\nTruy cập: ${dashboardUrl}`,
     html: renderEmailLayout({
-      title: input.approved ? 'Hồ sơ Cố vấn đã được phê duyệt' : 'Kết quả xét duyệt hồ sơ',
+      title: input.approved
+        ? 'Hồ sơ Cố vấn đã được phê duyệt'
+        : 'Kết quả xét duyệt hồ sơ',
       intro,
       summary,
       ctaLabel: input.approved ? 'Vào bảng điều khiển' : 'Cập nhật hồ sơ',
@@ -178,10 +218,14 @@ export type MentorBookingEmailInput = {
   logoUrl?: string | null;
 };
 
-export function buildMentorBookingNotificationEmailTemplate(input: MentorBookingEmailInput) {
+export function buildMentorBookingNotificationEmailTemplate(
+  input: MentorBookingEmailInput,
+) {
   const bookingsUrl = `${trimTrailingSlash(input.frontendBaseUrl)}/mentor/bookings`;
   const isPending = input.status === 'pending';
-  const statusLabel = isPending ? 'đã được ghi nhận và đang chờ thanh toán' : 'đã được xác nhận thành công';
+  const statusLabel = isPending
+    ? 'đã được ghi nhận và đang chờ thanh toán'
+    : 'đã được xác nhận thành công';
   const intro = `Xin chào Cố vấn ${input.recipientName}, học viên ${input.menteeName} đã đăng ký một buổi học mới cho khóa học “${input.courseTitle}” của bạn và ${statusLabel}.`;
   const summary = `Thời gian dự kiến: ${input.meetingTimeLabel}. ${
     isPending

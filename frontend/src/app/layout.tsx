@@ -6,6 +6,7 @@ import { cn } from "@/core/utils/cn";
 import { Providers } from "./providers";
 import { AuthProvider } from "./auth-provider";
 import { DeviceInitializer } from "@/shared/components/DeviceInitializer";
+import { FloatingSupport } from "@/shared/components/FloatingSupport";
 import "./global.css";
 
 const montserrat = Montserrat({
@@ -81,6 +82,7 @@ export default async function RootLayout({
             <AuthProvider session={session}>
               <DeviceInitializer />
               {children}
+              <FloatingSupport />
             </AuthProvider>
           </Providers>
         </NextIntlClientProvider>

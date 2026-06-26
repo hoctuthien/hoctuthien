@@ -15,7 +15,13 @@ import {
 import { Public } from 'src/common/decorators/public.decorator';
 import { Request, Response } from 'express';
 import { AuthService } from './services/auth.service';
-import { LoginDto, GoogleTokenDto, RegisterDto } from './dtos/auth.dto';
+import {
+  ForgotPasswordDto,
+  GoogleTokenDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from './dtos/auth.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { RateLimitFail } from 'src/common/decorators/rate-limit-fail.decorator';
@@ -70,6 +76,20 @@ export class AuthController {
       ip,
       deviceId: deviceId as string,
     });
+  }
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() payload: ForgotPasswordDto, @Ip() ip: string) {
+    return this.authService.requestPasswordReset(payload.email, { ip });
+  }
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() payload: ResetPasswordDto, @Ip() ip: string) {
+    return this.authService.resetPasswordWithOtp(payload, { ip });
   }
 
   @Public()

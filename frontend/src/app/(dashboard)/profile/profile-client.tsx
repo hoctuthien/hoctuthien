@@ -32,6 +32,7 @@ export function ProfileClient({ user }: { user: any }) {
   const [dayOfBirth, setDayOfBirth] = useState(user.dayOfBirth ? user.dayOfBirth.substring(0, 10) : '');
   const [gender, setGender] = useState(user.gender || 'other');
   const [timezone, setTimezone] = useState(user.timezone || 'Asia/Ho_Chi_Minh');
+  const [accountVerified, setAccountVerified] = useState(Boolean(user.isVerified));
 
   // Mentor Info Form States
   const [mentorProfile, setMentorProfile] = useState<any>(null);
@@ -57,6 +58,17 @@ export function ProfileClient({ user }: { user: any }) {
         .catch(() => setBadges([]));
     });
   }, []);
+
+  useEffect(() => {
+    authGateway
+      .getMe()
+      .then((res) => {
+        setAccountVerified(Boolean((res.user as any)?.isVerified));
+      })
+      .catch(() => {
+        setAccountVerified(Boolean(user.isVerified));
+      });
+  }, [user.isVerified]);
 
   // Fetch Mentor Profile if role is mentor
   useEffect(() => {
@@ -159,6 +171,13 @@ export function ProfileClient({ user }: { user: any }) {
   };
 
   const isMentor = user.role === 'mentor';
+  const initials = (name || user.email || '?')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part: string) => part[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="w-full font-sans">
@@ -169,11 +188,11 @@ export function ProfileClient({ user }: { user: any }) {
         <div className="absolute left-1/3 bottom-0 w-48 h-48 bg-indigo-500/10 rounded-full -ml-20 -mb-20 blur-2xl"></div>
 
         <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
-          <div className="w-24 h-24 rounded-2xl border-4 border-white/20 overflow-hidden bg-white/10 flex items-center justify-center text-4xl font-bold flex-shrink-0 shadow-lg">
+          <div className="w-24 h-24 rounded-2xl border-4 border-blue-100/90 overflow-hidden bg-white flex items-center justify-center text-4xl font-black text-blue-600 flex-shrink-0 shadow-lg shadow-blue-950/10">
             {avatarUrl ? (
               <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
             ) : (
-              name?.charAt(0).toUpperCase()
+              initials
             )}
           </div>
           <div className="flex-1 text-center md:text-left">
@@ -182,6 +201,14 @@ export function ProfileClient({ user }: { user: any }) {
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-3">
               <span className="bg-white/20 text-white font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md">
                 Vai trò: {user.role === 'mentor' ? 'Cố vấn (Mentor)' : user.role === 'admin' ? 'Quản trị viên' : 'Học viên (Mentee)'}
+              </span>
+              <span className={`flex items-center gap-1.5 font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md border ${
+                accountVerified
+                  ? 'bg-emerald-500/20 text-emerald-100 border-emerald-300/30'
+                  : 'bg-amber-500/25 text-amber-100 border-amber-300/30'
+              }`}>
+                {accountVerified ? <LuCheck size={12} /> : <LuTriangleAlert size={12} />}
+                <span>{accountVerified ? 'Tài khoản đã kích hoạt' : 'Tài khoản chưa kích hoạt'}</span>
               </span>
               {isMentor && mentorProfile && (
                 <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md ${

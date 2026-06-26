@@ -17,8 +17,8 @@ interface MentorProfile {
   linkedinUrl?: string;
   yearsOfExperience?: number;
   skills: string[];
-  averageRating: number;
-  totalStudents: number;
+  averageRating?: number | null;
+  totalStudents?: number | null;
   isApproved: boolean;
   status: string;
   user?: {
@@ -115,6 +115,8 @@ export default function MentorProfilePage() {
     { label: "Cố vấn học tập", href: "/mentorship" },
     { label: profile.user?.name || "Hồ sơ Cố vấn" },
   ];
+  const averageRating = Number(profile.averageRating ?? 0);
+  const totalStudents = Number(profile.totalStudents ?? 0);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -153,10 +155,10 @@ export default function MentorProfilePage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-4 mt-3">
-                <StarRating rating={Number(profile.averageRating) || 0} />
+                <StarRating rating={averageRating} />
                 <span className="flex items-center gap-1 text-xs font-bold text-slate-500">
                   <LuUsers size={13} />
-                  {profile.totalStudents} học viên
+                  {totalStudents} học viên
                 </span>
                 {profile.yearsOfExperience && (
                   <span className="flex items-center gap-1 text-xs font-bold text-slate-500">
@@ -246,8 +248,8 @@ export default function MentorProfilePage() {
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col gap-4">
               <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider">Thống kê</h2>
               {[
-                { label: "Đánh giá trung bình", value: `${Number(profile.averageRating).toFixed(1)} ⭐` },
-                { label: "Tổng học viên", value: profile.totalStudents.toString() },
+                { label: "Đánh giá trung bình", value: `${averageRating.toFixed(1)} ⭐` },
+                { label: "Tổng học viên", value: totalStudents.toString() },
                 { label: "Kinh nghiệm", value: profile.yearsOfExperience ? `${profile.yearsOfExperience} năm` : "—" },
                 { label: "Khóa học", value: courses.length.toString() },
               ].map(({ label, value }) => (

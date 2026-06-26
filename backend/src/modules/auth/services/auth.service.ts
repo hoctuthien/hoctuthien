@@ -1,12 +1,19 @@
-import { Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, MoreThan, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { randomInt } from 'crypto';
 import { UserEntity, UserRole } from '../../user/entities/user.entity';
 import { UserSessionEntity } from '../../user-session/entities/user-session.entity';
 import { IAuthService } from '../interfaces/auth.service.interface';
-import { LoginDto, RegisterDto } from '../dtos/auth.dto';
+import { LoginDto, RegisterDto, ResetPasswordDto } from '../dtos/auth.dto';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { REDIS_CLIENT } from 'src/modules/redis/redis.module';
 import Redis from 'ioredis';
@@ -15,6 +22,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserSessionService } from '../../user-session/services/user-session.service';
 import { ConflictException } from '@nestjs/common';
 import { MailService } from '../../mail/services/mail.service';
+import { OtpPurpose, OtpTokenEntity } from '../entities/otp-token.entity';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -30,6 +38,9 @@ export class AuthService implements IAuthService {
 
     @InjectRepository(UserSessionEntity)
     private readonly sessionRepository: Repository<UserSessionEntity>,
+
+    @InjectRepository(OtpTokenEntity)
+    private readonly otpRepository: Repository<OtpTokenEntity>,
 
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -223,6 +234,114 @@ export class AuthService implements IAuthService {
     };
   }
 
+  async requestPasswordReset(
+    email: string,
+    requestInfo?: { ip?: string },
+  ): Promise<{ message: string }> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await this.userRepository.findOne({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user) {
+      return {
+        message:
+          'Nếu email tồn tại trong hệ thống, mã OTP đặt lại mật khẩu đã được gửi.',
+      };
+    }
+
+    const otp = this.generateOtpCode();
+    const expiresInMinutes = 10;
+    const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+
+    await this.consumeActiveOtps(normalizedEmail, OtpPurpose.PASSWORD_RESET);
+
+    const codeHash = await bcrypt.hash(otp, 10);
+    const otpToken = this.otpRepository.create({
+      email: normalizedEmail,
+      userId: user.id,
+      purpose: OtpPurpose.PASSWORD_RESET,
+      codeHash,
+      expiresAt,
+      consumedAt: null,
+      attempts: 0,
+      metadata: {
+        ip: requestInfo?.ip || null,
+      },
+    });
+    await this.otpRepository.save(otpToken);
+
+    await this.mailService.sendPasswordResetOtpEmail({
+      to: user.email,
+      recipientName: user.name,
+      otp,
+      expiresInMinutes,
+    });
+
+    return {
+      message:
+        'Nếu email tồn tại trong hệ thống, mã OTP đặt lại mật khẩu đã được gửi.',
+    };
+  }
+
+  async resetPasswordWithOtp(
+    payload: ResetPasswordDto,
+    requestInfo?: { ip?: string },
+  ): Promise<{ message: string }> {
+    const normalizedEmail = payload.email.trim().toLowerCase();
+    const otp = payload.otp.trim();
+
+    const otpToken = await this.otpRepository.findOne({
+      where: {
+        email: normalizedEmail,
+        purpose: OtpPurpose.PASSWORD_RESET,
+        consumedAt: IsNull(),
+        expiresAt: MoreThan(new Date()),
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!otpToken) {
+      throw new BadRequestException('OTP không hợp lệ hoặc đã hết hạn.');
+    }
+
+    if (otpToken.attempts >= 5) {
+      otpToken.consumedAt = new Date();
+      await this.otpRepository.save(otpToken);
+      throw new BadRequestException('OTP đã vượt quá số lần thử cho phép.');
+    }
+
+    const isMatch = await bcrypt.compare(otp, otpToken.codeHash);
+    if (!isMatch) {
+      otpToken.attempts += 1;
+      otpToken.metadata = {
+        ...(otpToken.metadata || {}),
+        lastFailedIp: requestInfo?.ip || null,
+      };
+      await this.otpRepository.save(otpToken);
+      throw new BadRequestException('OTP không hợp lệ hoặc đã hết hạn.');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: otpToken.userId || undefined, email: normalizedEmail },
+    });
+    if (!user) {
+      throw new BadRequestException('OTP không hợp lệ hoặc đã hết hạn.');
+    }
+
+    user.passwordHash = await bcrypt.hash(payload.newPassword, 10);
+    await this.userRepository.save(user);
+
+    otpToken.consumedAt = new Date();
+    otpToken.metadata = {
+      ...(otpToken.metadata || {}),
+      resetIp: requestInfo?.ip || null,
+    };
+    await this.otpRepository.save(otpToken);
+
+    return { message: 'Đặt lại mật khẩu thành công.' };
+  }
+
   async refreshTokens(refreshToken: string, deviceId: string) {
     try {
       const requestDevice = this.requireDeviceId(deviceId);
@@ -252,7 +371,8 @@ export class AuthService implements IAuthService {
         // Adjust for timezone offset parsing shift since deletedAt column in BaseEntity
         // doesn't have timezone specification (defaults to timestamp without time zone)
         const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
-        const deletedTime = new Date(session.deletedAt).getTime() - timezoneOffsetMs;
+        const deletedTime =
+          new Date(session.deletedAt).getTime() - timezoneOffsetMs;
         const now = Date.now();
         const gracePeriodMs = 30 * 1000; // 30 seconds grace period
         if (now - deletedTime > gracePeriodMs) {
@@ -316,8 +436,6 @@ export class AuthService implements IAuthService {
         deviceId: requestDevice,
       };
       const tokens = await this.generateTokens(newPayload);
-
-
 
       return {
         user: {
@@ -387,6 +505,21 @@ export class AuthService implements IAuthService {
         now.setDate(now.getDate() + 7);
     }
     return now;
+  }
+
+  private generateOtpCode(): string {
+    return randomInt(0, 1000000).toString().padStart(6, '0');
+  }
+
+  private async consumeActiveOtps(email: string, purpose: OtpPurpose) {
+    await this.otpRepository
+      .createQueryBuilder()
+      .update(OtpTokenEntity)
+      .set({ consumedAt: new Date() })
+      .where('email = :email', { email })
+      .andWhere('purpose = :purpose', { purpose })
+      .andWhere('consumed_at IS NULL')
+      .execute();
   }
 
   async validateGoogleUser(googleUser: any, deviceId?: string) {

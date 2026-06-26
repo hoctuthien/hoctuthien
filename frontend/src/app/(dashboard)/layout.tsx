@@ -1,21 +1,19 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Header } from '@/shared/components/layout/Header';
 import { Footer } from '@/shared/components/layout/Footer';
-import { 
-  LuLayers, 
-  LuBookOpen, 
-  LuSearch, 
-  LuUser, 
-  LuCalendar, 
+import {
+  LuBookOpen,
+  LuCalendar,
   LuCalendarDays,
-  LuBug
+  LuLayers,
+  LuSearch,
+  LuUser,
 } from 'react-icons/lu';
-import { ReportBugModal } from '@/shared/components/ReportBugModal';
 
 interface SidebarItem {
   label: string;
@@ -30,7 +28,6 @@ export default function DashboardLayout({
 }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
-  const [bugReportOpen, setBugReportOpen] = useState(false);
 
   if (status === 'loading') {
     return (
@@ -45,8 +42,7 @@ export default function DashboardLayout({
 
   const isMentor = session?.user?.role === 'mentor';
 
-  // Sidebar links based on role
-  const sidebarItems: SidebarItem[] = isMentor 
+  const sidebarItems: SidebarItem[] = isMentor
     ? [
         { label: 'Bảng điều khiển', href: '/dashboard', icon: <LuLayers size={18} /> },
         { label: 'Lịch', href: '/calendar', icon: <LuCalendar size={18} /> },
@@ -65,32 +61,29 @@ export default function DashboardLayout({
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFBFD]">
       <Header />
-      
+
       <div className="flex-grow pt-20">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            
-            {/* Dashboard Sidebar Container */}
             <aside className="lg:col-span-1">
-              {/* Desktop Sidebar (visible on lg and up) */}
               <div className="hidden lg:flex flex-col gap-6 bg-white border border-[#E2E8F0] rounded-[32px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.005)]">
                 <div className="flex flex-col gap-1 border-b border-[#F1F5F9] pb-4 px-2">
                   <span className="text-[10px] text-[#94A3B8] font-black uppercase tracking-widest">
-                    {isMentor ? 'Khu vực Cố vấn' : 'Khu vực Học viên'}
+                    {isMentor ? 'Khu vực cố vấn' : 'Khu vực học viên'}
                   </span>
                   <span className="font-black text-sm text-[#0F172A] tracking-tight">Cài đặt tài khoản</span>
                 </div>
-                
+
                 <nav className="flex flex-col gap-1.5">
                   {sidebarItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (
-                      <Link 
-                        key={item.href} 
+                      <Link
+                        key={item.href}
                         href={item.href}
                         className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black transition-all no-underline ${
-                          isActive 
-                            ? 'bg-gradient-to-r from-[#005BBF] to-[#004493] text-white shadow-lg shadow-[#005BBF]/15' 
+                          isActive
+                            ? 'bg-gradient-to-r from-[#005BBF] to-[#004493] text-white shadow-lg shadow-[#005BBF]/15'
                             : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/50'
                         }`}
                       >
@@ -102,60 +95,37 @@ export default function DashboardLayout({
                     );
                   })}
                 </nav>
-                
-                <div className="border-t border-[#F1F5F9] pt-4">
-                  <button
-                    onClick={() => setBugReportOpen(true)}
-                    className="w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black text-amber-600 hover:text-white hover:bg-amber-500 transition-all cursor-pointer text-left border-0 bg-transparent"
-                  >
-                    <LuBug size={18} />
-                    <span>Báo lỗi hệ thống</span>
-                  </button>
-                </div>
               </div>
 
-              {/* Mobile Navigation (visible below lg) */}
               <div className="lg:hidden w-full bg-white border border-[#E2E8F0] rounded-2xl p-3 shadow-sm mb-4 overflow-x-auto whitespace-nowrap scrollbar-hide flex gap-2">
                 {sidebarItems.map((item) => {
                   const isActive = pathname === item.href;
                   return (
-                    <Link 
-                      key={item.href} 
+                    <Link
+                      key={item.href}
                       href={item.href}
                       className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all no-underline ${
-                        isActive 
-                          ? 'bg-gradient-to-r from-[#005BBF] to-[#004493] text-white' 
+                        isActive
+                          ? 'bg-gradient-to-r from-[#005BBF] to-[#004493] text-white'
                           : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/50'
                       }`}
                     >
-                      <div>
-                        {item.icon}
-                      </div>
+                      <div>{item.icon}</div>
                       <span>{item.label}</span>
                     </Link>
                   );
                 })}
-                <button
-                  onClick={() => setBugReportOpen(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black text-amber-600 hover:bg-amber-50 transition-all cursor-pointer border-0 bg-transparent"
-                >
-                  <LuBug size={18} />
-                  <span>Báo lỗi</span>
-                </button>
               </div>
             </aside>
 
-            {/* Main Content Area */}
             <main className="lg:col-span-3 min-w-0">
               {children}
             </main>
-
           </div>
         </div>
       </div>
 
       <Footer />
-      <ReportBugModal isOpen={bugReportOpen} onClose={() => setBugReportOpen(false)} />
     </div>
   );
 }

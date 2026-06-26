@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import nodemailer, { Transporter } from 'nodemailer';
 import {
   buildCourseBookingEmailTemplate,
+  buildPasswordResetOtpEmailTemplate,
   buildRegistrationEmailTemplate,
   buildMentorBookingNotificationEmailTemplate,
   buildMentorApprovalEmailTemplate,
@@ -52,7 +53,8 @@ export class MailService {
 
   constructor(private readonly configService: ConfigService) {
     this.enabled = this.configService.get<boolean>('mail.enabled') ?? false;
-    this.fromName = this.configService.get<string>('mail.fromName') || 'HocTuThien';
+    this.fromName =
+      this.configService.get<string>('mail.fromName') || 'HocTuThien';
     this.fromEmail = this.configService.get<string>('mail.fromEmail') || '';
     this.replyTo = this.configService.get<string>('mail.replyTo') || undefined;
     this.frontendBaseUrl = this.trimTrailingSlash(
@@ -65,7 +67,9 @@ export class MailService {
 
     if (!this.enabled) {
       this.transporter = null;
-      this.logger.log('Mail service is disabled. Email delivery will be skipped.');
+      this.logger.log(
+        'Mail service is disabled. Email delivery will be skipped.',
+      );
       return;
     }
 
@@ -119,6 +123,28 @@ export class MailService {
   async sendRegistrationEmail(input: RegistrationMailInput) {
     const template = buildRegistrationEmailTemplate({
       recipientName: input.recipientName,
+      frontendBaseUrl: this.frontendBaseUrl,
+      logoUrl: this.getLogoUrl(),
+    });
+
+    await this.sendMail({
+      to: input.to,
+      subject: template.subject,
+      text: template.text,
+      html: template.html,
+    });
+  }
+
+  async sendPasswordResetOtpEmail(input: {
+    to: string;
+    recipientName: string;
+    otp: string;
+    expiresInMinutes: number;
+  }) {
+    const template = buildPasswordResetOtpEmailTemplate({
+      recipientName: input.recipientName,
+      otp: input.otp,
+      expiresInMinutes: input.expiresInMinutes,
       frontendBaseUrl: this.frontendBaseUrl,
       logoUrl: this.getLogoUrl(),
     });
@@ -193,7 +219,9 @@ export class MailService {
 
   async sendMail(input: SendMailInput) {
     if (!this.enabled || !this.transporter) {
-      this.logger.debug(`Skipped email "${input.subject}" to ${input.to} because mail is disabled.`);
+      this.logger.debug(
+        `Skipped email "${input.subject}" to ${input.to} because mail is disabled.`,
+      );
       return;
     }
 
@@ -216,7 +244,9 @@ export class MailService {
   }
 
   private formatFromAddress() {
-    return this.fromName ? `${this.fromName} <${this.fromEmail}>` : this.fromEmail;
+    return this.fromName
+      ? `${this.fromName} <${this.fromEmail}>`
+      : this.fromEmail;
   }
 
   private getLogoUrl() {

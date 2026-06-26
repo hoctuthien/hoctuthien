@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Breadcrumb } from '@shared';
 import { courseBookingGateway, courseGateway, authGateway } from '@/core/gateway';
 import { useSession } from 'next-auth/react';
@@ -9,7 +9,8 @@ import {
   LuPlus, 
   LuArrowRight, 
   LuGraduationCap,
-  LuInfo
+  LuInfo,
+  LuUserPlus
 } from 'react-icons/lu';
 
 // Import SOLID Subcomponents
@@ -221,6 +222,14 @@ export default function DashboardClient() {
           >
             <span>Khám phá ngay</span>
             <LuArrowRight size={14} />
+          </button>
+
+          <button
+            onClick={() => window.location.href = '/mentor/register'}
+            className="bg-indigo-950/25 hover:bg-indigo-950/35 text-white border border-white/20 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            <LuUserPlus size={14} />
+            <span>Gửi đơn làm Cố vấn</span>
           </button>
         </div>
       )}

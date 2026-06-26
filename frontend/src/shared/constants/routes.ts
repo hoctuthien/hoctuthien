@@ -23,7 +23,7 @@ export const DASHBOARD_ROUTES = [
 export const PUBLIC_USER_ROUTES = ["/", "/courses", "/posts", "/homepage", "/mentorship"] as const;
 
 /** Routes xác thực (login, register) */
-export const AUTH_ROUTES = ["/login", "/register"] as const;
+export const AUTH_ROUTES = ["/login", "/register", "/forgot-password"] as const;
 
 /** Trang mặc định theo role sau khi đăng nhập */
 export const DEFAULT_REDIRECT: Record<UserRole, string> = {
