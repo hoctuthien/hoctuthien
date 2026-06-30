@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import { LuCheck } from 'react-icons/lu';
 import { cn } from '@/core/utils/cn';
@@ -18,13 +19,14 @@ interface TimelineProps {
 }
 
 export const Timeline: React.FC<TimelineProps> = ({ items, className }) => {
+  const tExtracted = useTranslations('Extracted.sharedComponentsTimelineTimeline');
   return (
     <div className={cn('flex flex-col p-6 bg-[#F1F7FF] rounded-[32px] max-w-[380px] font-sans antialiased', className)}>
-      <h2 className="text-[22px] font-bold text-[#3b60c0] mb-8 tracking-tight">Connection Lifecycle</h2>
+      <h2 className="text-[22px] font-bold text-[#3b60c0] mb-8 tracking-tight">{tExtracted('connectionLifecycle')}</h2>
       <div className="flex flex-col">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
-          
+
           return (
             <div key={item.id} className="flex gap-6 group">
               <div className="relative flex flex-col items-center">
@@ -46,13 +48,13 @@ export const Timeline: React.FC<TimelineProps> = ({ items, className }) => {
               <div className="pt-1.5 pb-10">
                 <h4 className={cn(
                   'text-[15px] font-bold uppercase tracking-wider mb-0.5 leading-none',
-                  item.status === 'future' ? 'text-[#9CA3AF]' : 'text-[#1e293b]'
+                  item.status === 'future' ? "text-[#9CA3AF]" : "text-[#1e293b]"
                 )}>
                   {item.title}
                 </h4>
                 <p className={cn(
                   'text-[13px] font-medium leading-relaxed',
-                  item.status === 'future' ? 'text-[#9CA3AF]/70' : 'text-[#64748b]'
+                  item.status === 'future' ? "text-[#9CA3AF]/70" : "text-[#64748b]"
                 )}>
                   {item.description}
                 </p>

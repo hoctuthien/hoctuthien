@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -26,6 +27,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const tExtracted = useTranslations('Extracted.appDashboardLayout');
   const { data: session, status } = useSession();
   const pathname = usePathname();
 
@@ -34,7 +36,7 @@ export default function DashboardLayout({
       <div className="w-full bg-[#FAFBFD] min-h-screen flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
-          <p className="text-xs font-black text-[#64748B] uppercase tracking-widest font-sans">Đang tải bố cục...</p>
+          <p className="text-xs font-black text-[#64748B] uppercase tracking-widest font-sans">{tExtracted('dangTaiBoCuc')}</p>
         </div>
       </div>
     );
@@ -44,18 +46,18 @@ export default function DashboardLayout({
 
   const sidebarItems: SidebarItem[] = isMentor
     ? [
-        { label: 'Bảng điều khiển', href: '/dashboard', icon: <LuLayers size={18} /> },
-        { label: 'Lịch', href: '/calendar', icon: <LuCalendar size={18} /> },
-        { label: 'Lịch dạy của tôi', href: '/mentor/bookings', icon: <LuCalendarDays size={18} /> },
-        { label: 'Khóa học đã tạo', href: '/mentor/courses', icon: <LuBookOpen size={18} /> },
-        { label: 'Hồ sơ cá nhân', href: '/profile', icon: <LuUser size={18} /> },
+        { label: tExtracted('bangDieuKhien'), href: '/dashboard', icon: <LuLayers size={18} /> },
+        { label: tExtracted('lich'), href: '/calendar', icon: <LuCalendar size={18} /> },
+        { label: tExtracted('lichDayCuaToi'), href: '/mentor/bookings', icon: <LuCalendarDays size={18} /> },
+        { label: tExtracted('khoaHocDaTao'), href: '/mentor/courses', icon: <LuBookOpen size={18} /> },
+        { label: tExtracted('hoSoCaNhan'), href: '/profile', icon: <LuUser size={18} /> },
       ]
     : [
-        { label: 'Bảng điều khiển', href: '/dashboard', icon: <LuLayers size={18} /> },
-        { label: 'Lịch', href: '/calendar', icon: <LuCalendar size={18} /> },
-        { label: 'Lịch học của tôi', href: '/my-courses', icon: <LuCalendarDays size={18} /> },
-        { label: 'Khám phá khóa học', href: '/courses', icon: <LuSearch size={18} /> },
-        { label: 'Hồ sơ cá nhân', href: '/profile', icon: <LuUser size={18} /> },
+        { label: tExtracted('bangDieuKhien'), href: '/dashboard', icon: <LuLayers size={18} /> },
+        { label: tExtracted('lich'), href: '/calendar', icon: <LuCalendar size={18} /> },
+        { label: tExtracted('lichHocCuaToi'), href: '/my-courses', icon: <LuCalendarDays size={18} /> },
+        { label: tExtracted('khamPhaKhoaHoc'), href: '/courses', icon: <LuSearch size={18} /> },
+        { label: tExtracted('hoSoCaNhan'), href: '/profile', icon: <LuUser size={18} /> },
       ];
 
   return (
@@ -69,9 +71,9 @@ export default function DashboardLayout({
               <div className="hidden lg:flex flex-col gap-6 bg-white border border-[#E2E8F0] rounded-[32px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.005)]">
                 <div className="flex flex-col gap-1 border-b border-[#F1F5F9] pb-4 px-2">
                   <span className="text-[10px] text-[#94A3B8] font-black uppercase tracking-widest">
-                    {isMentor ? 'Khu vực cố vấn' : 'Khu vực học viên'}
+                    {isMentor ? tExtracted('khuVucCoVan') : tExtracted('khuVucHocVien')}
                   </span>
-                  <span className="font-black text-sm text-[#0F172A] tracking-tight">Cài đặt tài khoản</span>
+                  <span className="font-black text-sm text-[#0F172A] tracking-tight">{tExtracted('caiDatTaiKhoan')}</span>
                 </div>
 
                 <nav className="flex flex-col gap-1.5">
@@ -83,11 +85,11 @@ export default function DashboardLayout({
                         href={item.href}
                         className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-black transition-all no-underline ${
                           isActive
-                            ? 'bg-gradient-to-r from-[#005BBF] to-[#004493] text-white shadow-lg shadow-[#005BBF]/15'
-                            : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/50'
+                            ? "bg-gradient-to-r from-[#005BBF] to-[#004493] text-white shadow-lg shadow-[#005BBF]/15"
+                            : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/50"
                         }`}
                       >
-                        <div className={isActive ? 'text-white' : 'text-slate-500'}>
+                        <div className={isActive ? "text-white" : "text-slate-500"}>
                           {item.icon}
                         </div>
                         <span>{item.label}</span>
@@ -106,8 +108,8 @@ export default function DashboardLayout({
                       href={item.href}
                       className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all no-underline ${
                         isActive
-                          ? 'bg-gradient-to-r from-[#005BBF] to-[#004493] text-white'
-                          : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/50'
+                          ? "bg-gradient-to-r from-[#005BBF] to-[#004493] text-white"
+                          : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/50"
                       }`}
                     >
                       <div>{item.icon}</div>

@@ -33,8 +33,7 @@ export const DateRangePicker = ({
   error,
   helperText,
   status: providedStatus,
-}: DateRangePickerProps) => {
-  const [range, setRange] = useState<DateRange | undefined>(value);
+}: DateRangePickerProps) => {  const [range, setRange] = useState<DateRange | undefined>(value);
   const id = useId();
 
   const handleSelect = (selectedRange: DateRange | undefined) => {

@@ -20,6 +20,7 @@ import { signIn } from "next-auth/react";
 import { ensureDeviceId } from "@/shared/utils/device";
 
 export function RegisterForm() {
+  const tExtracted = useTranslations('Extracted.appAuthRegisterComponentsRegisterForm');
   const t = useTranslations("Auth");
   const tError = useTranslations("Error");
   const router = useRouter();
@@ -124,9 +125,9 @@ export function RegisterForm() {
       >
         <Input
           id="register-name"
-          label={t("fullName") || "Full Name"}
+          label={t('fullName') || tExtracted('fullName')}
           type="text"
-          placeholder="Nguyen Van A"
+          placeholder={tExtracted('nguyenVanA')}
           error={errors.name?.message}
           autoComplete="name"
           containerClassName="gap-1.5"
@@ -140,7 +141,7 @@ export function RegisterForm() {
         />
         <Input
           id="register-email"
-          label={t("emailAddress")}
+          label={t('emailAddress')}
           type="email"
           placeholder="example@academic.edu"
           error={errors.email?.message}
@@ -157,7 +158,7 @@ export function RegisterForm() {
 
         <Input
           id="register-password"
-          label={t("password")}
+          label={t('password')}
           type={showPassword ? "text" : "password"}
           placeholder="••••••••"
           error={errors.password?.message}
@@ -175,7 +176,7 @@ export function RegisterForm() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="text-text-muted hover:text-text-heading transition-colors cursor-pointer focus:outline-none"
-              aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+              aria-label={showPassword ? t('hidePassword') : t('showPassword')}
               tabIndex={-1}
             >
               <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
@@ -185,7 +186,7 @@ export function RegisterForm() {
 
         <Input
           id="register-confirmPassword"
-          label={t("confirmPassword")}
+          label={t('confirmPassword')}
           type={showConfirmPassword ? "text" : "password"}
           placeholder="••••••••"
           error={errors.confirmPassword?.message}
@@ -197,7 +198,7 @@ export function RegisterForm() {
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="text-text-muted hover:text-text-heading transition-colors cursor-pointer focus:outline-none"
-              aria-label={showConfirmPassword ? t("hidePassword") : t("showPassword")}
+              aria-label={showConfirmPassword ? t('hidePassword') : t('showPassword')}
               tabIndex={-1}
             >
               <Icon name={showConfirmPassword ? "EyeOff" : "Eye"} size={20} />
@@ -216,12 +217,12 @@ export function RegisterForm() {
                 onChange={field.onChange}
                 label={
                   <span className="text-xs">
-                    {t("agreeToTerms")}{" "}
+                    {t('agreeToTerms')}{" "}
                     <Link
                       href="/terms"
                       className="text-primary font-semibold hover:underline"
                     >
-                      {t("termsOfService")}
+                      {t('termsOfService')}
                     </Link>
                   </span>
                 }
@@ -244,8 +245,8 @@ export function RegisterForm() {
           label={
             <span className="flex items-center justify-center gap-2">
               {isSubmitting
-                ? t("signingUp")
-                : t("createAccount")}
+                ? t('signingUp')
+                : t('createAccount')}
               {!isSubmitting && <Icon name="ArrowRight" size={18} />}
             </span>
           }
@@ -271,7 +272,7 @@ export function RegisterForm() {
         <AuthDivider text={t("orQuickAuth")} />
         <div className="mt-4">
           <GoogleSignInButton
-            label={t("signUpWithGoogle")}
+            label={t('signUpWithGoogle')}
             onClick={() => handleSocialSignIn("google")}
             loading={isGoogleLoading}
           />

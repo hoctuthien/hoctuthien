@@ -22,7 +22,7 @@ import {
 } from 'react-icons/lu';
 
 export function BugReportsClient() {
-  const t = useTranslations('Admin.bugReports');
+  const tExtracted = useTranslations('Extracted.appAdminBugReportsBugReportsClient');  const t = useTranslations('Admin.bugReports');
   const [reports, setReports] = useState<BugReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,10 +65,10 @@ export function BugReportsClient() {
     if (!window.confirm(t('deleteConfirm'))) return;
     try {
       await bugReportGateway.removeById(id);
-      showToast('success', t('deleteSuccess'));
+      showToast("success", t('deleteSuccess'));
       fetchReports();
     } catch {
-      showToast('error', t('deleteError'));
+      showToast("error", t('deleteError'));
     }
   };
 
@@ -104,8 +104,8 @@ export function BugReportsClient() {
         <div
           className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-2xl shadow-xl border text-sm font-semibold animate-in slide-in-from-bottom duration-300 ${
             toastMsg.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-red-50 border-red-200 text-red-800'
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-red-50 border-red-200 text-red-800"
           }`}
         >
           {toastMsg.type === 'success' ? <LuCheck size={16} /> : <LuX size={16} />}
@@ -119,7 +119,7 @@ export function BugReportsClient() {
           report={selectedReport}
           onClose={() => setSelectedReport(null)}
           onUpdated={() => {
-            showToast('success', t('updateSuccess'));
+            showToast("success", t('updateSuccess'));
             fetchReports();
           }}
         />
@@ -143,10 +143,10 @@ export function BugReportsClient() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         {[
-          { label: t('statTotal'), value: counts.all, color: 'from-slate-700 to-slate-800', icon: <LuFileText size={18} className="text-white/70" /> },
-          { label: t('statPending'), value: counts.open, color: 'from-violet-500 to-violet-600', icon: <LuClock size={18} className="text-white/70" /> },
-          { label: t('statCritical'), value: criticalCount, color: 'from-red-500 to-rose-600', icon: <LuTriangleAlert size={18} className="text-white/70" /> },
-          { label: t('statResolved'), value: counts.resolved, color: 'from-emerald-500 to-emerald-600', icon: <LuCheck size={18} className="text-white/70" /> },
+          { label: t('statTotal'), value: counts.all, color: "from-slate-700 to-slate-800", icon: <LuFileText size={18} className="text-white/70" /> },
+          { label: t('statPending'), value: counts.open, color: "from-violet-500 to-violet-600", icon: <LuClock size={18} className="text-white/70" /> },
+          { label: t('statCritical'), value: criticalCount, color: "from-red-500 to-rose-600", icon: <LuTriangleAlert size={18} className="text-white/70" /> },
+          { label: t('statResolved'), value: counts.resolved, color: "from-emerald-500 to-emerald-600", icon: <LuCheck size={18} className="text-white/70" /> },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -184,14 +184,14 @@ export function BugReportsClient() {
             onClick={() => setFilterStatus(opt.value)}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
               filterStatus === opt.value
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'
+                ? "bg-slate-900 text-white shadow-md"
+                : "bg-white text-slate-600 border border-slate-200 hover:border-slate-400"
             }`}
           >
             {opt.label}
             <span
               className={`ml-2 text-xs px-1.5 py-0.5 rounded-md ${
-                filterStatus === opt.value ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                filterStatus === opt.value ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
               }`}
             >
               {counts[opt.value as keyof typeof counts] ?? counts.all}
@@ -202,7 +202,7 @@ export function BugReportsClient() {
           onClick={fetchReports}
           variant="outline"
           label={t('reload')}
-          iconLeft={<LuRefreshCw size={14} className={loading ? 'animate-spin' : ''} />}
+          iconLeft={<LuRefreshCw size={14} className={loading ? "animate-spin" : ''} />}
           size="sm"
           className="ml-auto rounded-xl"
         />
@@ -254,18 +254,18 @@ export function BugReportsClient() {
                   {/* Left: Icon */}
                   <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
                     report.severity === 'critical'
-                      ? 'bg-red-100'
+                      ? "bg-red-100"
                       : report.severity === 'high'
-                      ? 'bg-orange-100'
-                      : 'bg-slate-100'
+                      ? "bg-orange-100"
+                      : "bg-slate-100"
                   }`}>
                     <LuBug
                       className={
                         report.severity === 'critical'
-                          ? 'text-red-600'
+                          ? "text-red-600"
                           : report.severity === 'high'
-                          ? 'text-orange-600'
-                          : 'text-slate-500'
+                          ? "text-orange-600"
+                          : "text-slate-500"
                       }
                       size={18}
                     />
@@ -290,7 +290,7 @@ export function BugReportsClient() {
                       {report.userId && (
                         <span className="flex items-center gap-1">
                           <LuUser size={11} />
-                          User:{' '}
+                          {tExtracted('user')}{' '}
                           <code className="font-mono text-slate-600">{report.userId.slice(0, 8)}…</code>
                         </span>
                       )}

@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/core/utils/cn";
 
 export const AdminSidebar = ({ isCollapsed, onToggle }: { isCollapsed: boolean; onToggle: () => void }) => {
+  const tExtracted = useTranslations('Extracted.appAdminComponentsAdminSidebar');
   const pathname = usePathname();
   const t = useTranslations("Admin.sidebar");
 
@@ -18,7 +19,7 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: { isCollapsed: boolean; 
     { label: t("mentors"), href: "/admin/mentors", icon: "ClipboardList" },
     { label: t("users"), href: "/admin/users", icon: "ShieldCheck" },
     { label: t("courses"), href: "/admin/courses", icon: "BookOpen" },
-    { label: "Chiến dịch", href: "/admin/campaigns", icon: "Target" },
+    { label: tExtracted('chienDich'), href: "/admin/campaigns", icon: "Target" },
     { label: t("penaltyTickets"), href: "/admin/penalty-tickets", icon: "AlertTriangle" },
     { label: t("bugReports"), href: "/admin/bug-reports", icon: "Bug" },
     { label: t("posts"), href: "/admin/posts", icon: "FileText" },
@@ -34,10 +35,9 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: { isCollapsed: boolean; 
           "px-7 pt-2 flex flex-col transition-all duration-300",
           isCollapsed ? "opacity-0 invisible" : "opacity-100 visible"
         )}>
-          <h1 className="text-xl font-bold text-[#2D89FF] tracking-tight">Admin Console</h1>
+          <h1 className="text-xl font-bold text-[#2D89FF] tracking-tight">{tExtracted('adminConsole')}</h1>
           <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">
-            Mentorship Governance
-          </p>
+            {tExtracted('mentorshipGovernance')}</p>
         </div>
       }
       footer={
@@ -45,10 +45,10 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: { isCollapsed: boolean; 
           "p-4 transition-all duration-300",
           isCollapsed ? "opacity-0 invisible" : "opacity-100 visible"
         )}>
-          <Button 
-            label="Review Queue" 
-            variant="primary" 
-            className="w-full justify-center !rounded-xl !py-3 shadow-lg shadow-primary/20" 
+          <Button
+            label={tExtracted('reviewQueue')}
+            variant="primary"
+            className="w-full justify-center !rounded-xl !py-3 shadow-lg shadow-primary/20"
           />
         </div>
       }

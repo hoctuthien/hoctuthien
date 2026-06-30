@@ -13,15 +13,14 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   variant = 'rectangular',
   width,
   height
-}) => {
-  return (
+}) => {  return (
     <div
       className={cn(
         'animate-pulse bg-gray-200',
         {
-          'rounded-md': variant === 'rectangular',
-          'rounded-full': variant === 'circular',
-          'h-4 w-full rounded': variant === 'text',
+          "rounded-md": variant === 'rectangular',
+          "rounded-full": variant === 'circular',
+          "h-4 w-full rounded": variant === 'text',
         },
         className
       )}

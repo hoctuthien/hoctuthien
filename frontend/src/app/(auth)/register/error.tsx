@@ -11,6 +11,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const tExtracted = useTranslations('Extracted.appAuthRegisterError');
   const t = useTranslations("Error");
   const tCommon = useTranslations("Common");
 
@@ -28,7 +29,7 @@ export default function Error({
         {t("registerPageError")}
       </p>
       <Button
-        label={tCommon("tryAgain")}
+        label={tCommon('tryAgain')}
         onClick={() => reset()}
         variant="primary"
         size="md"

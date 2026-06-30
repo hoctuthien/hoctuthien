@@ -19,23 +19,22 @@ const sizeConfig = {
   large: { w: '128px', h: '128px', r: '48px' },
 };
 
-export const Avatar = ({ 
-  src, 
-  alt = 'Avatar', 
-  size = 'medium', 
-  badge, 
-  className = '' 
-}: AvatarProps) => {
-  const config = sizeConfig[size];
+export const Avatar = ({
+  src,
+  alt = 'Avatar',
+  size = 'medium',
+  badge,
+  className = ''
+}: AvatarProps) => {  const config = sizeConfig[size];
   const isSmall = size === 'small';
-  
+
   return (
     <div className={cn('relative inline-block shrink-0', className)}>
-      <div 
-        style={{ 
-          width: config.w, 
-          height: config.h, 
-          borderRadius: config.r 
+      <div
+        style={{
+          width: config.w,
+          height: config.h,
+          borderRadius: config.r
         }}
         className={cn(
           'overflow-hidden bg-white border border-blue-100 flex items-center justify-center shadow-[0_2px_8px_rgba(37,99,235,0.08)]',
@@ -43,11 +42,11 @@ export const Avatar = ({
         )}
       >
         {src ? (
-          <Image 
-            src={src} 
-            alt={alt} 
+          <Image
+            src={src}
+            alt={alt}
             fill
-            sizes={size === 'large' ? '128px' : size === 'medium' ? '80px' : '48px'}
+            sizes={size === 'large' ? "128px" : size === 'medium' ? "80px" : "48px"}
             className="object-cover"
           />
         ) : (

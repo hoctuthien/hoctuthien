@@ -18,6 +18,7 @@ const Step2ExpertiseBio = dynamic(() => import("./components").then(mod => mod.S
 const Step3Credentials = dynamic(() => import("./components").then(mod => mod.Step3Credentials));
 
 export default function MentorRegisterClient() {
+  const tExtracted = useTranslations('Extracted.appDashboardMentorRegisterMentorRegisterClient');
   const t = useTranslations("MentorRegister");
   const [currentStep, setCurrentStep] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -84,7 +85,7 @@ export default function MentorRegisterClient() {
   return (
     <div className="min-h-screen bg-[#F7F9FB] flex items-center justify-center py-10 md:py-20 px-4">
       <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center lg:items-start">
-        
+
         {/* Left Side: Info & Progress */}
         <div className="lg:col-span-5 flex flex-col gap-8">
           <div className="flex flex-col gap-4">
@@ -122,9 +123,9 @@ export default function MentorRegisterClient() {
 
           <div className="mt-auto hidden lg:block">
             <div className="relative rounded-3xl overflow-hidden aspect-video shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=1000" 
-                alt="Mentorship" 
+              <img
+                src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=1000"
+                alt={tExtracted('mentorship')}
                 className="object-cover w-full h-full"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
@@ -137,7 +138,7 @@ export default function MentorRegisterClient() {
         {/* Right Side: Form */}
         <div className="lg:col-span-7 h-full">
           <div className="bg-white rounded-[24px] md:rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-50 p-6 md:p-8 lg:p-12 min-h-[600px] lg:min-h-[720px] flex flex-col transition-all duration-500">
-            
+
             {/* Horizontal Steps Header */}
             <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
               {STEPS.map((step, idx) => (
@@ -145,7 +146,7 @@ export default function MentorRegisterClient() {
                   <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3 flex-1 px-1">
                     <div className={cn(
                       "w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all duration-300 flex-shrink-0",
-                      currentStep === idx ? "bg-primary text-white shadow-lg shadow-primary/20" : 
+                      currentStep === idx ? "bg-primary text-white shadow-lg shadow-primary/20" :
                       currentStep > idx ? "bg-green-500 text-white" : "bg-slate-100 text-slate-400"
                     )}>
                       {currentStep > idx ? <Icon name="Check" size={14} /> : idx + 1}
@@ -169,7 +170,7 @@ export default function MentorRegisterClient() {
                 {currentStep === 0 && (
                   <Step1ProfessionalDetails form={form} />
                 )}
-                
+
                 {currentStep === 1 && (
                   <Step2ExpertiseBio form={form} />
                 )}
@@ -190,25 +191,25 @@ export default function MentorRegisterClient() {
                 </button>
 
                 {currentStep < STEPS.length - 1 ? (
-                  <Button 
+                  <Button
                     key="next-btn"
-                    type="button" 
+                    type="button"
                     onClick={nextStep}
                     label={
                       <div className="flex items-center">
-                        {t("nextStep")}
+                        {t('nextStep')}
                         <Icon name="ArrowRight" className="ml-2" size={20} />
                       </div>
                     }
                     className="h-[54px] px-10 rounded-2xl shadow-xl shadow-primary/20"
                   />
                 ) : (
-                  <Button 
+                  <Button
                     key="submit-btn"
                     type="submit"
                     label={
                       <div className="flex items-center">
-                        {t("completeProfile")}
+                        {t('completeProfile')}
                         <Icon name="Check" className="ml-2" size={20} />
                       </div>
                     }
@@ -248,16 +249,16 @@ export default function MentorRegisterClient() {
 
           {/* Text Content */}
           <h3 className="mb-4 text-4xl font-black tracking-tight text-[#181C20] bg-clip-text text-transparent bg-gradient-to-r from-[#181C20] to-[#414754]">
-            {t("successTitle") || "Chúc mừng!"}
+            {t("successTitle") || tExtracted('chucMung')}
           </h3>
-          
+
           <p className="mb-10 text-lg text-[#727785] leading-relaxed max-w-[340px]">
             {t("successMessage")}
           </p>
 
           {/* Action Button */}
           <Button
-            label={t("backToHome") || "Về trang chủ"}
+            label={t('backToHome') || tExtracted('veTrangChu')}
             fullWidth
             onClick={() => {
               setShowSuccessModal(false);
@@ -266,12 +267,12 @@ export default function MentorRegisterClient() {
             className="h-[60px] rounded-2xl text-lg font-bold shadow-2xl shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
             iconRight={<Icon name="ArrowRight" size={20} />}
           />
-          
-          <button 
+
+          <button
             onClick={() => setShowSuccessModal(false)}
             className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
           >
-            {t("close") || "Đóng"}
+            {t("close") || tExtracted('dong')}
           </button>
         </div>
       </Modal>

@@ -30,6 +30,7 @@ interface PostsCarouselProps {
 }
 
 export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
+  const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsPostsCarousel');
   const t = useTranslations("Homepage");
   const tCommon = useTranslations("Common");
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -40,7 +41,7 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
   const mockPosts: Post[] = [
     {
       id: "mock-1",
-      title: "Hành trình mang lớp học yêu thương lên bản cao Hà Giang",
+      title: tExtracted('hanhTrinhMangLopHocYeuThuongLen'),
       slug: "hanh-trinh-mang-lop-hoc-yeu-thuong-len-ban-cao",
       summary: "Chia sẻ những kỷ niệm và câu chuyện cảm động về dự án xây dựng trường học kiên cố cho hơn 120 học sinh nghèo tại vùng núi cao.",
       createdAt: new Date().toISOString(),
@@ -50,7 +51,7 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
     },
     {
       id: "mock-2",
-      title: "Phương pháp dạy tiếng Anh sáng tạo cho trẻ em khuyết tật",
+      title: tExtracted('phuongPhapDayTiengAnhSangTaoCho'),
       slug: "phuong-phap-day-tieng-anh-sang-tao",
       summary: "Khám phá các công cụ hỗ trợ và giáo án trực quan giúp các em dễ dàng tiếp thu ngôn ngữ mới một cách đầy hứng khởi.",
       createdAt: new Date(Date.now() - 86400000).toISOString(),
@@ -60,7 +61,7 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
     },
     {
       id: "mock-3",
-      title: "Quyên góp tủ sách lớp học - Mở ra bầu trời mơ ước cho em",
+      title: tExtracted('quyenGopTuSachLopHocMoRa'),
       slug: "quyen-gop-tu-sach-lop-hoc",
       summary: "Chiến dịch quyên góp sách cũ và tài liệu học tập thiết thực đã tiếp cận hơn 50 trường học nghèo miền Trung trong năm qua.",
       createdAt: new Date(Date.now() - 172800000).toISOString(),
@@ -70,7 +71,7 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
     },
     {
       id: "mock-4",
-      title: "Lan tỏa công nghệ số - Phổ cập lập trình miễn phí vùng sâu",
+      title: tExtracted('lanToaCongNgheSoPhoCapLap'),
       slug: "lan-toa-cong-nghe-so-pho-cap-lap-trinh",
       summary: "Dự án mang máy tính cũ lắp đặt phòng máy và giảng dạy tư duy thuật toán cơ bản cho thanh thiếu niên có hoàn cảnh đặc biệt.",
       createdAt: new Date(Date.now() - 259200000).toISOString(),
@@ -162,7 +163,7 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
                   ? "bg-white text-slate-800 hover:border-primary hover:text-primary hover:shadow-md"
                   : "bg-slate-50 text-slate-300 border-slate-150 cursor-not-allowed"
               }`}
-              aria-label="Scroll left"
+              aria-label={tExtracted('scrollLeft')}
             >
               <Icon name="ChevronLeft" size={24} />
             </button>
@@ -174,7 +175,7 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
                   ? "bg-white text-slate-800 hover:border-primary hover:text-primary hover:shadow-md"
                   : "bg-slate-50 text-slate-300 border-slate-150 cursor-not-allowed"
               }`}
-              aria-label="Scroll right"
+              aria-label={tExtracted('scrollRight')}
             >
               <Icon name="ChevronRight" size={24} />
             </button>
@@ -226,7 +227,7 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
                   <div>
                     {/* Date Details */}
                     <div className="flex items-center gap-2 text-[10px] text-slate-400 font-extrabold uppercase tracking-wider mb-3">
-                      <span>Admin</span>
+                      <span>{tExtracted('admin')}</span>
                       <span className="w-1 h-1 rounded-full bg-slate-300" />
                       <span>{formatDate(post.publishedAt || post.createdAt)}</span>
                     </div>

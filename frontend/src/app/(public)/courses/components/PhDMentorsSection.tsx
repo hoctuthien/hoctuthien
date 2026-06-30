@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/core/ui";
@@ -44,7 +45,9 @@ const PHD_MENTORS: PhDMentor[] = [
   },
 ];
 
-const PhDCard = ({ phd }: { phd: PhDMentor }) => (
+const PhDCard = ({ phd }: { phd: PhDMentor }) => {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesComponentsPhDMentorsSection');
+  return (
   <div className="bg-white rounded-3xl p-7 border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col gap-5">
     {/* Avatar + identity */}
     <div className="flex items-center gap-4">
@@ -80,31 +83,29 @@ const PhDCard = ({ phd }: { phd: PhDMentor }) => (
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
         <polyline points="22 4 12 14.01 9 11.01" />
       </svg>
-      Verified Scholar
-    </div>
+      {tExtracted('verifiedScholar')}</div>
   </div>
 );
+};
 
 export const PhDMentorsSection = () => {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesComponentsPhDMentorsSection');
   return (
     <div className="bg-slate-50 rounded-3xl p-8 md:p-10 border border-slate-100">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-6 mb-8 border-b border-slate-200">
         <div className="flex flex-col gap-2 max-w-xl">
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em]">
-            Academic Excellence
-          </span>
+            {tExtracted('academicExcellence')}</span>
           <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-            Học từ các Tiến sĩ hàng đầu thế giới
-          </h2>
+            {tExtracted('hocTuCacTienSiHangDauThe')}</h2>
           <p className="text-slate-500 text-sm font-medium leading-relaxed">
-            Kết nối với các nhà nghiên cứu và học giả từ các đại học danh tiếng toàn cầu.
-          </p>
+            {tExtracted('ketNoiVoiCacNhaNghienCuuVa')}</p>
         </div>
         <Link href="/mentorship" className="shrink-0">
           <Button
             variant="outline"
-            label="Gặp gỡ tất cả"
+            label={tExtracted('gapGoTatCa')}
             size="md"
             className="rounded-full font-bold border-slate-200 bg-white hover:border-primary/40 shadow-sm"
           />

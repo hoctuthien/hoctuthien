@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from "react";
 import { LuEllipsis } from "react-icons/lu";
 import { Checkbox } from "@ui";
@@ -28,6 +29,7 @@ export function DataTable<T extends { id: string; selected?: boolean }>({
   onSelectAll,
   className,
 }: DataTableProps<T>) {
+  const tExtracted = useTranslations('Extracted.sharedComponentsDataTableDataTable');
   const tableData = data || rows || [];
 
   // Default columns for backward compatibility if columns not provided
@@ -62,8 +64,7 @@ export function DataTable<T extends { id: string; selected?: boolean }>({
               </th>
             ))}
             <th className="w-20 p-3 px-4 text-[11px] font-black text-[#64748b] uppercase tracking-[0.2em] text-right">
-              Controls
-            </th>
+              {tExtracted('controls')}</th>
           </tr>
         </thead>
         <tbody>

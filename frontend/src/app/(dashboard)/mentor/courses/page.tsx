@@ -1,12 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import MentorCoursesDashboardClient from "./mentor-courses-dashboard-client";
 
-export const metadata: Metadata = {
-  title: "Quản lý khóa học - Mentor | Học Từ Thiện",
-  description: "Trang quản lý danh sách các khóa học của mentor tại Học Từ Thiện.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.dashboard_mentor_courses");
+  return { title: t("title"), description: t("description") };
+}
 
 export default async function MentorCoursesPage() {
   const session = await auth();

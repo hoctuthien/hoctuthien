@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Icon } from '@/core/ui/Icon';
 
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
- 
+
 const socialLinks = [
   { icon: FaFacebook, href: '#' },
   { icon: FaTwitter, href: '#' },
@@ -14,6 +14,7 @@ const socialLinks = [
 ];
 
 export const Footer = () => {
+  const tExtracted = useTranslations('Extracted.sharedComponentsLayoutFooter');
   const t = useTranslations('Common');
   const tHome = useTranslations('Homepage');
 
@@ -52,7 +53,7 @@ export const Footer = () => {
             <Link href="/" className="flex items-center mb-6">
               <Image
                 src="/images/logo.png"
-                alt="Học Từ Thiện"
+                alt={tExtracted('hocTuThien')}
                 width={180}
                 height={50}
                 className="h-16 w-auto object-contain"

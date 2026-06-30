@@ -16,6 +16,7 @@ interface ReportBugModalProps {
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
 export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
+  const tExtracted = useTranslations('Extracted.sharedComponentsReportBugModalReportBugModal');
   const t = useTranslations('ReportBugModal');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -179,7 +180,7 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
               <Button
                 variant="primary"
                 type="submit"
-                label={formState === 'loading' ? t('submitting') : t('submit')}
+                label={formState === "loading" ? t('submitting') : t('submit')}
                 loading={formState === 'loading'}
                 disabled={!title.trim() || !description.trim()}
                 className="flex-1"

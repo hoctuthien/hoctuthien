@@ -16,12 +16,25 @@
  */
 
 import { getRequestConfig } from 'next-intl/server';
-import { defaultLocale } from './config';
+import { cookies, headers } from 'next/headers';
+import {
+  defaultLocale,
+  isLocale,
+  localeCookieName,
+  type Locale,
+} from './config';
 
 export default getRequestConfig(async () => {
-  // Hiện tại dùng static locale.
-  // Khi cần dynamic, thay dòng này bằng logic detect locale.
-  const locale = defaultLocale;
+  const cookieLocale = (await cookies()).get(localeCookieName)?.value;
+  const acceptedLanguage = (await headers())
+    .get('accept-language')
+    ?.split(',')[0]
+    ?.split('-')[0];
+  const locale: Locale = isLocale(cookieLocale)
+    ? cookieLocale
+    : isLocale(acceptedLanguage)
+      ? acceptedLanguage
+      : defaultLocale;
 
   return {
     locale,

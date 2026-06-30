@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useRef } from "react";
 import { Icon } from "../Icon";
 import { cn } from "@/core/utils/cn";
@@ -27,16 +28,26 @@ export function ImageUploader({
   onUpload,
   multiple = false,
   error,
-  label = "Hình ảnh xác thực",
-  placeholder = "Kéo thả hình ảnh vào đây",
-  subPlaceholder = "hoặc click để chọn tệp từ máy tính",
-  uploadingLabel = "Đang tải lên cloud...",
-  viewOriginalLabel = "Xem ảnh gốc",
-  deleteLabel = "Xóa ảnh",
-  onlyImagesError = "Chỉ chấp nhận tệp tin định dạng hình ảnh!",
-  uploadFailedError = "Tải lên tệp tin thất bại. Vui lòng kiểm tra định dạng.",
+  label: labelProp,
+  placeholder: placeholderProp,
+  subPlaceholder: subPlaceholderProp,
+  uploadingLabel: uploadingLabelProp,
+  viewOriginalLabel: viewOriginalLabelProp,
+  deleteLabel: deleteLabelProp,
+  onlyImagesError: onlyImagesErrorProp,
+  uploadFailedError: uploadFailedErrorProp,
   className,
 }: ImageUploaderProps) {
+  const tExtracted = useTranslations('Extracted.coreUiImageUploaderImageUploader');
+  const t = useTranslations('ImageUploader');
+  const label = labelProp ?? t('label');
+  const placeholder = placeholderProp ?? t('placeholder');
+  const subPlaceholder = subPlaceholderProp ?? t('subPlaceholder');
+  const uploadingLabel = uploadingLabelProp ?? t('uploading');
+  const viewOriginalLabel = viewOriginalLabelProp ?? t('viewOriginal');
+  const deleteLabel = deleteLabelProp ?? t('delete');
+  const onlyImagesError = onlyImagesErrorProp ?? t('onlyImagesError');
+  const uploadFailedError = uploadFailedErrorProp ?? t('uploadFailedError');
   const [uploadingCount, setUploadingCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -66,14 +77,14 @@ export function ImageUploader({
     try {
       const uploadPromises = files.map(file => onUpload(file));
       const results = await Promise.allSettled(uploadPromises);
-      
+
       const successfulUrls = results
         .filter((r): r is PromiseFulfilledResult<string> => r.status === "fulfilled")
         .map(r => r.value);
-        
+
       const failedCount = results.filter(r => r.status === "rejected").length;
       if (failedCount > 0) {
-        alert(`${failedCount} tệp tải lên thất bại.`);
+        alert(t('filesUploadFailed', { count: failedCount }));
       }
 
       if (successfulUrls.length > 0) {
@@ -100,7 +111,7 @@ export function ImageUploader({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const files = Array.from(e.dataTransfer.files || []);
     if (files.length === 0) return;
 
@@ -178,13 +189,13 @@ export function ImageUploader({
         valueArray[0] ? (
           /* Single Image Preview Frame */
           <div className="relative border border-slate-200/60 rounded-2xl overflow-hidden bg-slate-100 aspect-video w-full max-w-sm mx-auto group/preview shadow-sm hover:shadow-md transition-all">
-            <img 
-              src={valueArray[0]} 
-              alt="Uploaded Preview" 
+            <img
+              src={valueArray[0]}
+              alt={tExtracted('uploadedPreview')}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-              <a 
+              <a
                 href={valueArray[0]}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -211,8 +222,8 @@ export function ImageUploader({
               onClick={() => fileInputRef.current?.click()}
               className={cn(
                 "border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-200 min-h-[140px]",
-                isDragging 
-                  ? "border-primary bg-primary/5 scale-[1.01]" 
+                isDragging
+                  ? "border-primary bg-primary/5 scale-[1.01]"
                   : "border-slate-300 hover:border-primary/50 hover:bg-slate-50 bg-white",
                 error && "border-red-500 bg-red-50/20"
               )}
@@ -234,7 +245,7 @@ export function ImageUploader({
                 </div>
               )}
             </div>
-            
+
             {error && (
               <p className="text-[11px] text-red-500 font-bold mt-1">
                 {error}
@@ -254,8 +265,8 @@ export function ImageUploader({
               onClick={() => fileInputRef.current?.click()}
               className={cn(
                 "border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-200 min-h-[160px]",
-                isDragging 
-                  ? "border-primary bg-primary/5 scale-[1.01]" 
+                isDragging
+                  ? "border-primary bg-primary/5 scale-[1.01]"
                   : "border-slate-300 hover:border-primary/50 hover:bg-slate-50 bg-white",
                 error && "border-red-500 bg-red-50/20"
               )}
@@ -275,17 +286,17 @@ export function ImageUploader({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full animate-in fade-in duration-300">
               {/* Render Existing Uploaded Images */}
               {valueArray.map((url, idx) => (
-                <div 
-                  key={`${url}-${idx}`} 
+                <div
+                  key={`${url}-${idx}`}
                   className="relative border border-slate-200/60 rounded-2xl overflow-hidden bg-slate-100 aspect-video group/preview shadow-sm hover:shadow-md transition-all animate-in zoom-in-95 duration-200"
                 >
-                  <img 
-                    src={url} 
-                    alt={`Preview ${idx + 1}`} 
+                  <img
+                    src={url}
+                    alt={`Preview ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5">
-                    <a 
+                    <a
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -306,8 +317,8 @@ export function ImageUploader({
 
               {/* Render Uploading Placeholders */}
               {Array.from({ length: uploadingCount }).map((_, idx) => (
-                <div 
-                  key={`uploading-${idx}`} 
+                <div
+                  key={`uploading-${idx}`}
                   className="relative border border-dashed border-primary/40 rounded-2xl overflow-hidden bg-primary/5 aspect-video flex flex-col items-center justify-center gap-2 text-primary animate-pulse"
                 >
                   <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -323,15 +334,15 @@ export function ImageUploader({
                 onDrop={handleDrop}
                 className={cn(
                   "border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 aspect-video",
-                  isDragging 
-                    ? "border-primary bg-primary/5 scale-[1.01]" 
+                  isDragging
+                    ? "border-primary bg-primary/5 scale-[1.01]"
                     : "border-slate-300 hover:border-primary/50 hover:bg-slate-50 bg-white"
                 )}
               >
                 <div className="p-2 rounded-full bg-slate-100 text-slate-400 group-hover:text-primary transition-colors">
                   <Icon name="Plus" size={16} />
                 </div>
-                <span className="text-[10px] font-bold text-slate-500">Thêm ảnh</span>
+                <span className="text-[10px] font-bold text-slate-500">{tExtracted('themAnh')}</span>
               </div>
             </div>
           )}

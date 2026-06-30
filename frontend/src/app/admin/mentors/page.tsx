@@ -16,6 +16,7 @@ interface MentorManagementPageProps {
 }
 
 export default async function MentorManagementPage({ searchParams }: MentorManagementPageProps) {
+  const tExtracted = await getTranslations('Extracted.appAdminMentorsPage');
   const t = await getTranslations("Admin.mentors");
   const params = await searchParams;
 
@@ -48,29 +49,29 @@ export default async function MentorManagementPage({ searchParams }: MentorManag
   const approvalRate = totalCount > 0 ? Math.round((approvedCount / totalCount) * 100) : 100;
 
   const stats = [
-    { 
-      label: "PENDING APPLICATIONS", 
-      value: pendingCount.toString(), 
-      trend: `+${pendingCount} pending`, 
-      icon: "ClipboardList", 
-      color: "text-blue-600", 
-      bg: "bg-blue-50" 
+    {
+      label: tExtracted('pendingApplications'),
+      value: pendingCount.toString(),
+      trend: `+${pendingCount} pending`,
+      icon: "ClipboardList",
+      color: "text-blue-600",
+      bg: "bg-blue-50"
     },
-    { 
-      label: "TOTAL APPLICATIONS", 
-      value: totalCount.toString(), 
-      trend: "All-time submissions", 
-      icon: "ShieldCheck", 
-      color: "text-emerald-600", 
-      bg: "bg-emerald-50" 
+    {
+      label: tExtracted('totalApplications'),
+      value: totalCount.toString(),
+      trend: "All-time submissions",
+      icon: "ShieldCheck",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50"
     },
-    { 
-      label: "APPROVAL RATE", 
-      value: `${approvalRate}%`, 
-      trend: `${approvedCount} approved`, 
-      icon: "PieChart", 
-      color: "text-amber-600", 
-      bg: "bg-amber-50" 
+    {
+      label: tExtracted('approvalRate'),
+      value: `${approvalRate}%`,
+      trend: `${approvedCount} approved`,
+      icon: "PieChart",
+      color: "text-amber-600",
+      bg: "bg-amber-50"
     },
   ];
 

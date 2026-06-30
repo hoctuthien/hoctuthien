@@ -23,8 +23,7 @@ export const SidebarGroup: React.FC<SidebarGroupProps> = ({
   defaultOpen = false,
   className,
   isActive = false,
-}) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+}) => {  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   if (!isCollapsible) {
     return (
@@ -55,7 +54,7 @@ export const SidebarGroup: React.FC<SidebarGroupProps> = ({
           )
         }
       />
-      
+
       <div
         className={cn(
           "overflow-hidden transition-all duration-500 ease-in-out",

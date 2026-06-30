@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from "react";
 import { Icon, type IconName } from "@/core/ui";
 import { Card } from "@/core/ui/Card";
@@ -32,8 +33,9 @@ function formatCurrency(amount: number) {
 }
 
 function MonthlyBarChart({ data }: { data: { month: string; amount: number }[] }) {
+  const tExtracted = useTranslations('Extracted.appAdminDashboardAdminDashboardClient');
   if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center h-full text-sm text-slate-400">Chưa có dữ liệu</div>;
+    return <div className="flex items-center justify-center h-full text-sm text-slate-400">{tExtracted('chuaCoDuLieu')}</div>;
   }
   const max = Math.max(...data.map((d) => d.amount), 1);
   return (
@@ -59,6 +61,7 @@ function MonthlyBarChart({ data }: { data: { month: string; amount: number }[] }
 }
 
 export default function AdminDashboardClient() {
+  const tExtracted = useTranslations('Extracted.appAdminDashboardAdminDashboardClient');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -75,29 +78,29 @@ export default function AdminDashboardClient() {
 
   const statCards: StatCard[] = stats
     ? [
-        { label: "Tổng người dùng", value: stats.totalUsers.toLocaleString(), icon: "Users", color: "text-blue-600", bg: "bg-blue-50" },
-        { label: "Chờ duyệt Mentor", value: stats.pendingMentors.toString(), icon: "Clock", color: "text-amber-600", bg: "bg-amber-50" },
-        { label: "Khóa học đang hoạt động", value: stats.activeCourses.toString(), icon: "BookOpen", color: "text-green-600", bg: "bg-green-50" },
-        { label: "Tổng quyên góp", value: formatCurrency(stats.totalDonations), icon: "Heart", color: "text-rose-600", bg: "bg-rose-50" },
-        { label: "Mentor", value: stats.totalMentors.toString(), icon: "UserCheck", color: "text-purple-600", bg: "bg-purple-50" },
-        { label: "Mentee", value: stats.totalMentees.toString(), icon: "User", color: "text-cyan-600", bg: "bg-cyan-50" },
-        { label: "Tổng đặt lịch", value: stats.totalBookings.toString(), icon: "Calendar", color: "text-indigo-600", bg: "bg-indigo-50" },
-        { label: "Buổi học hoàn thành", value: stats.completedBookings.toString(), icon: "CheckCircle", color: "text-emerald-600", bg: "bg-emerald-50" },
+        { label: tExtracted('tongNguoiDung'), value: stats.totalUsers.toLocaleString(), icon: "Users", color: "text-blue-600", bg: "bg-blue-50" },
+        { label: tExtracted('choDuyetMentor'), value: stats.pendingMentors.toString(), icon: "Clock", color: "text-amber-600", bg: "bg-amber-50" },
+        { label: tExtracted('khoaHocDangHoatDong'), value: stats.activeCourses.toString(), icon: "BookOpen", color: "text-green-600", bg: "bg-green-50" },
+        { label: tExtracted('tongQuyenGop'), value: formatCurrency(stats.totalDonations), icon: "Heart", color: "text-rose-600", bg: "bg-rose-50" },
+        { label: tExtracted('mentor'), value: stats.totalMentors.toString(), icon: "UserCheck", color: "text-purple-600", bg: "bg-purple-50" },
+        { label: tExtracted('mentee'), value: stats.totalMentees.toString(), icon: "User", color: "text-cyan-600", bg: "bg-cyan-50" },
+        { label: tExtracted('tongDatLich'), value: stats.totalBookings.toString(), icon: "Calendar", color: "text-indigo-600", bg: "bg-indigo-50" },
+        { label: tExtracted('buoiHocHoanThanh'), value: stats.completedBookings.toString(), icon: "CheckCircle", color: "text-emerald-600", bg: "bg-emerald-50" },
       ]
     : [];
 
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-3xl font-bold text-[#181C20] mb-2">Bảng điều khiển Admin</h1>
-        <p className="text-text-muted">Tổng quan số liệu hệ thống Học Từ Thiện</p>
+        <h1 className="text-3xl font-bold text-[#181C20] mb-2">{tExtracted('bangDieuKhienAdmin')}</h1>
+        <p className="text-text-muted">{tExtracted('tongQuanSoLieuHeThongHocTu')}</p>
       </div>
 
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i} padding="lg" className="border-none shadow-sm animate-pulse h-20 bg-slate-100">
-              <span className="sr-only">Loading</span>
+              <span className="sr-only">{tExtracted('loading')}</span>
             </Card>
           ))}
         </div>
@@ -125,18 +128,18 @@ export default function AdminDashboardClient() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Card className="lg:col-span-2 border-none shadow-sm" padding="lg">
-              <h3 className="text-sm font-bold text-slate-600 mb-4 uppercase tracking-wider">Doanh thu quyên góp theo tháng</h3>
+              <h3 className="text-sm font-bold text-slate-600 mb-4 uppercase tracking-wider">{tExtracted('doanhThuQuyenGopTheoThang')}</h3>
               <div className="h-[320px]">
                 <MonthlyBarChart data={stats.monthlyStats} />
               </div>
             </Card>
             <Card className="lg:col-span-1 border-none shadow-sm" padding="lg">
-              <h3 className="text-sm font-bold text-slate-600 mb-4 uppercase tracking-wider">Tình trạng đặt lịch</h3>
+              <h3 className="text-sm font-bold text-slate-600 mb-4 uppercase tracking-wider">{tExtracted('tinhTrangDatLich')}</h3>
               <div className="flex flex-col gap-4 mt-2">
                 {[
-                  { label: "Hoàn thành", value: stats.completedBookings, color: "bg-emerald-500" },
-                  { label: "Đã hủy", value: stats.cancelledBookings, color: "bg-rose-400" },
-                  { label: "Khác", value: stats.totalBookings - stats.completedBookings - stats.cancelledBookings, color: "bg-slate-300" },
+                  { label: tExtracted('hoanThanh'), value: stats.completedBookings, color: "bg-emerald-500" },
+                  { label: tExtracted('daHuy'), value: stats.cancelledBookings, color: "bg-rose-400" },
+                  { label: tExtracted('khac'), value: stats.totalBookings - stats.completedBookings - stats.cancelledBookings, color: "bg-slate-300" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full flex-shrink-0 ${item.color}`} />
@@ -146,7 +149,7 @@ export default function AdminDashboardClient() {
                 ))}
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100">
-                <div className="text-xs text-slate-400">Tổng khóa học: {stats.totalCourses} | Active: {stats.activeCourses}</div>
+                <div className="text-xs text-slate-400">{tExtracted('tongKhoaHoc')}{stats.totalCourses} {tExtracted('active')}{stats.activeCourses}</div>
               </div>
             </Card>
           </div>
@@ -155,8 +158,7 @@ export default function AdminDashboardClient() {
 
       {!loading && !stats && (
         <div className="text-sm text-rose-500 bg-rose-50 p-4 rounded-xl border border-rose-100">
-          Không thể tải số liệu. Vui lòng kiểm tra kết nối hoặc quyền truy cập.
-        </div>
+          {tExtracted('khongTheTaiSoLieuVuiLongKiem')}</div>
       )}
     </div>
   );

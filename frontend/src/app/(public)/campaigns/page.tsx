@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LuTarget, LuCalendar, LuTrendingUp } from "react-icons/lu";
@@ -36,6 +37,7 @@ const breadcrumbItems = [
 ];
 
 export default function CampaignsPage() {
+  const tExtracted = useTranslations('Extracted.appPublicCampaignsPage');
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,10 +55,9 @@ export default function CampaignsPage() {
         <Breadcrumb items={breadcrumbItems} />
 
         <div>
-          <h1 className="text-3xl font-black text-slate-900">Chiến dịch thiện nguyện</h1>
+          <h1 className="text-3xl font-black text-slate-900">{tExtracted('chienDichThienNguyen')}</h1>
           <p className="text-slate-500 text-sm mt-2 font-semibold">
-            Cùng chung tay đóng góp vào các chiến dịch giáo dục thiện nguyện của Học Từ Thiện
-          </p>
+            {tExtracted('cungChungTayDongGopVaoCacChien')}</p>
         </div>
 
         {loading ? (
@@ -68,7 +69,7 @@ export default function CampaignsPage() {
         ) : campaigns.length === 0 ? (
           <div className="py-16 bg-white rounded-2xl border border-slate-100 text-center">
             <div className="text-4xl mb-3">🌱</div>
-            <p className="text-slate-500 text-sm font-semibold">Chưa có chiến dịch nào đang hoạt động.</p>
+            <p className="text-slate-500 text-sm font-semibold">{tExtracted('chuaCoChienDichNaoDangHoatDong')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -95,8 +96,8 @@ export default function CampaignsPage() {
                     )}
                     <div className="flex flex-col gap-1.5 mt-auto">
                       <div className="flex justify-between text-xs font-bold">
-                        <span className="text-blue-600">{Number(campaign.raisedAmount).toLocaleString("vi-VN")}đ</span>
-                        <span className="text-slate-400">/ {Number(campaign.targetAmount).toLocaleString("vi-VN")}đ ({pct}%)</span>
+                        <span className="text-blue-600">{Number(campaign.raisedAmount).toLocaleString("vi-VN")}{tExtracted('d')}</span>
+                        <span className="text-slate-400">/ {Number(campaign.targetAmount).toLocaleString("vi-VN")}{tExtracted('d2')}{pct}%)</span>
                       </div>
                       <ProgressBar raised={Number(campaign.raisedAmount)} target={Number(campaign.targetAmount)} />
                     </div>

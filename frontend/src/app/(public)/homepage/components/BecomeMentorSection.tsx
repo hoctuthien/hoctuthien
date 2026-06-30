@@ -7,6 +7,7 @@ import { Icon } from '@/core/ui/Icon';
 import { Button } from '@/core/ui/Button';
 
 export const BecomeMentorSection = () => {
+  const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsBecomeMentorSection');
   const t = useTranslations('Homepage');
 
   return (

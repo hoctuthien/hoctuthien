@@ -6,6 +6,7 @@ import { Icon } from '@/core/ui/Icon';
 import { MOCK_TESTIMONIALS } from '@/shared/mocks/homepage.mock';
 
 export const Testimonials = () => {
+  const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsTestimonials');
   const t = useTranslations('Homepage');
 
   const testimonials = MOCK_TESTIMONIALS.map(rev => ({
@@ -50,7 +51,7 @@ export const Testimonials = () => {
                     key={i}
                     name="Star"
                     size={16}
-                    className={i < testimonial.rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200'}
+                    className={i < testimonial.rating ? "fill-yellow-400 text-yellow-400" : "text-slate-200"}
                   />
                 ))}
               </div>
@@ -64,12 +65,11 @@ export const Testimonials = () => {
 
         <div className="mt-16 flex flex-col items-center">
           <div className="flex -space-x-4 mb-6">
-            {['User 1', 'User 2', 'User 3', 'User 4', 'User 5'].map((name, i) => (
+            {["User 1", "User 2", "User 3", "User 4", "User 5"].map((name, i) => (
               <Avatar key={i} size="sm" name={name} className="border-2 border-white" />
             ))}
             <div className="w-8 h-8 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center border-2 border-white z-10">
-              +2K
-            </div>
+              {tExtracted('text2k')}</div>
           </div>
           <p className="text-text-muted text-sm font-medium">
             {t('happyStudents')}

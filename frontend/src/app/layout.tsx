@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { cn } from "@/core/utils/cn";
 import { Providers } from "./providers";
 import { AuthProvider } from "./auth-provider";
@@ -17,39 +17,35 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://hoctuthien.com"),
-  title: "Học Từ Thiện",
-  description:
-    "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
-  icons: {
-    icon: "/images/avatar_browser.png",
-  },
-  openGraph: {
-    title: "Học Từ Thiện",
-    description:
-      "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
-    url: "https://hoctuthien.com",
-    siteName: "Học Từ Thiện",
-    images: [
-      {
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata");
+  return {
+    metadataBase: new URL("https://hoctuthien.com"),
+    title: t("siteTitle"),
+    description: t("siteDescription"),
+    icons: { icon: "/images/avatar_browser.png" },
+    openGraph: {
+      title: t("siteTitle"),
+      description: t("siteDescription"),
+      url: "https://hoctuthien.com",
+      siteName: t("siteTitle"),
+      images: [{
         url: "https://hoctuthien.com/images/avatar_main.png",
         width: 1200,
         height: 630,
-        alt: "Học Từ Thiện - Kết nối tri thức",
-      },
-    ],
-    locale: "vi_VN",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Học Từ Thiện",
-    description:
-      "Nền tảng giáo dục và từ thiện — Kết nối tri thức, lan toả yêu thương.",
-    images: ["https://hoctuthien.com/images/avatar_main.png"],
-  },
-};
+        alt: t("ogAlt"),
+      }],
+      locale: "vi_VN",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("siteTitle"),
+      description: t("siteDescription"),
+      images: ["https://hoctuthien.com/images/avatar_main.png"],
+    },
+  };
+}
 
 /**
  * Root Layout — async vì cần await locale & messages từ server.

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -35,7 +36,9 @@ const FilterPill = ({
   value: string;
   current: string;
   onChange: (v: string) => void;
-}) => (
+}) => {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesComponentsCourseFilters');
+  return (
   <button
     onClick={() => onChange(current === value ? "" : value)}
     className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap border cursor-pointer ${
@@ -47,6 +50,7 @@ const FilterPill = ({
     {label}
   </button>
 );
+};
 
 export const CourseFilters = ({
   searchQuery,
@@ -62,6 +66,7 @@ export const CourseFilters = ({
   isFilterActive,
   clearAllFilters,
 }: CourseFiltersProps) => {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesComponentsCourseFilters');
   const { data: session } = useSession();
 
   return (
@@ -75,7 +80,7 @@ export const CourseFilters = ({
           />
           <input
             type="text"
-            placeholder="Tìm kiếm khóa học, chủ đề..."
+            placeholder={tExtracted('timKiemKhoaHocChuDe')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-transparent rounded-2xl text-sm font-medium outline-none focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all"
@@ -89,7 +94,7 @@ export const CourseFilters = ({
               label={
                 <div className="flex items-center gap-2">
                   <LuPlus size={15} />
-                  <span>Tạo khóa học</span>
+                  <span>{tExtracted('taoKhoaHoc')}</span>
                 </div>
               }
               size="md"
@@ -124,24 +129,23 @@ export const CourseFilters = ({
         {/* Secondary row: refine + clear */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-1">
-            Lọc thêm:
-          </span>
+            {tExtracted('locThem')}</span>
 
-          <FilterPill label="Cơ bản" value="beginner" current={academicLevel} onChange={setAcademicLevel} />
-          <FilterPill label="Trung cấp" value="intermediate" current={academicLevel} onChange={setAcademicLevel} />
-          <FilterPill label="Nâng cao" value="advanced" current={academicLevel} onChange={setAcademicLevel} />
-
-          <div className="w-px h-4 bg-slate-200 mx-1" />
-
-          <FilterPill label="Online" value="online" current={formatFilter} onChange={setFormatFilter} />
-          <FilterPill label="Offline" value="offline" current={formatFilter} onChange={setFormatFilter} />
-          <FilterPill label="Hybrid" value="hybrid" current={formatFilter} onChange={setFormatFilter} />
+          <FilterPill label={tExtracted('coBan')} value="beginner" current={academicLevel} onChange={setAcademicLevel} />
+          <FilterPill label={tExtracted('trungCap')} value="intermediate" current={academicLevel} onChange={setAcademicLevel} />
+          <FilterPill label={tExtracted('nangCao')} value="advanced" current={academicLevel} onChange={setAcademicLevel} />
 
           <div className="w-px h-4 bg-slate-200 mx-1" />
 
-          <FilterPill label="< 1 giờ" value="short" current={durationFilter} onChange={setDurationFilter} />
-          <FilterPill label="1–3 giờ" value="medium" current={durationFilter} onChange={setDurationFilter} />
-          <FilterPill label="> 3 giờ" value="long" current={durationFilter} onChange={setDurationFilter} />
+          <FilterPill label={tExtracted('online')} value="online" current={formatFilter} onChange={setFormatFilter} />
+          <FilterPill label={tExtracted('offline')} value="offline" current={formatFilter} onChange={setFormatFilter} />
+          <FilterPill label={tExtracted('hybrid')} value="hybrid" current={formatFilter} onChange={setFormatFilter} />
+
+          <div className="w-px h-4 bg-slate-200 mx-1" />
+
+          <FilterPill label={tExtracted('text1Gio')} value="short" current={durationFilter} onChange={setDurationFilter} />
+          <FilterPill label={tExtracted('text13Gio')} value="medium" current={durationFilter} onChange={setDurationFilter} />
+          <FilterPill label={tExtracted('text3Gio')} value="long" current={durationFilter} onChange={setDurationFilter} />
 
           {isFilterActive && (
             <button
@@ -149,8 +153,7 @@ export const CourseFilters = ({
               className="flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-full text-[10px] font-black border border-red-100 transition-all cursor-pointer ml-1"
             >
               <LuX size={10} strokeWidth={3} />
-              Xóa bộ lọc
-            </button>
+              {tExtracted('xoaBoLoc')}</button>
           )}
         </div>
       </div>

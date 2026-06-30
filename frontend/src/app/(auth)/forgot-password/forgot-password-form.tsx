@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,6 +23,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 export function ForgotPasswordForm() {
+  const tExtracted = useTranslations('Extracted.appAuthForgotPasswordForgotPasswordForm');
   const router = useRouter();
   const [step, setStep] = useState<Step>("request");
   const [email, setEmail] = useState("");
@@ -41,10 +43,10 @@ export function ForgotPasswordForm() {
 
     try {
       await authGateway.forgotPassword({ email });
-      setMessage("Nếu email tồn tại, mã OTP đã được gửi. Vui lòng kiểm tra hộp thư.");
+      setMessage(tExtracted('neuEmailTonTaiMaOtpDaDuoc'));
       setStep("reset");
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "Không thể gửi OTP. Vui lòng thử lại."));
+      setError(getErrorMessage(err, tExtracted('khongTheGuiOtpVuiLongThuLai')));
     } finally {
       setLoading(false);
     }
@@ -56,7 +58,7 @@ export function ForgotPasswordForm() {
     setError(null);
 
     if (newPassword !== confirmPassword) {
-      setError("Mật khẩu nhập lại không khớp.");
+      setError(tExtracted('matKhauNhapLaiKhongKhop'));
       setLoading(false);
       return;
     }
@@ -68,9 +70,9 @@ export function ForgotPasswordForm() {
         newPassword,
       });
       setStep("success");
-      setMessage("Đặt lại mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới.");
+      setMessage(tExtracted('datLaiMatKhauThanhCongBanCo'));
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "OTP không hợp lệ hoặc đã hết hạn."));
+      setError(getErrorMessage(err, tExtracted('otpKhongHopLeHoacDaHetHan')));
     } finally {
       setLoading(false);
     }
@@ -84,14 +86,11 @@ export function ForgotPasswordForm() {
           className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline mb-5"
         >
           <Icon name="ChevronLeft" size={16} />
-          Quay lại đăng nhập
-        </Link>
+          {tExtracted('quayLaiDangNhap')}</Link>
         <h2 className="text-3xl md:text-4xl font-bold text-text-heading mb-3 tracking-tight">
-          Quên mật khẩu
-        </h2>
+          {tExtracted('quenMatKhau')}</h2>
         <p className="text-text-muted text-base leading-relaxed font-[Montserrat]">
-          Nhập email tài khoản để nhận mã OTP. Mã mới nhất sẽ thay thế mã cũ và chỉ dùng được một lần.
-        </p>
+          {tExtracted('nhapEmailTaiKhoanDeNhanMaOtp')}</p>
       </div>
 
       {message && (
@@ -110,7 +109,7 @@ export function ForgotPasswordForm() {
         <form onSubmit={requestOtp} className="flex flex-col gap-5">
           <Input
             id="forgot-email"
-            label="Email"
+            label={tExtracted('email')}
             type="email"
             autoComplete="email"
             value={email}
@@ -121,7 +120,7 @@ export function ForgotPasswordForm() {
 
           <Button
             type="submit"
-            label={loading ? "Đang gửi..." : "Gửi mã OTP"}
+            label={loading ? tExtracted('dangGui') : tExtracted('guiMaOtp')}
             loading={loading}
             fullWidth
           />
@@ -132,7 +131,7 @@ export function ForgotPasswordForm() {
         <form onSubmit={resetPassword} className="flex flex-col gap-5">
           <Input
             id="reset-email"
-            label="Email"
+            label={tExtracted('email')}
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -141,7 +140,7 @@ export function ForgotPasswordForm() {
 
           <Input
             id="reset-otp"
-            label="Mã OTP"
+            label={tExtracted('maOtp')}
             inputMode="numeric"
             maxLength={6}
             value={otp}
@@ -152,7 +151,7 @@ export function ForgotPasswordForm() {
 
           <Input
             id="new-password"
-            label="Mật khẩu mới"
+            label={tExtracted('matKhauMoi')}
             type={showPassword ? "text" : "password"}
             value={newPassword}
             onChange={(event) => setNewPassword(event.target.value)}
@@ -164,7 +163,7 @@ export function ForgotPasswordForm() {
                 onClick={() => setShowPassword((value) => !value)}
                 className="text-text-muted hover:text-text-heading transition-colors"
                 tabIndex={-1}
-                aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                aria-label={showPassword ? tExtracted('anMatKhau') : tExtracted('hienMatKhau')}
               >
                 <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
               </button>
@@ -173,7 +172,7 @@ export function ForgotPasswordForm() {
 
           <Input
             id="confirm-password"
-            label="Nhập lại mật khẩu mới"
+            label={tExtracted('nhapLaiMatKhauMoi')}
             type={showPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
@@ -185,13 +184,13 @@ export function ForgotPasswordForm() {
             <Button
               type="button"
               variant="outline"
-              label="Gửi lại OTP"
+              label={tExtracted('guiLaiOtp')}
               disabled={loading || !email}
               onClick={() => requestOtp()}
             />
             <Button
               type="submit"
-              label={loading ? "Đang đặt lại..." : "Đặt lại mật khẩu"}
+              label={loading ? tExtracted('dangDatLai') : tExtracted('datLaiMatKhau')}
               loading={loading}
             />
           </div>
@@ -200,7 +199,7 @@ export function ForgotPasswordForm() {
 
       {step === "success" && (
         <Button
-          label="Đăng nhập ngay"
+          label={tExtracted('dangNhapNgay')}
           fullWidth
           onClick={() => router.push("/login")}
         />

@@ -15,6 +15,7 @@ interface PageProps {
 }
 
 export default async function MentorApplicationDetailPage(props: PageProps) {
+  const tExtracted = await getTranslations('Extracted.appAdminMentorsIdPage');
   // Await params as required by Next.js 15+ App Router patterns
   const resolvedParams = await props.params;
   const id = resolvedParams.id;
@@ -47,7 +48,7 @@ export default async function MentorApplicationDetailPage(props: PageProps) {
         </div>
         <Link href="/admin/mentors">
           <Button
-            label={tMentors("backToList")}
+            label={tMentors('backToList')}
             variant="outline"
             iconLeft={<Icon name="ArrowLeft" size={16} />}
             className="!px-6 !py-2.5 !rounded-xl"
@@ -95,7 +96,7 @@ export default async function MentorApplicationDetailPage(props: PageProps) {
         detailTranslation={tMentors("detailTitle")}
         approveLabel={tMentors("approve")}
         rejectLabel={tMentors("reject")}
-        startProcessingLabel="Tiến hành xử lý"
+        startProcessingLabel={tExtracted('tienHanhXuLy')}
       />
 
       {/* Main Two-Column Layout */}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Icon } from '@/core/ui/Icon';
@@ -11,6 +12,7 @@ interface SearchOverlayProps {
 }
 
 export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
+  const tExtracted = useTranslations('Extracted.sharedComponentsLayoutSearchOverlay');
   const [query, setQuery] = useState('');
   const [courses, setCourses] = useState<any[]>([]);
   const [mentors, setMentors] = useState<any[]>([]);
@@ -86,11 +88,11 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-md flex flex-col justify-start items-center pt-24 px-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
-      <div 
+      <div
         className="w-full max-w-3xl bg-white rounded-[32px] shadow-2xl border border-slate-100 flex flex-col max-h-[70vh] overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
@@ -99,7 +101,7 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
           <Icon name="Search" className="text-slate-400" size={22} />
           <input
             type="text"
-            placeholder="Tìm kiếm khóa học hoặc cố vấn..."
+            placeholder={tExtracted('timKiemKhoaHocHoacCoVan')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
@@ -108,7 +110,7 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
           {loading ? (
             <Icon name="Loader2" className="animate-spin text-primary" size={20} />
           ) : query ? (
-            <button 
+            <button
               onClick={() => setQuery('')}
               className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-50 rounded-xl transition-all border-0 bg-transparent cursor-pointer"
             >
@@ -122,20 +124,20 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
           {query.trim().length < 2 ? (
             <div className="text-center py-12 text-slate-400 font-semibold text-xs flex flex-col items-center gap-2">
               <Icon name="Search" size={32} className="text-slate-300" />
-              <span>Nhập tối thiểu 2 ký tự để tìm kiếm</span>
+              <span>{tExtracted('nhapToiThieu2KyTuDeTim')}</span>
             </div>
           ) : !loading && courses.length === 0 && mentors.length === 0 ? (
             <div className="text-center py-12 text-slate-400 font-semibold text-xs flex flex-col items-center gap-2">
               <Icon name="Inbox" size={32} className="text-slate-300" />
-              <span>Không tìm thấy kết quả phù hợp cho "{query}"</span>
+              <span>{tExtracted('khongTimThayKetQuaPhuHopCho')}{query}"</span>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              
+
               {/* Courses Column */}
               <div className="flex flex-col gap-4">
                 <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">
-                  Khóa Học ({courses.length})
+                  {tExtracted('khoaHoc')}{courses.length})
                 </span>
                 <div className="flex flex-col gap-3">
                   {courses.map((course) => (
@@ -146,8 +148,8 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                       className="flex gap-4 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all group no-underline"
                     >
                       <div className="w-14 h-14 bg-slate-100 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100">
-                        <img 
-                          src={course.thumbnailUrl || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=150&q=80"} 
+                        <img
+                          src={course.thumbnailUrl || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=150&q=80"}
                           alt={course.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
@@ -157,13 +159,12 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                           {course.title}
                         </h4>
                         <span className="text-[10px] font-bold text-slate-500 mt-1">
-                          {course.price === 0 ? "Miễn phí" : `${course.price.toLocaleString('vi-VN')}đ`} • {course.durationMinutes} phút
-                        </span>
+                          {course.price === 0 ? tExtracted('mienPhi') : `${course.price.toLocaleString('vi-VN')}đ`} • {course.durationMinutes} {tExtracted('phut')}</span>
                       </div>
                     </Link>
                   ))}
                   {courses.length === 0 && (
-                    <p className="text-[11px] text-slate-400 italic">Không có khóa học nào</p>
+                    <p className="text-[11px] text-slate-400 italic">{tExtracted('khongCoKhoaHocNao')}</p>
                   )}
                 </div>
               </div>
@@ -171,7 +172,7 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
               {/* Mentors Column */}
               <div className="flex flex-col gap-4">
                 <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">
-                  Cố Vấn ({mentors.length})
+                  {tExtracted('coVan')}{mentors.length})
                 </span>
                 <div className="flex flex-col gap-3">
                   {mentors.map((mentor) => (
@@ -182,8 +183,8 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                       className="flex gap-4 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all group no-underline"
                     >
                       <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-slate-100 border border-slate-100">
-                        <img 
-                          src={mentor.user?.avatarUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"} 
+                        <img
+                          src={mentor.user?.avatarUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"}
                           alt={mentor.user?.name}
                           className="w-full h-full object-cover"
                         />
@@ -193,13 +194,13 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                           {mentor.user?.name}
                         </h4>
                         <span className="text-[10px] font-bold text-slate-500 mt-1 line-clamp-1">
-                          {mentor.jobTitle ? `${mentor.jobTitle}${mentor.company ? ` tại ${mentor.company}` : ''}` : 'Cố vấn Học Tự Thiện'}
+                          {mentor.jobTitle ? `${mentor.jobTitle}${mentor.company ? ` tại ${mentor.company}` : ''}` : tExtracted('coVanHocTuThien')}
                         </span>
                       </div>
                     </Link>
                   ))}
                   {mentors.length === 0 && (
-                    <p className="text-[11px] text-slate-400 italic">Không có cố vấn nào</p>
+                    <p className="text-[11px] text-slate-400 italic">{tExtracted('khongCoCoVanNao')}</p>
                   )}
                 </div>
               </div>

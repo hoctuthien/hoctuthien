@@ -61,7 +61,7 @@ async function signInWithCredentials(email: string, password: string) {
 }
 
 export function LoginForm() {
-  const t = useTranslations("Auth");
+  const tExtracted = useTranslations('Extracted.appAuthLoginComponentsLoginForm');  const t = useTranslations("Auth");
   const tError = useTranslations("Error");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -109,7 +109,7 @@ export function LoginForm() {
         // Lấy session mới nhất để check role
         const res = await fetch("/api/auth/session");
         const session = await res.json();
-        
+
         const redirectUrl = session?.user?.role === "admin" ? "/admin/dashboard" : "/";
         router.push(redirectUrl);
         router.refresh();
@@ -147,7 +147,7 @@ export function LoginForm() {
       </div>
 
       <GoogleSignInButton
-        label={t("signInWithGoogle")}
+        label={t('signInWithGoogle')}
         onClick={handleGoogleSignIn}
         loading={isGoogleLoading}
       />
@@ -162,7 +162,7 @@ export function LoginForm() {
       >
         <Input
           id="login-email"
-          label={t("emailAddress")}
+          label={t('emailAddress')}
           type="email"
           placeholder="name@atelier.edu"
           error={errors.email?.message}
@@ -178,7 +178,7 @@ export function LoginForm() {
 
         <Input
           id="login-password"
-          label={t("password")}
+          label={t('password')}
           type={showPassword ? "text" : "password"}
           placeholder="••••••••"
           error={errors.password?.message}
@@ -197,7 +197,7 @@ export function LoginForm() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="text-text-muted hover:text-text-heading transition-colors cursor-pointer focus:outline-none"
-              aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+              aria-label={showPassword ? t('hidePassword') : t('showPassword')}
               tabIndex={-1}
             >
               <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
@@ -212,7 +212,7 @@ export function LoginForm() {
             render={({ field }) => (
               <Checkbox
                 id="remember-me"
-                label={t("rememberMe")}
+                label={t('rememberMe')}
                 checked={field.value}
                 onChange={field.onChange}
               />
@@ -233,7 +233,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          label={isSubmitting ? t("signingIn") : t("signIn")}
+          label={isSubmitting ? t('signingIn') : t('signIn')}
           variant="primary"
           size="md"
           fullWidth

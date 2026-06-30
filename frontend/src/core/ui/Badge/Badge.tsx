@@ -16,7 +16,7 @@ interface BadgeProps {
 const variantStyles: Record<BadgeVariant, string> = {
   primary: 'bg-[#E0E7FF] text-[#3730A3]',
   success: 'bg-[#BBF7D0] text-[#166534]',
-  warning: 'bg-[#FEF3C7] text-[#92400E]', 
+  warning: 'bg-[#FEF3C7] text-[#92400E]',
   error: 'bg-[#FEE2E2] text-[#991B1B]',
   growth: 'bg-[#DCFCE7] text-[#166534]',
   neutral: 'bg-[#F1F5F9] text-[#475569]',
@@ -38,8 +38,7 @@ export const Badge = ({
   dot,
   count,
   className
-}: BadgeProps) => {
-  return (
+}: BadgeProps) => {  return (
     <div className={cn('relative inline-flex items-center', className)}>
       {icon && <span className="inline-flex text-[#475569]">{icon}</span>}
       {children && (
@@ -66,7 +65,7 @@ export const Badge = ({
       {count !== undefined && (
         <span className={cn(
           'absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 text-[10px] font-bold text-white border-[1.5px] border-white',
-          count === 12 ? 'bg-[#B91C1C]' : 'bg-[#2563EB]'
+          count === 12 ? "bg-[#B91C1C]" : "bg-[#2563EB]"
         )}>
           {count > 99 ? '99+' : count}
         </span>

@@ -14,6 +14,7 @@ interface MentorshipPageProps {
 }
 
 export default async function MentorshipPage({ searchParams }: MentorshipPageProps) {
+  const tExtracted = await getTranslations('Extracted.appPublicMentorshipPage');
   const params = await searchParams;
   const t = await getTranslations('Common');
 
@@ -23,14 +24,12 @@ export default async function MentorshipPage({ searchParams }: MentorshipPagePro
         {/* Header Title */}
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
           <p className="font-bold text-primary uppercase tracking-widest text-xs">
-            {t('mentorship') || "MENTORSHIP"}
+            {t('mentorship') || tExtracted('mentorship')}
           </p>
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
-            Meet Our Professional Mentors
-          </h1>
+            {tExtracted('meetOurProfessionalMentors')}</h1>
           <p className="text-slate-500 text-sm md:text-base leading-relaxed">
-            Learn from industry experts, get career guidance, and level up your skills through 1-on-1 mentorship sessions.
-          </p>
+            {tExtracted('learnFromIndustryExpertsGetCareerGuidanceAnd')}</p>
         </div>
 
         {/* Filters (Client Component) */}

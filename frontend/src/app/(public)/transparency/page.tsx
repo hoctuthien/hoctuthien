@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from "react";
 import { LuTrendingUp, LuDollarSign, LuCheck } from "react-icons/lu";
 import { apiService } from "@/core/api/base";
@@ -69,8 +70,9 @@ function normalizeTransparencyData(response: unknown): TransparencyData {
 }
 
 function MonthlyBarChart({ data }: { data: MonthlyStat[] }) {
+  const tExtracted = useTranslations('Extracted.appPublicTransparencyPage');
   if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center h-full text-sm text-slate-400">Chưa có dữ liệu</div>;
+    return <div className="flex items-center justify-center h-full text-sm text-slate-400">{tExtracted('chuaCoDuLieu')}</div>;
   }
 
   const max = Math.max(...data.map((d) => d.amount), 1);
@@ -105,6 +107,7 @@ const breadcrumbItems = [
 ];
 
 export default function TransparencyPage() {
+  const tExtracted = useTranslations('Extracted.appPublicTransparencyPage');
   const [data, setData] = useState<TransparencyData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -122,10 +125,9 @@ export default function TransparencyPage() {
         <Breadcrumb items={breadcrumbItems} />
 
         <div>
-          <h1 className="text-3xl font-black text-slate-900">Minh bạch tài chính</h1>
+          <h1 className="text-3xl font-black text-slate-900">{tExtracted('minhBachTaiChinh')}</h1>
           <p className="text-slate-500 text-sm mt-2 font-semibold">
-            Học Từ Thiện cam kết công khai toàn bộ thông tin về các khoản quyên góp và sử dụng quỹ.
-          </p>
+            {tExtracted('hocTuThienCamKetCongKhaiToan')}</p>
         </div>
 
         {loading ? (
@@ -134,28 +136,27 @@ export default function TransparencyPage() {
           </div>
         ) : !data ? (
           <div className="text-sm text-rose-500 bg-rose-50 p-4 rounded-xl border border-rose-100">
-            Không thể tải dữ liệu. Vui lòng thử lại sau.
-          </div>
+            {tExtracted('khongTheTaiDuLieuVuiLongThu')}</div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[
                 {
-                  label: "Tổng quyên góp",
+                  label: tExtracted('tongQuyenGop'),
                   value: formatCurrency(data.totalRaised),
                   icon: LuDollarSign,
                   color: "text-blue-600",
                   bg: "bg-blue-50",
                 },
                 {
-                  label: "Giao dịch thành công",
+                  label: tExtracted('giaoDichThanhCong'),
                   value: data.totalCompleted.toString(),
                   icon: LuCheck,
                   color: "text-emerald-600",
                   bg: "bg-emerald-50",
                 },
                 {
-                  label: "Tháng có dữ liệu",
+                  label: tExtracted('thangCoDuLieu'),
                   value: data.monthlyStats.length.toString(),
                   icon: LuTrendingUp,
                   color: "text-purple-600",
@@ -179,8 +180,7 @@ export default function TransparencyPage() {
 
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">
-                Quyên góp theo tháng (12 tháng gần nhất)
-              </h2>
+                {tExtracted('quyenGopTheoThang12ThangGanNhat')}</h2>
               <div className="h-64">
                 <MonthlyBarChart data={data.monthlyStats} />
               </div>
@@ -189,21 +189,17 @@ export default function TransparencyPage() {
             {data.recentPayments.length > 0 && (
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                 <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">
-                  Giao dịch gần đây
-                </h2>
+                  {tExtracted('giaoDichGanDay')}</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
                       <tr className="border-b border-slate-100">
                         <th className="text-left py-2 pr-4 font-black text-slate-400 uppercase tracking-wide">
-                          Ngày
-                        </th>
+                          {tExtracted('ngay')}</th>
                         <th className="text-right py-2 pr-4 font-black text-slate-400 uppercase tracking-wide">
-                          Số tiền
-                        </th>
+                          {tExtracted('soTien')}</th>
                         <th className="text-left py-2 font-black text-slate-400 uppercase tracking-wide">
-                          Mô tả
-                        </th>
+                          {tExtracted('moTa')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -227,8 +223,7 @@ export default function TransparencyPage() {
             )}
 
             <p className="text-xs text-slate-400 text-center font-semibold">
-              Dữ liệu được cập nhật theo thời gian thực. Thông tin cá nhân được ẩn danh hoàn toàn để bảo vệ quyền riêng tư.
-            </p>
+              {tExtracted('duLieuDuocCapNhatTheoThoiGian')}</p>
           </>
         )}
       </div>

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from "react";
 import Link from "next/link";
 import { MentorCard } from "@/shared/components/MentorCard";
@@ -43,22 +44,21 @@ const MOCK_EXPERTS: ExpertMentor[] = [
 ];
 
 export const ExpertMentorsSection = () => {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesComponentsExpertMentorsSection');
   return (
     <div className="flex flex-col gap-6">
       {/* Section header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-100">
         <div className="flex flex-col gap-1">
           <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em]">
-            Top Experts
-          </span>
+            {tExtracted('topExperts')}</span>
           <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
-            Mentor nổi bật
-          </h2>
+            {tExtracted('mentorNoiBat')}</h2>
         </div>
         <Link href="/mentorship" className="shrink-0">
           <Button
             variant="outline"
-            label="Xem tất cả"
+            label={tExtracted('xemTatCa')}
             size="md"
             className="rounded-full font-bold text-sm border-slate-200 hover:border-primary/40"
           />

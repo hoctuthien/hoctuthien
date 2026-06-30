@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LuStar, LuUsers, LuTrophy } from "react-icons/lu";
@@ -29,6 +30,7 @@ const breadcrumbItems = [
 ];
 
 export default function LeaderboardPage() {
+  const tExtracted = useTranslations('Extracted.appPublicLeaderboardPage');
   const [tab, setTab] = useState<"mentor" | "mentee">("mentor");
   const [mentors, setMentors] = useState<MentorEntry[]>([]);
   const [mentees, setMentees] = useState<MenteeEntry[]>([]);
@@ -58,10 +60,9 @@ export default function LeaderboardPage() {
 
         <div className="text-center">
           <div className="text-5xl mb-3">🏆</div>
-          <h1 className="text-3xl font-black text-slate-900">Bảng xếp hạng</h1>
+          <h1 className="text-3xl font-black text-slate-900">{tExtracted('bangXepHang')}</h1>
           <p className="text-slate-500 text-sm mt-2 font-semibold">
-            Vinh danh những Cố vấn và Học viên xuất sắc nhất của Học Từ Thiện
-          </p>
+            {tExtracted('vinhDanhNhungCoVanVaHocVien')}</p>
         </div>
 
         {/* Tabs */}
@@ -74,7 +75,7 @@ export default function LeaderboardPage() {
                 tab === t ? "bg-[#005BBF] text-white shadow-sm" : "text-slate-500 hover:text-slate-700 bg-transparent"
               }`}
             >
-              {t === "mentor" ? "Cố vấn học tập" : "Học viên"}
+              {t === "mentor" ? tExtracted('coVanHocTap') : tExtracted('hocVien2')}
             </button>
           ))}
         </div>
@@ -86,7 +87,7 @@ export default function LeaderboardPage() {
         ) : tab === "mentor" ? (
           <div className="flex flex-col gap-3">
             {mentors.length === 0 && (
-              <p className="text-center text-slate-400 text-sm py-8">Chưa có dữ liệu</p>
+              <p className="text-center text-slate-400 text-sm py-8">{tExtracted('chuaCoDuLieu')}</p>
             )}
             {mentors.map((mentor, idx) => (
               <Link
@@ -106,7 +107,7 @@ export default function LeaderboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-black text-slate-900 text-sm group-hover:text-blue-600 transition-colors truncate">
-                    {mentor.user?.name || "Cố vấn"}
+                    {mentor.user?.name || tExtracted('coVan')}
                   </p>
                   {(mentor.jobTitle || mentor.company) && (
                     <p className="text-xs text-slate-400 font-semibold truncate">
@@ -121,8 +122,7 @@ export default function LeaderboardPage() {
                   </span>
                   <span className="flex items-center gap-1 text-xs font-bold text-slate-500">
                     <LuUsers size={12} />
-                    {mentor.totalStudents} học viên
-                  </span>
+                    {mentor.totalStudents} {tExtracted('hocVien')}</span>
                 </div>
               </Link>
             ))}
@@ -130,7 +130,7 @@ export default function LeaderboardPage() {
         ) : (
           <div className="flex flex-col gap-3">
             {mentees.length === 0 && (
-              <p className="text-center text-slate-400 text-sm py-8">Chưa có dữ liệu</p>
+              <p className="text-center text-slate-400 text-sm py-8">{tExtracted('chuaCoDuLieu')}</p>
             )}
             {mentees.map((mentee, idx) => (
               <div
@@ -144,12 +144,12 @@ export default function LeaderboardPage() {
                   <LuTrophy size={22} className="text-slate-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-black text-slate-900 text-sm truncate">Học viên</p>
+                  <p className="font-black text-slate-900 text-sm truncate">{tExtracted('hocVien2')}</p>
                   <p className="text-xs text-slate-400 font-mono truncate">{mentee.menteeId?.slice(0, 16)}…</p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-sm font-black text-emerald-600">{mentee.completedCount}</p>
-                  <p className="text-[10px] text-slate-400 font-semibold">buổi hoàn thành</p>
+                  <p className="text-[10px] text-slate-400 font-semibold">{tExtracted('buoiHoanThanh')}</p>
                 </div>
               </div>
             ))}

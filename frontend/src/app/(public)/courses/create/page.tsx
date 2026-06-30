@@ -1,12 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import CourseCreateClient from "./course-create-client";
 
-export const metadata: Metadata = {
-  title: "Tạo khóa học mới | Học Từ Thiện",
-  description: "Trang thiết kế và khởi tạo khóa học mới dành cho các Cố vấn.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.public_courses_create");
+  return { title: t("title"), description: t("description") };
+}
 
 export default async function CourseCreatePage() {
   const session = await auth();

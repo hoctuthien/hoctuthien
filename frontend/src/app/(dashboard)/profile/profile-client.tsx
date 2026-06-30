@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect } from 'react';
 import { authGateway, mentorGateway } from '@/core/gateway';
 import { useRouter } from 'next/navigation';
@@ -20,8 +21,9 @@ import {
 } from 'react-icons/lu';
 
 export function ProfileClient({ user }: { user: any }) {
+  const tExtracted = useTranslations('Extracted.appDashboardProfileProfileClient');
   const router = useRouter();
-  
+
   // Navigation tabs for Mentor
   const [activeTab, setActiveTab] = useState<'personal' | 'teaching'>('personal');
 
@@ -120,11 +122,11 @@ export function ProfileClient({ user }: { user: any }) {
       };
 
       await authGateway.updateMe(payload);
-      showMessage('success', 'Cập nhật thông tin cá nhân thành công! Thay đổi sẽ hiển thị đầy đủ sau khi tải lại trang.');
+      showMessage("success", tExtracted('capNhatThongTinCaNhanThanhCong'));
       router.refresh();
     } catch (error: any) {
       console.error('Update personal info failed:', error);
-      showMessage('error', error?.message || 'Cập nhật thông tin cá nhân thất bại. Vui lòng kiểm tra lại.');
+      showMessage("error", error?.message || tExtracted('capNhatThongTinCaNhanThatBai'));
     } finally {
       setSubmittingUser(false);
     }
@@ -151,10 +153,10 @@ export function ProfileClient({ user }: { user: any }) {
       };
 
       await mentorGateway.updateMentorProfileMe(payload);
-      showMessage('success', 'Cập nhật hồ sơ giảng dạy (Mentor) thành công!');
+      showMessage("success", tExtracted('capNhatHoSoGiangDayMentorThanh'));
     } catch (error: any) {
       console.error('Update mentor profile failed:', error);
-      showMessage('error', error?.message || 'Cập nhật hồ sơ giảng dạy thất bại. Vui lòng kiểm tra lại.');
+      showMessage("error", error?.message || tExtracted('capNhatHoSoGiangDayThatBai'));
     } finally {
       setSubmittingMentor(false);
     }
@@ -196,27 +198,27 @@ export function ProfileClient({ user }: { user: any }) {
             )}
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h1 className="text-2xl md:text-3xl font-black font-[Montserrat] tracking-tight">{name || 'Người dùng'}</h1>
+            <h1 className="text-2xl md:text-3xl font-black font-[Montserrat] tracking-tight">{name || tExtracted('nguoiDung')}</h1>
             <p className="text-white/80 text-sm mt-1">{user.email}</p>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-3">
               <span className="bg-white/20 text-white font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md">
-                Vai trò: {user.role === 'mentor' ? 'Cố vấn (Mentor)' : user.role === 'admin' ? 'Quản trị viên' : 'Học viên (Mentee)'}
+                {tExtracted('vaiTro')}{user.role === 'mentor' ? tExtracted('coVanMentor') : user.role === 'admin' ? tExtracted('quanTriVien') : tExtracted('hocVienMentee')}
               </span>
               <span className={`flex items-center gap-1.5 font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md border ${
                 accountVerified
-                  ? 'bg-emerald-500/20 text-emerald-100 border-emerald-300/30'
-                  : 'bg-amber-500/25 text-amber-100 border-amber-300/30'
+                  ? "bg-emerald-500/20 text-emerald-100 border-emerald-300/30"
+                  : "bg-amber-500/25 text-amber-100 border-amber-300/30"
               }`}>
                 {accountVerified ? <LuCheck size={12} /> : <LuTriangleAlert size={12} />}
-                <span>{accountVerified ? 'Tài khoản đã kích hoạt' : 'Tài khoản chưa kích hoạt'}</span>
+                <span>{accountVerified ? tExtracted('taiKhoanDaKichHoat') : tExtracted('taiKhoanChuaKichHoat')}</span>
               </span>
               {isMentor && mentorProfile && (
                 <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md ${
-                  mentorProfile.status === 'approved' 
-                    ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-500/20' 
-                    : 'bg-amber-500/30 text-amber-200 border border-amber-500/20'
+                  mentorProfile.status === 'approved'
+                    ? "bg-emerald-500/30 text-emerald-200 border border-emerald-500/20"
+                    : "bg-amber-500/30 text-amber-200 border border-amber-500/20"
                 }`}>
-                  Trạng thái hồ sơ: {mentorProfile.status === 'approved' ? 'Đã duyệt' : 'Chờ duyệt'}
+                  {tExtracted('trangThaiHoSo')}{mentorProfile.status === 'approved' ? tExtracted('daDuyet') : tExtracted('choDuyet')}
                 </span>
               )}
             </div>
@@ -226,7 +228,7 @@ export function ProfileClient({ user }: { user: any }) {
             className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-black text-xs px-5 py-3 rounded-2xl border border-white/10 transition-all cursor-pointer backdrop-blur-md active:scale-95"
           >
             <LuLogOut size={14} />
-            <span>Đăng xuất</span>
+            <span>{tExtracted('dangXuat')}</span>
           </button>
         </div>
       </div>
@@ -235,8 +237,8 @@ export function ProfileClient({ user }: { user: any }) {
       {message && (
         <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-2xl border shadow-lg flex items-start gap-3 max-w-md animate-in slide-in-from-bottom duration-300 ${
           message.type === 'success'
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-            : 'bg-rose-50 border-rose-200 text-rose-800'
+            ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+            : "bg-rose-50 border-rose-200 text-rose-800"
         }`}>
           <div className="mt-0.5">
             {message.type === 'success' ? (
@@ -247,7 +249,7 @@ export function ProfileClient({ user }: { user: any }) {
           </div>
           <div className="flex-1">
             <h4 className="text-xs font-black uppercase tracking-wider mb-0.5">
-              {message.type === 'success' ? 'Thành công' : 'Lỗi hệ thống'}
+              {message.type === 'success' ? tExtracted('thanhCong') : tExtracted('loiHeThong')}
             </h4>
             <p className="text-xs font-semibold leading-relaxed">{message.text}</p>
           </div>
@@ -262,24 +264,24 @@ export function ProfileClient({ user }: { user: any }) {
             onClick={() => setActiveTab('personal')}
             className={`flex-1 py-3 px-6 text-xs font-black tracking-wide rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer border-0 ${
               activeTab === 'personal'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100/50'
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-100/50"
             }`}
           >
             <LuUser size={16} />
-            <span>Thông tin cá nhân</span>
+            <span>{tExtracted('thongTinCaNhan')}</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('teaching')}
             className={`flex-1 py-3 px-6 text-xs font-black tracking-wide rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer border-0 ${
               activeTab === 'teaching'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100/50'
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-100/50"
             }`}
           >
             <LuBriefcase size={16} />
-            <span>Hồ sơ giảng dạy (Mentor)</span>
+            <span>{tExtracted('hoSoGiangDayMentor')}</span>
           </button>
         </div>
       )}
@@ -289,22 +291,21 @@ export function ProfileClient({ user }: { user: any }) {
         {activeTab === 'personal' ? (
           <form onSubmit={handleUpdateUser} className="space-y-6">
             <h3 className="text-lg font-black text-[#0F172A] font-[Montserrat] mb-2 tracking-tight">
-              Cập nhật Thông tin cá nhân
-            </h3>
-            
+              {tExtracted('capNhatThongTinCaNhan')}</h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Full Name */}
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <LuUser size={14} className="text-slate-400" />
-                  <span>Họ và tên *</span>
+                  <span>{tExtracted('hoVaTen')}</span>
                 </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ví dụ: Nguyễn Văn A"
+                  placeholder={tExtracted('viDuNguyenVanA')}
                   className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
                 />
               </div>
@@ -313,13 +314,13 @@ export function ProfileClient({ user }: { user: any }) {
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <LuPhone size={14} className="text-slate-400" />
-                  <span>Số điện thoại</span>
+                  <span>{tExtracted('soDienThoai')}</span>
                 </label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ví dụ: 0987654321"
+                  placeholder={tExtracted('viDu0987654321')}
                   className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
                 />
               </div>
@@ -328,7 +329,7 @@ export function ProfileClient({ user }: { user: any }) {
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <LuCalendar size={14} className="text-slate-400" />
-                  <span>Ngày sinh</span>
+                  <span>{tExtracted('ngaySinh')}</span>
                 </label>
                 <input
                   type="date"
@@ -342,16 +343,16 @@ export function ProfileClient({ user }: { user: any }) {
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <LuUser size={14} className="text-slate-400" />
-                  <span>Giới tính</span>
+                  <span>{tExtracted('gioiTinh')}</span>
                 </label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
                   className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors cursor-pointer"
                 >
-                  <option value="male">Nam</option>
-                  <option value="female">Nữ</option>
-                  <option value="other">Khác</option>
+                  <option value="male">{tExtracted('nam')}</option>
+                  <option value="female">{tExtracted('nu')}</option>
+                  <option value="other">{tExtracted('khac')}</option>
                 </select>
               </div>
 
@@ -359,13 +360,13 @@ export function ProfileClient({ user }: { user: any }) {
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <LuGlobe size={14} className="text-slate-400" />
-                  <span>Múi giờ</span>
+                  <span>{tExtracted('muiGio')}</span>
                 </label>
                 <input
                   type="text"
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  placeholder="Ví dụ: Asia/Ho_Chi_Minh"
+                  placeholder={tExtracted('viDuAsiaHoChiMinh')}
                   className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
                 />
               </div>
@@ -374,7 +375,7 @@ export function ProfileClient({ user }: { user: any }) {
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <LuImage size={14} className="text-slate-400" />
-                  <span>Đường dẫn ảnh đại diện (URL)</span>
+                  <span>{tExtracted('duongDanAnhDaiDienUrl')}</span>
                 </label>
                 <input
                   type="url"
@@ -397,7 +398,7 @@ export function ProfileClient({ user }: { user: any }) {
                 ) : (
                   <>
                     <LuCheck size={14} />
-                    <span>Lưu thay đổi</span>
+                    <span>{tExtracted('luuThayDoi')}</span>
                   </>
                 )}
               </button>
@@ -406,13 +407,12 @@ export function ProfileClient({ user }: { user: any }) {
         ) : (
           <form onSubmit={handleUpdateMentor} className="space-y-6">
             <h3 className="text-lg font-black text-[#0F172A] font-[Montserrat] mb-2 tracking-tight">
-              Cập nhật Hồ sơ Cố vấn (Mentor Profile)
-            </h3>
+              {tExtracted('capNhatHoSoCoVanMentorProfile')}</h3>
 
             {loadingMentor ? (
               <div className="py-8 flex flex-col items-center justify-center text-slate-400 gap-2">
                 <LuRefreshCw size={32} className="animate-spin text-blue-500" />
-                <span className="text-xs font-semibold">Đang tải hồ sơ giảng dạy...</span>
+                <span className="text-xs font-semibold">{tExtracted('dangTaiHoSoGiangDay')}</span>
               </div>
             ) : (
               <div className="space-y-6">
@@ -421,13 +421,13 @@ export function ProfileClient({ user }: { user: any }) {
                   <div className="flex flex-col gap-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                       <LuBriefcase size={14} className="text-slate-400" />
-                      <span>Chức danh công việc / Vị trí</span>
+                      <span>{tExtracted('chucDanhCongViecViTri')}</span>
                     </label>
                     <input
                       type="text"
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
-                      placeholder="Ví dụ: Senior Software Engineer"
+                      placeholder={tExtracted('viDuSeniorSoftwareEngineer')}
                       className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
                     />
                   </div>
@@ -436,13 +436,13 @@ export function ProfileClient({ user }: { user: any }) {
                   <div className="flex flex-col gap-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                       <LuBriefcase size={14} className="text-slate-400" />
-                      <span>Công ty / Tổ chức</span>
+                      <span>{tExtracted('congTyToChuc')}</span>
                     </label>
                     <input
                       type="text"
                       value={company}
                       onChange={(e) => setCompany(e.target.value)}
-                      placeholder="Ví dụ: Google Vietnam"
+                      placeholder={tExtracted('viDuGoogleVietnam')}
                       className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
                     />
                   </div>
@@ -451,14 +451,14 @@ export function ProfileClient({ user }: { user: any }) {
                   <div className="flex flex-col gap-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                       <LuCalendar size={14} className="text-slate-400" />
-                      <span>Số năm kinh nghiệm</span>
+                      <span>{tExtracted('soNamKinhNghiem')}</span>
                     </label>
                     <input
                       type="number"
                       min={0}
                       value={yearsOfExperience}
                       onChange={(e) => setYearsOfExperience(e.target.value === '' ? '' : Number(e.target.value))}
-                      placeholder="Ví dụ: 5"
+                      placeholder={tExtracted('viDu5')}
                       className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
                     />
                   </div>
@@ -467,7 +467,7 @@ export function ProfileClient({ user }: { user: any }) {
                   <div className="flex flex-col gap-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                       <LuLinkedin size={14} className="text-slate-400" />
-                      <span>Đường dẫn LinkedIn (URL)</span>
+                      <span>{tExtracted('duongDanLinkedinUrl')}</span>
                     </label>
                     <input
                       type="url"
@@ -483,30 +483,29 @@ export function ProfileClient({ user }: { user: any }) {
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                     <LuBookOpen size={14} className="text-slate-400" />
-                    <span>Kỹ năng giảng dạy (Phân cách bằng dấu phẩy)</span>
+                    <span>{tExtracted('kyNangGiangDayPhanCachBangDau')}</span>
                   </label>
                   <input
                     type="text"
                     value={skills}
                     onChange={(e) => setSkills(e.target.value)}
-                    placeholder="Ví dụ: NestJS, React, TypeScript, Docker"
+                    placeholder={tExtracted('viDuNestjsReactTypescriptDocker')}
                     className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors"
                   />
                   <span className="text-[10px] text-slate-400 font-semibold italic mt-0.5">
-                    * Các kỹ năng sẽ được hiển thị trên trang danh sách để học viên tìm kiếm.
-                  </span>
+                    {tExtracted('cacKyNangSeDuocHienThiTren')}</span>
                 </div>
 
                 {/* Bio text */}
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                     <LuUser size={14} className="text-slate-400" />
-                    <span>Giới thiệu bản thân (Bio)</span>
+                    <span>{tExtracted('gioiThieuBanThanBio')}</span>
                   </label>
                   <textarea
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    placeholder="Mô tả kinh nghiệm, phương pháp giảng dạy hoặc mong muốn hỗ trợ học viên..."
+                    placeholder={tExtracted('moTaKinhNghiemPhuongPhapGiangDay')}
                     className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-semibold bg-[#FAFBFD] focus:bg-white transition-colors min-h-[120px] resize-none leading-relaxed"
                   />
                 </div>
@@ -522,7 +521,7 @@ export function ProfileClient({ user }: { user: any }) {
                     ) : (
                       <>
                         <LuCheck size={14} />
-                        <span>Cập nhật hồ sơ</span>
+                        <span>{tExtracted('capNhatHoSo')}</span>
                       </>
                     )}
                   </button>
@@ -535,7 +534,7 @@ export function ProfileClient({ user }: { user: any }) {
         {/* Badges Section */}
         {badges.length > 0 && (
           <div className="mt-6 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">Huy hiệu của bạn</h2>
+            <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">{tExtracted('huyHieuCuaBan')}</h2>
             <div className="flex flex-wrap gap-3">
               {badges.map((ub: any) => (
                 <div
@@ -544,7 +543,7 @@ export function ProfileClient({ user }: { user: any }) {
                   title={ub.badge?.description || ''}
                 >
                   <span className="text-lg">🏅</span>
-                  <span className="text-xs font-bold text-amber-800">{ub.badge?.name || 'Huy hiệu'}</span>
+                  <span className="text-xs font-bold text-amber-800">{ub.badge?.name || tExtracted('huyHieu')}</span>
                 </div>
               ))}
             </div>

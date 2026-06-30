@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import { IoClose } from 'react-icons/io5';
 
@@ -10,14 +11,15 @@ interface ToastProps {
   className?: string;
 }
 
-export const Toast = ({ 
-  message, 
-  actionLabel, 
-  onAction, 
-  onClose, 
-  icon, 
-  className = '' 
+export const Toast = ({
+  message,
+  actionLabel,
+  onAction,
+  onClose,
+  icon,
+  className = ''
 }: ToastProps) => {
+  const tExtracted = useTranslations('Extracted.coreUiFeedbackToast');
   return (
     <div className={`flex items-center gap-4 px-6 py-3.5 rounded-full bg-[#1A1D21] text-white shadow-[0_12px_32px_rgba(0,0,0,0.3)] animate-in zoom-in-95 fade-in duration-500 transform-gpu ${className}`}>
       {icon && (
@@ -31,7 +33,7 @@ export const Toast = ({
       {(actionLabel || onClose) && (
         <div className="flex items-center gap-4 ml-1 border-l border-white/10 pl-4 h-5">
           {actionLabel && (
-            <button 
+            <button
               onClick={onAction}
               className="text-[11px] font-[900] uppercase tracking-[0.12em] text-[#FFB443] hover:text-[#FFCF87] transition-all cursor-pointer select-none active:scale-95"
             >
@@ -39,10 +41,10 @@ export const Toast = ({
             </button>
           )}
           {onClose && (
-            <button 
+            <button
               onClick={onClose}
               className="text-white/40 hover:text-white transition-colors cursor-pointer p-0.5 rounded-full"
-              aria-label="Close"
+              aria-label={tExtracted('close')}
             >
               <IoClose size={18} />
             </button>

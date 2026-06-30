@@ -1,9 +1,10 @@
+import { getTranslations } from "next-intl/server";
 import { ForgotPasswordForm } from './forgot-password-form';
 
-export const metadata = {
-  title: 'Quên mật khẩu | Học Từ Thiện',
-  description: 'Nhận mã OTP qua email để đặt lại mật khẩu tài khoản.',
-};
+export async function generateMetadata() {
+  const t = await getTranslations("PageMetadata.auth_forgotpassword");
+  return { title: t("title"), description: t("description") };
+}
 
 export default function ForgotPasswordPage() {
   return <ForgotPasswordForm />;

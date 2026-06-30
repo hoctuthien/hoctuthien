@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useId } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Clock, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
@@ -40,6 +41,7 @@ export const TimePicker = ({
   helperText,
   status: providedStatus,
 }: TimePickerProps) => {
+  const tExtracted = useTranslations('Extracted.sharedComponentsTimePickerTimePicker');
   const [time, setTime] = useState<string | undefined>(value);
   const id = useId();
 
@@ -141,7 +143,7 @@ export const TimePicker = ({
         >
           <div className="flex flex-col gap-1.5">
             <div className="px-2 pb-2 mb-1 border-b border-slate-100 flex items-center justify-between">
-              <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Select Time</span>
+              <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">{tExtracted('selectTime')}</span>
               <Clock size={12} className="text-text-muted" />
             </div>
             <div className="grid grid-cols-2 gap-2">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React from "react";
 import { MentorCard as SharedMentorCard } from "@/shared/components/MentorCard";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,7 @@ interface MentorCardProps {
 }
 
 export const MentorCard = ({ mentor }: MentorCardProps) => {
+  const tExtracted = useTranslations('Extracted.appPublicMentorshipComponentsMentorCard');
   const router = useRouter();
 
   const handleNavigate = () => {
@@ -42,7 +44,7 @@ export const MentorCard = ({ mentor }: MentorCardProps) => {
       <SharedMentorCard
         name={mentor.user?.name || "Mentor"}
         title={mentor.jobTitle + (mentor.company ? ` at ${mentor.company}` : "")}
-        description={mentor.bio || "No description provided."}
+        description={mentor.bio || tExtracted('noDescriptionProvided')}
         avatarSrc={mentor.user?.avatarUrl || "/images/avatar_logo.png"}
         onConnect={handleViewCourses}
         onProfile={handleNavigate}

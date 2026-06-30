@@ -1,13 +1,14 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect } from "react";
 import { Button, Icon, Badge } from "@/core/ui";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MantineProvider } from "@mantine/core";
-import { 
-  createPostAction, 
-  getCategoriesAction, 
+import {
+  createPostAction,
+  getCategoriesAction,
   getTagsAction,
   createCategoryAction,
   createTagAction,
@@ -21,6 +22,7 @@ const BlockEditor = dynamic(() => import("../components/BlockEditor"), {
 });
 
 export default function AdminEditorPage() {
+  const tExtracted = useTranslations('Extracted.appAdminPostsNewPage');
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState("draft");
@@ -102,7 +104,7 @@ export default function AdminEditorPage() {
       setNewCategoryName("");
       setShowNewCatInput(false);
     } catch (error) {
-      alert("Failed to create category");
+      alert(tExtracted('failedToCreateCategory'));
     } finally {
       setIsCreatingCat(false);
     }
@@ -118,7 +120,7 @@ export default function AdminEditorPage() {
       setNewTagName("");
       setShowNewTagInput(false);
     } catch (error) {
-      alert("Failed to create tag");
+      alert(tExtracted('failedToCreateTag'));
     } finally {
       setIsCreatingTag(false);
     }
@@ -136,7 +138,7 @@ export default function AdminEditorPage() {
       setThumbnail(url);
     } catch (error: any) {
       console.error("Failed to upload image:", error);
-      alert(error.message || "Failed to upload image. Please check format or size.");
+      alert(error.message || tExtracted('failedToUploadImagePleaseCheckFormatOr'));
     } finally {
       setIsUploadingImage(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -145,7 +147,7 @@ export default function AdminEditorPage() {
 
   const handleSave = async (newStatus: string) => {
     if (!title) {
-      alert("Please enter a title");
+      alert(tExtracted('pleaseEnterATitle'));
       return;
     }
 
@@ -168,7 +170,7 @@ export default function AdminEditorPage() {
       router.push("/admin/posts");
     } catch (error) {
       console.error("Failed to save post:", error);
-      alert("Error saving post");
+      alert(tExtracted('errorSavingPost'));
     } finally {
       setIsLoading(false);
     }
@@ -185,24 +187,24 @@ export default function AdminEditorPage() {
             </Link>
             <div className="h-4 w-px bg-slate-200" />
             <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
-              <span>Posts</span>
+              <span>{tExtracted('posts')}</span>
               <Icon name="ChevronRight" size={12} />
-              <span className="text-slate-900 truncate max-w-[200px]">{title || "Untitled Post"}</span>
+              <span className="text-slate-900 truncate max-w-[200px]">{title || tExtracted('untitledPost')}</span>
             </div>
             <Badge variant="warning" className="!text-[9px] !px-2 !py-0.5 ml-2">
               {status.toUpperCase()}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
-              label={isPreviewMode ? "Edit Post" : "Preview"} 
-              variant="secondary" 
+            <Button
+              label={isPreviewMode ? tExtracted('editPost') : tExtracted('preview')}
+              variant="secondary"
               iconLeft={<Icon name={isPreviewMode ? "Pencil" : "Eye"} size={14} />}
               className="!px-4 !py-2 !rounded-xl !text-xs !bg-slate-50 hover:!bg-slate-100 !text-slate-700 font-bold border border-slate-200 shadow-sm"
               onClick={() => setIsPreviewMode(!isPreviewMode)}
             />
-            <Button label="Save Draft" variant="secondary" className="!px-4 !py-2 !rounded-xl !text-xs" loading={isLoading} onClick={() => handleSave("draft")} />
-            <Button label="Publish" variant="primary" className="!px-6 !py-2 !rounded-xl !text-xs shadow-lg shadow-primary/20" loading={isLoading} onClick={() => handleSave("published")} />
+            <Button label={tExtracted('saveDraft')} variant="secondary" className="!px-4 !py-2 !rounded-xl !text-xs" loading={isLoading} onClick={() => handleSave("draft")} />
+            <Button label={tExtracted('publish')} variant="primary" className="!px-6 !py-2 !rounded-xl !text-xs shadow-lg shadow-primary/20" loading={isLoading} onClick={() => handleSave("published")} />
           </div>
         </div>
 
@@ -214,34 +216,33 @@ export default function AdminEditorPage() {
                 {/* Article Category & Date */}
                 <div className="flex items-center gap-3 text-xs">
                   <span className="px-3 py-1 bg-primary/10 text-primary font-extrabold rounded-full uppercase tracking-wider">
-                    {categories.find(c => c.id === categoryId)?.name || "Uncategorized"}
+                    {categories.find(c => c.id === categoryId)?.name || tExtracted('uncategorized')}
                   </span>
                   <span className="text-slate-400 font-medium">•</span>
                   <span className="text-slate-400 font-medium">
-                    {new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    {new Date().toLocaleDateString('vi-VN', { day: "numeric", month: "long", year: "numeric" })}
                   </span>
                 </div>
 
                 {/* Title */}
                 <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                  {title || "Untitled Post"}
+                  {title || tExtracted('untitledPost')}
                 </h1>
 
                 {/* Author Widget */}
                 <div className="flex items-center gap-3 py-4 border-y border-slate-100">
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                    AD
-                  </div>
+                    {tExtracted('ad')}</div>
                   <div>
-                    <p className="text-xs font-bold text-slate-900">Administrator</p>
-                    <p className="text-[10px] text-slate-400 font-medium">Tác giả bài viết</p>
+                    <p className="text-xs font-bold text-slate-900">{tExtracted('administrator')}</p>
+                    <p className="text-[10px] text-slate-400 font-medium">{tExtracted('tacGiaBaiViet')}</p>
                   </div>
                 </div>
 
                 {/* Featured Cover Image */}
                 {thumbnail && (
                   <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-100 shadow-md">
-                    <img src={thumbnail} alt="Featured Cover" className="w-full h-full object-cover" />
+                    <img src={thumbnail} alt={tExtracted('featuredCover')} className="w-full h-full object-cover" />
                   </div>
                 )}
 
@@ -259,10 +260,10 @@ export default function AdminEditorPage() {
                 <textarea
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Post Title..."
+                  placeholder={tExtracted('postTitle')}
                   rows={1}
                   className="w-full text-5xl font-black text-slate-900 placeholder:text-slate-200 focus:outline-none resize-none leading-tight tracking-tight"
-                  style={{ height: 'auto' }}
+                  style={{ height: "auto" }}
                 />
                 <div className="min-h-[500px]">
                   <BlockEditor onChange={(blocks) => setContent(blocks)} />
@@ -274,15 +275,14 @@ export default function AdminEditorPage() {
           {/* Sidebar */}
           <div className="w-80 border-l border-slate-100 bg-slate-50/50 overflow-y-auto hidden xl:block p-6 space-y-8">
             <div>
-              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-6">Post Settings</h4>
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-6">{tExtracted('postSettings')}</h4>
               <div className="space-y-6">
 
                 {/* Category */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                    Category
-                    <button onClick={() => setShowNewCatInput(!showNewCatInput)} className="text-[10px] text-primary font-bold hover:underline">
-                      {showNewCatInput ? "Cancel" : "+ New"}
+                    {tExtracted('category')}<button onClick={() => setShowNewCatInput(!showNewCatInput)} className="text-[10px] text-primary font-bold hover:underline">
+                      {showNewCatInput ? tExtracted('cancel') : tExtracted('new')}
                     </button>
                   </label>
 
@@ -292,11 +292,11 @@ export default function AdminEditorPage() {
                         type="text"
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
-                        placeholder="Category name..."
+                        placeholder={tExtracted('categoryName')}
                         className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary"
                         onKeyDown={(e) => e.key === "Enter" && handleCreateCategory()}
                       />
-                      <Button label="Add" variant="primary" className="!px-3 !py-1.5 !text-[10px] !rounded-lg" loading={isCreatingCat} onClick={handleCreateCategory} />
+                      <Button label={tExtracted('add')} variant="primary" className="!px-3 !py-1.5 !text-[10px] !rounded-lg" loading={isCreatingCat} onClick={handleCreateCategory} />
                     </div>
                   )}
 
@@ -305,22 +305,21 @@ export default function AdminEditorPage() {
                     onChange={(e) => setCategoryId(e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
                   >
-                    <option value="">— Select Category —</option>
+                    <option value="">{tExtracted('selectCategory')}</option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                   </select>
                   {categories.length === 0 && !showNewCatInput && (
-                    <p className="text-[10px] text-slate-400 italic">No categories yet. Click "+ New" to create one.</p>
+                    <p className="text-[10px] text-slate-400 italic">{tExtracted('noCategoriesYetClickNewToCreateOne')}</p>
                   )}
                 </div>
 
                 {/* Tags */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                    Tags
-                    <button onClick={() => setShowNewTagInput(!showNewTagInput)} className="text-[10px] text-primary font-bold hover:underline">
-                      {showNewTagInput ? "Cancel" : "+ New"}
+                    {tExtracted('tags')}<button onClick={() => setShowNewTagInput(!showNewTagInput)} className="text-[10px] text-primary font-bold hover:underline">
+                      {showNewTagInput ? tExtracted('cancel') : tExtracted('new')}
                     </button>
                   </label>
 
@@ -330,11 +329,11 @@ export default function AdminEditorPage() {
                         type="text"
                         value={newTagName}
                         onChange={(e) => setNewTagName(e.target.value)}
-                        placeholder="Tag name..."
+                        placeholder={tExtracted('tagName')}
                         className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary"
                         onKeyDown={(e) => e.key === "Enter" && handleCreateTag()}
                       />
-                      <Button label="Add" variant="primary" className="!px-3 !py-1.5 !text-[10px] !rounded-lg" loading={isCreatingTag} onClick={handleCreateTag} />
+                      <Button label={tExtracted('add')} variant="primary" className="!px-3 !py-1.5 !text-[10px] !rounded-lg" loading={isCreatingTag} onClick={handleCreateTag} />
                     </div>
                   )}
 
@@ -354,7 +353,7 @@ export default function AdminEditorPage() {
                       </button>
                     ))}
                     {tags.length === 0 && !showNewTagInput && (
-                      <span className="text-xs text-slate-400 italic">No tags yet. Click "+ New" to create one.</span>
+                      <span className="text-xs text-slate-400 italic">{tExtracted('noTagsYetClickNewToCreateOne')}</span>
                     )}
                   </div>
                 </div>
@@ -362,50 +361,47 @@ export default function AdminEditorPage() {
                 {/* Featured Image */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-700">Featured Image</label>
+                    <label className="text-xs font-bold text-slate-700">{tExtracted('featuredImage')}</label>
                     {thumbnail && (
                       <button
                         onClick={() => setThumbnail("")}
                         className="text-[10px] text-red-500 hover:text-red-700 font-semibold"
                       >
-                        Remove
-                      </button>
+                        {tExtracted('remove')}</button>
                     )}
                   </div>
-                  <input 
-                    type="file" 
-                    accept="image/png, image/jpeg, image/webp, image/avif" 
-                    className="hidden" 
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg, image/webp, image/avif"
+                    className="hidden"
                     ref={fileInputRef}
-                    onChange={handleImageUpload} 
+                    onChange={handleImageUpload}
                   />
-                  <div 
+                  <div
                     className={`aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 group transition-all shadow-sm overflow-hidden relative ${
-                      thumbnail 
-                        ? 'border-primary/30 bg-slate-50' 
-                        : 'border-slate-300 bg-slate-100'
+                      thumbnail
+                        ? "border-primary/30 bg-slate-50"
+                        : "border-slate-300 bg-slate-100"
                     }`}
                   >
                     {thumbnail ? (
                       <>
-                        <img src={thumbnail} alt="Featured" className="w-full h-full object-cover" />
+                        <img src={thumbnail} alt={tExtracted('featured')} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                           <button
                             onClick={() => fileInputRef.current?.click()}
                             className="px-3 py-1.5 bg-white text-slate-800 rounded-lg text-xs font-bold hover:bg-slate-50 shadow-md flex items-center gap-1.5"
                           >
-                            <Icon name="Upload" size={14} /> Upload
-                          </button>
+                            <Icon name="Upload" size={14} /> {tExtracted('upload')}</button>
                           <button
                             onClick={() => setIsMediaModalOpen(true)}
                             className="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary/90 shadow-md flex items-center gap-1.5"
                           >
-                            <Icon name="Image" size={14} /> Library
-                          </button>
+                            <Icon name="Image" size={14} /> {tExtracted('library')}</button>
                         </div>
                       </>
                     ) : isUploadingImage ? (
-                      <span className="text-xs font-bold text-slate-500">Uploading...</span>
+                      <span className="text-xs font-bold text-slate-500">{tExtracted('uploading')}</span>
                     ) : (
                       <div className="flex flex-col items-center gap-3 p-4">
                         <Icon name="Image" size={24} className="text-slate-400" />
@@ -414,14 +410,12 @@ export default function AdminEditorPage() {
                             onClick={() => fileInputRef.current?.click()}
                             className="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-50 shadow-sm flex items-center gap-1.5"
                           >
-                            <Icon name="Upload" size={14} /> Upload New
-                          </button>
+                            <Icon name="Upload" size={14} /> {tExtracted('uploadNew')}</button>
                           <button
                             onClick={() => setIsMediaModalOpen(true)}
                             className="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary/90 shadow-md flex items-center gap-1.5"
                           >
-                            <Icon name="Image" size={14} /> From Library
-                          </button>
+                            <Icon name="Image" size={14} /> {tExtracted('fromLibrary')}</button>
                         </div>
                       </div>
                     )}
@@ -431,8 +425,7 @@ export default function AdminEditorPage() {
                 {/* SEO Summary */}
                 <div className="space-y-2 pt-4">
                   <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                    SEO Summary
-                    <span className="text-[10px] font-normal text-slate-400">{summary.length}/160</span>
+                    {tExtracted('seoSummary')}<span className="text-[10px] font-normal text-slate-400">{summary.length}/160</span>
                   </label>
                   <textarea
                     rows={4}
@@ -440,7 +433,7 @@ export default function AdminEditorPage() {
                     onChange={(e) => setSummary(e.target.value)}
                     maxLength={160}
                     className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all shadow-sm resize-none"
-                    placeholder="Summarize this post for search engines..."
+                    placeholder={tExtracted('summarizeThisPostForSearchEngines')}
                   />
                 </div>
               </div>
@@ -458,9 +451,8 @@ export default function AdminEditorPage() {
               <div>
                 <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                   <Icon name="Image" className="text-primary" size={20} />
-                  Thư viện Media
-                </h3>
-                <p className="text-[11px] text-slate-500">Chọn một hình ảnh từ thư viện của bạn để làm ảnh bìa bài viết</p>
+                  {tExtracted('thuVienMedia')}</h3>
+                <p className="text-[11px] text-slate-500">{tExtracted('chonMotHinhAnhTuThuVienCua')}</p>
               </div>
               <button
                 onClick={() => setIsMediaModalOpen(false)}
@@ -476,7 +468,7 @@ export default function AdminEditorPage() {
                 <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input
                   type="text"
-                  placeholder="Tìm kiếm hình ảnh theo tên..."
+                  placeholder={tExtracted('timKiemHinhAnhTheoTen')}
                   value={modalSearchQuery}
                   onChange={(e) => setModalSearchQuery(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
@@ -485,7 +477,7 @@ export default function AdminEditorPage() {
               <button
                 onClick={loadModalMedia}
                 className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors"
-                title="Tải lại thư viện"
+                title={tExtracted('taiLaiThuVien')}
               >
                 <Icon name="RefreshCw" size={16} className={isModalLoading ? "animate-spin" : ""} />
               </button>
@@ -496,14 +488,14 @@ export default function AdminEditorPage() {
               {isModalLoading ? (
                 <div className="h-full flex flex-col items-center justify-center gap-3 min-h-[300px]">
                   <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-xs text-slate-500 font-semibold">Đang tải thư viện ảnh...</span>
+                  <span className="text-xs text-slate-500 font-semibold">{tExtracted('dangTaiThuVienAnh')}</span>
                 </div>
               ) : filteredModalMedia.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-8 min-h-[300px] gap-3">
                   <Icon name="Image" size={48} className="text-slate-300" />
                   <div>
-                    <p className="text-xs font-semibold text-slate-700">Thư viện trống hoặc không khớp từ khóa</p>
-                    <p className="text-[11px] text-slate-400 mt-1">Hãy upload ảnh mới trong thư mục HTT</p>
+                    <p className="text-xs font-semibold text-slate-700">{tExtracted('thuVienTrongHoacKhongKhopTuKhoa')}</p>
+                    <p className="text-[11px] text-slate-400 mt-1">{tExtracted('hayUploadAnhMoiTrongThuMucHtt')}</p>
                   </div>
                 </div>
               ) : (

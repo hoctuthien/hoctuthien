@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoClose } from "react-icons/io5";
@@ -23,6 +24,7 @@ export const Modal = ({
   className = "",
   containerClassName = "max-w-lg",
 }: ModalProps) => {
+  const tExtracted = useTranslations('Extracted.sharedComponentsModalModal');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export const Modal = ({
             <button
               onClick={onClose}
               className="p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-100"
-              aria-label="Close modal"
+              aria-label={tExtracted('closeModal')}
             >
               <IoClose size={24} />
             </button>

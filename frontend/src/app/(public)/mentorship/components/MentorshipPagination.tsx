@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from "react";
 import Link from "next/link";
 import { Icon } from "@/core/ui";
@@ -20,6 +21,7 @@ export const MentorshipPagination = ({
   searchParams,
   itemsLength,
 }: MentorshipPaginationProps) => {
+  const tExtracted = useTranslations('Extracted.appPublicMentorshipComponentsMentorshipPagination');
   const { totalPages, total } = meta;
 
   const getPageUrl = (pageNumber: number) => {
@@ -60,13 +62,12 @@ export const MentorshipPagination = ({
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-5 py-4 bg-white rounded-2xl border border-slate-100 shadow-sm mt-8">
       {/* Info */}
       <p className="text-xs text-slate-400 font-medium">
-        Showing{" "}
+        {tExtracted('showing')}{" "}
         <span className="text-slate-700 font-semibold">
           {startItem}–{endItem}
         </span>{" "}
-        of{" "}
-        <span className="text-slate-700 font-semibold">{total}</span> mentors
-      </p>
+        {tExtracted('of')}{" "}
+        <span className="text-slate-700 font-semibold">{total}</span> {tExtracted('mentors')}</p>
 
       {/* Page controls */}
       <div className="flex items-center gap-1.5">
@@ -75,7 +76,7 @@ export const MentorshipPagination = ({
           <Link
             href={getPageUrl(currentPage - 1)}
             className="no-underline"
-            aria-label="Previous page"
+            aria-label={tExtracted('previousPage')}
           >
             <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition-all duration-150">
               <Icon name="ChevronLeft" size={14} />
@@ -116,7 +117,7 @@ export const MentorshipPagination = ({
           <Link
             href={getPageUrl(currentPage + 1)}
             className="no-underline"
-            aria-label="Next page"
+            aria-label={tExtracted('nextPage')}
           >
             <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition-all duration-150">
               <Icon name="ChevronRight" size={14} />

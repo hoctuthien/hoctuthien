@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState } from "react";
 import { Breadcrumb } from "@shared";
 import { courseGateway } from "@/core/gateway";
@@ -44,6 +45,7 @@ const TAG_MAP: Record<string, string[]> = {
 // ─── Main Component ────────────────────────────────────────────────────────────
 
 export default function PublicCoursesClient() {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesPublicCoursesClient');
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState("All Topics");
   const [academicLevel, setAcademicLevel] = useState("");
@@ -141,7 +143,7 @@ export default function PublicCoursesClient() {
 
         {/* 2b. Price filter */}
         <div className="flex items-center gap-2">
-          <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Học phí:</span>
+          <span className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('hocPhi')}</span>
           {(["", "free", "paid"] as const).map((val) => (
             <button
               key={val}
@@ -152,7 +154,7 @@ export default function PublicCoursesClient() {
                   : "bg-white text-slate-500 border-slate-200 hover:border-[#005BBF] hover:text-[#005BBF]"
               }`}
             >
-              {val === "" ? "Tất cả" : val === "free" ? "Miễn phí" : "Có phí"}
+              {val === "" ? tExtracted('tatCa') : val === "free" ? tExtracted('mienPhi') : tExtracted('coPhi')}
             </button>
           ))}
         </div>
@@ -163,14 +165,12 @@ export default function PublicCoursesClient() {
           <div className="flex items-end justify-between border-b border-slate-200 pb-4">
             <div className="flex flex-col gap-1">
               <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em]">
-                Khóa học nổi bật
-              </span>
+                {tExtracted('khoaHocNoiBat')}</span>
               <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
-                Các chương trình chất lượng cao
-              </h2>
+                {tExtracted('cacChuongTrinhChatLuongCao')}</h2>
             </div>
             <span className="text-xs font-bold text-slate-400">
-              {isLoading ? "Đang tải..." : `${filteredCourses.length} khóa học`}
+              {isLoading ? tExtracted('dangTai') : `${filteredCourses.length} khóa học`}
             </span>
           </div>
 
@@ -178,8 +178,7 @@ export default function PublicCoursesClient() {
           {isError && (
             <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 text-xs font-semibold text-red-700 flex items-center gap-3 animate-in fade-in duration-300">
               <span className="text-red-500 text-base">⚠️</span>
-              Không thể tải danh sách khóa học. Vui lòng thử lại sau.
-            </div>
+              {tExtracted('khongTheTaiDanhSachKhoaHocVui')}</div>
           )}
 
           <CourseGrid

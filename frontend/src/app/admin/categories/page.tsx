@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect } from "react";
 import { Button, Icon } from "@/core/ui";
 import { cn } from "@/core/utils/cn";
@@ -25,6 +26,7 @@ function generateSlug(text: string): string {
 }
 
 export default function AdminCategoriesPage() {
+  const tExtracted = useTranslations('Extracted.appAdminCategoriesPage');
   const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -94,21 +96,21 @@ export default function AdminCategoriesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return alert("Please enter a category name");
+    if (!name.trim()) return alert(tExtracted('pleaseEnterACategoryName'));
 
     try {
       setIsSubmitting(true);
       if (editingId) {
         await updateCategoryAction(editingId, name, slug, description);
-        alert("Category updated successfully!");
+        alert(tExtracted('categoryUpdatedSuccessfully'));
       } else {
         await createCategoryAction(name, slug, description);
-        alert("Category created successfully!");
+        alert(tExtracted('categoryCreatedSuccessfully'));
       }
       handleCancelEdit();
       await fetchCategories();
     } catch (error: any) {
-      alert(error.message || "Failed to save category");
+      alert(error.message || tExtracted('failedToSaveCategory'));
     } finally {
       setIsSubmitting(false);
     }
@@ -127,8 +129,8 @@ export default function AdminCategoriesPage() {
 
     try {
       await deleteCategoryAction(id);
-      alert("Category deleted successfully!");
-      
+      alert(tExtracted('categoryDeletedSuccessfully'));
+
       // If we deleted the last item on the last page, go to previous page
       if (categories.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -136,15 +138,15 @@ export default function AdminCategoriesPage() {
         await fetchCategories();
       }
     } catch (error: any) {
-      alert(error.message || "Failed to delete category");
+      alert(error.message || tExtracted('failedToDeleteCategory'));
     }
   };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Categories</h1>
-        <p className="text-slate-500 mt-1">Organize your posts into logical sections.</p>
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{tExtracted('categories')}</h1>
+        <p className="text-slate-500 mt-1">{tExtracted('organizeYourPostsIntoLogicalSections')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -153,62 +155,62 @@ export default function AdminCategoriesPage() {
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-8">
             <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
               <Icon name={editingId ? "Pencil" : "PlusCircle"} size={20} className="text-primary" />
-              {editingId ? "Edit Category" : "Add New Category"}
+              {editingId ? tExtracted('editCategory') : tExtracted('addNewCategory')}
             </h3>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-700">Name</label>
-                <input 
-                  type="text" 
+                <label className="text-sm font-semibold text-slate-700">{tExtracted('name')}</label>
+                <input
+                  type="text"
                   value={name}
                   onChange={handleNameChange}
-                  placeholder="e.g. Graphic Design"
+                  placeholder={tExtracted('eGGraphicDesign')}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   required
                 />
-                <p className="text-[11px] text-slate-400">How it appears on your site.</p>
+                <p className="text-[11px] text-slate-400">{tExtracted('howItAppearsOnYourSite')}</p>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-700">Slug</label>
-                <input 
-                  type="text" 
+                <label className="text-sm font-semibold text-slate-700">{tExtracted('slug')}</label>
+                <input
+                  type="text"
                   value={slug}
                   onChange={handleSlugChange}
-                  placeholder="e.g. graphic-design"
+                  placeholder={tExtracted('eGGraphicDesign2')}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                 />
-                <p className="text-[11px] text-slate-400">The "slug" is the URL-friendly version of the name.</p>
+                <p className="text-[11px] text-slate-400">{tExtracted('theSlugIsTheUrlFriendlyVersionOf')}</p>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-700">Description</label>
-                <textarea 
+                <label className="text-sm font-semibold text-slate-700">{tExtracted('description')}</label>
+                <textarea
                   rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Tell us about this category..."
+                  placeholder={tExtracted('tellUsAboutThisCategory')}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                 />
               </div>
 
               <div className="flex gap-2 pt-2">
                 {editingId && (
-                  <Button 
+                  <Button
                     type="button"
                     onClick={handleCancelEdit}
-                    label="Cancel" 
-                    variant="secondary" 
-                    className="flex-1 !rounded-xl !py-3" 
+                    label={tExtracted('cancel')}
+                    variant="secondary"
+                    className="flex-1 !rounded-xl !py-3"
                   />
                 )}
-                <Button 
+                <Button
                   type="submit"
                   disabled={isSubmitting}
-                  label={isSubmitting ? "Saving..." : (editingId ? "Update" : "Add Category")} 
-                  variant="primary" 
-                  className="flex-1 !rounded-xl !py-3 shadow-lg shadow-primary/20" 
+                  label={isSubmitting ? tExtracted('saving') : (editingId ? tExtracted('update') : tExtracted('addCategory'))}
+                  variant="primary"
+                  className="flex-1 !rounded-xl !py-3 shadow-lg shadow-primary/20"
                 />
               </div>
             </form>
@@ -221,16 +223,16 @@ export default function AdminCategoriesPage() {
             <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="relative w-64">
                 <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search categories..." 
+                  placeholder={tExtracted('searchCategories')}
                   className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
                 />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500">Rows per page:</span>
+                <span className="text-xs text-slate-500">{tExtracted('rowsPerPage')}</span>
                 <select
                   value={limit}
                   onChange={(e) => {
@@ -251,10 +253,10 @@ export default function AdminCategoriesPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50">
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Slug</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">{tExtracted('name')}</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">{tExtracted('slug')}</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">{tExtracted('description')}</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">{tExtracted('actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -262,14 +264,12 @@ export default function AdminCategoriesPage() {
                     <tr>
                       <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
                         <Icon name="Loader2" size={24} className="animate-spin mx-auto mb-2" />
-                        Loading categories...
-                      </td>
+                        {tExtracted('loadingCategories')}</td>
                     </tr>
                   ) : categories.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
-                        No categories found.
-                      </td>
+                        {tExtracted('noCategoriesFound')}</td>
                     </tr>
                   ) : (
                     categories.map((cat) => (
@@ -285,17 +285,17 @@ export default function AdminCategoriesPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button 
-                              variant="text" 
+                            <Button
+                              variant="text"
                               onClick={() => handleEditClick(cat)}
-                              label={<Icon name="Pencil" size={16} />} 
-                              className="!p-2 text-slate-400 hover:text-primary" 
+                              label={<Icon name="Pencil" size={16} />}
+                              className="!p-2 text-slate-400 hover:text-primary"
                             />
-                            <Button 
-                              variant="text" 
+                            <Button
+                              variant="text"
                               onClick={() => handleDeleteClick(cat.id, cat.name)}
-                              label={<Icon name="Trash2" size={16} />} 
-                              className="!p-2 text-slate-400 hover:text-red-500" 
+                              label={<Icon name="Trash2" size={16} />}
+                              className="!p-2 text-slate-400 hover:text-red-500"
                             />
                           </div>
                         </td>
@@ -305,14 +305,13 @@ export default function AdminCategoriesPage() {
                 </tbody>
               </table>
             </div>
-            
+
             {/* Pagination Controls */}
             <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30 text-xs text-slate-500">
               <p>
-                Showing {categories.length > 0 ? (currentPage - 1) * limit + 1 : 0} to{" "}
-                {Math.min(currentPage * limit, meta.total)} of {meta.total} categories
-              </p>
-              
+                {tExtracted('showing')}{categories.length > 0 ? (currentPage - 1) * limit + 1 : 0} {tExtracted('to')}{" "}
+                {Math.min(currentPage * limit, meta.total)} {tExtracted('of')}{meta.total} {tExtracted('categories2')}</p>
+
               {meta.totalPages > 1 && (
                 <div className="flex items-center gap-2">
                   <button
@@ -322,22 +321,22 @@ export default function AdminCategoriesPage() {
                   >
                     <Icon name="ChevronLeft" size={16} />
                   </button>
-                  
+
                   {(() => {
                     const pages: (number | string)[] = [];
                     const totalPages = meta.totalPages;
-                    
+
                     if (totalPages <= 5) {
                       for (let i = 1; i <= totalPages; i++) pages.push(i);
                     } else {
                       pages.push(1);
                       if (currentPage > 3) pages.push("...");
-                      
+
                       const start = Math.max(2, currentPage - 1);
                       const end = Math.min(totalPages - 1, currentPage + 1);
-                      
+
                       for (let i = start; i <= end; i++) pages.push(i);
-                      
+
                       if (currentPage < totalPages - 2) pages.push("...");
                       pages.push(totalPages);
                     }
@@ -350,7 +349,7 @@ export default function AdminCategoriesPage() {
                           </span>
                         );
                       }
-                      
+
                       const pageNumber = pageVal as number;
                       return (
                         <button
@@ -369,7 +368,7 @@ export default function AdminCategoriesPage() {
                       );
                     });
                   })()}
-                  
+
                   <button
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, meta.totalPages))}
                     disabled={currentPage === meta.totalPages || isLoading}

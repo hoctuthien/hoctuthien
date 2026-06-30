@@ -64,7 +64,7 @@ export const DropdownTrigger: React.FC<DropdownTriggerProps> = ({
   const { isOpen, setIsOpen } = useDropdown();
 
   const baseStyles = "inline-flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer select-none outline-none disabled:cursor-not-allowed";
-  
+
   const variants = {
     primary: cn(
       "bg-[#2D89FF] !text-white border-none rounded-full font-bold shadow-sm",
@@ -102,7 +102,7 @@ export const DropdownTrigger: React.FC<DropdownTriggerProps> = ({
         <ChevronDown
           size={variant === "text" ? 18 : 16}
           className={cn(
-            "transition-all duration-300", 
+            "transition-all duration-300",
             isOpen && "rotate-180",
             variant === "primary" && "!text-white",
             variant === "secondary" && "!text-[#2D89FF]",
@@ -151,8 +151,7 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   isDanger,
   onClick,
   className,
-}) => {
-  const { setIsOpen } = useDropdown();
+}) => {  const { setIsOpen } = useDropdown();
 
   const handleClick = () => {
     if (onClick) onClick();
@@ -173,7 +172,7 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
       <div className="flex items-center gap-3">
         {icon && (
           <span className={cn(
-            "flex items-center justify-center transition-colors duration-200 w-5 h-5", 
+            "flex items-center justify-center transition-colors duration-200 w-5 h-5",
             isActive ? "text-primary" : "text-text-muted group-hover:text-primary",
             isDanger && "text-red-600 group-hover:text-red-700"
           )}>

@@ -1,20 +1,21 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Breadcrumb, EmptyState, Modal } from '@shared';
 import { courseBookingGateway, paymentGateway, penaltyTicketGateway, reviewGateway } from '@/core/gateway';
 import { Button } from '@/core/ui';
-import { 
-  LuBookOpen, 
-  LuCalendar, 
-  LuCheck, 
-  LuX, 
-  LuClock, 
-  LuSearch, 
-  LuExternalLink, 
-  LuUser, 
-  LuMessageSquare, 
+import {
+  LuBookOpen,
+  LuCalendar,
+  LuCheck,
+  LuX,
+  LuClock,
+  LuSearch,
+  LuExternalLink,
+  LuUser,
+  LuMessageSquare,
   LuTriangleAlert,
   LuTrash2,
   LuCopy,
@@ -55,6 +56,7 @@ interface BookingRelation {
 }
 
 export default function MyCoursesClient() {
+  const tExtracted = useTranslations('Extracted.appDashboardMyCoursesMyCoursesClient');
   const { data: session, status } = useSession();
   const [bookings, setBookings] = useState<BookingRelation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,13 +168,13 @@ export default function MyCoursesClient() {
       setVerifyMessage(null);
       setExpired(false);
       setCooldown(0);
-      
+
       const qr = await paymentGateway.generateGenericQr('course_booking', booking.id);
       setQrData({ ...qr, referenceId: booking.id });
       setPaymentModalOpen(true);
     } catch (err: any) {
       console.error("Failed to generate payment QR:", err);
-      alert("Không thể khởi tạo cổng thanh toán. Vui lòng thử lại sau.");
+      alert(tExtracted('khongTheKhoiTaoCongThanhToanVui'));
     }
   };
 
@@ -187,7 +189,7 @@ export default function MyCoursesClient() {
       setQrData({ ...freshQr, referenceId: paymentBooking.id });
     } catch (err: any) {
       console.error("Failed to regenerate QR:", err);
-      alert("Không thể làm mới mã QR. Vui lòng thử lại.");
+      alert(tExtracted('khongTheLamMoiMaQrVuiLong'));
     }
   };
 
@@ -215,8 +217,8 @@ export default function MyCoursesClient() {
 
       if (result.activated) {
         setVerifyStatus('success');
-        setVerifyMessage(result.message || 'Thanh toán khóa học thành công!');
-        
+        setVerifyMessage(result.message || tExtracted('thanhToanKhoaHocThanhCong'));
+
         // Cập nhật trạng thái booking local sang confirmed
         if (paymentBooking) {
           setBookings((prev) =>
@@ -246,7 +248,7 @@ export default function MyCoursesClient() {
           }, 3000);
         } else {
           setVerifyStatus('manual_retry');
-          setVerifyMessage(result.message || 'Chưa tìm thấy giao dịch chuyển khoản phù hợp.');
+          setVerifyMessage(result.message || tExtracted('chuaTimThayGiaoDichChuyenKhoanPhu'));
           setCooldown(5);
         }
       }
@@ -254,11 +256,11 @@ export default function MyCoursesClient() {
       console.error('Verify error:', err);
       if (err.status === 422) {
         setVerifyStatus('error');
-        setVerifyMessage('Mã QR đã hết hạn. Đang tự động làm mới...');
+        setVerifyMessage(tExtracted('maQrDaHetHanDangTuDong'));
         setTimeout(() => handleRegenerateQr(), 2000);
       } else {
         setVerifyStatus('error');
-        setVerifyMessage(err.message || 'Đã có lỗi xảy ra trong quá trình xác minh.');
+        setVerifyMessage(err.message || tExtracted('daCoLoiXayRaTrongQuaTrinh'));
         setCooldown(5);
       }
     } finally {
@@ -288,7 +290,7 @@ export default function MyCoursesClient() {
 
     const days = [];
     const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
-    
+
     for (let i = 0; i < 7; i++) {
       const currentDay = new Date(monday);
       currentDay.setDate(monday.getDate() + i);
@@ -308,7 +310,7 @@ export default function MyCoursesClient() {
     const isValid = mTime && !isNaN(mTime.getTime());
     return {
       id: b.id,
-      timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
+      timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : tExtracted('chuaDinhGio'),
       dateStr: (isValid && mTime) ? getLocalDateString(mTime) : '',
       courseTitle: b.course?.title || 'Khóa học',
       partnerName: b.course?.mentor?.name || 'Cố vấn học tập',
@@ -326,7 +328,7 @@ export default function MyCoursesClient() {
       setError(null);
     } catch (err: any) {
       console.error('Failed to load bookings:', err);
-      setError('Không thể tải danh sách buổi học của bạn. Vui lòng thử lại sau.');
+      setError(tExtracted('khongTheTaiDanhSachBuoiHocCua'));
     } finally {
       setLoading(false);
     }
@@ -353,7 +355,7 @@ export default function MyCoursesClient() {
     if (!reviewBooking) return;
     try {
       setSubmittingReview(true);
-      
+
       // 1. Submit Course Review
       await reviewGateway.createCourseReview({
         courseBookingId: reviewBooking.id,
@@ -378,7 +380,7 @@ export default function MyCoursesClient() {
       setReviewedBookingIds(nextReviewed);
       localStorage.setItem('reviewed_booking_ids', JSON.stringify(nextReviewed));
 
-      alert('Cảm ơn bạn đã gửi đánh giá buổi học!');
+      alert(tExtracted('camOnBanDaGuiDanhGiaBuoi'));
       setReviewBooking(null);
       setCourseRating(5);
       setCourseComment('');
@@ -386,7 +388,7 @@ export default function MyCoursesClient() {
       setMentorComment('');
     } catch (err: any) {
       console.error('Failed to submit reviews:', err);
-      alert(err.response?.data?.message || err.message || 'Gửi đánh giá thất bại, vui lòng thử lại.');
+      alert(err.response?.data?.message || err.message || tExtracted('guiDanhGiaThatBaiVuiLongThu'));
     } finally {
       setSubmittingReview(false);
     }
@@ -397,7 +399,7 @@ export default function MyCoursesClient() {
     try {
       setSubmittingCancel(true);
       await courseBookingGateway.cancelBookingByMentee(cancelBookingId, cancelReason);
-      
+
       // Update local state instantly with premium feel
       setBookings((prev) =>
         prev.map((b) =>
@@ -410,7 +412,7 @@ export default function MyCoursesClient() {
       setCancelReason('');
     } catch (err) {
       console.error('Failed to cancel booking:', err);
-      alert('Hủy buổi học thất bại, vui lòng thử lại.');
+      alert(tExtracted('huyBuoiHocThatBaiVuiLongThu'));
     } finally {
       setSubmittingCancel(false);
     }
@@ -422,7 +424,7 @@ export default function MyCoursesClient() {
       setSubmittingReport(true);
       const mentorId = reportBooking.course?.mentor?.id;
       if (!mentorId) {
-        alert("Không tìm thấy thông tin Cố vấn để báo cáo.");
+        alert(tExtracted('khongTimThayThongTinCoVanDe'));
         return;
       }
 
@@ -444,13 +446,13 @@ export default function MyCoursesClient() {
       await penaltyTicketGateway.createPenaltyTicket(payload);
 
       setReportedBookingIds((prev) => [...prev, reportBooking.id]);
-      alert("Gửi báo cáo vắng mặt thành công! Ban quản trị sẽ sớm xem xét báo cáo này.");
+      alert(tExtracted('guiBaoCaoVangMatThanhCongBan'));
       setReportBooking(null);
       setReportReason('');
       setEvidenceUrl('');
     } catch (err: any) {
       console.error('Failed to submit report:', err);
-      alert(err.message || 'Gửi báo cáo thất bại, vui lòng thử lại.');
+      alert(err.message || tExtracted('guiBaoCaoThatBaiVuiLongThu'));
     } finally {
       setSubmittingReport(false);
     }
@@ -466,7 +468,7 @@ export default function MyCoursesClient() {
       mentorName.toLowerCase().includes(searchQuery.toLowerCase());
 
     const isUpcoming = b.status === 'pending' || b.status === 'confirmed' || b.status === 'rescheduled';
-    
+
     if (activeTab === 'upcoming') return matchesSearch && isUpcoming;
     if (activeTab === 'completed') return matchesSearch && b.status === 'completed';
     if (activeTab === 'cancelled') return matchesSearch && b.status === 'cancelled';
@@ -480,24 +482,22 @@ export default function MyCoursesClient() {
   const cancelledCount = bookings.filter((b) => b.status === 'cancelled').length;
 
   const breadcrumbItems = [
-    { label: 'Trang chủ', href: '/' },
-    { label: 'Bảng điều khiển', href: '#' },
-    { label: 'Khóa học của tôi' },
+    { label: tExtracted('trangChu'), href: '/' },
+    { label: tExtracted('bangDieuKhien'), href: '#' },
+    { label: tExtracted('khoaHocCuaToi') },
   ];
 
   return (
     <div className="w-full flex flex-col gap-8 font-sans">
-        
+
         {/* Title and Breadcrumbs */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-col gap-2">
             <Breadcrumb items={breadcrumbItems} />
             <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mt-1 font-[Montserrat]">
-              Khóa học & Lịch học của Tôi
-            </h1>
+              {tExtracted('khoaHocLichHocCuaToi')}</h1>
             <p className="text-sm text-[#64748b] font-semibold">
-              Theo dõi tiến trình học tập, quản lý lịch hẹn học và kết nối với các Cố vấn (Mentor) tâm huyết.
-            </p>
+              {tExtracted('theoDoiTienTrinhHocTapQuanLy')}</p>
           </div>
 
           {/* View Mode Toggle */}
@@ -505,18 +505,18 @@ export default function MyCoursesClient() {
             <button
               onClick={() => setViewType('list')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewType === 'list' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewType === 'list' ? "bg-[#005BBF] text-white shadow-sm" : "text-slate-500 hover:text-slate-700 bg-transparent"
               }`}
             >
-              <span>Dạng Danh sách</span>
+              <span>{tExtracted('dangDanhSach')}</span>
             </button>
             <button
               onClick={() => setViewType('calendar')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewType === 'calendar' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewType === 'calendar' ? "bg-[#005BBF] text-white shadow-sm" : "text-slate-500 hover:text-slate-700 bg-transparent"
               }`}
             >
-              <span>Dạng Lịch Tháng</span>
+              <span>{tExtracted('dangLichThang')}</span>
             </button>
           </div>
         </div>
@@ -543,7 +543,7 @@ export default function MyCoursesClient() {
                   <LuBookOpen size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">TỔNG BUỔI HỌC</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('tongBuoiHoc')}</span>
                   <span className="text-xl font-black text-[#0F172A]">{loading ? '...' : total}</span>
                 </div>
               </div>
@@ -553,7 +553,7 @@ export default function MyCoursesClient() {
                   <LuCalendar size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">LỊCH SẮP TỚI</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('lichSapToi')}</span>
                   <span className="text-xl font-black text-[#D97706]">{loading ? '...' : upcomingCount}</span>
                 </div>
               </div>
@@ -563,7 +563,7 @@ export default function MyCoursesClient() {
                   <LuCheck size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">HOÀN THÀNH</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('hoanThanh')}</span>
                   <span className="text-xl font-black text-[#005320]">{loading ? '...' : completedCount}</span>
                 </div>
               </div>
@@ -573,7 +573,7 @@ export default function MyCoursesClient() {
                   <LuX size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ HỦY</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('daHuy')}</span>
                   <span className="text-xl font-black text-rose-700">{loading ? '...' : cancelledCount}</span>
                 </div>
               </div>
@@ -587,42 +587,38 @@ export default function MyCoursesClient() {
                   onClick={() => setActiveTab('all')}
                   className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                     activeTab === 'all'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Tất cả
-                </button>
+                  {tExtracted('tatCa')}</button>
                 <button
                   onClick={() => setActiveTab('upcoming')}
                   className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                     activeTab === 'upcoming'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Lịch sắp tới
-                </button>
+                  {tExtracted('lichSapToi2')}</button>
                 <button
                   onClick={() => setActiveTab('completed')}
                   className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                     activeTab === 'completed'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Đã học
-                </button>
+                  {tExtracted('daHoc')}</button>
                 <button
                   onClick={() => setActiveTab('cancelled')}
                   className={`flex-1 md:flex-none px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                     activeTab === 'cancelled'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Đã hủy
-                </button>
+                  {tExtracted('daHuy2')}</button>
               </div>
 
               {/* Search bar */}
@@ -630,7 +626,7 @@ export default function MyCoursesClient() {
                 <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
                 <input
                   type="text"
-                  placeholder="Tìm theo tên khóa học hoặc Cố vấn..."
+                  placeholder={tExtracted('timTheoTenKhoaHocHoacCoVan')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-11 pr-4 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl outline-none focus:bg-white focus:border-[#2563eb] text-xs font-semibold transition-all"
@@ -660,7 +656,7 @@ export default function MyCoursesClient() {
                 <p className="text-sm font-semibold text-rose-500">{error}</p>
                 <Button
                   variant="outline"
-                  label="Tải lại dữ liệu"
+                  label={tExtracted('taiLaiDuLieu')}
                   onClick={fetchBookings}
                   className="mt-3 rounded-full text-xs font-black"
                 />
@@ -670,24 +666,24 @@ export default function MyCoursesClient() {
                 {filteredBookings.map((booking, index) => {
                   const meetingDate = new Date(booking.meetingTime);
                   const isPast = meetingDate < new Date();
-                  
+
                   // Status Badge logic
-                  let statusLabel = 'Đang xử lý';
+                  let statusLabel = tExtracted('dangXuLy');
                   let statusStyles = 'bg-amber-500 text-white border-none';
                   if (booking.status === 'pending') {
-                    statusLabel = 'Chưa thanh toán';
+                    statusLabel = "Chưa thanh toán";
                     statusStyles = 'bg-rose-500 text-white border-none';
                   } else if (booking.status === 'confirmed') {
-                    statusLabel = 'Đã xác nhận';
+                    statusLabel = "Đã xác nhận";
                     statusStyles = 'bg-emerald-600 text-white border-none';
                   } else if (booking.status === 'completed') {
-                    statusLabel = 'Đã hoàn thành';
+                    statusLabel = "Đã hoàn thành";
                     statusStyles = 'bg-slate-400 text-white border-none';
                   } else if (booking.status === 'cancelled') {
-                    statusLabel = 'Đã hủy';
+                    statusLabel = "Đã hủy";
                     statusStyles = 'bg-rose-500 text-white border-none';
                   } else if (booking.status === 'rescheduled') {
-                    statusLabel = 'Đã đổi lịch';
+                    statusLabel = "Đã đổi lịch";
                     statusStyles = 'bg-[#005BBF] text-white border-none';
                   }
 
@@ -695,7 +691,7 @@ export default function MyCoursesClient() {
                   const isCancellable = booking.status === 'pending' || booking.status === 'confirmed';
 
                   return (
-                    <div 
+                    <div
                       key={`${booking.id || 'booking'}-${index}`}
                       className="bg-white rounded-3xl p-6 border border-slate-100/90 shadow-[0_8px_30px_rgba(0,0,0,0.005)] transition-all duration-300 hover:shadow-md flex flex-col justify-between"
                     >
@@ -706,7 +702,7 @@ export default function MyCoursesClient() {
                             {statusLabel}
                           </span>
                           <span className="text-[11px] font-black text-[#10B981] bg-[#ECFDF5] px-2.5 py-1 rounded-lg">
-                            {booking.course?.price === 0 ? '100% Miễn phí' : `${(booking.course?.price || 0).toLocaleString('vi-VN')}đ`}
+                            {booking.course?.price === 0 ? tExtracted('text100MienPhi') : `${(booking.course?.price || 0).toLocaleString('vi-VN')}đ`}
                           </span>
                         </div>
 
@@ -716,11 +712,11 @@ export default function MyCoursesClient() {
                           <div className="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 flex-shrink-0">
                             <img
                               src={booking.course?.thumbnailUrl || 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=120&q=80'}
-                              alt={booking.course?.title || 'Khóa học'}
+                              alt={booking.course?.title || tExtracted('khoaHoc')}
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          
+
                           {/* Title and Mentor */}
                           <div className="flex flex-col gap-1 min-w-0">
                             <h3 className="text-[15px] font-black text-[#0F172A] tracking-tight leading-snug truncate">
@@ -728,7 +724,7 @@ export default function MyCoursesClient() {
                             </h3>
                             <div className="flex items-center gap-1.5 text-xs text-[#64748b] font-semibold">
                               <LuUser size={13} className="text-slate-400" />
-                              <span>Cố vấn: <strong className="text-[#475569]">{booking.course?.mentor?.name || 'Chưa phân công'}</strong></span>
+                              <span>{tExtracted('coVan')}<strong className="text-[#475569]">{booking.course?.mentor?.name || tExtracted('chuaPhanCong')}</strong></span>
                             </div>
                           </div>
                         </div>
@@ -736,23 +732,23 @@ export default function MyCoursesClient() {
                         {/* Class Schedule detail */}
                         <div className="bg-[#F8FAFC] border border-[#E2E8F0]/70 p-4 rounded-2xl flex flex-col gap-2 text-xs">
                           <div className="flex items-center justify-between gap-3 font-semibold text-[#475569]">
-                            <span className="text-[#94A3B8] font-bold">Thời gian học:</span>
+                            <span className="text-[#94A3B8] font-bold">{tExtracted('thoiGianHoc')}</span>
                             <span className="flex items-center gap-1">
                               <LuClock size={13} className="text-blue-500" />
-                              {meetingDate.toLocaleDateString('vi-VN', { weekday: 'long' })}, {meetingDate.toLocaleDateString('vi-VN')} vào {meetingDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                              {meetingDate.toLocaleDateString('vi-VN', { weekday: "long" })}, {meetingDate.toLocaleDateString('vi-VN')} {tExtracted('vao')}{meetingDate.toLocaleTimeString('vi-VN', { hour: "2-digit", minute: "2-digit" })}
                             </span>
                           </div>
 
                           {booking.googleMeetUrl && (
                             <div className="flex items-center justify-between gap-3 font-semibold text-[#475569] border-t border-[#E2E8F0] pt-2 mt-1">
-                              <span className="text-[#94A3B8] font-bold">Phòng học online:</span>
-                              <a 
+                              <span className="text-[#94A3B8] font-bold">{tExtracted('phongHocOnline')}</span>
+                              <a
                                 href={booking.googleMeetUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-600 hover:text-blue-700 flex items-center gap-1 no-underline font-black"
                               >
-                                <span>Google Meet Link</span>
+                                <span>{tExtracted('googleMeetLink')}</span>
                                 <LuExternalLink size={12} />
                               </a>
                             </div>
@@ -764,7 +760,7 @@ export default function MyCoursesClient() {
                           <div className="flex items-start gap-2 text-xs text-slate-500 border border-slate-100 p-3 rounded-2xl bg-white shadow-[0_4px_12px_rgba(0,0,0,0.002)]">
                             <LuMessageSquare className="text-slate-400 flex-shrink-0 mt-0.5" size={14} />
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lời nhắn của bạn:</span>
+                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{tExtracted('loiNhanCuaBan')}</span>
                               <p className="font-medium italic leading-relaxed text-[#475569]">{booking.notesForMentor}</p>
                             </div>
                           </div>
@@ -775,7 +771,7 @@ export default function MyCoursesClient() {
                           <div className="flex items-start gap-2 text-xs text-rose-600 bg-rose-50/50 border border-rose-100 p-3 rounded-2xl">
                             <LuTriangleAlert className="text-rose-500 flex-shrink-0 mt-0.5" size={14} />
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-black text-rose-500 uppercase tracking-wider">Lý do hủy buổi học:</span>
+                              <span className="text-[10px] font-black text-rose-500 uppercase tracking-wider">{tExtracted('lyDoHuyBuoiHoc')}</span>
                               <p className="font-semibold leading-relaxed text-rose-700">{booking.cancellationReason}</p>
                             </div>
                           </div>
@@ -792,12 +788,12 @@ export default function MyCoursesClient() {
                               disabled={reviewedBookingIds.includes(booking.id)}
                               className={`flex-1 text-center font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider transition-all cursor-pointer border flex items-center justify-center gap-1.5 ${
                                 reviewedBookingIds.includes(booking.id)
-                                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                                  : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-sm shadow-emerald-500/10'
+                                  ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                  : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-sm shadow-emerald-500/10"
                               }`}
                             >
-                              <LuStar size={14} className={reviewedBookingIds.includes(booking.id) ? 'text-slate-400' : 'text-emerald-100'} />
-                              <span>{reviewedBookingIds.includes(booking.id) ? 'Đã đánh giá' : 'Đánh giá buổi học'}</span>
+                              <LuStar size={14} className={reviewedBookingIds.includes(booking.id) ? "text-slate-400" : "text-emerald-100"} />
+                              <span>{reviewedBookingIds.includes(booking.id) ? tExtracted('daDanhGia') : tExtracted('danhGiaBuoiHoc')}</span>
                             </button>
                           )}
 
@@ -808,12 +804,12 @@ export default function MyCoursesClient() {
                               disabled={reportedBookingIds.includes(booking.id)}
                               className={`flex-1 text-center font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider transition-all cursor-pointer border flex items-center justify-center gap-1.5 ${
                                 reportedBookingIds.includes(booking.id)
-                                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                                  : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200 shadow-sm'
+                                  ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                  : "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200 shadow-sm"
                               }`}
                             >
                               <LuTriangleAlert size={14} />
-                              <span>{reportedBookingIds.includes(booking.id) ? 'Đã báo cáo vắng mặt' : 'Báo cáo vắng mặt'}</span>
+                              <span>{reportedBookingIds.includes(booking.id) ? tExtracted('daBaoCaoVangMat') : tExtracted('baoCaoVangMat')}</span>
                             </button>
                           )}
 
@@ -824,27 +820,24 @@ export default function MyCoursesClient() {
                                   onClick={() => handleOpenPayment(booking)}
                                   className="flex-1 text-center bg-gradient-to-r from-[#005BBF] to-[#004493] hover:from-[#004493] hover:to-[#002D62] text-white font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider shadow-md shadow-[#005BBF]/15 transition-all cursor-pointer border-0"
                                 >
-                                  Thanh toán ngay
-                                </button>
+                                  {tExtracted('thanhToanNgay')}</button>
                               ) : booking.googleMeetUrl ? (
-                                <a 
+                                <a
                                   href={booking.googleMeetUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex-1 text-center bg-[#005BBF] hover:bg-[#004493] text-white font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider no-underline shadow-md shadow-[#005BBF]/10 transition-all cursor-pointer"
                                 >
-                                  Vào phòng học (Google Meet)
-                                </a>
+                                  {tExtracted('vaoPhongHocGoogleMeet')}</a>
                               ) : (
                                 <div className="flex-1 bg-slate-50 text-slate-400 font-extrabold text-[11px] py-3.5 rounded-xl uppercase tracking-wider text-center border border-slate-100">
-                                  Chờ Mentor gửi link Meet
-                                </div>
+                                  {tExtracted('choMentorGuiLinkMeet')}</div>
                               )}
 
                               <button
                                 onClick={() => setCancelBookingId(booking.id)}
                                 className="px-4 py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-all cursor-pointer border border-rose-100 flex items-center justify-center"
-                                title="Hủy buổi học này"
+                                title={tExtracted('huyBuoiHocNay')}
                               >
                                 <LuTrash2 size={15} />
                               </button>
@@ -861,9 +854,9 @@ export default function MyCoursesClient() {
               <div className="py-16 bg-white rounded-[32px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.005)]">
                 <EmptyState
                   icon={<LuCalendar size={48} className="text-slate-400 animate-pulse" />}
-                  title="Không có lịch học nào"
-                  description="Bạn chưa đăng ký lịch học hoặc bộ lọc hiện tại không khớp với kết quả nào."
-                  actionText="Khám phá khóa học ngay"
+                  title={tExtracted('khongCoLichHocNao')}
+                  description={tExtracted('banChuaDangKyLichHocHoacBo')}
+                  actionText={tExtracted('khamPhaKhoaHocNgay')}
                   onAction={() => window.location.href = '/courses'}
                 />
               </div>
@@ -878,7 +871,7 @@ export default function MyCoursesClient() {
             setCancelBookingId(null);
             setCancelReason('');
           }}
-          title="Xác nhận hủy buổi học"
+          title={tExtracted('xacNhanHuyBuoiHoc')}
           containerClassName="max-w-md"
           className="p-8 pt-0 font-sans"
         >
@@ -886,16 +879,15 @@ export default function MyCoursesClient() {
             <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 text-xs text-amber-800 leading-relaxed font-semibold">
               <LuTriangleAlert size={24} className="text-amber-600 flex-shrink-0" />
               <p>
-                Hành động này sẽ hủy bỏ buổi học của bạn với Cố vấn. Vui lòng cho biết lý do cụ thể để Cố vấn được biết và sắp xếp lịch phù hợp.
-              </p>
+                {tExtracted('hanhDongNaySeHuyBoBuoiHoc')}</p>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Lý do hủy lịch học:</label>
+              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('lyDoHuyLichHoc')}</label>
               <textarea
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                placeholder="Ví dụ: Bận lịch kiểm tra đột xuất tại trường, xin phép dời lịch học sau..."
+                placeholder={tExtracted('viDuBanLichKiemTraDotXuat')}
                 className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[90px] transition-colors resize-none font-semibold leading-relaxed"
               />
             </div>
@@ -908,8 +900,7 @@ export default function MyCoursesClient() {
                 }}
                 className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer"
               >
-                Không hủy nữa
-              </button>
+                {tExtracted('khongHuyNua')}</button>
               <button
                 onClick={handleCancelBooking}
                 disabled={submittingCancel || !cancelReason.trim()}
@@ -920,7 +911,7 @@ export default function MyCoursesClient() {
                 ) : (
                   <>
                     <LuTrash2 size={12} />
-                    <span>Xác nhận hủy</span>
+                    <span>{tExtracted('xacNhanHuy')}</span>
                   </>
                 )}
               </button>
@@ -936,7 +927,7 @@ export default function MyCoursesClient() {
             setQrData(null);
             setPaymentBooking(null);
           }}
-          title="Thanh toán Đăng ký Khóa học"
+          title={tExtracted('thanhToanDangKyKhoaHoc')}
           containerClassName="max-w-md"
           className="p-8 pt-0 font-sans"
         >
@@ -946,16 +937,14 @@ export default function MyCoursesClient() {
                 <LuCheck size={32} strokeWidth={3.5} />
               </div>
               <h3 className="text-xl font-black text-[#0F172A] mb-2 font-[Montserrat]">
-                Thanh toán thành công!
-              </h3>
+                {tExtracted('thanhToanThanhCong')}</h3>
               <p className="text-[#475569] text-xs font-semibold max-w-sm leading-relaxed mb-4">
-                Khóa học của bạn đã được xác nhận thanh toán thành công. Cửa sổ này sẽ tự động đóng lại...
-              </p>
+                {tExtracted('khoaHocCuaBanDaDuocXacNhan')}</p>
             </div>
           ) : (
             <div className="flex flex-col gap-4 py-2">
               <p className="text-slate-500 text-xs font-semibold">
-                Quét mã QR dưới đây bằng App Ngân hàng của bạn để tiến hành thanh toán cho khóa học: <strong className="text-[#0F172A]">"{paymentBooking?.course?.title}"</strong>.
+                {tExtracted('quetMaQrDuoiDayBangAppNgan')}<strong className="text-[#0F172A]">"{paymentBooking?.course?.title}"</strong>.
               </p>
 
               {/* QR display */}
@@ -965,14 +954,14 @@ export default function MyCoursesClient() {
                     <div className="w-12 h-12 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center border border-rose-100">
                       <LuClock size={22} />
                     </div>
-                    <h4 className="text-sm font-black text-slate-800 font-[Montserrat]">Mã QR Đã Hết Hạn</h4>
+                    <h4 className="text-sm font-black text-slate-800 font-[Montserrat]">{tExtracted('maQrDaHetHan')}</h4>
                     <button
                       type="button"
                       onClick={handleRegenerateQr}
                       className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-4 py-2 rounded-xl uppercase tracking-wider transition-all active:scale-95 cursor-pointer border-0 flex items-center gap-1"
                     >
                       <LuRefreshCw size={12} />
-                      <span>Làm mới QR</span>
+                      <span>{tExtracted('lamMoiQr')}</span>
                     </button>
                   </div>
                 )}
@@ -981,7 +970,7 @@ export default function MyCoursesClient() {
                   {qrData?.qrUrl && (
                     <img
                       src={qrData.qrUrl}
-                      alt="VietQR Code"
+                      alt={tExtracted('vietqrCode')}
                       className="w-full h-full object-contain mix-blend-multiply"
                     />
                   )}
@@ -998,14 +987,13 @@ export default function MyCoursesClient() {
               {/* Info Details */}
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
-                  <span className="text-slate-500 font-bold uppercase tracking-wider">Số tiền cần chuyển</span>
+                  <span className="text-slate-500 font-bold uppercase tracking-wider">{tExtracted('soTienCanChuyen')}</span>
                   <span className="font-black text-blue-600 font-[Montserrat]">
-                    {qrData?.amount?.toLocaleString("vi-VN")}đ
-                  </span>
+                    {qrData?.amount?.toLocaleString("vi-VN")}{tExtracted('d')}</span>
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Nội dung chuyển khoản</span>
+                  <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{tExtracted('noiDungChuyenKhoan')}</span>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-xl font-mono text-xs font-black text-slate-700 tracking-wider break-all select-all">
                       {qrData?.transactionCode}
@@ -1016,8 +1004,8 @@ export default function MyCoursesClient() {
                       disabled={expired}
                       className={`p-2.5 rounded-xl border transition-all cursor-pointer flex-shrink-0 flex items-center justify-center ${
                         copySuccess
-                          ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
-                          : 'bg-white border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-[#F0F7FF] hover:border-blue-200'
+                          ? "bg-emerald-50 border-emerald-200 text-emerald-600"
+                          : "bg-white border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-[#F0F7FF] hover:border-blue-200"
                       }`}
                     >
                       {copySuccess ? <LuCheck size={14} /> : <LuCopy size={14} />}
@@ -1030,12 +1018,12 @@ export default function MyCoursesClient() {
               {verifyMessage && (
                 <div className={`p-3 rounded-xl border flex items-start gap-2 text-xs leading-relaxed font-semibold ${
                   verifyStatus === 'processing'
-                    ? 'bg-blue-50 border-blue-100 text-blue-700'
+                    ? "bg-blue-50 border-blue-100 text-blue-700"
                     : verifyStatus === 'manual_retry'
-                    ? 'bg-amber-50 border-amber-100 text-amber-700'
+                    ? "bg-amber-50 border-amber-100 text-amber-700"
                     : verifyStatus === 'error'
-                    ? 'bg-rose-50 border-rose-100 text-rose-700'
-                    : 'bg-slate-50 border-slate-100 text-slate-700'
+                    ? "bg-rose-50 border-rose-100 text-rose-700"
+                    : "bg-slate-50 border-slate-100 text-slate-700"
                 }`}>
                   <div className="flex-shrink-0 mt-0.5">
                     {verifyStatus === 'processing' && <LuRefreshCw size={12} className="animate-spin text-blue-600" />}
@@ -1058,8 +1046,7 @@ export default function MyCoursesClient() {
                   }}
                   className="flex-1 py-2.5 border border-[#E2E8F0] text-[#64748b] hover:bg-[#F8FAFC] font-extrabold text-xs rounded-xl uppercase tracking-wider transition-colors cursor-pointer text-center"
                 >
-                  Thanh toán sau
-                </button>
+                  {tExtracted('thanhToanSau')}</button>
 
                 <button
                   type="button"
@@ -1070,17 +1057,17 @@ export default function MyCoursesClient() {
                   {verifying ? (
                     <>
                       <LuRefreshCw size={12} className="animate-spin" />
-                      <span>Đang kiểm tra...</span>
+                      <span>{tExtracted('dangKiemTra')}</span>
                     </>
                   ) : verifyStatus === 'processing' ? (
                     <>
                       <LuRefreshCw size={12} className="animate-spin" />
-                      <span>Đang kiểm tra ({cooldown}s)...</span>
+                      <span>{tExtracted('dangKiemTra2')}{cooldown}{tExtracted('s')}</span>
                     </>
                   ) : cooldown > 0 ? (
-                    <span>Thử lại sau {cooldown}s</span>
+                    <span>{tExtracted('thuLaiSau')}{cooldown}{tExtracted('s2')}</span>
                   ) : (
-                    <span>Tôi đã chuyển khoản</span>
+                    <span>{tExtracted('toiDaChuyenKhoan')}</span>
                   )}
                 </button>
               </div>
@@ -1096,7 +1083,7 @@ export default function MyCoursesClient() {
             setReportReason('');
             setEvidenceUrl('');
           }}
-          title="Báo cáo vắng mặt / Vi phạm"
+          title={tExtracted('baoCaoVangMatViPham')}
           containerClassName="max-w-md"
           className="p-8 pt-0 font-sans"
         >
@@ -1104,22 +1091,21 @@ export default function MyCoursesClient() {
             <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 text-xs text-amber-800 leading-relaxed font-semibold">
               <LuTriangleAlert size={24} className="text-amber-600 flex-shrink-0" />
               <p>
-                Báo cáo này sẽ được gửi tới Ban quản trị để xử lý vi phạm/hoàn trả điểm (nếu có). Vui lòng điền chi tiết lý do và cung cấp bằng chứng (ảnh chụp màn hình, link drive bằng chứng...) để được hỗ trợ tốt nhất.
-              </p>
+                {tExtracted('baoCaoNaySeDuocGuiToiBan')}</p>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Lý do báo cáo *:</label>
+              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('lyDoBaoCao')}</label>
               <textarea
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                placeholder="Ví dụ: Đến giờ học nhưng Cố vấn không online, tôi đã đợi 15 phút nhưng không liên lạc được..."
+                placeholder={tExtracted('viDuDenGioHocNhungCoVan')}
                 className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[90px] transition-colors resize-none font-semibold leading-relaxed"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Link bằng chứng (hình ảnh, Drive,...) [Không bắt buộc]:</label>
+              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('linkBangChungHinhAnhDriveKhongBat')}</label>
               <input
                 type="url"
                 value={evidenceUrl}
@@ -1138,8 +1124,7 @@ export default function MyCoursesClient() {
                 }}
                 className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer"
               >
-                Hủy bỏ
-              </button>
+                {tExtracted('huyBo')}</button>
               <button
                 onClick={handleReportSubmit}
                 disabled={submittingReport || !reportReason.trim()}
@@ -1150,7 +1135,7 @@ export default function MyCoursesClient() {
                 ) : (
                   <>
                     <LuTriangleAlert size={12} />
-                    <span>Gửi báo cáo</span>
+                    <span>{tExtracted('guiBaoCao')}</span>
                   </>
                 )}
               </button>
@@ -1168,19 +1153,18 @@ export default function MyCoursesClient() {
             setMentorRating(5);
             setMentorComment('');
           }}
-          title="Đánh giá buổi học"
+          title={tExtracted('danhGiaBuoiHoc')}
           containerClassName="max-w-md"
           className="p-8 pt-0 font-sans"
         >
           <div className="flex flex-col gap-5 py-2">
             <p className="text-slate-500 text-xs font-semibold">
-              Hãy chia sẻ trải nghiệm học tập của bạn để giúp hệ thống ngày một tốt hơn và lan tỏa tri thức cộng đồng nhé!
-            </p>
+              {tExtracted('hayChiaSeTraiNghiemHocTapCua')}</p>
 
             {/* 1. Course Review */}
             <div className="flex flex-col gap-2 border-b border-slate-100 pb-4">
               <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
-                1. Đánh giá Khóa học: <span className="text-blue-600">"{reviewBooking?.course?.title}"</span>
+                {tExtracted('text1DanhGiaKhoaHoc')}<span className="text-blue-600">"{reviewBooking?.course?.title}"</span>
               </label>
               <div className="flex items-center gap-1 my-1">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -1191,7 +1175,7 @@ export default function MyCoursesClient() {
                     className="p-1 text-2xl focus:outline-none transition-colors cursor-pointer bg-transparent border-none"
                   >
                     <LuStar
-                      className={star <= courseRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+                      className={star <= courseRating ? "fill-amber-400 text-amber-400" : "text-slate-300"}
                       size={24}
                     />
                   </button>
@@ -1200,7 +1184,7 @@ export default function MyCoursesClient() {
               <textarea
                 value={courseComment}
                 onChange={(e) => setCourseComment(e.target.value)}
-                placeholder="Nhận xét của bạn về nội dung bài giảng, kiến thức thu nhận được..."
+                placeholder={tExtracted('nhanXetCuaBanVeNoiDungBai')}
                 className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[70px] transition-colors resize-none font-semibold leading-relaxed"
               />
             </div>
@@ -1208,7 +1192,7 @@ export default function MyCoursesClient() {
             {/* 2. Mentor Review */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
-                2. Đánh giá Cố vấn: <span className="text-emerald-700">"{reviewBooking?.course?.mentor?.name}"</span>
+                {tExtracted('text2DanhGiaCoVan')}<span className="text-emerald-700">"{reviewBooking?.course?.mentor?.name}"</span>
               </label>
               <div className="flex items-center gap-1 my-1">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -1219,7 +1203,7 @@ export default function MyCoursesClient() {
                     className="p-1 text-2xl focus:outline-none transition-colors cursor-pointer bg-transparent border-none"
                   >
                     <LuStar
-                      className={star <= mentorRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+                      className={star <= mentorRating ? "fill-amber-400 text-amber-400" : "text-slate-300"}
                       size={24}
                     />
                   </button>
@@ -1228,7 +1212,7 @@ export default function MyCoursesClient() {
               <textarea
                 value={mentorComment}
                 onChange={(e) => setMentorComment(e.target.value)}
-                placeholder="Nhận xét về thái độ giảng dạy, phương pháp truyền đạt của Cố vấn..."
+                placeholder={tExtracted('nhanXetVeThaiDoGiangDayPhuong')}
                 className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[70px] transition-colors resize-none font-semibold leading-relaxed"
               />
             </div>
@@ -1244,8 +1228,7 @@ export default function MyCoursesClient() {
                 }}
                 className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer"
               >
-                Hủy bỏ
-              </button>
+                {tExtracted('huyBo')}</button>
               <button
                 onClick={handleReviewSubmit}
                 disabled={submittingReview}
@@ -1256,7 +1239,7 @@ export default function MyCoursesClient() {
                 ) : (
                   <>
                     <LuCheck size={12} />
-                    <span>Gửi đánh giá</span>
+                    <span>{tExtracted('guiDanhGia')}</span>
                   </>
                 )}
               </button>

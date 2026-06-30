@@ -12,7 +12,7 @@ interface UpdateModalProps {
 }
 
 export function UpdateModal({ report, onClose, onUpdated }: UpdateModalProps) {
-  const t = useTranslations('Admin.bugReports');
+  const tExtracted = useTranslations('Extracted.appAdminBugReportsComponentsUpdateModal');  const t = useTranslations('Admin.bugReports');
   const [status, setStatus] = useState<BugReportStatus>(report.status || 'open');
   const [severity, setSeverity] = useState<BugReportSeverity>(report.severity || 'medium');
   const [loading, setLoading] = useState(false);
@@ -100,7 +100,7 @@ export function UpdateModal({ report, onClose, onUpdated }: UpdateModalProps) {
             >
               <LuMonitor size={14} />
               {t('deviceInfoLabel')}
-              <LuChevronDown size={12} className={`transition-transform ${showDeviceInfo ? 'rotate-180' : ''}`} />
+              <LuChevronDown size={12} className={`transition-transform ${showDeviceInfo ? "rotate-180" : ''}`} />
             </button>
             {showDeviceInfo && (
               <div className="mt-2 bg-slate-50 rounded-xl px-4 py-3 border border-slate-100 space-y-1">

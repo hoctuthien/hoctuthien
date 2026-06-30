@@ -1,9 +1,10 @@
+import { getTranslations } from "next-intl/server";
 import { BugReportsClient } from './bug-reports-client';
 
-export const metadata = {
-  title: 'Báo cáo lỗi | Admin - Học Từ Thiện',
-  description: 'Quản lý và xử lý các báo cáo lỗi từ học viên và mentor.',
-};
+export async function generateMetadata() {
+  const t = await getTranslations("PageMetadata.admin_bugreports");
+  return { title: t("title"), description: t("description") };
+}
 
 export default function BugReportsPage() {
   return <BugReportsClient />;

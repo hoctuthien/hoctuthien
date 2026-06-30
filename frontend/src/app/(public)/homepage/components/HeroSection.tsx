@@ -9,6 +9,7 @@ import { Card } from '@/core/ui/Card';
 import { Icon } from '@/core/ui/Icon';
 
 export const HeroSection = () => {
+  const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsHeroSection');
   const t = useTranslations('Homepage');
   const tCommon = useTranslations('Common');
 
@@ -53,12 +54,12 @@ export const HeroSection = () => {
               {/* Background Decoration */}
               <div className="absolute -top-10 -right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
               <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-secondary/5 rounded-full blur-3xl" />
-              
+
               {/* Main Image */}
               <div className="relative h-full rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
                 <Image
                   src="/images/avatar_main.png"
-                  alt="Student Learning"
+                  alt={tExtracted('studentLearning')}
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
@@ -67,9 +68,9 @@ export const HeroSection = () => {
               </div>
 
               {/* Floating Badge */}
-              <Card 
-                variant="glass" 
-                padding="sm" 
+              <Card
+                variant="glass"
+                padding="sm"
                 className="hidden md:flex absolute bottom-10 -left-12 items-center gap-4 animate-bounce-slow z-20"
               >
                 <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-white">

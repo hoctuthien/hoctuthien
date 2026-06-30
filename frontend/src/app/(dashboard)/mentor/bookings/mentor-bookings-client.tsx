@@ -1,18 +1,19 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect } from 'react';
 import { Breadcrumb, EmptyState, Modal } from '@shared';
 import { courseBookingGateway, penaltyTicketGateway, reviewGateway } from '@/core/gateway';
 import { Button } from '@/core/ui';
-import { 
-  LuCalendar, 
-  LuCheck, 
-  LuX, 
-  LuClock, 
-  LuSearch, 
-  LuExternalLink, 
-  LuUser, 
-  LuMessageSquare, 
+import {
+  LuCalendar,
+  LuCheck,
+  LuX,
+  LuClock,
+  LuSearch,
+  LuExternalLink,
+  LuUser,
+  LuMessageSquare,
   LuTriangleAlert,
   LuSettings,
   LuLink,
@@ -46,6 +47,7 @@ interface BookingRelation {
 }
 
 export default function MentorBookingsClient() {
+  const tExtracted = useTranslations('Extracted.appDashboardMentorBookingsMentorBookingsClient');
   const { data: session, status } = useSession();
   const [bookings, setBookings] = useState<BookingRelation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,7 +95,7 @@ export default function MentorBookingsClient() {
 
     const days = [];
     const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
-    
+
     for (let i = 0; i < 7; i++) {
       const currentDay = new Date(monday);
       currentDay.setDate(monday.getDate() + i);
@@ -113,7 +115,7 @@ export default function MentorBookingsClient() {
     const isValid = mTime && !isNaN(mTime.getTime());
     return {
       id: b.id,
-      timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
+      timeLabel: isValid ? mTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : tExtracted('chuaDinhGio'),
       dateStr: (isValid && mTime) ? getLocalDateString(mTime) : '',
       courseTitle: b.course?.title || 'Khóa học',
       partnerName: b.mentee?.name || 'Học viên',
@@ -138,7 +140,7 @@ export default function MentorBookingsClient() {
       setError(null);
     } catch (err: any) {
       console.error('Failed to load mentor bookings:', err);
-      setError('Không thể tải danh sách lịch dạy của bạn. Vui lòng thử lại sau.');
+      setError(tExtracted('khongTheTaiDanhSachLichDayCua'));
     } finally {
       setLoading(false);
     }
@@ -165,10 +167,10 @@ export default function MentorBookingsClient() {
     if (!reviewBooking) return;
     try {
       setSubmittingReview(true);
-      
+
       const menteeId = reviewBooking.menteeId || reviewBooking.mentee?.id;
       if (!menteeId) {
-        alert("Không tìm thấy thông tin Học viên để đánh giá.");
+        alert(tExtracted('khongTimThayThongTinHocVienDe'));
         return;
       }
 
@@ -184,13 +186,13 @@ export default function MentorBookingsClient() {
       setReviewedBookingIds(nextReviewed);
       localStorage.setItem('mentor_reviewed_booking_ids', JSON.stringify(nextReviewed));
 
-      alert('Cảm ơn bạn đã gửi đánh giá học viên!');
+      alert(tExtracted('camOnBanDaGuiDanhGiaHoc'));
       setReviewBooking(null);
       setMenteeRating(5);
       setMenteeComment('');
     } catch (err: any) {
       console.error('Failed to submit user review:', err);
-      alert(err.response?.data?.message || err.message || 'Gửi đánh giá thất bại, vui lòng thử lại.');
+      alert(err.response?.data?.message || err.message || tExtracted('guiDanhGiaThatBaiVuiLongThu'));
     } finally {
       setSubmittingReview(false);
     }
@@ -211,7 +213,7 @@ export default function MentorBookingsClient() {
       );
     } catch (err) {
       console.error('Failed to confirm booking:', err);
-      alert('Xác nhận lịch học thất bại.');
+      alert(tExtracted('xacNhanLichHocThatBai'));
     }
   };
 
@@ -223,7 +225,7 @@ export default function MentorBookingsClient() {
       );
     } catch (err) {
       console.error('Failed to complete booking:', err);
-      alert('Cập nhật trạng thái hoàn thành thất bại.');
+      alert(tExtracted('capNhatTrangThaiHoanThanhThatBai'));
     }
   };
 
@@ -240,14 +242,14 @@ export default function MentorBookingsClient() {
       }
 
       await courseBookingGateway.updateBooking(editBooking.id, payload);
-      
+
       // Update local state beautifully
       setBookings((prev) =>
         prev.map((b) =>
           b.id === editBooking.id
-            ? { 
-                ...b, 
-                status: newStatus, 
+            ? {
+                ...b,
+                status: newStatus,
                 googleMeetUrl: meetUrl.trim() || null,
                 cancellationReason: newStatus === 'cancelled' ? cancellationReason : b.cancellationReason
               }
@@ -257,7 +259,7 @@ export default function MentorBookingsClient() {
       setEditBooking(null);
     } catch (err) {
       console.error('Failed to update booking:', err);
-      alert('Cập nhật lịch học thất bại.');
+      alert(tExtracted('capNhatLichHocThatBai'));
     } finally {
       setSubmittingEdit(false);
     }
@@ -269,7 +271,7 @@ export default function MentorBookingsClient() {
       setSubmittingReport(true);
       const menteeId = reportBooking.menteeId || reportBooking.mentee?.id;
       if (!menteeId) {
-        alert("Không tìm thấy thông tin Học viên để báo cáo.");
+        alert(tExtracted('khongTimThayThongTinHocVienDe2'));
         return;
       }
 
@@ -291,13 +293,13 @@ export default function MentorBookingsClient() {
       await penaltyTicketGateway.createPenaltyTicket(payload);
 
       setReportedBookingIds((prev) => [...prev, reportBooking.id]);
-      alert("Gửi báo cáo vắng mặt thành công! Ban quản trị sẽ sớm xem xét báo cáo này.");
+      alert(tExtracted('guiBaoCaoVangMatThanhCongBan'));
       setReportBooking(null);
       setReportReason('');
       setEvidenceUrl('');
     } catch (err: any) {
       console.error('Failed to submit report:', err);
-      alert(err.message || 'Gửi báo cáo thất bại, vui lòng thử lại.');
+      alert(err.message || tExtracted('guiBaoCaoThatBaiVuiLongThu'));
     } finally {
       setSubmittingReport(false);
     }
@@ -327,24 +329,22 @@ export default function MentorBookingsClient() {
   const cancelledCount = bookings.filter((b) => b.status === 'cancelled').length;
 
   const breadcrumbItems = [
-    { label: 'Trang chủ', href: '/' },
-    { label: 'Cố vấn', href: '#' },
-    { label: 'Quản lý lịch dạy' },
+    { label: tExtracted('trangChu'), href: '/' },
+    { label: tExtracted('coVan'), href: '#' },
+    { label: tExtracted('quanLyLichDay') },
   ];
 
   return (
     <div className="w-full flex flex-col gap-8 font-sans">
-        
+
         {/* Title & Breadcrumbs */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-col gap-2">
             <Breadcrumb items={breadcrumbItems} />
             <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mt-1 font-[Montserrat]">
-              Quản lý Lịch dạy & Buổi học
-            </h1>
+              {tExtracted('quanLyLichDayBuoiHoc')}</h1>
             <p className="text-sm text-[#64748b] font-semibold">
-              Xem danh sách các buổi học được học viên đặt, cập nhật phòng học trực tuyến (Google Meet) và xác nhận kết quả giảng dạy.
-            </p>
+              {tExtracted('xemDanhSachCacBuoiHocDuocHoc')}</p>
           </div>
 
           {/* View Mode Toggle */}
@@ -352,18 +352,18 @@ export default function MentorBookingsClient() {
             <button
               onClick={() => setViewType('list')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewType === 'list' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewType === 'list' ? "bg-[#005BBF] text-white shadow-sm" : "text-slate-500 hover:text-slate-700 bg-transparent"
               }`}
             >
-              <span>Dạng Danh sách</span>
+              <span>{tExtracted('dangDanhSach')}</span>
             </button>
             <button
               onClick={() => setViewType('calendar')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all border-0 ${
-                viewType === 'calendar' ? 'bg-[#005BBF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 bg-transparent'
+                viewType === 'calendar' ? "bg-[#005BBF] text-white shadow-sm" : "text-slate-500 hover:text-slate-700 bg-transparent"
               }`}
             >
-              <span>Dạng Lịch Tháng</span>
+              <span>{tExtracted('dangLichThang')}</span>
             </button>
           </div>
         </div>
@@ -390,7 +390,7 @@ export default function MentorBookingsClient() {
                   <LuCalendar size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">TỔNG LỊCH DẠY</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('tongLichDay')}</span>
                   <span className="text-xl font-black text-[#0F172A]">{loading ? '...' : total}</span>
                 </div>
               </div>
@@ -400,7 +400,7 @@ export default function MentorBookingsClient() {
                   <LuClock size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">CHỜ XÁC NHẬN</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('choXacNhan')}</span>
                   <span className="text-xl font-black text-[#D97706]">{loading ? '...' : pendingCount}</span>
                 </div>
               </div>
@@ -410,7 +410,7 @@ export default function MentorBookingsClient() {
                   <LuCalendar size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ XÁC NHẬN</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('daXacNhan')}</span>
                   <span className="text-xl font-black text-[#005320]">{loading ? '...' : confirmedCount}</span>
                 </div>
               </div>
@@ -420,7 +420,7 @@ export default function MentorBookingsClient() {
                   <LuCheck size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ HOÀN THÀNH</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('daHoanThanh')}</span>
                   <span className="text-xl font-black text-emerald-700">{loading ? '...' : completedCount}</span>
                 </div>
               </div>
@@ -430,7 +430,7 @@ export default function MentorBookingsClient() {
                   <LuX size={20} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">ĐÃ HỦY BỎ</span>
+                  <span className="text-[10px] text-[#64748b] font-black uppercase tracking-wider block truncate">{tExtracted('daHuyBo')}</span>
                   <span className="text-xl font-black text-rose-700">{loading ? '...' : cancelledCount}</span>
                 </div>
               </div>
@@ -444,52 +444,47 @@ export default function MentorBookingsClient() {
                   onClick={() => setActiveTab('all')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'all'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Tất cả
-                </button>
+                  {tExtracted('tatCa')}</button>
                 <button
                   onClick={() => setActiveTab('pending')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'pending'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Chờ xác nhận
-                </button>
+                  {tExtracted('choXacNhan2')}</button>
                 <button
                   onClick={() => setActiveTab('confirmed')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'confirmed'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Đã xác nhận
-                </button>
+                  {tExtracted('daXacNhan2')}</button>
                 <button
                   onClick={() => setActiveTab('completed')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'completed'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Đã học
-                </button>
+                  {tExtracted('daHoc')}</button>
                 <button
                   onClick={() => setActiveTab('cancelled')}
                   className={`px-5 py-2 rounded-xl text-xs font-black tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === 'cancelled'
-                      ? 'bg-[#005BBF] text-white shadow-sm'
-                      : 'text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30'
+                      ? "bg-[#005BBF] text-white shadow-sm"
+                      : "text-[#475569] hover:text-[#005BBF] hover:bg-[#DFEFFF]/30"
                   }`}
                 >
-                  Đã hủy
-                </button>
+                  {tExtracted('daHuy')}</button>
               </div>
 
               {/* Search bar */}
@@ -497,7 +492,7 @@ export default function MentorBookingsClient() {
                 <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
                 <input
                   type="text"
-                  placeholder="Tìm theo tên khóa học hoặc Học viên..."
+                  placeholder={tExtracted('timTheoTenKhoaHocHoacHocVien')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-11 pr-4 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl outline-none focus:bg-white focus:border-[#2563eb] text-xs font-semibold transition-all"
@@ -521,7 +516,7 @@ export default function MentorBookingsClient() {
                 <p className="text-sm font-semibold text-rose-500">{error}</p>
                 <Button
                   variant="outline"
-                  label="Tải lại dữ liệu"
+                  label={tExtracted('taiLaiDuLieu')}
                   onClick={fetchBookings}
                   className="mt-3 rounded-full text-xs font-black"
                 />
@@ -531,21 +526,21 @@ export default function MentorBookingsClient() {
                 {filteredBookings.map((booking, index) => {
                   const meetingDate = new Date(booking.meetingTime);
                   const isPast = meetingDate < new Date();
-                  
+
                   // Status Styling logic
-                  let statusLabel = 'Đang xử lý';
+                  let statusLabel = tExtracted('dangXuLy');
                   let statusStyles = 'bg-amber-500 text-white border-none';
                   if (booking.status === 'confirmed') {
-                    statusLabel = 'Đã xác nhận';
+                    statusLabel = "Đã xác nhận";
                     statusStyles = 'bg-emerald-600 text-white border-none';
                   } else if (booking.status === 'completed') {
-                    statusLabel = 'Đã hoàn thành';
+                    statusLabel = "Đã hoàn thành";
                     statusStyles = 'bg-slate-400 text-white border-none';
                   } else if (booking.status === 'cancelled') {
-                    statusLabel = 'Đã hủy';
+                    statusLabel = "Đã hủy";
                     statusStyles = 'bg-rose-500 text-white border-none';
                   } else if (booking.status === 'rescheduled') {
-                    statusLabel = 'Đã đổi lịch';
+                    statusLabel = "Đã đổi lịch";
                     statusStyles = 'bg-[#005BBF] text-white border-none';
                   }
 
@@ -555,7 +550,7 @@ export default function MentorBookingsClient() {
                   const canEdit = booking.status !== 'completed' && booking.status !== 'cancelled';
 
                   return (
-                    <div 
+                    <div
                       key={`${booking.id || 'booking'}-${index}`}
                       className="bg-white rounded-3xl p-6 border border-slate-100/90 shadow-[0_8px_30px_rgba(0,0,0,0.005)] transition-all duration-300 hover:shadow-md flex flex-col justify-between"
                     >
@@ -569,7 +564,7 @@ export default function MentorBookingsClient() {
                             <button
                               onClick={() => handleOpenEdit(booking)}
                               className="p-2 text-slate-400 hover:text-[#005BBF] hover:bg-[#DFEFFF]/50 rounded-xl transition-all cursor-pointer"
-                              title="Cập nhật buổi học"
+                              title={tExtracted('capNhatBuoiHoc')}
                             >
                               <LuSettings size={15} />
                             </button>
@@ -578,7 +573,7 @@ export default function MentorBookingsClient() {
 
                         {/* Course Title and Booking ID */}
                         <div className="flex flex-col gap-1">
-                          <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">KHÓA HỌC</span>
+                          <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{tExtracted('khoaHoc')}</span>
                           <h3 className="text-base font-black text-[#0F172A] tracking-tight leading-snug line-clamp-1">
                             {booking.course?.title}
                           </h3>
@@ -587,14 +582,14 @@ export default function MentorBookingsClient() {
                         {/* Student Identity */}
                         <div className="flex items-center gap-3 bg-slate-50/50 p-3 rounded-2xl border border-slate-100/80">
                           <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-100">
-                            <img 
-                              src={booking.mentee?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'} 
-                              alt="Học viên" 
+                            <img
+                              src={booking.mentee?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
+                              alt={tExtracted('hocVien')}
                               className="w-full h-full object-cover"
                             />
                           </div>
                           <div className="flex flex-col gap-0.5 min-w-0">
-                            <span className="text-[9px] font-black text-[#94A3B8] uppercase tracking-wider">HỌC VIÊN</span>
+                            <span className="text-[9px] font-black text-[#94A3B8] uppercase tracking-wider">{tExtracted('hocVien2')}</span>
                             <strong className="text-xs text-[#475569] truncate block">{booking.mentee?.name}</strong>
                             <span className="text-[10px] text-[#94A3B8] truncate">{booking.mentee?.email}</span>
                           </div>
@@ -603,33 +598,32 @@ export default function MentorBookingsClient() {
                         {/* Class Time Detail */}
                         <div className="bg-[#F8FAFC] border border-[#E2E8F0]/70 p-4 rounded-2xl flex flex-col gap-2 text-xs">
                           <div className="flex items-center justify-between gap-3 font-semibold text-[#475569]">
-                            <span className="text-[#94A3B8] font-bold">Thời gian dạy:</span>
+                            <span className="text-[#94A3B8] font-bold">{tExtracted('thoiGianDay')}</span>
                             <span className="flex items-center gap-1">
                               <LuClock size={13} className="text-blue-500" />
-                              {meetingDate.toLocaleDateString('vi-VN', { weekday: 'long' })}, {meetingDate.toLocaleDateString('vi-VN')} vào {meetingDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                              {meetingDate.toLocaleDateString('vi-VN', { weekday: "long" })}, {meetingDate.toLocaleDateString('vi-VN')} {tExtracted('vao')}{meetingDate.toLocaleTimeString('vi-VN', { hour: "2-digit", minute: "2-digit" })}
                             </span>
                           </div>
 
                           {booking.googleMeetUrl ? (
                             <div className="flex items-center justify-between gap-3 font-semibold text-[#475569] border-t border-[#E2E8F0] pt-2 mt-1">
-                              <span className="text-[#94A3B8] font-bold">Link Google Meet:</span>
-                              <a 
+                              <span className="text-[#94A3B8] font-bold">{tExtracted('linkGoogleMeet')}</span>
+                              <a
                                 href={booking.googleMeetUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-600 hover:text-blue-700 flex items-center gap-1 no-underline font-black"
                               >
-                                <span>Vào phòng học</span>
+                                <span>{tExtracted('vaoPhongHoc')}</span>
                                 <LuExternalLink size={12} />
                               </a>
                             </div>
                           ) : (
                             <div className="flex items-center justify-between gap-3 font-semibold text-[#EF4444] border-t border-rose-100 pt-2 mt-1 bg-rose-50/20 px-2 py-1.5 rounded-xl border border-rose-100/50">
-                              <span className="text-rose-500 font-bold">Trạng thái:</span>
+                              <span className="text-rose-500 font-bold">{tExtracted('trangThai')}</span>
                               <span className="font-black text-[11px] flex items-center gap-1">
                                 <LuTriangleAlert size={12} />
-                                Chưa cập nhật link phòng học
-                              </span>
+                                {tExtracted('chuaCapNhatLinkPhongHoc')}</span>
                             </div>
                           )}
                         </div>
@@ -639,7 +633,7 @@ export default function MentorBookingsClient() {
                           <div className="flex items-start gap-2 text-xs text-slate-500 border border-slate-100 p-3 rounded-2xl bg-white shadow-[0_4px_12px_rgba(0,0,0,0.002)]">
                             <LuMessageSquare className="text-slate-400 flex-shrink-0 mt-0.5" size={14} />
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lời nhắn từ học viên:</span>
+                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{tExtracted('loiNhanTuHocVien')}</span>
                               <p className="font-medium italic leading-relaxed text-[#475569]">{booking.notesForMentor}</p>
                             </div>
                           </div>
@@ -650,7 +644,7 @@ export default function MentorBookingsClient() {
                           <div className="flex items-start gap-2 text-xs text-rose-600 bg-rose-50/50 border border-rose-100 p-3 rounded-2xl">
                             <LuTriangleAlert className="text-rose-500 flex-shrink-0 mt-0.5" size={14} />
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-black text-rose-500 uppercase tracking-wider">Lý do hủy buổi học:</span>
+                              <span className="text-[10px] font-black text-rose-500 uppercase tracking-wider">{tExtracted('lyDoHuyBuoiHoc')}</span>
                               <p className="font-semibold leading-relaxed text-rose-700">{booking.cancellationReason}</p>
                             </div>
                           </div>
@@ -671,12 +665,12 @@ export default function MentorBookingsClient() {
                               disabled={reviewedBookingIds.includes(booking.id)}
                               className={`w-full text-center font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider transition-all cursor-pointer border flex items-center justify-center gap-1.5 ${
                                 reviewedBookingIds.includes(booking.id)
-                                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                                  : 'bg-[#10B981] hover:bg-[#059669] text-white border-[#10B981] shadow-sm shadow-[#10B981]/10'
+                                  ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                  : "bg-[#10B981] hover:bg-[#059669] text-white border-[#10B981] shadow-sm shadow-[#10B981]/10"
                               }`}
                             >
-                              <LuStar size={14} className={reviewedBookingIds.includes(booking.id) ? 'text-slate-400' : 'text-emerald-100'} />
-                              <span>{reviewedBookingIds.includes(booking.id) ? 'Đã đánh giá' : 'Đánh giá học viên'}</span>
+                              <LuStar size={14} className={reviewedBookingIds.includes(booking.id) ? "text-slate-400" : "text-emerald-100"} />
+                              <span>{reviewedBookingIds.includes(booking.id) ? tExtracted('daDanhGia') : tExtracted('danhGiaHocVien')}</span>
                             </button>
                           )}
 
@@ -687,12 +681,12 @@ export default function MentorBookingsClient() {
                               disabled={reportedBookingIds.includes(booking.id)}
                               className={`w-full text-center font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider transition-all cursor-pointer border flex items-center justify-center gap-1.5 ${
                                 reportedBookingIds.includes(booking.id)
-                                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                                  : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200 shadow-sm'
+                                  ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                  : "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200 shadow-sm"
                               }`}
                             >
                               <LuTriangleAlert size={14} />
-                              <span>{reportedBookingIds.includes(booking.id) ? 'Đã báo cáo học viên vắng mặt' : 'Báo cáo học viên vắng mặt'}</span>
+                              <span>{reportedBookingIds.includes(booking.id) ? tExtracted('daBaoCaoHocVienVangMat') : tExtracted('baoCaoHocVienVangMat')}</span>
                             </button>
                           )}
 
@@ -704,14 +698,12 @@ export default function MentorBookingsClient() {
                                     onClick={() => handleOpenEdit(booking)}
                                     className="flex-1 bg-white border border-[#CBD5E1] text-[#475569] hover:bg-slate-50 font-black text-[11px] py-3 rounded-xl uppercase tracking-wider text-center cursor-pointer transition-all"
                                   >
-                                    Thêm link phòng học
-                                  </button>
+                                    {tExtracted('themLinkPhongHoc')}</button>
                                   <button
                                     onClick={() => handleQuickConfirm(booking.id)}
                                     className="flex-1 bg-[#005BBF] hover:bg-[#004493] text-white font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider text-center shadow-md shadow-[#005BBF]/10 transition-all cursor-pointer"
                                   >
-                                    Xác nhận lịch học
-                                  </button>
+                                    {tExtracted('xacNhanLichHoc')}</button>
                                 </>
                               )}
 
@@ -721,14 +713,12 @@ export default function MentorBookingsClient() {
                                     onClick={() => handleOpenEdit(booking)}
                                     className="flex-1 bg-white border border-[#CBD5E1] text-[#475569] hover:bg-slate-50 font-black text-[11px] py-3 rounded-xl uppercase tracking-wider text-center cursor-pointer transition-all"
                                   >
-                                    Đổi giờ / Hủy lịch
-                                  </button>
+                                    {tExtracted('doiGioHuyLich')}</button>
                                   <button
                                     onClick={() => handleQuickComplete(booking.id)}
                                     className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] py-3 rounded-xl uppercase tracking-wider text-center shadow-md shadow-emerald-500/10 transition-all cursor-pointer"
                                   >
-                                    Hoàn thành buổi học
-                                  </button>
+                                    {tExtracted('hoanThanhBuoiHoc')}</button>
                                 </>
                               )}
                             </div>
@@ -743,9 +733,9 @@ export default function MentorBookingsClient() {
               <div className="py-16 bg-white rounded-[32px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.005)]">
                 <EmptyState
                   icon={<LuCalendar size={48} className="text-slate-400 animate-pulse" />}
-                  title="Không có lịch dạy nào"
-                  description="Hiện tại chưa có học viên nào đặt lịch học thuộc các khóa học do bạn đảm nhận."
-                  actionText="Xem danh sách khóa học của bạn"
+                  title={tExtracted('khongCoLichDayNao')}
+                  description={tExtracted('hienTaiChuaCoHocVienNaoDat')}
+                  actionText={tExtracted('xemDanhSachKhoaHocCuaBan')}
                   onAction={() => window.location.href = '/mentor/courses'}
                 />
               </div>
@@ -757,30 +747,30 @@ export default function MentorBookingsClient() {
         <Modal
           isOpen={editBooking !== null}
           onClose={() => setEditBooking(null)}
-          title="Cập nhật thông tin buổi học"
+          title={tExtracted('capNhatThongTinBuoiHoc')}
           containerClassName="max-w-md"
           className="p-8 pt-0 font-sans"
         >
           {editBooking && (
             <div className="flex flex-col gap-4 py-2">
               <div className="flex flex-col gap-1 bg-blue-50/50 border border-blue-100 p-4 rounded-2xl text-xs text-slate-500 font-semibold leading-relaxed">
-                <span className="text-[10px] font-black text-blue-500 uppercase tracking-wider">Học viên đang cập nhật:</span>
+                <span className="text-[10px] font-black text-blue-500 uppercase tracking-wider">{tExtracted('hocVienDangCapNhat')}</span>
                 <strong className="text-slate-700">{editBooking.mentee?.name}</strong>
-                <span className="text-slate-400">Khóa học: {editBooking.course?.title}</span>
+                <span className="text-slate-400">{tExtracted('khoaHoc2')}{editBooking.course?.title}</span>
               </div>
 
               {/* Status input */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Trạng thái buổi học:</label>
+                <label className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('trangThaiBuoiHoc')}</label>
                 <select
                   value={newStatus}
                   onChange={(e: any) => setNewStatus(e.target.value)}
                   className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs font-black text-[#475569] bg-white cursor-pointer"
                 >
-                  <option value="pending">Đang xử lý (Pending)</option>
-                  <option value="confirmed">Đã xác nhận (Confirmed)</option>
-                  <option value="completed">Đã hoàn thành (Completed)</option>
-                  <option value="cancelled">Hủy bỏ lịch dạy (Cancelled)</option>
+                  <option value="pending">{tExtracted('dangXuLyPending')}</option>
+                  <option value="confirmed">{tExtracted('daXacNhanConfirmed')}</option>
+                  <option value="completed">{tExtracted('daHoanThanhCompleted')}</option>
+                  <option value="cancelled">{tExtracted('huyBoLichDayCancelled')}</option>
                 </select>
               </div>
 
@@ -789,7 +779,7 @@ export default function MentorBookingsClient() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
                     <LuLink size={13} className="text-blue-500" />
-                    <span>Link phòng học Google Meet:</span>
+                    <span>{tExtracted('linkPhongHocGoogleMeet')}</span>
                   </label>
                   <input
                     type="url"
@@ -806,12 +796,12 @@ export default function MentorBookingsClient() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-black text-rose-500 uppercase tracking-wider flex items-center gap-1">
                     <LuTriangleAlert size={13} />
-                    <span>Lý do hủy buổi học:</span>
+                    <span>{tExtracted('lyDoHuyBuoiHoc')}</span>
                   </label>
                   <textarea
                     value={cancellationReason}
                     onChange={(e) => setCancellationReason(e.target.value)}
-                    placeholder="Ví dụ: Cố vấn bận lịch nghiên cứu khoa học đột xuất, xin phép chuyển lịch học sang ngày hôm sau..."
+                    placeholder={tExtracted('viDuCoVanBanLichNghienCuu')}
                     className="w-full border border-slate-200 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[80px] resize-none font-semibold leading-relaxed"
                   />
                 </div>
@@ -822,8 +812,7 @@ export default function MentorBookingsClient() {
                   onClick={() => setEditBooking(null)}
                   className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer"
                 >
-                  Đóng lại
-                </button>
+                  {tExtracted('dongLai')}</button>
                 <button
                   onClick={handleUpdateBookingSubmit}
                   disabled={submittingEdit}
@@ -832,7 +821,7 @@ export default function MentorBookingsClient() {
                   {submittingEdit ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    <span>Cập nhật lịch học</span>
+                    <span>{tExtracted('capNhatLichHoc')}</span>
                   )}
                 </button>
               </div>
@@ -848,7 +837,7 @@ export default function MentorBookingsClient() {
             setReportReason('');
             setEvidenceUrl('');
           }}
-          title="Báo cáo vắng mặt / Vi phạm"
+          title={tExtracted('baoCaoVangMatViPham')}
           containerClassName="max-w-md"
           className="p-8 pt-0 font-sans"
         >
@@ -856,22 +845,21 @@ export default function MentorBookingsClient() {
             <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 text-xs text-amber-800 leading-relaxed font-semibold">
               <LuTriangleAlert size={24} className="text-amber-600 flex-shrink-0" />
               <p>
-                Báo cáo này sẽ được gửi tới Ban quản trị để xử lý vi phạm. Vui lòng điền chi tiết lý do và cung cấp bằng chứng (ảnh chụp màn hình, link drive bằng chứng...) để được hỗ trợ tốt nhất.
-              </p>
+                {tExtracted('baoCaoNaySeDuocGuiToiBan')}</p>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Lý do báo cáo *:</label>
+              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('lyDoBaoCao')}</label>
               <textarea
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                placeholder="Ví dụ: Đến giờ học nhưng Học viên không online, tôi đã đợi 15 phút nhưng không thể liên lạc..."
+                placeholder={tExtracted('viDuDenGioHocNhungHocVien')}
                 className="w-full border border-slate-200 hover:border-slate-300 focus:border-blue-500 rounded-xl p-3 outline-none text-xs min-h-[90px] transition-colors resize-none font-semibold leading-relaxed"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Link bằng chứng (hình ảnh, Drive,...) [Không bắt buộc]:</label>
+              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('linkBangChungHinhAnhDriveKhongBat')}</label>
               <input
                 type="url"
                 value={evidenceUrl}
@@ -890,8 +878,7 @@ export default function MentorBookingsClient() {
                 }}
                 className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer"
               >
-                Hủy bỏ
-              </button>
+                {tExtracted('huyBo')}</button>
               <button
                 onClick={handleReportSubmit}
                 disabled={submittingReport || !reportReason.trim()}
@@ -902,7 +889,7 @@ export default function MentorBookingsClient() {
                 ) : (
                   <>
                     <LuTriangleAlert size={12} />
-                    <span>Gửi báo cáo</span>
+                    <span>{tExtracted('guiBaoCao')}</span>
                   </>
                 )}
               </button>
@@ -918,18 +905,17 @@ export default function MentorBookingsClient() {
             setMenteeRating(5);
             setMenteeComment('');
           }}
-          title="Đánh giá học viên"
+          title={tExtracted('danhGiaHocVien')}
           containerClassName="max-w-md"
           className="p-8 pt-0 font-sans"
         >
           <div className="flex flex-col gap-5 py-2">
             <p className="text-slate-500 text-xs font-semibold">
-              Đánh giá thái độ, tinh thần tự học và sự chuẩn bị của học viên trong buổi học vừa qua để giúp xây dựng uy tín của học viên trên hệ thống nhé!
-            </p>
+              {tExtracted('danhGiaThaiDoTinhThanTuHoc')}</p>
 
             <div className="flex flex-col gap-2">
               <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
-                Đánh giá Học viên: <span className="text-[#005BBF]">"{reviewBooking?.mentee?.name}"</span>
+                {tExtracted('danhGiaHocVien2')}<span className="text-[#005BBF]">"{reviewBooking?.mentee?.name}"</span>
               </label>
               <div className="flex items-center gap-1 my-1">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -940,7 +926,7 @@ export default function MentorBookingsClient() {
                     className="p-1 text-2xl focus:outline-none transition-colors cursor-pointer bg-transparent border-none"
                   >
                     <LuStar
-                      className={star <= menteeRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+                      className={star <= menteeRating ? "fill-amber-400 text-amber-400" : "text-slate-300"}
                       size={24}
                     />
                   </button>
@@ -949,7 +935,7 @@ export default function MentorBookingsClient() {
               <textarea
                 value={menteeComment}
                 onChange={(e) => setMenteeComment(e.target.value)}
-                placeholder="Nhận xét về tinh thần học tập, mức độ tiếp thu bài giảng, sự tương tác của học viên..."
+                placeholder={tExtracted('nhanXetVeTinhThanHocTapMuc')}
                 className="w-full border border-slate-200 hover:border-slate-300 focus:border-[#005BBF] rounded-xl p-3 outline-none text-xs min-h-[90px] transition-colors resize-none font-semibold leading-relaxed"
               />
             </div>
@@ -963,8 +949,7 @@ export default function MentorBookingsClient() {
                 }}
                 className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer"
               >
-                Hủy bỏ
-              </button>
+                {tExtracted('huyBo')}</button>
               <button
                 onClick={handleReviewSubmit}
                 disabled={submittingReview}
@@ -975,7 +960,7 @@ export default function MentorBookingsClient() {
                 ) : (
                   <>
                     <LuCheck size={12} />
-                    <span>Gửi đánh giá</span>
+                    <span>{tExtracted('guiDanhGia')}</span>
                   </>
                 )}
               </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useId, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icon } from "@/core/ui/Icon";
 import { cn } from "@/core/utils/cn";
 
@@ -45,6 +46,7 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
     },
     ref,
   ) => {
+    const tExtracted = useTranslations("Extracted.coreUiInputNumberInputNumber");
     const id = useId();
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -144,7 +146,7 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             tabIndex={-1}
             disabled={disabled || isAtMin}
             onClick={handleDecrement}
-            aria-label="Decrement"
+            aria-label={tExtracted("decrement")}
             className={cn(
               "flex items-center justify-center w-[29px] h-10 rounded-lg shrink-0 transition-all duration-150 hover:cursor-pointer",
               "text-primary hover:bg-black/5 active:scale-90",
@@ -187,7 +189,7 @@ export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             tabIndex={-1}
             disabled={disabled || isAtMax}
             onClick={handleIncrement}
-            aria-label="Increment"
+            aria-label={tExtracted("increment")}
             className={cn(
               "flex items-center justify-center w-[29px] h-10 rounded-lg shrink-0 transition-all duration-150 hover:cursor-pointer",
               "text-primary hover:bg-black/5 active:scale-90",
@@ -259,6 +261,7 @@ export const InputNumberBorderless = React.forwardRef<
     },
     ref,
   ) => {
+    const tExtracted = useTranslations("Extracted.coreUiInputNumberInputNumber");
     const id = useId();
     const [internalValue, setInternalValue] = useState(defaultValue);
     const isControlled = controlledValue !== undefined;
@@ -318,7 +321,7 @@ export const InputNumberBorderless = React.forwardRef<
             tabIndex={-1}
             disabled={disabled || isAtMin}
             onClick={handleDecrement}
-            aria-label="Decrement"
+            aria-label={tExtracted("decrement")}
             className={cn(
               "flex items-center justify-center transition-all duration-150 hover:cursor-pointer",
               "text-primary hover:text-primary-dark active:scale-90",
@@ -352,7 +355,7 @@ export const InputNumberBorderless = React.forwardRef<
             tabIndex={-1}
             disabled={disabled || isAtMax}
             onClick={handleIncrement}
-            aria-label="Increment"
+            aria-label={tExtracted("increment")}
             className={cn(
               "flex items-center justify-center transition-all duration-150 hover:cursor-pointer",
               "text-primary hover:text-primary-dark active:scale-90",

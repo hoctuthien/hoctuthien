@@ -15,6 +15,7 @@ interface InstructorTeamProps {
 }
 
 export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
+  const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsInstructorTeam');
   const t = useTranslations('Homepage');
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -123,7 +124,7 @@ export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
                   ? "border-outline-variant text-text-muted hover:border-primary hover:text-primary bg-white cursor-pointer"
                   : "border-outline-variant/50 text-text-muted/40 cursor-not-allowed bg-slate-50/50"
               }`}
-              aria-label="Scroll left"
+              aria-label={tExtracted('scrollLeft')}
             >
               <Icon name="ChevronLeft" size={24} />
             </button>
@@ -135,7 +136,7 @@ export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
                   ? "border-outline-variant text-text-muted hover:border-primary hover:text-primary bg-white cursor-pointer"
                   : "border-outline-variant/50 text-text-muted/40 cursor-not-allowed bg-slate-50/50"
               }`}
-              aria-label="Scroll right"
+              aria-label={tExtracted('scrollRight')}
             >
               <Icon name="ChevronRight" size={24} />
             </button>
@@ -150,9 +151,9 @@ export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
           onDragStart={(e) => e.preventDefault()}
-          style={{ scrollBehavior: isDown ? 'auto' : 'smooth' }}
+          style={{ scrollBehavior: isDown ? "auto" : "smooth" }}
           className={`flex gap-8 overflow-x-auto no-scrollbar pb-6 -mx-4 px-4 sm:mx-0 sm:px-0 select-none ${
-            isDown ? 'snap-none cursor-grabbing' : 'snap-x snap-mandatory cursor-grab'
+            isDown ? "snap-none cursor-grabbing" : "snap-x snap-mandatory cursor-grab"
           }`}
         >
           {instructors.map((instructor, idx) => (
@@ -172,13 +173,13 @@ export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
                       />
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/30" />
-                    
+
                     {/* Hover Social Overlay */}
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 z-20">
                       {[
-                        { icon: FaFacebook, key: 'facebook' },
-                        { icon: FaTwitter, key: 'twitter' },
-                        { icon: FaLinkedin, key: 'linkedin' }
+                        { icon: FaFacebook, key: "facebook" },
+                        { icon: FaTwitter, key: "twitter" },
+                        { icon: FaLinkedin, key: "linkedin" }
                       ].map((social) => (
                         <button key={social.key} className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white hover:bg-primary hover:scale-110 transition-all flex items-center justify-center">
                           <social.icon size={14} />
@@ -206,7 +207,7 @@ export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
                     <p className="text-text-muted text-sm">{instructor.role}</p>
                   </div>
                 </div>
-                
+
                 <div className="px-6 pb-6">
                   <Link href={`/courses?mentorId=${instructor.targetUserId}`} className="no-underline block w-full">
                     <Button

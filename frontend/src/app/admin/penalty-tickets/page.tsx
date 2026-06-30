@@ -1,10 +1,11 @@
+import { getTranslations } from "next-intl/server";
 import type { Metadata } from 'next';
 import { PenaltyTicketsClient } from './penalty-tickets-client';
 
-export const metadata: Metadata = {
-  title: 'Báo cáo vi phạm | Admin',
-  description: 'Quản lý các báo cáo vi phạm và vắng mặt của học viên và mentor.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.admin_penaltytickets");
+  return { title: t("title"), description: t("description") };
+}
 
 export default function AdminPenaltyTicketsPage() {
   return <PenaltyTicketsClient />;

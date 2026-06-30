@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -39,6 +40,7 @@ interface Course {
 }
 
 function StarRating({ rating }: { rating: number }) {
+  const tExtracted = useTranslations('Extracted.appPublicMentorsIdPage');
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -54,6 +56,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function MentorProfilePage() {
+  const tExtracted = useTranslations('Extracted.appPublicMentorsIdPage');
   const params = useParams();
   const router = useRouter();
   const mentorId = params?.id as string;
@@ -102,18 +105,17 @@ export default function MentorProfilePage() {
   if (notFound || !profile) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
-        <p className="text-slate-500 text-sm font-semibold">Không tìm thấy hồ sơ Cố vấn này.</p>
+        <p className="text-slate-500 text-sm font-semibold">{tExtracted('khongTimThayHoSoCoVanNay')}</p>
         <button onClick={() => router.push("/mentorship")} className="text-blue-600 text-sm font-bold hover:underline">
-          ← Quay về danh sách Cố vấn
-        </button>
+          {tExtracted('quayVeDanhSachCoVan')}</button>
       </div>
     );
   }
 
   const breadcrumbItems = [
-    { label: "Trang chủ", href: "/" },
-    { label: "Cố vấn học tập", href: "/mentorship" },
-    { label: profile.user?.name || "Hồ sơ Cố vấn" },
+    { label: tExtracted('trangChu'), href: "/" },
+    { label: tExtracted('coVanHocTap'), href: "/mentorship" },
+    { label: profile.user?.name || tExtracted('hoSoCoVan') },
   ];
   const averageRating = Number(profile.averageRating ?? 0);
   const totalStudents = Number(profile.totalStudents ?? 0);
@@ -150,21 +152,18 @@ export default function MentorProfilePage() {
                   className="inline-flex items-center gap-2 bg-[#005BBF] hover:bg-[#004493] text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-200 no-underline"
                 >
                   <LuBookOpen size={15} />
-                  Xem khóa học
-                </Link>
+                  {tExtracted('xemKhoaHoc')}</Link>
               </div>
 
               <div className="flex flex-wrap items-center gap-4 mt-3">
                 <StarRating rating={averageRating} />
                 <span className="flex items-center gap-1 text-xs font-bold text-slate-500">
                   <LuUsers size={13} />
-                  {totalStudents} học viên
-                </span>
+                  {totalStudents} {tExtracted('hocVien')}</span>
                 {profile.yearsOfExperience && (
                   <span className="flex items-center gap-1 text-xs font-bold text-slate-500">
                     <LuBriefcase size={13} />
-                    {profile.yearsOfExperience} năm kinh nghiệm
-                  </span>
+                    {profile.yearsOfExperience} {tExtracted('namKinhNghiem')}</span>
                 )}
                 {profile.linkedinUrl && (
                   <a
@@ -174,8 +173,7 @@ export default function MentorProfilePage() {
                     className="flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 no-underline"
                   >
                     <LuLink size={13} />
-                    LinkedIn
-                  </a>
+                    {tExtracted('linkedin')}</a>
                 )}
               </div>
             </div>
@@ -187,14 +185,14 @@ export default function MentorProfilePage() {
           <div className="md:col-span-2 flex flex-col gap-5">
             {profile.bio && (
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">Giới thiệu</h2>
+                <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">{tExtracted('gioiThieu')}</h2>
                 <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{profile.bio}</p>
               </div>
             )}
 
             {profile.skills?.length > 0 && (
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">Kỹ năng</h2>
+                <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-3">{tExtracted('kyNang')}</h2>
                 <div className="flex flex-wrap gap-2">
                   {profile.skills.map((skill) => (
                     <span
@@ -212,7 +210,7 @@ export default function MentorProfilePage() {
             {courses.length > 0 && (
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                 <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">
-                  Khóa học đang dạy ({courses.length})
+                  {tExtracted('khoaHocDangDay')}{courses.length})
                 </h2>
                 <div className="flex flex-col gap-3">
                   {courses.map((course) => (
@@ -233,7 +231,7 @@ export default function MentorProfilePage() {
                           {course.title}
                         </p>
                         <p className="text-xs text-slate-400 font-semibold mt-0.5">
-                          {course.durationMinutes} phút · {Number(course.price) === 0 ? "Miễn phí" : `${Number(course.price).toLocaleString("vi-VN")}đ`}
+                          {course.durationMinutes} {tExtracted('phut')}{Number(course.price) === 0 ? tExtracted('mienPhi') : `${Number(course.price).toLocaleString("vi-VN")}đ`}
                         </p>
                       </div>
                     </Link>
@@ -246,12 +244,12 @@ export default function MentorProfilePage() {
           {/* Right: Stats card */}
           <div className="flex flex-col gap-4">
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col gap-4">
-              <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider">Thống kê</h2>
+              <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider">{tExtracted('thongKe')}</h2>
               {[
-                { label: "Đánh giá trung bình", value: `${averageRating.toFixed(1)} ⭐` },
-                { label: "Tổng học viên", value: totalStudents.toString() },
-                { label: "Kinh nghiệm", value: profile.yearsOfExperience ? `${profile.yearsOfExperience} năm` : "—" },
-                { label: "Khóa học", value: courses.length.toString() },
+                { label: tExtracted('danhGiaTrungBinh'), value: `${averageRating.toFixed(1)} ⭐` },
+                { label: tExtracted('tongHocVien'), value: totalStudents.toString() },
+                { label: tExtracted('kinhNghiem'), value: profile.yearsOfExperience ? `${profile.yearsOfExperience} năm` : "—" },
+                { label: tExtracted('khoaHoc'), value: courses.length.toString() },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                   <span className="text-xs text-slate-500 font-semibold">{label}</span>

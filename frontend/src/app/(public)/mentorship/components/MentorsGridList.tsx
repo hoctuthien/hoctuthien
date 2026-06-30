@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import React from 'react';
 import { mentorGateway } from '@/core/gateway';
 import { MentorCard } from './MentorCard';
@@ -14,6 +15,7 @@ interface MentorsGridListProps {
 }
 
 export const MentorsGridList = async ({ searchParams }: MentorsGridListProps) => {
+  const tExtracted = await getTranslations('Extracted.appPublicMentorshipComponentsMentorsGridList');
   const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   const search = searchParams.search || undefined;
   const skills = searchParams.skills || undefined;
@@ -41,8 +43,8 @@ export const MentorsGridList = async ({ searchParams }: MentorsGridListProps) =>
     return (
       <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
         <Icon name="Users" size={48} className="mx-auto text-slate-300 mb-4" />
-        <h3 className="text-lg font-bold text-slate-800">No Mentors Found</h3>
-        <p className="text-slate-500 text-sm mt-1">Try adjusting your filters or search keywords.</p>
+        <h3 className="text-lg font-bold text-slate-800">{tExtracted('noMentorsFound')}</h3>
+        <p className="text-slate-500 text-sm mt-1">{tExtracted('tryAdjustingYourFiltersOrSearchKeywords')}</p>
       </div>
     );
   }
