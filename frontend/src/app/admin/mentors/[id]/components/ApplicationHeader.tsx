@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,6 +39,7 @@ export function ApplicationHeader({
   errorMessage = "Có lỗi xảy ra khi cập nhật trạng thái.",
   enterNoteMessage = "Nhập ghi chú phản hồi:",
 }: ApplicationHeaderProps) {
+  const tExtracted = useTranslations('Extracted.appAdminMentorsIdComponentsApplicationHeader');
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isApproveOpen, setIsApproveOpen] = useState(false);
@@ -191,21 +193,19 @@ export function ApplicationHeader({
       <TransactionalModal
         isOpen={isApproveOpen}
         onClose={() => setIsApproveOpen(false)}
-        title="Phê duyệt đơn ứng tuyển"
-        subtitle="Xác nhận phê duyệt cố vấn"
-        primaryActionLabel="Phê duyệt"
-        secondaryActionLabel="Hủy"
+        title={tExtracted('pheDuyetDonUngTuyen')}
+        subtitle={tExtracted('xacNhanPheDuyetCoVan')}
+        primaryActionLabel={tExtracted('pheDuyet')}
+        secondaryActionLabel={tExtracted('huy')}
         onPrimaryAction={submitApprove}
         isPrimaryLoading={isLoading}
       >
         <div className="space-y-4">
           <p className="text-sm text-[#414754]">
-            Bạn đang thực hiện phê duyệt đơn đăng ký của ứng viên <strong>{name}</strong> làm Cố vấn trên hệ thống.
-            Vui lòng để lại ghi chú phản hồi cho ứng viên:
-          </p>
+            {tExtracted('banDangThucHienPheDuyetDonDang')}<strong>{name}</strong> {tExtracted('lamCoVanTrenHeThongVuiLong')}</p>
           <Textarea
-            label="Ghi chú phản hồi"
-            placeholder="Nhập ghi chú phản hồi cho ứng viên..."
+            label={tExtracted('ghiChuPhanHoi')}
+            placeholder={tExtracted('nhapGhiChuPhanHoiChoUngVien')}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={4}
@@ -216,21 +216,19 @@ export function ApplicationHeader({
       <TransactionalModal
         isOpen={isRejectOpen}
         onClose={() => setIsRejectOpen(false)}
-        title="Từ chối đơn ứng tuyển"
-        subtitle="Từ chối hồ sơ cố vấn"
-        primaryActionLabel="Từ chối ứng viên"
-        secondaryActionLabel="Hủy"
+        title={tExtracted('tuChoiDonUngTuyen')}
+        subtitle={tExtracted('tuChoiHoSoCoVan')}
+        primaryActionLabel={tExtracted('tuChoiUngVien')}
+        secondaryActionLabel={tExtracted('huy')}
         onPrimaryAction={submitReject}
         isPrimaryLoading={isLoading}
       >
         <div className="space-y-4">
           <p className="text-sm text-[#414754]">
-            Bạn đang thực hiện từ chối đơn đăng ký của ứng viên <strong>{name}</strong>.
-            Vui lòng nhập lý do từ chối cụ thể để gửi phản hồi cho ứng viên:
-          </p>
+            {tExtracted('banDangThucHienTuChoiDonDang')}<strong>{name}</strong>{tExtracted('vuiLongNhapLyDoTuChoiCu')}</p>
           <Textarea
-            label="Lý do từ chối"
-            placeholder="Nhập lý do từ chối..."
+            label={tExtracted('lyDoTuChoi')}
+            placeholder={tExtracted('nhapLyDoTuChoi')}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             status="error"
@@ -247,10 +245,10 @@ export function ApplicationHeader({
           router.refresh();
         }}
         type="success"
-        title="Thành công"
+        title={tExtracted('thanhCong')}
         description={successModal.message}
-        primaryActionLabel="Xác nhận"
-        secondaryActionLabel="Đóng"
+        primaryActionLabel={tExtracted('xacNhan')}
+        secondaryActionLabel={tExtracted('dong')}
         onPrimaryAction={() => {
           setSuccessModal({ isOpen: false, message: "" });
           router.refresh();
@@ -262,10 +260,10 @@ export function ApplicationHeader({
         isOpen={errorModal.isOpen}
         onClose={() => setErrorModal({ isOpen: false, message: "" })}
         type="danger"
-        title="Thất bại"
+        title={tExtracted('thatBai')}
         description={errorModal.message}
-        primaryActionLabel="Thử lại"
-        secondaryActionLabel="Đóng"
+        primaryActionLabel={tExtracted('thuLai')}
+        secondaryActionLabel={tExtracted('dong')}
         onPrimaryAction={() => setErrorModal({ isOpen: false, message: "" })}
       />
     </div>

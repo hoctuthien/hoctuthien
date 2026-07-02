@@ -9,8 +9,7 @@ export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
-}) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+}) {  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-[#F7F9FB]">

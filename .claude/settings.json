@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//tmp/**)",
+      "Bash(python -)",
+      "Bash(npm --prefix \"/d/code/http/hoctuthien/backend\" install nodemailer)",
+      "Bash(npm --prefix \"/d/code/http/hoctuthien/backend\" install -D @types/nodemailer)",
+      "Bash(mkdir -p \"/d/code/http/hoctuthien/frontend/src/app/\\(public\\)/mentors/[id]\")"
+    ],
+    "additionalDirectories": [
+      "D:\\code\\http\\hoctuthien\\frontend\\src\\app\\(public)\\mentors"
+    ]
+  }
+}

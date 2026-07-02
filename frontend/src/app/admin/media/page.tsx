@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Icon } from "@/core/ui";
 import { cn } from "@/core/utils/cn";
@@ -16,6 +17,7 @@ function formatBytes(bytes: number, decimals = 2) {
 }
 
 export default function AdminMediaPage() {
+  const tExtracted = useTranslations('Extracted.appAdminMediaPage');
   const [mediaList, setMediaList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -61,10 +63,10 @@ export default function AdminMediaPage() {
     try {
       setIsUploading(true);
       await uploadFileAction(formData, "HTT");
-      alert("Tải lên ảnh thành công!");
+      alert(tExtracted('taiLenAnhThanhCong'));
       await fetchMedia();
     } catch (error: any) {
-      alert(error.message || "Tải lên ảnh thất bại");
+      alert(error.message || tExtracted('taiLenAnhThatBai'));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -76,10 +78,10 @@ export default function AdminMediaPage() {
 
     try {
       await deleteMediaAction(id);
-      alert("Xóa ảnh thành công!");
+      alert(tExtracted('xoaAnhThanhCong'));
       await fetchMedia();
     } catch (error: any) {
-      alert(error.message || "Xóa ảnh thất bại");
+      alert(error.message || tExtracted('xoaAnhThatBai'));
     }
   };
 
@@ -89,7 +91,7 @@ export default function AdminMediaPage() {
   const filteredMedia = mediaList.filter((img) => {
     const matchesSearch = img.filename?.toLowerCase().includes(searchQuery.toLowerCase());
     if (selectedMonth === "all") return matchesSearch;
-    
+
     // Simple filter by month (e.g. "2026-05")
     const uploadDate = img.createdAt ? new Date(img.createdAt).toISOString() : "";
     return matchesSearch && uploadDate.includes(selectedMonth);
@@ -111,29 +113,29 @@ export default function AdminMediaPage() {
 
   const handleCopyLink = (url: string) => {
     navigator.clipboard.writeText(url);
-    alert("Đã sao chép liên kết vào bộ nhớ tạm!");
+    alert(tExtracted('daSaoChepLienKetVaoBoNho'));
   };
 
   return (
     <div className="h-full flex flex-col gap-6 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Media Library</h1>
-          <p className="text-slate-500 mt-1">Manage your images and assets.</p>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{tExtracted('mediaLibrary')}</h1>
+          <p className="text-slate-500 mt-1">{tExtracted('manageYourImagesAndAssets')}</p>
         </div>
         <div className="flex gap-2">
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            className="hidden" 
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
             accept="image/*"
           />
-          <Button 
+          <Button
             onClick={handleUploadClick}
             disabled={isUploading}
-            label={isUploading ? "Uploading..." : "Upload New"} 
-            variant="primary" 
+            label={isUploading ? tExtracted('uploading') : tExtracted('uploadNew')}
+            variant="primary"
             iconLeft={<Icon name="Upload" size={18} />}
             className="!rounded-xl shadow-lg shadow-primary/20"
           />
@@ -146,25 +148,25 @@ export default function AdminMediaPage() {
           <div className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
             <div className="relative flex-1 max-w-md">
               <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search media..." 
+                placeholder={tExtracted('searchMedia')}
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
               />
             </div>
-            <select 
+            <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/10"
             >
-              <option value="all">All Dates</option>
+              <option value="all">{tExtracted('allDates')}</option>
               {uniqueMonths.map((m: any) => {
                 const [year, month] = m.split("-");
                 return (
                   <option key={m} value={m}>
-                    Tháng {month}/{year}
+                    {tExtracted('thang')}{month}/{year}
                   </option>
                 );
               })}
@@ -174,17 +176,15 @@ export default function AdminMediaPage() {
           {isLoading ? (
             <div className="py-24 text-center text-slate-400">
               <Icon name="Loader2" size={32} className="animate-spin mx-auto mb-2 text-slate-300" />
-              Loading media library...
-            </div>
+              {tExtracted('loadingMediaLibrary')}</div>
           ) : filteredMedia.length === 0 ? (
             <div className="py-24 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">
               <Icon name="Image" size={48} className="mx-auto mb-2 text-slate-300" />
-              Thư viện trống. Hãy bắt đầu tải lên ảnh!
-            </div>
+              {tExtracted('thuVienTrongHayBatDauTaiLen')}</div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 pb-8">
               {filteredMedia.map((img) => (
-                <div 
+                <div
                   key={img.id}
                   onClick={() => setSelectedId(img.id)}
                   className={cn(
@@ -219,22 +219,22 @@ export default function AdminMediaPage() {
                 </div>
                 <div className="p-6 space-y-6">
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-1 text-[10px]">File Details</h4>
+                    <h4 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-1 text-[10px]">{tExtracted('fileDetails')}</h4>
                     <div className="space-y-2 mt-4">
                       <div className="flex justify-between text-xs">
-                        <span className="text-slate-500 font-medium">Filename:</span>
+                        <span className="text-slate-500 font-medium">{tExtracted('filename')}</span>
                         <span className="text-slate-900 font-bold truncate ml-4" title={selectedImage.filename}>{selectedImage.filename}</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-slate-500 font-medium">Size:</span>
+                        <span className="text-slate-500 font-medium">{tExtracted('size')}</span>
                         <span className="text-slate-900 font-bold">{formatBytes(selectedImage.size)}</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-slate-500 font-medium">Mime Type:</span>
-                        <span className="text-slate-900 font-bold">{selectedImage.mimeType || "image/jpeg"}</span>
+                        <span className="text-slate-500 font-medium">{tExtracted('mimeType')}</span>
+                        <span className="text-slate-900 font-bold">{selectedImage.mimeType || tExtracted('imageJpeg')}</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-slate-500 font-medium">Uploaded on:</span>
+                        <span className="text-slate-500 font-medium">{tExtracted('uploadedOn')}</span>
                         <span className="text-slate-900 font-bold">
                           {selectedImage.createdAt ? new Date(selectedImage.createdAt).toLocaleDateString("vi-VN") : "-"}
                         </span>
@@ -243,17 +243,17 @@ export default function AdminMediaPage() {
                   </div>
 
                   <div className="pt-4 flex gap-2 border-t border-slate-100">
-                    <Button 
+                    <Button
                       onClick={() => handleCopyLink(selectedImage.url)}
-                      label="Copy Link" 
-                      variant="secondary" 
+                      label={tExtracted('copyLink')}
+                      variant="secondary"
                       iconLeft={<Icon name="Copy" size={14} />}
                       className="flex-1 !py-2.5 !text-xs !rounded-xl"
                     />
-                    <Button 
+                    <Button
                       onClick={() => handleDeleteClick(selectedImage.id, selectedImage.filename)}
-                      label={<Icon name="Trash2" size={14} />} 
-                      variant="text" 
+                      label={<Icon name="Trash2" size={14} />}
+                      variant="text"
                       className="!p-2.5 !text-red-500 hover:bg-red-50 !rounded-xl"
                     />
                   </div>
@@ -264,7 +264,7 @@ export default function AdminMediaPage() {
                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
                   <Icon name="Image" size={32} />
                 </div>
-                <p className="text-sm text-slate-500">Select an image to view details</p>
+                <p className="text-sm text-slate-500">{tExtracted('selectAnImageToViewDetails')}</p>
               </div>
             )}
           </div>

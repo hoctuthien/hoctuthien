@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import React from 'react';
 import { Breadcrumb } from '@shared';
 import { courseBookingGateway, courseGateway, authGateway } from '@/core/gateway';
 import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  LuPlus, 
-  LuArrowRight, 
+import {
+  LuPlus,
+  LuArrowRight,
   LuGraduationCap,
-  LuInfo
+  LuInfo,
+  LuUserPlus
 } from 'react-icons/lu';
 
 // Import SOLID Subcomponents
@@ -35,6 +37,7 @@ interface CourseItem {
 
 
 export default function DashboardClient() {
+  const tExtracted = useTranslations('Extracted.appDashboardDashboardDashboardClient');
   const { data: session, status: authStatus } = useSession();
   // Fetch all dashboard data via TanStack Query
   const { data: dashboardData, isLoading: queryLoading } = useQuery({
@@ -42,7 +45,7 @@ export default function DashboardClient() {
     queryFn: async () => {
       if (!session) return null;
       const isMentor = session.user?.role === 'mentor';
-      
+
       let isVerifiedVal = true;
       try {
         const meRes = await authGateway.getMe();
@@ -82,7 +85,7 @@ export default function DashboardClient() {
         coursesVal = mentorCourses.map((c: any) => {
           const courseBookings = bookings.filter((b: any) => b.courseId === c.id);
           const distinctStudents = new Set(courseBookings.map((b: any) => b.menteeId)).size;
-          
+
           return {
             id: c.id,
             title: c.title,
@@ -99,7 +102,7 @@ export default function DashboardClient() {
       } else {
         const upcomingCount = bookings.filter((b: any) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'rescheduled').length;
         const completedCount = bookings.filter((b: any) => b.status === 'completed').length;
-        
+
         const courseMap = new Map<string, any>();
         bookings.forEach((b: any) => {
           if (b.courseId && b.course) {
@@ -113,7 +116,7 @@ export default function DashboardClient() {
           }
         });
 
-        const totalHours = completedCount * 1.5; 
+        const totalHours = completedCount * 1.5;
 
         metricsVal = {
           stat1: courseMap.size,
@@ -126,7 +129,7 @@ export default function DashboardClient() {
           const completed = courseBookings.filter((b: any) => b.status === 'completed').length;
           const total = courseBookings.length;
           const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-          
+
           return {
             id: course.id,
             title: course.title,
@@ -163,20 +166,20 @@ export default function DashboardClient() {
       <div className="w-full bg-[#FAFBFD] min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
-          <p className="text-xs font-black text-[#64748B] uppercase tracking-widest font-sans">Đang tải bảng điều khiển...</p>
+          <p className="text-xs font-black text-[#64748B] uppercase tracking-widest font-sans">{tExtracted('dangTaiBangDieuKhien')}</p>
         </div>
       </div>
     );
   }
 
   const isMentor = session?.user?.role === 'mentor';
-  const welcomeMessage = isMentor 
-    ? 'Xin chào Cố vấn học tập! Cùng theo dõi các lớp học hôm nay nhé.' 
+  const welcomeMessage = isMentor
+    ? 'Xin chào Cố vấn học tập! Cùng theo dõi các lớp học hôm nay nhé.'
     : 'Bắt đầu hành trình chinh phục kiến thức thiện nguyện cùng các Cố vấn nào!';
 
   const breadcrumbItems = [
-    { label: 'Trang chủ', href: '/' },
-    { label: 'Bảng điều khiển' },
+    { label: tExtracted('trangChu'), href: '/' },
+    { label: tExtracted('bangDieuKhien') },
   ];
 
   // Reusable Sidebar right column content
@@ -189,17 +192,15 @@ export default function DashboardClient() {
             <LuPlus size={24} className="text-emerald-200" />
           </div>
           <h3 className="text-base font-black tracking-tight leading-snug font-[Montserrat] mt-1">
-            Tạo Thêm Khóa Học Mới
-          </h3>
+            {tExtracted('taoThemKhoaHocMoi')}</h3>
           <p className="text-xs text-emerald-100/90 leading-relaxed font-medium">
-            Truyền thụ tri thức và giúp đỡ các em học sinh có hoàn cảnh khó khăn qua những bài giảng bổ ích của bạn.
-          </p>
-          
+            {tExtracted('truyenThuTriThucVaGiupDoCac')}</p>
+
           <button
             onClick={() => window.location.href = '/mentor/courses'}
             className="bg-white hover:bg-slate-50 text-emerald-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1 opacity-90 border-0"
           >
-            <span>Tạo khóa học mới</span>
+            <span>{tExtracted('taoKhoaHocMoi')}</span>
             <LuPlus size={14} />
           </button>
         </div>
@@ -209,34 +210,40 @@ export default function DashboardClient() {
             <LuGraduationCap size={24} className="text-cyan-300" />
           </div>
           <h3 className="text-base font-black tracking-tight leading-snug font-[Montserrat] mt-1">
-            Đăng Ký Khóa Học Mới?
-          </h3>
+            {tExtracted('dangKyKhoaHocMoi')}</h3>
           <p className="text-xs text-indigo-100/90 leading-relaxed font-medium">
-            Hàng ngàn Cố vấn học tập tận tụy từ khắp các trường Đại học luôn sẵn lòng đồng hành cùng bạn 100% miễn phí.
-          </p>
-          
+            {tExtracted('hangNganCoVanHocTapTanTuy')}</p>
+
           <button
             onClick={() => window.location.href = '/courses'}
             className="bg-white hover:bg-slate-50 text-indigo-700 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-1 opacity-90 border-0"
           >
-            <span>Khám phá ngay</span>
+            <span>{tExtracted('khamPhaNgay')}</span>
             <LuArrowRight size={14} />
+          </button>
+
+          <button
+            onClick={() => window.location.href = '/mentor/register'}
+            className="bg-indigo-950/25 hover:bg-indigo-950/35 text-white border border-white/20 text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            <LuUserPlus size={14} />
+            <span>{tExtracted('guiDonLamCoVan')}</span>
           </button>
         </div>
       )}
 
       {/* Upcoming Next Study Class Card */}
-      <UpcomingClassCard 
-        isMentor={isMentor} 
-        allBookings={allBookings} 
+      <UpcomingClassCard
+        isMentor={isMentor}
+        allBookings={allBookings}
       />
 
       {/* Quick Profile details */}
       <div className="bg-white border border-[#E2E8F0] rounded-[32px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.005)] flex items-center gap-4">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
-          <img 
-            src={session?.user?.image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'} 
-            alt={session?.user?.name || 'Tài khoản'} 
+          <img
+            src={session?.user?.image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
+            alt={session?.user?.name || tExtracted('taiKhoan')}
             className="w-full h-full object-cover"
           />
         </div>
@@ -248,7 +255,7 @@ export default function DashboardClient() {
             {session?.user?.email}
           </span>
           <span className="text-[8px] bg-slate-100 text-slate-500 font-black px-2 py-0.5 rounded-full uppercase tracking-wider w-max border border-slate-200/50 mt-1">
-            {isMentor ? 'Cố vấn' : 'Học viên'}
+            {isMentor ? tExtracted('coVan') : tExtracted('hocVien')}
           </span>
         </div>
       </div>
@@ -256,17 +263,16 @@ export default function DashboardClient() {
   );
 
   return (
-    <div className="w-full bg-[#FAFBFD] min-h-screen py-8 px-4 md:px-8 font-sans">
-      <div className="max-w-7xl mx-auto flex flex-col gap-8">
-        
+    <div className="w-full flex flex-col gap-8 font-sans">
+
         {/* Title, Breadcrumb & Welcome Banner */}
         <div className="flex flex-col gap-2">
           <Breadcrumb items={breadcrumbItems} />
-          
-          <WelcomeBanner 
-            name={session?.user?.name || ''} 
-            isMentor={isMentor} 
-            message={welcomeMessage} 
+
+          <WelcomeBanner
+            name={session?.user?.name || ''}
+            isMentor={isMentor}
+            message={welcomeMessage}
           />
         </div>
 
@@ -279,29 +285,26 @@ export default function DashboardClient() {
               </div>
               <div className="flex flex-col gap-1">
                 <h4 className="text-sm font-black text-slate-800 font-[Montserrat] tracking-tight">
-                  Tài Khoản Chưa Được Kích Hoạt 🔐
-                </h4>
+                  {tExtracted('taiKhoanChuaDuocKichHoat')}</h4>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-xl">
-                  Để bắt đầu đăng ký học 100% miễn phí từ hàng ngàn Cố vấn tận tâm, hãy tiến hành kích hoạt tài khoản của bạn.
-                </p>
+                  {tExtracted('deBatDauDangKyHoc100Mien')}</p>
               </div>
             </div>
             <button
               onClick={() => window.location.href = '/activation'}
               className="w-full sm:w-max bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-black px-6 py-3.5 rounded-2xl uppercase tracking-wider text-center transition-all cursor-pointer shadow-lg shadow-amber-500/15 hover:shadow-xl hover:shadow-amber-500/20 active:scale-[0.98] border-0"
             >
-              Kích hoạt ngay
-            </button>
+              {tExtracted('kichHoatNgay')}</button>
           </div>
         )}
 
         {/* 1. Statistics Cards */}
-        <MetricsGrid 
-          isMentor={isMentor} 
-          stat1={metrics.stat1} 
-          stat2={metrics.stat2} 
-          stat3={metrics.stat3} 
-          stat4={metrics.stat4} 
+        <MetricsGrid
+          isMentor={isMentor}
+          stat1={metrics.stat1}
+          stat2={metrics.stat2}
+          stat3={metrics.stat3}
+          stat4={metrics.stat4}
         />
 
         {/* Main Dashboard Layout */}
@@ -310,7 +313,7 @@ export default function DashboardClient() {
           <div className="lg:col-span-2 flex flex-col gap-8">
             <CourseList courses={courses} isMentor={isMentor} />
           </div>
-          
+
           {/* Right Column - Sidebar info */}
           <div className="flex flex-col gap-8">
             {rightSidebarContent}
@@ -318,6 +321,6 @@ export default function DashboardClient() {
         </div>
 
       </div>
-    </div>
   );
+
 }

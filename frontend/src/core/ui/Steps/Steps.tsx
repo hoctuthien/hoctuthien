@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import { LuCheck, LuX, LuTimer } from 'react-icons/lu';
 import { cn } from '@/core/utils/cn';
@@ -20,7 +21,7 @@ export interface StepsProps {
 }
 
 export const Steps: React.FC<StepsProps> = ({ items, orientation = 'horizontal', className }) => {
-  const containerClass = cn(
+  const tExtracted = useTranslations('Extracted.coreUiStepsSteps');  const containerClass = cn(
     'w-full font-sans',
     orientation === 'horizontal' ? 'flex justify-between py-6 relative' : 'flex flex-col gap-4',
     className
@@ -53,8 +54,8 @@ export const Steps: React.FC<StepsProps> = ({ items, orientation = 'horizontal',
           const isCompleted = item.status === 'completed';
 
           return (
-            <div 
-              key={item.id} 
+            <div
+              key={item.id}
               className={cn(
                 'flex-1 flex flex-col items-center relative min-w-[120px]',
                 !isLast && 'after:content-[""] after:absolute after:top-4 after:left-[calc(50%+20px)] after:right-[calc(-50%+20px)] after:h-0.5 after:bg-border-default after:z-0 after:transition-colors after:duration-300',
@@ -85,8 +86,8 @@ export const Steps: React.FC<StepsProps> = ({ items, orientation = 'horizontal',
         const isCompletedOrActive = item.status === 'completed' || item.status === 'active';
 
         return (
-          <div 
-            key={item.id} 
+          <div
+            key={item.id}
             className={cn(
               'flex gap-4 relative pb-8',
               !isLast && 'before:content-[""] before:absolute before:top-8 before:left-[15px] before:bottom-0 before:w-0.5 before:bg-border-subtle',
@@ -107,8 +108,7 @@ export const Steps: React.FC<StepsProps> = ({ items, orientation = 'horizontal',
               {item.description && <div className="text-caption text-text-muted font-medium">{item.description}</div>}
               {item.info && (
                 <div className="mt-3 p-3 px-4 bg-surface-variant rounded-md text-text-body text-caption italic max-w-[320px] leading-relaxed">
-                  &ldquo;{item.info}&rdquo;
-                </div>
+                  {tExtracted('ldquo')}{item.info}{tExtracted('rdquo')}</div>
               )}
             </div>
           </div>
@@ -126,11 +126,10 @@ export interface StatusPillProps {
   className?: string;
 }
 
-export const StatusPill: React.FC<StatusPillProps> = ({ label, variant = 'ghost', isActive, icon, className }) => {
-  return (
+export const StatusPill: React.FC<StatusPillProps> = ({ label, variant = 'ghost', isActive, icon, className }) => {  return (
     <div className={cn(
       'flex items-center gap-2 py-2.5 px-6 rounded-full text-body-sm font-bold transition-all duration-300 w-fit cursor-pointer',
-      (variant === 'filled' || isActive) && !className?.includes('bg-transparent') ? 'bg-primary text-text-inverse shadow-md' : '',
+      (variant === 'filled' || isActive) && !className?.includes('bg-transparent') ? "bg-primary text-text-inverse shadow-md" : '',
       variant === 'outline' && 'bg-transparent border-2 border-primary text-primary hover:bg-primary-fixed',
       variant === 'ghost' && 'bg-transparent text-text-muted hover:text-primary',
       className
@@ -148,14 +147,13 @@ export interface StatusCardProps {
   className?: string;
 }
 
-export const StatusCard: React.FC<StatusCardProps> = ({ title, description, status, className }) => {
-  const isCompleted = status === 'completed';
+export const StatusCard: React.FC<StatusCardProps> = ({ title, description, status, className }) => {  const isCompleted = status === 'completed';
   return (
     <div className={cn(
       'flex flex-col gap-3 w-60 p-5 bg-surface rounded-xl border border-border-subtle shadow-sm',
       className
     )}>
-      <div className={cn(isCompleted ? 'text-secondary' : 'text-primary', 'flex')}>
+      <div className={cn(isCompleted ? "text-secondary" : "text-primary", 'flex')}>
         {isCompleted ? <LuCheck size={24} strokeWidth={3} /> : <LuTimer size={24} strokeWidth={3} />}
       </div>
       <div>

@@ -3,7 +3,9 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Not } from 'typeorm';
 import { CourseBookingRepository } from '../repositories/course-booking.repository';
 import { BookingStatus } from '../entities/course-booking.entity';
@@ -22,12 +24,23 @@ import {
 } from '../types/course-booking.types';
 import { Role } from '../../../common/enums/role.enum';
 import { CourseRepository } from '../../course/repositories/course.repository';
+import { MailService } from '../../mail/services/mail.service';
+import { NotificationService } from '../../notification/services/notification.service';
+import {
+  BOOKING_COMPLETED_EVENT,
+  BookingCompletedPayload,
+} from '../events/course-booking.events';
 
 @Injectable()
 export class CourseBookingService {
+  private readonly logger = new Logger(CourseBookingService.name);
+
   constructor(
     private readonly courseBookingRepository: CourseBookingRepository,
     private readonly courseRepository: CourseRepository,
+    private readonly mailService: MailService,
+    private readonly notificationService: NotificationService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findAll(
@@ -233,7 +246,161 @@ export class CourseBookingService {
           ? BookingStatus.CONFIRMED
           : BookingStatus.PENDING,
     });
+
+    void this.sendBookingNotificationEmails(created.id).catch(() => undefined);
+    void this.sendBookingNotifications(created.id).catch(() => undefined);
+
     return courseBookingSchema.parse(created);
+  }
+
+  async sendBookingNotificationEmails(bookingId: string) {
+    const booking = await this.courseBookingRepository.findById(bookingId, {
+      relations: ['course', 'course.mentor', 'mentee'],
+    });
+
+    if (!booking || !booking.course) {
+      return;
+    }
+
+    const meetingTimeLabel = new Intl.DateTimeFormat('vi-VN', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+      dateStyle: 'full',
+      timeStyle: 'short',
+    }).format(new Date(booking.meetingTime));
+
+    const status =
+      booking.status === BookingStatus.CONFIRMED ? 'confirmed' : 'pending';
+
+    // 1. Send email to Mentee
+    if (booking.mentee?.email) {
+      await this.mailService
+        .sendCourseBookingEmail({
+          to: booking.mentee.email,
+          recipientName: booking.mentee.name || 'bạn',
+          courseTitle: booking.course.title,
+          mentorName: booking.course.mentor?.name,
+          meetingTimeLabel,
+          status,
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Failed to send booking email to mentee ${booking.mentee.email}: ${err?.message || err}`,
+          );
+        });
+    }
+
+    // 2. Send email to Mentor
+    if (booking.course.mentor?.email) {
+      await this.mailService
+        .sendMentorBookingNotificationEmail({
+          to: booking.course.mentor.email,
+          recipientName: booking.course.mentor.name || 'Cố vấn',
+          menteeName: booking.mentee?.name || 'Học viên',
+          courseTitle: booking.course.title,
+          meetingTimeLabel,
+          status,
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Failed to send booking email to mentor ${booking.course.mentor.email}: ${err?.message || err}`,
+          );
+        });
+    }
+
+    // 3. Send copy of booking email to the administrator
+    const adminEmail = this.mailService.getAdminEmail();
+    if (adminEmail) {
+      await this.mailService
+        .sendCourseBookingEmail({
+          to: adminEmail,
+          recipientName: `Ban quản trị (Đặt bởi học viên ${booking.mentee?.name || 'Học viên'})`,
+          courseTitle: booking.course.title,
+          mentorName: booking.course.mentor?.name,
+          meetingTimeLabel,
+          status,
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Failed to send booking copy to admin: ${err?.message || err}`,
+          );
+        });
+    }
+  }
+
+  async sendBookingNotifications(bookingId: string, isPaymentSuccess = false) {
+    const booking = await this.courseBookingRepository.findById(bookingId, {
+      relations: ['course', 'course.mentor', 'mentee'],
+    });
+
+    if (!booking || !booking.course) {
+      return;
+    }
+
+    const isPending = booking.status === BookingStatus.PENDING;
+
+    // 1. Notification for Mentee
+    try {
+      let menteeTitle = 'Đăng ký buổi học thành công';
+      let menteeContent = `Bạn đã đăng ký thành công buổi học cho khóa “${booking.course.title}”.`;
+
+      if (isPaymentSuccess) {
+        menteeTitle = 'Thanh toán lịch học thành công';
+        menteeContent = `Thanh toán cho buổi học của khóa “${booking.course.title}” đã được xác nhận. Lịch học của bạn đã được chuyển sang trạng thái đã xác nhận.`;
+      } else if (isPending) {
+        menteeTitle = 'Đăng ký buổi học thành công - Chờ thanh toán';
+        menteeContent = `Bạn đã đăng ký buổi học cho khóa “${booking.course.title}” thành công. Vui lòng hoàn tất thanh toán để giữ chỗ.`;
+      }
+
+      await this.notificationService.create({
+        userId: booking.menteeId,
+        title: menteeTitle,
+        content: menteeContent,
+        type: 'course_booking',
+        actionLink: '/my-courses',
+        payload: {
+          bookingId: booking.id,
+          courseId: booking.courseId,
+          status: booking.status,
+        },
+      });
+    } catch (err: any) {
+      this.logger.error(
+        `Failed to create booking notification for mentee ${booking.menteeId}: ${err?.message || err}`,
+      );
+    }
+
+    // 2. Notification for Mentor
+    if (booking.course.mentorId) {
+      try {
+        let mentorTitle = 'Có lịch học mới đã xác nhận';
+        let mentorContent = `Học viên ${booking.mentee?.name || 'Học viên'} đã đăng ký thành công một buổi học cho khóa học “${booking.course.title}” của bạn.`;
+
+        if (isPaymentSuccess) {
+          mentorTitle = 'Lịch học mới đã được thanh toán';
+          mentorContent = `Học viên ${booking.mentee?.name || 'Học viên'} đã thanh toán thành công buổi học của khóa “${booking.course.title}”. Lịch học đã được xác nhận.`;
+        } else if (isPending) {
+          mentorTitle = 'Có yêu cầu đăng ký buổi học mới';
+          mentorContent = `Học viên ${booking.mentee?.name || 'Học viên'} đã đăng ký một buổi học mới cho khóa học “${booking.course.title}” của bạn (Chờ thanh toán).`;
+        }
+
+        await this.notificationService.create({
+          userId: booking.course.mentorId,
+          title: mentorTitle,
+          content: mentorContent,
+          type: 'course_booking',
+          actionLink: '/mentor/bookings',
+          payload: {
+            bookingId: booking.id,
+            courseId: booking.courseId,
+            status: booking.status,
+          },
+        });
+      } catch (err: any) {
+        this.logger.error(
+          `Failed to create booking notification for mentor ${booking.course.mentorId}: ${err?.message || err}`,
+        );
+      }
+    }
   }
 
   private validateMeetingTime(meetingTime: Date, metadata: any) {
@@ -311,6 +478,12 @@ export class CourseBookingService {
       throw new ForbiddenException('Bạn không có quyền cập nhật booking này.');
     }
 
+    if (item.meetingTime < new Date()) {
+      throw new BadRequestException(
+        'Không thể hủy buổi học đã diễn ra hoặc đã qua thời gian.',
+      );
+    }
+
     const parsed = updateCourseBookingByMenteeSchema.parse(payload);
     const updated = await this.courseBookingRepository.updateById(id, parsed);
     return courseBookingSchema.parse(updated);
@@ -337,6 +510,18 @@ export class CourseBookingService {
 
     const parsed = updateCourseBookingSchema.parse(payload);
     const updated = await this.courseBookingRepository.updateById(id, parsed);
+
+    if (parsed.status === BookingStatus.COMPLETED) {
+      const course = await this.courseRepository.findById(item.courseId);
+      const payload: BookingCompletedPayload = {
+        bookingId: updated.id,
+        menteeId: updated.menteeId,
+        mentorId: course?.mentorId,
+        courseId: updated.courseId,
+      };
+      this.eventEmitter.emit(BOOKING_COMPLETED_EVENT, payload);
+    }
+
     return courseBookingSchema.parse(updated);
   }
 

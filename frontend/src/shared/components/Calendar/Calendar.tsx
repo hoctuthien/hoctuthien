@@ -28,8 +28,7 @@ function Calendar({
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
-}) {
-  const defaultClassNames = getDefaultClassNames()
+}) {  const defaultClassNames = getDefaultClassNames()
 
   return (
     <DayPicker
@@ -95,7 +94,7 @@ function Calendar({
           defaultClassNames.range_start
         ),
         range_middle: cn(
-          "bg-slate-50 !rounded-none", 
+          "bg-slate-50 !rounded-none",
           defaultClassNames.range_middle
         ),
         range_end: cn(
@@ -167,8 +166,7 @@ function CalendarDayButton({
   modifiers,
   locale,
   ...props
-}: React.ComponentProps<typeof DayButton> & { locale?: Partial<Locale> }) {
-  const ref = React.useRef<HTMLButtonElement>(null)
+}: React.ComponentProps<typeof DayButton> & { locale?: Partial<Locale> }) {  const ref = React.useRef<HTMLButtonElement>(null)
   React.useEffect(() => {
     if (modifiers.focused) ref.current?.focus()
   }, [modifiers.focused])

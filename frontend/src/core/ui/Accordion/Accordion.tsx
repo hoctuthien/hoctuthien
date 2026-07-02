@@ -11,8 +11,7 @@ interface AccordionProps {
   className?: string;
 }
 
-export const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOpen = false, className }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+export const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOpen = false, className }) => {  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
     <div className={cn(
@@ -20,7 +19,7 @@ export const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOp
       isOpen && 'shadow-lg',
       className
     )}>
-      <button 
+      <button
         className={cn(
           'w-full flex items-center justify-between py-4 px-6 bg-transparent border-none cursor-pointer text-left transition-all duration-150',
           !isOpen && 'hover:bg-primary-fixed/50 hover:text-primary',
@@ -37,7 +36,7 @@ export const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOp
         </span>
         <div className={cn(
           'transition-all duration-300',
-          isOpen ? 'rotate-180 text-text-inverse' : 'text-primary'
+          isOpen ? "rotate-180 text-text-inverse" : "text-primary"
         )}>
           <LuChevronDown size={20} />
         </div>

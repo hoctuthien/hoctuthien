@@ -33,8 +33,7 @@ export const Select = ({
   error,
   helperText,
   status: providedStatus,
-}: SelectProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+}: SelectProps) => {  const [isOpen, setIsOpen] = useState(false);
 
   const selectedOption = options.find((opt) => opt.value === value);
   const status = providedStatus || (error ? "error" : "default");
@@ -70,8 +69,8 @@ export const Select = ({
   };
 
   return (
-    <div 
-      className={cn("flex flex-col gap-2 w-full outline-none", className)} 
+    <div
+      className={cn("flex flex-col gap-2 w-full outline-none", className)}
       onBlur={handleBlur}
       tabIndex={-1}
     >
@@ -97,10 +96,10 @@ export const Select = ({
             {statusStyles[status].icon}
             <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
           </div>
-          <Icon 
+          <Icon
             name="ChevronDown"
-            className={cn("transition-transform duration-300 text-[#727785] flex-shrink-0 ml-2", isOpen && "rotate-180 text-primary")} 
-            size={20} 
+            className={cn("transition-transform duration-300 text-[#727785] flex-shrink-0 ml-2", isOpen && "rotate-180 text-primary")}
+            size={20}
           />
         </button>
 
@@ -112,8 +111,8 @@ export const Select = ({
                 type="button"
                 className={cn(
                   "w-full px-4 py-3 text-left text-sm font-medium transition-colors font-[Montserrat] hover:cursor-pointer",
-                  option.value === value 
-                    ? "text-primary bg-primary/5 font-bold" 
+                  option.value === value
+                    ? "text-primary bg-primary/5 font-bold"
                     : "text-slate-600 hover:bg-slate-50 hover:text-primary"
                 )}
                 onClick={() => {

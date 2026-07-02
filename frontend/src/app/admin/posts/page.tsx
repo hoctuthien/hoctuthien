@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import React from "react";
 import { Button, Icon } from "@/core/ui";
 import Link from "next/link";
@@ -5,11 +6,12 @@ import { getPostsAction, getCategoriesAction, getTagsAction } from "./actions/po
 import { PostFilter } from "./components/PostFilter";
 import { PostsTable } from "./components/PostsTable";
 
-export default async function AdminPostsPage({ 
-  searchParams 
- }: { 
-  searchParams: Promise<{ categoryId?: string; tagId?: string; search?: string }> 
+export default async function AdminPostsPage({
+  searchParams
+ }: {
+  searchParams: Promise<{ categoryId?: string; tagId?: string; search?: string }>
 }) {
+  const tExtracted = await getTranslations('Extracted.appAdminPostsPage');
   const params = await searchParams;
   let posts: any[] = [];
   let categories: any[] = [];
@@ -33,13 +35,13 @@ export default async function AdminPostsPage({
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Post Management</h1>
-          <p className="text-slate-500 text-sm mt-1">Create, edit and manage your blog content.</p>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">{tExtracted('postManagement')}</h1>
+          <p className="text-slate-500 text-sm mt-1">{tExtracted('createEditAndManageYourBlogContent')}</p>
         </div>
         <Link href="/admin/posts/new">
-          <Button 
-            label="Create New Post" 
-            variant="primary" 
+          <Button
+            label={tExtracted('createNewPost')}
+            variant="primary"
             iconLeft={<Icon name="Plus" size={18} />}
             className="!rounded-xl shadow-lg shadow-primary/20"
           />

@@ -32,8 +32,7 @@ export const DatePicker = ({
   error,
   helperText,
   status: providedStatus,
-}: DatePickerProps) => {
-  const [date, setDate] = useState<Date | undefined>(value);
+}: DatePickerProps) => {  const [date, setDate] = useState<Date | undefined>(value);
   const id = useId();
 
   const handleSelect = (selectedDate: Date | undefined) => {
@@ -117,9 +116,9 @@ export const DatePicker = ({
                 "shrink-0 transition-colors",
                 !disabled && status === "default" && "group-hover/date-picker:text-primary",
                 date && status === "default" ? "text-primary" : "text-[#727785]",
-                status !== "default" && "hidden" // Hide calendar icon if status icon is present? 
-                // Actually, let's keep it if success/warning? 
-                // Guideline says icon on the right. 
+                status !== "default" && "hidden" // Hide calendar icon if status icon is present?
+                // Actually, let's keep it if success/warning?
+                // Guideline says icon on the right.
               )}
             />
             <span className="truncate flex-1 text-left">

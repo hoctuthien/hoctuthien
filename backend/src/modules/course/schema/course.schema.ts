@@ -52,6 +52,11 @@ export const findCoursesQuerySchema = paginationQuerySchema.extend({
   groupCategorySlug: z.string().optional(),
   categoryId: z.string().uuid().optional(),
   categorySlug: z.string().optional(),
+  isFree: z
+    .string()
+    .optional()
+    .transform((v) => (v === 'true' ? true : v === 'false' ? false : undefined)),
+  sortBy: z.enum(['newest', 'rating', 'popular']).optional(),
 });
 
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;

@@ -15,6 +15,10 @@ type BackendAuthPayload = {
   refresh_token?: string;
 };
 
+function isValidDeviceId(deviceId: unknown): deviceId is string {
+  return typeof deviceId === "string" && deviceId.trim().length > 0 && deviceId !== "unknown";
+}
+
 function extractAuthPayload(responseData: any): BackendAuthPayload | null {
   const payload = Array.isArray(responseData?.data)
     ? responseData.data[0]
@@ -54,6 +58,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             // Ignored
           }
 
+          if (!isValidDeviceId(deviceId)) {
+            console.warn("[NextAuth] Missing device_id cookie during credentials login");
+            return null;
+          }
+
           const headers: Record<string, string> = {
             "Content-Type": "application/json",
           };
@@ -88,7 +97,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               role: actualData.user.role,
               accessToken: actualData.access_token,
               refreshToken: actualData.refresh_token,
-              deviceId: deviceId || "unknown",
+              deviceId,
             };
           }
           return null;
@@ -114,6 +123,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               // Ignored
             }
 
+            if (!isValidDeviceId(deviceId)) {
+              console.warn("[NextAuth] Missing device_id cookie during Google login");
+              return {
+                ...token,
+                error: "MissingDeviceId",
+              };
+            }
+
             const headers: Record<string, string> = {
               "Content-Type": "application/json",
             };
@@ -136,7 +153,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 role: actualData.user.role,
                 accessToken: actualData.access_token,
                 refreshToken: actualData.refresh_token,
-                deviceId: deviceId || "unknown",
+                deviceId,
                 accessTokenExpires: Date.now() + 14 * 60 * 1000, // 14 phút
               };
             }
@@ -151,7 +168,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: (user as any).role,
           accessToken: (user as any).accessToken,
           refreshToken: (user as any).refreshToken,
-          deviceId: (user as any).deviceId || "unknown",
+          deviceId: (user as any).deviceId,
           accessTokenExpires: Date.now() + 14 * 60 * 1000, // 14 phút
         };
       }
@@ -198,15 +215,15 @@ async function refreshAccessToken(token: any) {
       };
     }
 
-    let deviceId = token.deviceId;
-    if (!deviceId) {
-      try {
-        const { cookies } = require("next/headers");
-        const cookieStore = await cookies();
-        deviceId = cookieStore.get("device_id")?.value;
-      } catch (e) {
-        // Ignored
-      }
+    // Always use token.deviceId (set at login time) — never read from current
+    // request cookies, which can differ from the device used at login.
+    const deviceId = token.deviceId as string | undefined;
+    if (!isValidDeviceId(deviceId)) {
+      console.error("[NextAuth] Cannot refresh without a valid deviceId");
+      return {
+        ...token,
+        error: "RefreshAccessTokenError",
+      };
     }
 
     const cookieParts = [`refresh_token=${token.refreshToken}`];
@@ -247,7 +264,7 @@ async function refreshAccessToken(token: any) {
       ...token,
       accessToken: actualData.access_token,
       refreshToken: actualData.refresh_token,
-      deviceId: deviceId || token.deviceId || "unknown",
+      deviceId,
       accessTokenExpires: Date.now() + 14 * 60 * 1000,
       error: undefined,
     };

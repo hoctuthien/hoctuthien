@@ -1,12 +1,19 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, MoreThan, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { randomInt } from 'crypto';
 import { UserEntity, UserRole } from '../../user/entities/user.entity';
 import { UserSessionEntity } from '../../user-session/entities/user-session.entity';
 import { IAuthService } from '../interfaces/auth.service.interface';
-import { LoginDto, RegisterDto } from '../dtos/auth.dto';
+import { LoginDto, RegisterDto, ResetPasswordDto } from '../dtos/auth.dto';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { REDIS_CLIENT } from 'src/modules/redis/redis.module';
 import Redis from 'ioredis';
@@ -14,9 +21,12 @@ import { OAuth2Client } from 'google-auth-library';
 import { ConfigService } from '@nestjs/config';
 import { UserSessionService } from '../../user-session/services/user-session.service';
 import { ConflictException } from '@nestjs/common';
+import { MailService } from '../../mail/services/mail.service';
+import { OtpPurpose, OtpTokenEntity } from '../entities/otp-token.entity';
 
 @Injectable()
 export class AuthService implements IAuthService {
+  private readonly logger = new Logger(AuthService.name);
   private googleClient: OAuth2Client;
 
   constructor(
@@ -29,9 +39,13 @@ export class AuthService implements IAuthService {
     @InjectRepository(UserSessionEntity)
     private readonly sessionRepository: Repository<UserSessionEntity>,
 
+    @InjectRepository(OtpTokenEntity)
+    private readonly otpRepository: Repository<OtpTokenEntity>,
+
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly userSessionService: UserSessionService,
+    private readonly mailService: MailService,
   ) {
     this.googleClient = new OAuth2Client(
       this.configService.get<string>('google.clientId') ||
@@ -39,18 +53,28 @@ export class AuthService implements IAuthService {
     );
   }
 
+  private requireDeviceId(deviceId?: string | null) {
+    const normalized = typeof deviceId === 'string' ? deviceId.trim() : '';
+    if (!normalized || normalized === 'unknown') {
+      throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
+    }
+
+    return normalized;
+  }
+
   private async createSession(
     userId: string,
     refreshToken: string,
     deviceId?: string,
   ) {
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // Mặc định 7 ngày
+    const expiresAt = this.calculateExpirationDate(
+      process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+    );
 
     const session = this.sessionRepository.create({
       userId,
       refreshToken,
-      deviceName: deviceId || 'unknown',
+      deviceName: this.requireDeviceId(deviceId),
       refreshTokenExpiresAt: expiresAt,
       lastUsedAt: new Date(),
       status: 'active',
@@ -99,13 +123,19 @@ export class AuthService implements IAuthService {
     requestInfo?: { ip?: string; deviceId?: string },
   ) {
     const { email, password, name, phone, dayOfBirth, gender } = registerDto;
-    const deviceId = requestInfo?.deviceId;
+    const deviceId = this.requireDeviceId(requestInfo?.deviceId);
 
     const existingUser = await this.userRepository.findOne({
       where: { email },
+      withDeleted: true,
     });
     if (existingUser) {
-      throw new ConflictException(AUTH_MESSAGES.EMAIL_ALREADY_EXISTS);
+      if (existingUser.deletedAt) {
+        // Tài khoản đã bị xóa (soft deleted), tiến hành xóa hoàn toàn để đăng ký mới
+        await this.userRepository.delete(existingUser.id);
+      } else {
+        throw new ConflictException(AUTH_MESSAGES.EMAIL_ALREADY_EXISTS);
+      }
     }
 
     const salt = await bcrypt.genSalt();
@@ -132,6 +162,31 @@ export class AuthService implements IAuthService {
     };
     const tokens = await this.generateTokens(payload);
 
+    void this.mailService
+      .sendRegistrationEmail({
+        to: user.email,
+        recipientName: user.name,
+      })
+      .catch((err) => {
+        this.logger.error(
+          `Failed to send registration email to ${user.email}: ${err?.message || err}`,
+        );
+      });
+
+    const adminEmail = this.mailService.getAdminEmail();
+    if (adminEmail && adminEmail !== user.email) {
+      void this.mailService
+        .sendRegistrationEmail({
+          to: adminEmail,
+          recipientName: `Ban quản trị (Đăng ký mới: ${user.name})`,
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Failed to send registration email to admin ${adminEmail}: ${err?.message || err}`,
+          );
+        });
+    }
+
     return {
       user: {
         id: user.id,
@@ -148,7 +203,7 @@ export class AuthService implements IAuthService {
     requestInfo?: { ip?: string; userAgent?: string; deviceId?: string },
   ) {
     const { email, password } = loginDto;
-    const deviceId = requestInfo?.deviceId;
+    const deviceId = this.requireDeviceId(requestInfo?.deviceId);
 
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user || !user.passwordHash) {
@@ -179,9 +234,118 @@ export class AuthService implements IAuthService {
     };
   }
 
+  async requestPasswordReset(
+    email: string,
+    requestInfo?: { ip?: string },
+  ): Promise<{ message: string }> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await this.userRepository.findOne({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user) {
+      return {
+        message:
+          'Nếu email tồn tại trong hệ thống, mã OTP đặt lại mật khẩu đã được gửi.',
+      };
+    }
+
+    const otp = this.generateOtpCode();
+    const expiresInMinutes = 10;
+    const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+
+    await this.consumeActiveOtps(normalizedEmail, OtpPurpose.PASSWORD_RESET);
+
+    const codeHash = await bcrypt.hash(otp, 10);
+    const otpToken = this.otpRepository.create({
+      email: normalizedEmail,
+      userId: user.id,
+      purpose: OtpPurpose.PASSWORD_RESET,
+      codeHash,
+      expiresAt,
+      consumedAt: null,
+      attempts: 0,
+      metadata: {
+        ip: requestInfo?.ip || null,
+      },
+    });
+    await this.otpRepository.save(otpToken);
+
+    await this.mailService.sendPasswordResetOtpEmail({
+      to: user.email,
+      recipientName: user.name,
+      otp,
+      expiresInMinutes,
+    });
+
+    return {
+      message:
+        'Nếu email tồn tại trong hệ thống, mã OTP đặt lại mật khẩu đã được gửi.',
+    };
+  }
+
+  async resetPasswordWithOtp(
+    payload: ResetPasswordDto,
+    requestInfo?: { ip?: string },
+  ): Promise<{ message: string }> {
+    const normalizedEmail = payload.email.trim().toLowerCase();
+    const otp = payload.otp.trim();
+
+    const otpToken = await this.otpRepository.findOne({
+      where: {
+        email: normalizedEmail,
+        purpose: OtpPurpose.PASSWORD_RESET,
+        consumedAt: IsNull(),
+        expiresAt: MoreThan(new Date()),
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!otpToken) {
+      throw new BadRequestException('OTP không hợp lệ hoặc đã hết hạn.');
+    }
+
+    if (otpToken.attempts >= 5) {
+      otpToken.consumedAt = new Date();
+      await this.otpRepository.save(otpToken);
+      throw new BadRequestException('OTP đã vượt quá số lần thử cho phép.');
+    }
+
+    const isMatch = await bcrypt.compare(otp, otpToken.codeHash);
+    if (!isMatch) {
+      otpToken.attempts += 1;
+      otpToken.metadata = {
+        ...(otpToken.metadata || {}),
+        lastFailedIp: requestInfo?.ip || null,
+      };
+      await this.otpRepository.save(otpToken);
+      throw new BadRequestException('OTP không hợp lệ hoặc đã hết hạn.');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: otpToken.userId || undefined, email: normalizedEmail },
+    });
+    if (!user) {
+      throw new BadRequestException('OTP không hợp lệ hoặc đã hết hạn.');
+    }
+
+    user.passwordHash = await bcrypt.hash(payload.newPassword, 10);
+    await this.userRepository.save(user);
+
+    otpToken.consumedAt = new Date();
+    otpToken.metadata = {
+      ...(otpToken.metadata || {}),
+      resetIp: requestInfo?.ip || null,
+    };
+    await this.otpRepository.save(otpToken);
+
+    return { message: 'Đặt lại mật khẩu thành công.' };
+  }
+
   async refreshTokens(refreshToken: string, deviceId: string) {
     try {
-      console.log('[refreshTokens Debug] Input deviceId:', deviceId);
+      const requestDevice = this.requireDeviceId(deviceId);
+      console.log('[refreshTokens Debug] Input deviceId:', requestDevice);
       const payload = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
       });
@@ -204,7 +368,11 @@ export class AuthService implements IAuthService {
 
       // Check if session is soft-deleted (which means it was rotated)
       if (session.deletedAt) {
-        const deletedTime = new Date(session.deletedAt).getTime();
+        // Adjust for timezone offset parsing shift since deletedAt column in BaseEntity
+        // doesn't have timezone specification (defaults to timestamp without time zone)
+        const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+        const deletedTime =
+          new Date(session.deletedAt).getTime() - timezoneOffsetMs;
         const now = Date.now();
         const gracePeriodMs = 30 * 1000; // 30 seconds grace period
         if (now - deletedTime > gracePeriodMs) {
@@ -226,25 +394,25 @@ export class AuthService implements IAuthService {
         }
       }
 
-      const expectedDevice = deviceId || payload.deviceId || 'unknown';
-      const sessionDevice = session.deviceName || 'unknown';
+      const tokenDevice = this.requireDeviceId(payload.deviceId);
+      const sessionDevice = this.requireDeviceId(session.deviceName);
       console.log(
         '[refreshTokens Debug] sessionDevice:',
         sessionDevice,
-        '| expectedDevice:',
-        expectedDevice,
+        '| tokenDevice:',
+        tokenDevice,
+        '| requestDevice:',
+        requestDevice,
       );
 
-      if (
-        sessionDevice !== expectedDevice &&
-        sessionDevice !== 'unknown' &&
-        expectedDevice !== 'unknown'
-      ) {
+      if (sessionDevice !== requestDevice || tokenDevice !== requestDevice) {
         console.warn(
           '[refreshTokens Debug] Device verification failed. sessionDevice:',
           sessionDevice,
-          'expectedDevice:',
-          expectedDevice,
+          'tokenDevice:',
+          tokenDevice,
+          'requestDevice:',
+          requestDevice,
         );
         throw new UnauthorizedException(AUTH_MESSAGES.DEVICE_INVALID);
       }
@@ -265,20 +433,9 @@ export class AuthService implements IAuthService {
         sub: user.id,
         email: user.email,
         role: user.role,
-        deviceId: expectedDevice,
+        deviceId: requestDevice,
       };
       const tokens = await this.generateTokens(newPayload);
-
-      // Create new session
-      const expiresAt = this.calculateExpirationDate(
-        process.env.JWT_REFRESH_EXPIRES_IN || '7d',
-      );
-      await this.userSessionService.create({
-        userId: user.id,
-        refreshToken: tokens.refresh_token,
-        refreshTokenExpiresAt: expiresAt,
-        deviceName: expectedDevice,
-      });
 
       return {
         user: {
@@ -350,8 +507,24 @@ export class AuthService implements IAuthService {
     return now;
   }
 
+  private generateOtpCode(): string {
+    return randomInt(0, 1000000).toString().padStart(6, '0');
+  }
+
+  private async consumeActiveOtps(email: string, purpose: OtpPurpose) {
+    await this.otpRepository
+      .createQueryBuilder()
+      .update(OtpTokenEntity)
+      .set({ consumedAt: new Date() })
+      .where('email = :email', { email })
+      .andWhere('purpose = :purpose', { purpose })
+      .andWhere('consumed_at IS NULL')
+      .execute();
+  }
+
   async validateGoogleUser(googleUser: any, deviceId?: string) {
     const { googleId, email, name, avatarUrl } = googleUser;
+    const currentDeviceId = this.requireDeviceId(deviceId);
 
     let user = await this.userRepository.findOne({
       where: [{ googleId }, { email }],
@@ -377,7 +550,7 @@ export class AuthService implements IAuthService {
       sub: user.id,
       email: user.email,
       role: user.role,
-      deviceId,
+      deviceId: currentDeviceId,
     };
     const tokens = await this.generateTokens(payload);
 

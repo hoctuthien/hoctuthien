@@ -111,6 +111,10 @@ describe('PaymentService — verifyActivationPayment', () => {
   let dataSource: jest.Mocked<DataSource>;
   let eventEmitter: jest.Mocked<EventEmitter2>;
   let paymentStrategyRegistry: jest.Mocked<PaymentStrategyRegistry>;
+  let mailService: {
+    getAdminEmail: jest.Mock;
+    sendPaymentTransactionEmail: jest.Mock;
+  };
   let redis: {
     set: jest.Mock;
     del: jest.Mock;
@@ -168,6 +172,11 @@ describe('PaymentService — verifyActivationPayment', () => {
       register: jest.fn(),
     } as unknown as jest.Mocked<PaymentStrategyRegistry>;
 
+    mailService = {
+      getAdminEmail: jest.fn().mockReturnValue('hoctuthien@gmail.com'),
+      sendPaymentTransactionEmail: jest.fn().mockResolvedValue(undefined),
+    };
+
     redis = {
       set: jest.fn(),
       del: jest.fn().mockResolvedValue(1),
@@ -182,6 +191,7 @@ describe('PaymentService — verifyActivationPayment', () => {
       dataSource,
       eventEmitter,
       paymentStrategyRegistry,
+      mailService as any,
       redis as any,
     );
   });

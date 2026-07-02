@@ -3,7 +3,7 @@ import type { operations } from '../types/api.generated';
 
 type LoginRequest = operations['AuthController_login']['requestBody']['content']['application/json'];
 type RegisterRequest = operations['AuthController_register']['requestBody']['content']['application/json'];
-type UserProfile = NonNullable<operations['AuthController_login']['responses'][201]['content']['application/json']['user']>;
+type UserProfile = NonNullable<operations['AuthController_login']['responses'][200]['content']['application/json']['user']>;
 
 export const authGateway = {
   /**
@@ -47,6 +47,18 @@ export const authGateway = {
    */
   async logout(): Promise<void> {
     return httpClient.post('/v1/auths/logout');
+  },
+
+  async forgotPassword(payload: { email: string }): Promise<{ message?: string }> {
+    return httpClient.post('/v1/auths/forgot-password', payload);
+  },
+
+  async resetPassword(payload: {
+    email: string;
+    otp: string;
+    newPassword: string;
+  }): Promise<{ message?: string }> {
+    return httpClient.post('/v1/auths/reset-password', payload);
   },
 
   /**

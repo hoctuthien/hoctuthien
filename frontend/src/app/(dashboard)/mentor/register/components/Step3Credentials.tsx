@@ -12,6 +12,7 @@ interface Props {
 }
 
 export default function Step3Credentials({ form }: Props) {
+  const tExtracted = useTranslations('Extracted.appDashboardMentorRegisterComponentsStep3Credentials');
   const t = useTranslations("MentorRegister");
   const tUploader = useTranslations("ImageUploader");
   const { register, formState: { errors }, control, watch } = form;
@@ -20,19 +21,19 @@ export default function Step3Credentials({ form }: Props) {
   const certificatesWatch = watch("metadata.certificates") || [];
   const degreesWatch = watch("metadata.degrees") || [];
 
-  const { 
-    fields: certificateFields, 
-    append: appendCertificate, 
-    remove: removeCertificate 
+  const {
+    fields: certificateFields,
+    append: appendCertificate,
+    remove: removeCertificate
   } = useFieldArray({
     control,
     name: "metadata.certificates",
   });
 
-  const { 
-    fields: degreeFields, 
-    append: appendDegree, 
-    remove: removeDegree 
+  const {
+    fields: degreeFields,
+    append: appendDegree,
+    remove: removeDegree
   } = useFieldArray({
     control,
     name: "metadata.degrees",
@@ -40,7 +41,7 @@ export default function Step3Credentials({ form }: Props) {
 
   return (
     <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-right-4 duration-500">
-      
+
       {/* Certificates Section */}
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
@@ -60,8 +61,8 @@ export default function Step3Credentials({ form }: Props) {
 
         <div className="grid grid-cols-1 gap-4">
           {certificateFields.map((field, index) => (
-            <div 
-              key={field.id} 
+            <div
+              key={field.id}
               className="p-6 bg-slate-50/50 border border-slate-100 rounded-2xl relative group animate-in zoom-in-95 duration-200"
             >
               {/* Remove entire certificate block */}
@@ -76,14 +77,14 @@ export default function Step3Credentials({ form }: Props) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <Input
-                    label={t("certificateName")}
-                    placeholder={t("certificateNamePlaceholder")}
+                    label={t('certificateName')}
+                    placeholder={t('certificateNamePlaceholder')}
                     {...register(`metadata.certificates.${index}.name`)}
                     error={errors.metadata?.certificates?.[index]?.name?.message}
                   />
                   <Input
-                    label={t("issuedBy")}
-                    placeholder={t("issuedByPlaceholder")}
+                    label={t('issuedBy')}
+                    placeholder={t('issuedByPlaceholder')}
                     {...register(`metadata.certificates.${index}.issuedBy`)}
                     error={errors.metadata?.certificates?.[index]?.issuedBy?.message}
                   />
@@ -96,8 +97,8 @@ export default function Step3Credentials({ form }: Props) {
                     onChange={(url) => form.setValue(`metadata.certificates.${index}.imageUrl`, url, { shouldValidate: true })}
                     onUpload={uploadImageToCloud}
                     error={errors.metadata?.certificates?.[index]?.imageUrl?.message}
-                    label="Ảnh chụp chứng chỉ xác thực"
-                    placeholder={tUploader("placeholder")}
+                    label={tExtracted('anhChupChungChiXacThuc')}
+                    placeholder={tUploader('placeholder')}
                     subPlaceholder={tUploader("subPlaceholder")}
                     uploadingLabel={tUploader("uploading")}
                     viewOriginalLabel={tUploader("viewOriginal")}
@@ -140,8 +141,8 @@ export default function Step3Credentials({ form }: Props) {
 
         <div className="grid grid-cols-1 gap-4">
           {degreeFields.map((field, index) => (
-            <div 
-              key={field.id} 
+            <div
+              key={field.id}
               className="p-6 bg-slate-50/50 border border-slate-100 rounded-2xl relative group animate-in zoom-in-95 duration-200"
             >
               {/* Remove entire degree block */}
@@ -156,14 +157,14 @@ export default function Step3Credentials({ form }: Props) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <Input
-                    label={t("degreeName")}
-                    placeholder={t("degreeNamePlaceholder")}
+                    label={t('degreeName')}
+                    placeholder={t('degreeNamePlaceholder')}
                     {...register(`metadata.degrees.${index}.name`)}
                     error={errors.metadata?.degrees?.[index]?.name?.message}
                   />
                   <Input
-                    label={t("university")}
-                    placeholder={t("universityPlaceholder")}
+                    label={t('university')}
+                    placeholder={t('universityPlaceholder')}
                     {...register(`metadata.degrees.${index}.university`)}
                     error={errors.metadata?.degrees?.[index]?.university?.message}
                   />
@@ -176,8 +177,8 @@ export default function Step3Credentials({ form }: Props) {
                     onChange={(url) => form.setValue(`metadata.degrees.${index}.imageUrl`, url, { shouldValidate: true })}
                     onUpload={uploadImageToCloud}
                     error={errors.metadata?.degrees?.[index]?.imageUrl?.message}
-                    label="Ảnh chụp bằng cấp xác thực"
-                    placeholder={tUploader("placeholder")}
+                    label={tExtracted('anhChupBangCapXacThuc')}
+                    placeholder={tUploader('placeholder')}
                     subPlaceholder={tUploader("subPlaceholder")}
                     uploadingLabel={tUploader("uploading")}
                     viewOriginalLabel={tUploader("viewOriginal")}

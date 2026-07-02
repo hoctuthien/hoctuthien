@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState } from "react";
 import { Button, Icon, Badge } from "@/core/ui";
 import Link from "next/link";
@@ -17,6 +18,7 @@ interface PostsTableProps {
 }
 
 export function PostsTable({ posts, categories, tags }: PostsTableProps) {
+  const tExtracted = useTranslations('Extracted.appAdminPostsComponentsPostsTable');
   const [previewPost, setPreviewPost] = useState<any>(null);
 
   return (
@@ -26,28 +28,27 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Post Details</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Created At</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">{tExtracted('postDetails')}</th>
+                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">{tExtracted('category')}</th>
+                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">{tExtracted('status')}</th>
+                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">{tExtracted('createdAt')}</th>
+                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider text-right">{tExtracted('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {posts.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-20 text-center text-slate-400 italic">
-                    No posts found. Start by creating one!
-                  </td>
+                    {tExtracted('noPostsFoundStartByCreatingOne')}</td>
                 </tr>
               ) : (
                 posts.map((post) => (
-                  <tr 
-                    key={post.id} 
+                  <tr
+                    key={post.id}
                     className="group hover:bg-slate-50/50 transition-colors"
                   >
                     {/* Clickable Area: Post Details */}
-                    <td 
+                    <td
                       onClick={() => setPreviewPost(post)}
                       className="px-6 py-4 cursor-pointer"
                     >
@@ -66,39 +67,39 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
                             {post.title}
                           </h3>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-slate-400 font-medium">By Admin</span>
+                            <span className="text-[10px] text-slate-400 font-medium">{tExtracted('byAdmin')}</span>
                             <div className="w-1 h-1 rounded-full bg-slate-200" />
-                            <span className="text-[10px] text-slate-400 font-medium">Xem trước khi click</span>
+                            <span className="text-[10px] text-slate-400 font-medium">{tExtracted('xemTruocKhiClick')}</span>
                           </div>
                         </div>
                       </div>
                     </td>
 
                     {/* Clickable Area: Category */}
-                    <td 
+                    <td
                       onClick={() => setPreviewPost(post)}
                       className="px-6 py-4 cursor-pointer"
                     >
                       <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-md">
-                        {post.category?.name || "Uncategorized"}
+                        {post.category?.name || tExtracted('uncategorized')}
                       </span>
                     </td>
 
                     {/* Clickable Area: Status */}
-                    <td 
+                    <td
                       onClick={() => setPreviewPost(post)}
                       className="px-6 py-4 cursor-pointer"
                     >
-                      <Badge 
-                        variant={post.status === 'published' ? 'success' : 'warning'} 
+                      <Badge
+                        variant={post.status === 'published' ? "success" : "warning"}
                         className="!rounded-lg !px-3 !py-1 text-[10px]"
                       >
-                        {post.status?.toUpperCase() || "DRAFT"}
+                        {post.status?.toUpperCase() || tExtracted('draft')}
                       </Badge>
                     </td>
 
                     {/* Clickable Area: Created At */}
-                    <td 
+                    <td
                       onClick={() => setPreviewPost(post)}
                       className="px-6 py-4 text-sm text-slate-500 font-medium cursor-pointer"
                     >
@@ -121,9 +122,9 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
             </tbody>
           </table>
         </div>
-        
+
         <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30">
-          <p className="text-xs text-slate-500">Showing {posts.length} entries</p>
+          <p className="text-xs text-slate-500">{tExtracted('showing')}{posts.length} {tExtracted('entries')}</p>
           <div className="flex items-center gap-1">
             <Button variant="secondary" label={<Icon name="ChevronLeft" size={14} />} className="!p-2 !rounded-lg" disabled />
             <button className="w-8 h-8 rounded-lg bg-primary text-white text-xs font-bold shadow-md shadow-primary/20">1</button>
@@ -141,15 +142,15 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
               <div className="flex items-center gap-3">
                 <Icon name="Eye" className="text-primary" size={20} />
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900">Xem trước bài viết</h3>
-                  <p className="text-[11px] text-slate-500">Chế độ xem trước nội dung xuất bản thực tế</p>
+                  <h3 className="text-base font-extrabold text-slate-900">{tExtracted('xemTruocBaiViet')}</h3>
+                  <p className="text-[11px] text-slate-500">{tExtracted('cheDoXemTruocNoiDungXuatBan')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Link href={`/admin/posts/${previewPost.id}/edit`}>
-                  <Button 
-                    label="Chỉnh sửa bài viết" 
-                    variant="primary" 
+                  <Button
+                    label={tExtracted('chinhSuaBaiViet')}
+                    variant="primary"
                     iconLeft={<Icon name="Pencil" size={14} />}
                     className="!px-4 !py-2 !rounded-xl !text-xs shadow-lg shadow-primary/20"
                   />
@@ -169,19 +170,19 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
                 {/* Category & Date */}
                 <div className="flex items-center gap-3 text-xs">
                   <span className="px-3 py-1 bg-primary/10 text-primary font-extrabold rounded-full uppercase tracking-wider">
-                    {previewPost.category?.name || "Uncategorized"}
+                    {previewPost.category?.name || tExtracted('uncategorized')}
                   </span>
                   <span className="text-slate-400 font-medium">•</span>
                   <span className="text-slate-400 font-medium">
-                    {new Date(previewPost.createdAt).toLocaleDateString('vi-VN', { 
-                      day: 'numeric', 
-                      month: 'long', 
-                      year: 'numeric' 
+                    {new Date(previewPost.createdAt).toLocaleDateString('vi-VN', {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric"
                     })}
                   </span>
                   <span className="text-slate-400 font-medium">•</span>
-                  <Badge 
-                    variant={previewPost.status === 'published' ? 'success' : 'warning'} 
+                  <Badge
+                    variant={previewPost.status === 'published' ? "success" : "warning"}
                     className="!rounded-lg !px-2 !py-0.5 text-[9px]"
                   >
                     {previewPost.status?.toUpperCase()}
@@ -196,21 +197,20 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
                 {/* Author Info */}
                 <div className="flex items-center gap-3 py-4 border-y border-slate-100">
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                    AD
-                  </div>
+                    {tExtracted('ad')}</div>
                   <div>
-                    <p className="text-xs font-bold text-slate-900">Administrator</p>
-                    <p className="text-[10px] text-slate-400 font-medium">Tác giả bài viết</p>
+                    <p className="text-xs font-bold text-slate-900">{tExtracted('administrator')}</p>
+                    <p className="text-[10px] text-slate-400 font-medium">{tExtracted('tacGiaBaiViet')}</p>
                   </div>
                 </div>
 
                 {/* Featured Image */}
                 {(previewPost.metadata?.thumbnail || previewPost.coverImage?.url) && (
                   <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-100 shadow-md">
-                    <img 
-                      src={previewPost.metadata?.thumbnail || previewPost.coverImage?.url} 
-                      alt="Featured Cover" 
-                      className="w-full h-full object-cover" 
+                    <img
+                      src={previewPost.metadata?.thumbnail || previewPost.coverImage?.url}
+                      alt={tExtracted('featuredCover')}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}
@@ -228,11 +228,11 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
 
             {/* Modal Footer */}
             <div className="px-8 py-4 border-t border-slate-100 flex justify-end gap-2 bg-slate-50 shrink-0">
-              <Button 
-                label="Đóng" 
-                variant="secondary" 
-                className="!px-5 !py-2 !rounded-xl !text-xs !bg-white hover:!bg-slate-100 !text-slate-700 font-semibold border border-slate-200" 
-                onClick={() => setPreviewPost(null)} 
+              <Button
+                label={tExtracted('dong')}
+                variant="secondary"
+                className="!px-5 !py-2 !rounded-xl !text-xs !bg-white hover:!bg-slate-100 !text-slate-700 font-semibold border border-slate-200"
+                onClick={() => setPreviewPost(null)}
               />
             </div>
           </div>

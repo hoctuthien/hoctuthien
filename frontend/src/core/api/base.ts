@@ -89,7 +89,11 @@ export const createHttpClient = (baseUrl: string, prefix: string = '') => {
   };
 };
 
+// Server-side: call backend directly via internal URL
+// Client-side (browser): use relative path so Next.js rewrites proxy to backend
 export const apiService = createHttpClient(
-  process.env.BACKEND_URL || 'http://localhost:5050',
+  typeof window === 'undefined'
+    ? (process.env.BACKEND_URL || 'http://localhost:5050')
+    : '',
   '/api/v1'
 );

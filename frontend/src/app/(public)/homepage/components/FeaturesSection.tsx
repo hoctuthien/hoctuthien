@@ -5,6 +5,7 @@ import { Button } from '@/core/ui/Button';
 import { Icon } from '@/core/ui/Icon';
 
 export const FeaturesSection = () => {
+  const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsFeaturesSection');
   const t = useTranslations('Homepage');
   const tCommon = useTranslations('Common');
 
@@ -44,7 +45,7 @@ export const FeaturesSection = () => {
             <div className="relative aspect-[4/5] rounded-[40px] overflow-hidden shadow-xl group">
               <Image
                 src="/images/login-background.jpg"
-                alt="Benefit"
+                alt={tExtracted('benefit')}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"

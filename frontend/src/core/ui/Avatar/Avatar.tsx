@@ -36,16 +36,16 @@ export const Avatar: React.FC<AvatarProps> = ({
   return (
     <div 
       className={cn(
-        'relative inline-flex items-center justify-center rounded-full overflow-hidden bg-primary-fixed border-background flex-shrink-0',
+        'relative inline-flex items-center justify-center rounded-full overflow-hidden bg-white text-blue-600 border-blue-100 shadow-sm flex-shrink-0',
         sizeClasses[size],
         className
       )}
       style={borderColor ? { borderColor } : {}}
     >
       {src ? (
-        <Image src={src} alt={alt} fill className="object-cover" />
+        <Image src={src} alt={alt} fill sizes="(max-width: 768px) 48px, 100px" className="object-cover" />
       ) : (
-        <div className="font-sans font-bold text-primary text-[0.8em]">
+        <div className="font-sans font-black text-blue-600 text-[0.8em]">
           {name ? getInitials(name) : '?'}
         </div>
       )}

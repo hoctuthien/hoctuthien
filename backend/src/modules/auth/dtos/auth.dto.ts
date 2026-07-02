@@ -6,6 +6,7 @@ import {
   MinLength,
   IsOptional,
   IsDateString,
+  Length,
 } from 'class-validator';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 
@@ -80,4 +81,29 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   gender?: string;
+}
+
+export class ForgotPasswordDto {
+  @ApiProperty({ example: 'user@example.com' })
+  @IsEmail({}, { message: AUTH_MESSAGES.INVALID_EMAIL })
+  @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_EMAIL })
+  email!: string;
+}
+
+export class ResetPasswordDto {
+  @ApiProperty({ example: 'user@example.com' })
+  @IsEmail({}, { message: AUTH_MESSAGES.INVALID_EMAIL })
+  @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_EMAIL })
+  email!: string;
+
+  @ApiProperty({ example: '123456', minLength: 6, maxLength: 6 })
+  @IsString()
+  @Length(6, 6, { message: 'OTP phải gồm 6 chữ số' })
+  otp!: string;
+
+  @ApiProperty({ example: 'newPassword123', minLength: 6 })
+  @IsString()
+  @IsNotEmpty({ message: AUTH_MESSAGES.EMPTY_PASSWORD })
+  @MinLength(6, { message: AUTH_MESSAGES.INVALID_PASSWORD })
+  newPassword!: string;
 }

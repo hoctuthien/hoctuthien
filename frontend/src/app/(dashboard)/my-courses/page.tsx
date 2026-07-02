@@ -1,10 +1,11 @@
+import { getTranslations } from "next-intl/server";
 import { Metadata } from 'next';
 import MyCoursesClient from './my-courses-client';
 
-export const metadata: Metadata = {
-  title: 'Khóa học của tôi | Học Từ Thiện',
-  description: 'Quản lý lịch trình, xem thông tin buổi học và tương tác với các Cố vấn (Mentor) của bạn.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.dashboard_mycourses");
+  return { title: t("title"), description: t("description") };
+}
 
 export default function MyCoursesPage() {
   return <MyCoursesClient />;

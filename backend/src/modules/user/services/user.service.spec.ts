@@ -4,6 +4,7 @@ import { UserRepository } from '../repositories/user.repository';
 import { UserRole } from '../entities/user.entity';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { AppLogger } from '../../../common/logger/app-logger.service';
 
 describe('UserService', () => {
   let service: UserService;
@@ -25,6 +26,15 @@ describe('UserService', () => {
         {
           provide: UserRepository,
           useValue: mockUserRepository,
+        },
+        {
+          provide: AppLogger,
+          useValue: {
+            setContext: jest.fn(),
+            debug: jest.fn(),
+            log: jest.fn(),
+            error: jest.fn(),
+          },
         },
       ],
     }).compile();

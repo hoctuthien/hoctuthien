@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/core/ui";
@@ -42,6 +43,7 @@ function getCategoryGradient(category: string): string {
 
 // --- Course Card ---
 const CourseCard = ({ course }: { course: Course }) => {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesComponentsCourseGrid');
   return (
     <div className="group bg-white rounded-[24px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100 hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 flex flex-col gap-5 select-none">
 
@@ -78,7 +80,7 @@ const CourseCard = ({ course }: { course: Course }) => {
 
       {/* Description */}
       <p className="text-[13px] leading-relaxed text-slate-500 font-normal line-clamp-3 flex-1">
-        {course.description || "Khóa học chất lượng cao được thiết kế bởi chuyên gia thực chiến."}
+        {course.description || tExtracted('khoaHocChatLuongCaoDuocThietKe')}
       </p>
 
       {/* Divider */}
@@ -87,15 +89,14 @@ const CourseCard = ({ course }: { course: Course }) => {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[11px] text-slate-400 font-semibold">Học viên</span>
+          <span className="text-[11px] text-slate-400 font-semibold">{tExtracted('hocVien')}</span>
           <span className="text-[15px] font-black text-slate-900">
-            {course.studentsCount.toLocaleString("vi-VN")} enrolled
-          </span>
+            {course.studentsCount.toLocaleString("vi-VN")} {tExtracted('enrolled')}</span>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[11px] text-slate-400 font-semibold">Học phí</span>
+          <span className="text-[11px] text-slate-400 font-semibold">{tExtracted('hocPhi')}</span>
           <span className={`text-[15px] font-black ${course.price === 0 ? "text-emerald-600" : "text-primary"}`}>
-            {course.price === 0 ? "Miễn phí" : `${course.price.toLocaleString("vi-VN")}đ`}
+            {course.price === 0 ? tExtracted('mienPhi') : `${course.price.toLocaleString("vi-VN")}đ`}
           </span>
         </div>
       </div>
@@ -103,8 +104,7 @@ const CourseCard = ({ course }: { course: Course }) => {
       {/* CTA button */}
       <Link href={`/courses/detail/${course.id}`} className="block no-underline">
         <div className="w-full bg-slate-100 hover:bg-slate-200 active:scale-[0.98] transition-all rounded-xl py-3.5 text-center text-[13px] font-bold text-primary tracking-wide cursor-pointer">
-          Xem chi tiết
-        </div>
+          {tExtracted('xemChiTiet')}</div>
       </Link>
     </div>
   );
@@ -156,25 +156,28 @@ const CourseEmpty = ({
 }: {
   searchQuery: string;
   onClear: () => void;
-}) => (
+}) => {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesComponentsCourseGrid');
+  return (
   <div className="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-3xl border border-slate-100 shadow-sm text-center px-8 animate-in fade-in duration-300">
     <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center text-primary mb-5">
       <LuGraduationCap size={40} />
     </div>
-    <h3 className="text-xl font-black text-slate-900 mb-2">Không tìm thấy khóa học</h3>
+    <h3 className="text-xl font-black text-slate-900 mb-2">{tExtracted('khongTimThayKhoaHoc')}</h3>
     <p className="text-slate-500 text-sm font-medium max-w-sm mb-6 leading-relaxed">
       {searchQuery
         ? `Không có kết quả nào cho "${searchQuery}". Thử điều chỉnh bộ lọc.`
-        : "Chưa có khóa học nào phù hợp với bộ lọc này."}
+        : tExtracted('chuaCoKhoaHocNaoPhuHopVoi')}
     </p>
     <Button
       variant="primary"
-      label="Xem tất cả khóa học"
+      label={tExtracted('xemTatCaKhoaHoc')}
       onClick={onClear}
       className="rounded-full font-bold px-8"
     />
   </div>
 );
+};
 
 // --- Grid ---
 interface CourseGridProps {

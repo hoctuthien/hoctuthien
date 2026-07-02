@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from "react";
 import { Card } from "@/core/ui/Card";
 import { Icon } from "@/core/ui";
@@ -17,6 +18,7 @@ export function ApplicationBioAndNote({
   noteLabel,
   noNoteMessage,
 }: ApplicationBioAndNoteProps) {
+  const tExtracted = useTranslations('Extracted.appAdminMentorsIdComponentsApplicationBioAndNote');
   return (
     <div className="space-y-8">
       {/* Biography Card */}
@@ -32,7 +34,7 @@ export function ApplicationBioAndNote({
             “
           </span>
           <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line italic relative z-10">
-            {bio || "Không có đoạn giới thiệu bản thân."}
+            {bio || tExtracted('khongCoDoanGioiThieuBanThan')}
           </p>
         </div>
       </Card>

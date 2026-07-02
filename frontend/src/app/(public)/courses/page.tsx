@@ -1,10 +1,11 @@
+import { getTranslations } from "next-intl/server";
 import { Metadata } from "next";
 import PublicCoursesClient from "./public-courses-client";
 
-export const metadata: Metadata = {
-  title: "Khóa học & Cố vấn | Học Từ Thiện",
-  description: "Khám phá các chương trình học chất lượng cao được thiết kế và cố vấn bởi các chuyên gia hàng đầu.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.public_courses");
+  return { title: t("title"), description: t("description") };
+}
 
 export default async function CoursesPage() {
   return <PublicCoursesClient />;

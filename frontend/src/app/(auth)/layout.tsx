@@ -8,6 +8,7 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const tExtracted = useTranslations('Extracted.appAuthLayout');
   const t = useTranslations("Auth");
   const tCommon = useTranslations("Common");
 
@@ -30,7 +31,7 @@ export default function AuthLayout({
             >
               <Image
                 src="/images/logo.png"
-                alt="Học Từ Thiện"
+                alt={tExtracted('hocTuThien')}
                 width={160}
                 height={80}
                 className="h-10 w-auto object-contain transition-all"
@@ -89,7 +90,7 @@ export default function AuthLayout({
           >
             <Image
               src="/images/logo.png"
-              alt="Học Từ Thiện"
+              alt={tExtracted('hocTuThien')}
               width={140}
               height={40}
               className="h-8 w-auto object-contain"

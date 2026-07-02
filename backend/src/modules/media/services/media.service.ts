@@ -16,8 +16,10 @@ export class MediaService {
     @InjectRepository(MediaEntity)
     private mediaRepository: Repository<MediaEntity>,
   ) {
-    this.openinaryUrl = this.configService.get<string>('openinary.url');
-    this.apiKey = this.configService.get<string>('openinary.apiKey');
+    this.openinaryUrl = (
+      this.configService.get<string>('openinary.url') || ''
+    ).replace(/\/$/, '');
+    this.apiKey = this.configService.get<string>('openinary.apiKey') || '';
   }
 
   async uploadImage(file: any, folder?: string, uploaderId?: string) {
@@ -30,13 +32,11 @@ export class MediaService {
 
     try {
       const formData = new FormData();
-      // Field name 'files' theo yêu cầu của Openinary
       formData.append('files', file.buffer, {
         filename: file.originalname,
         contentType: file.mimetype,
       });
 
-      // Nếu FE truyền folder, dùng folder đó, nếu không sẽ lưu ở gốc
       if (folder) {
         formData.append('folder', folder);
       }
@@ -45,6 +45,7 @@ export class MediaService {
         `${this.openinaryUrl}/api/upload`,
         formData,
         {
+          timeout: 15000,
           headers: {
             ...formData.getHeaders(),
             Authorization: `Bearer ${this.apiKey}`,
@@ -52,14 +53,12 @@ export class MediaService {
         },
       );
 
-      // Xử lý để trả về URL tuyệt đối giúp Frontend/Database dễ sử dụng
       if (response.data.success && Array.isArray(response.data.files)) {
         response.data.files = response.data.files.map((f: any) => ({
           ...f,
           url: `${this.openinaryUrl}${f.url}`,
         }));
 
-        // Lưu thông tin ảnh vào database
         for (const fileObj of response.data.files) {
           const media = this.mediaRepository.create({
             url: fileObj.url,
@@ -73,16 +72,23 @@ export class MediaService {
             },
           });
           await this.mediaRepository.save(media);
-          // Gán id từ DB vào fileObj để FE nhận diện được id
           fileObj.id = media.id;
         }
       }
 
       return response.data;
     } catch (error: any) {
-      const status = error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+      const isTimeout =
+        error.code === 'ECONNABORTED' ||
+        error.code === 'ETIMEDOUT' ||
+        error.response?.status === HttpStatus.GATEWAY_TIMEOUT;
+      const status = isTimeout
+        ? HttpStatus.GATEWAY_TIMEOUT
+        : error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
       const message =
-        error.response?.data?.message ||
+        (isTimeout
+          ? 'Dịch vụ lưu trữ ảnh đang không phản hồi. Vui lòng kiểm tra OPENINARY_URL hoặc trạng thái cloud upload.'
+          : error.response?.data?.message) ||
         error.message ||
         'Lỗi khi upload ảnh lên Openinary';
 
@@ -90,6 +96,8 @@ export class MediaService {
         status,
         message,
         data: error.response?.data,
+        code: error.code,
+        uploadUrl: `${this.openinaryUrl}/api/upload`,
       });
 
       throw new HttpException(message, status);

@@ -24,10 +24,13 @@ const navLinks = [
   { label: 'home', href: '/' },
   { label: 'courses', href: '/courses' },
   { label: 'mentorship', href: '/mentorship' },
-  { label: 'aboutUs', href: '/about-us' },
+  { label: 'campaigns', href: '/campaigns' },
+  { label: 'leaderboard', href: '/leaderboard' },
+  { label: 'transparency', href: '/transparency' },
 ];
 
 export const Header = () => {
+  const tExtracted = useTranslations('Extracted.sharedComponentsLayoutHeader');
   const t = useTranslations('Common');
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -43,7 +46,7 @@ export const Header = () => {
         <Link href="/" className="flex items-center group">
           <Image
             src="/images/logo.png"
-            alt="Học Từ Thiện"
+            alt={tExtracted('hocTuThien')}
             width={160}
             height={45}
             className="h-16 w-auto object-contain transition-transform"
@@ -73,7 +76,7 @@ export const Header = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => setIsSearchOpen(true)}
             className="p-2 text-text-muted hover:text-primary transition-colors border-0 bg-transparent cursor-pointer"
           >
@@ -107,8 +110,7 @@ export const Header = () => {
                 <div className="lg:hidden h-px bg-outline-variant my-1 mx-2" />
                 <Link href="/dashboard" className="no-underline">
                   <DropdownItem icon={<Icon name="Layers" size={18} />}>
-                    Bảng điều khiển
-                  </DropdownItem>
+                    {tExtracted('bangDieuKhien')}</DropdownItem>
                 </Link>
                 <Link href="/profile" className="no-underline">
                   <DropdownItem icon={<Icon name="User" size={18} />}>
@@ -129,8 +131,7 @@ export const Header = () => {
                     </Link>
                     <Link href="/mentor/bookings" className="no-underline">
                       <DropdownItem icon={<Icon name="Calendar" size={18} />}>
-                        Quản lý lịch dạy
-                      </DropdownItem>
+                        {tExtracted('quanLyLichDay')}</DropdownItem>
                     </Link>
                   </>
                 )}

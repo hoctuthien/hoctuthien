@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from "react";
 import {
   LuChevronLeft,
@@ -31,6 +32,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   entriesOptions = [10, 20, 50, 100],
   className
 }) => {
+  const tExtracted = useTranslations('Extracted.coreUiPaginationPagination');
   const handlePrev = () => {
     if (currentPage > 1) onPageChange(currentPage - 1);
   };
@@ -61,14 +63,14 @@ export const Pagination: React.FC<PaginationProps> = ({
     return (
       <div className={cn("flex items-center justify-between w-full p-4 px-6 bg-surface rounded-lg shadow-sm border border-border-subtle font-sans", className)}>
         <div className="flex items-center gap-3 text-text-muted text-body-sm font-medium">
-          <span>Show</span>
+          <span>{tExtracted('show')}</span>
           <div className="relative">
             <select
               className="appearance-none bg-surface-elevated border-1.5 border-border rounded-md px-3 pr-8 py-1.5 font-bold text-primary cursor-pointer outline-none focus:border-primary transition-colors"
               style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23005BBF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 8px center'
+                backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23005BBF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "right 8px center"
               }}
               value={entriesPerPage}
               onChange={(e) => onEntriesChange?.(Number(e.target.value))}
@@ -80,7 +82,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               ))}
             </select>
           </div>
-          <span>entries</span>
+          <span>{tExtracted('entries')}</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -119,15 +121,14 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === 1}
         >
           <LuArrowLeft size={18} className="text-text-body" />
-          Previous
-        </button>
+          {tExtracted('previous')}</button>
         <div className="flex gap-2.5 items-center mx-1">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
               className={cn(
                 'h-2 w-2 rounded-full transition-all duration-300 cursor-pointer',
-                currentPage === i + 1 ? 'bg-primary' : 'bg-primary-fixed'
+                currentPage === i + 1 ? "bg-primary" : "bg-primary-fixed"
               )}
               onClick={() => onPageChange(i + 1)}
             />
@@ -138,8 +139,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           onClick={handleNext}
           disabled={currentPage === totalPages}
         >
-          Next
-          <LuArrowRight size={18} />
+          {tExtracted('next')}<LuArrowRight size={18} />
         </button>
       </div>
     );
@@ -156,7 +156,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <LuArrowLeft size={20} />
         </button>
         <div className="font-black text-body-sm tracking-widest text-text-heading uppercase">
-          PAGE {currentPage.toString().padStart(2, "0")} — {totalPages.toString().padStart(2, "0")}
+          {tExtracted('page')}{currentPage.toString().padStart(2, "0")} — {totalPages.toString().padStart(2, "0")}
         </div>
         <button
           className={cn(btnClasses, 'w-11 h-11 rounded-full border-1.5 border-primary text-primary bg-transparent p-0 hover:shadow-[0_0_0_4px_var(--color-primary-fixed)]')}

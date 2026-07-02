@@ -6,13 +6,14 @@ import { useSession, signOut } from "next-auth/react";
 import { Avatar, Icon, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Skeleton } from "@/core/ui";
 import { useTranslations } from "next-intl";
 
-export const AdminHeader = ({ 
-  onToggleSidebar, 
-  isSidebarCollapsed 
-}: { 
-  onToggleSidebar: () => void; 
-  isSidebarCollapsed: boolean; 
+export const AdminHeader = ({
+  onToggleSidebar,
+  isSidebarCollapsed
+}: {
+  onToggleSidebar: () => void;
+  isSidebarCollapsed: boolean;
 }) => {
+  const tExtracted = useTranslations('Extracted.appAdminComponentsAdminHeader');
   const { data: session, status } = useSession();
   const t = useTranslations("Admin.header");
   const commonT = useTranslations("Common");
@@ -28,7 +29,7 @@ export const AdminHeader = ({
   return (
     <header className="h-24 bg-white/80 backdrop-blur-md sticky top-0 z-30 px-10 flex items-center justify-between">
       <div className="flex items-center gap-6">
-        <button 
+        <button
           onClick={onToggleSidebar}
           className="p-2.5 text-slate-500 hover:text-primary hover:bg-slate-50 rounded-xl transition-all"
         >
@@ -37,8 +38,7 @@ export const AdminHeader = ({
 
         <div className="flex flex-col">
           <p className="text-[11px] font-bold text-[#2D89FF] uppercase tracking-[0.2em] mb-1">
-            Administrative Panel
-          </p>
+            {tExtracted('administrativePanel')}</p>
           <h2 className="text-3xl font-extrabold text-[#181C20] tracking-tight">
             {getPageTitle()}
           </h2>
@@ -65,21 +65,21 @@ export const AdminHeader = ({
                 ) : (
                   <>
                     <p className="text-sm font-bold text-[#181C20] group-hover:text-[#2D89FF] transition-colors">
-                      {session?.user?.name || "Anonymous User"}
+                      {session?.user?.name || tExtracted('anonymousUser')}
                     </p>
                     <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-                      {session?.user?.role || "Administrator"}
+                      {session?.user?.role || tExtracted('administrator')}
                     </p>
                   </>
                 )}
               </div>
-              
+
               {isLoading ? (
                 <Skeleton className="h-12 w-12 rounded-full" />
               ) : (
-                <Avatar 
-                  src={session?.user?.image || undefined} 
-                  name={session?.user?.name || "Admin"} 
+                <Avatar
+                  src={session?.user?.image || undefined}
+                  name={session?.user?.name || "Admin"}
                   size="md"
                   className="ring-4 ring-slate-50 group-hover:ring-[#DDEBFF] transition-all"
                 />
@@ -90,9 +90,9 @@ export const AdminHeader = ({
             <DropdownItem icon={<Icon name="User" size={18} />}>{t("profile")}</DropdownItem>
             <DropdownItem icon={<Icon name="Settings" size={18} />}>{t("settings")}</DropdownItem>
             <div className="h-px bg-surface-variant my-1" />
-            <DropdownItem 
-              icon={<Icon name="LogOut" size={18} />} 
-              isDanger 
+            <DropdownItem
+              icon={<Icon name="LogOut" size={18} />}
+              isDanger
               onClick={() => signOut({ callbackUrl: "/login" })}
             >
               {commonT("signOut")}

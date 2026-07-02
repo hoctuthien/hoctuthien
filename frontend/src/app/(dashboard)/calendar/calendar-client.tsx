@@ -1,16 +1,17 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect } from 'react';
 import { Breadcrumb, EmptyState, Modal } from '@shared';
 import { courseBookingGateway } from '@/core/gateway';
 import { Button } from '@/core/ui';
-import { 
-  LuCalendar, 
-  LuClock, 
-  LuSearch, 
-  LuExternalLink, 
-  LuUser, 
-  LuMessageSquare, 
+import {
+  LuCalendar,
+  LuClock,
+  LuSearch,
+  LuExternalLink,
+  LuUser,
+  LuMessageSquare,
   LuTriangleAlert,
   LuSettings,
   LuLink,
@@ -50,6 +51,7 @@ interface BookingRelation {
 }
 
 export default function CalendarClient() {
+  const tExtracted = useTranslations('Extracted.appDashboardCalendarCalendarClient');
   const { data: session, status } = useSession();
   const [bookings, setBookings] = useState<BookingRelation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +85,7 @@ export default function CalendarClient() {
 
     const days = [];
     const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
-    
+
     for (let i = 0; i < 7; i++) {
       const currentDay = new Date(monday);
       currentDay.setDate(monday.getDate() + i);
@@ -103,7 +105,7 @@ export default function CalendarClient() {
     const isValid = bTime && !isNaN(bTime.getTime());
     return {
       id: b.id,
-      timeLabel: isValid ? bTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa định giờ',
+      timeLabel: isValid ? bTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : tExtracted('chuaDinhGio'),
       dateStr: (isValid && bTime) ? getLocalDateString(bTime) : '',
       courseTitle: b.course?.title || 'Khóa học',
       partnerName: isMentor ? (b.mentee?.name || 'Học viên') : (b.course?.mentor?.name || 'Cố vấn học tập'),
@@ -121,7 +123,7 @@ export default function CalendarClient() {
       setError(null);
     } catch (err: any) {
       console.error('Failed to load bookings for calendar:', err);
-      setError('Không thể tải lịch trình. Vui lòng thử lại sau.');
+      setError(tExtracted('khongTheTaiLichTrinhVuiLongThu'));
     } finally {
       setLoading(false);
     }
@@ -147,7 +149,7 @@ export default function CalendarClient() {
     if (!editBooking) return;
     try {
       setSubmittingEdit(true);
-      
+
       if (isMentor) {
         // Mentor actions: full status/Meet URL updates
         const payload: any = {
@@ -159,13 +161,13 @@ export default function CalendarClient() {
         }
 
         await courseBookingGateway.updateBooking(editBooking.id, payload);
-        
+
         setBookings((prev) =>
           prev.map((b) =>
             b.id === editBooking.id
-              ? { 
-                  ...b, 
-                  status: newStatus, 
+              ? {
+                  ...b,
+                  status: newStatus,
                   googleMeetUrl: meetUrl.trim() || null,
                   cancellationReason: newStatus === 'cancelled' ? cancellationReason : b.cancellationReason
                 }
@@ -179,9 +181,9 @@ export default function CalendarClient() {
           setBookings((prev) =>
             prev.map((b) =>
               b.id === editBooking.id
-                ? { 
-                    ...b, 
-                    status: 'cancelled', 
+                ? {
+                    ...b,
+                    status: 'cancelled',
                     cancellationReason: cancellationReason.trim() || 'Học viên hủy lịch'
                   }
                 : b
@@ -192,32 +194,30 @@ export default function CalendarClient() {
       setEditBooking(null);
     } catch (err) {
       console.error('Failed to update booking:', err);
-      alert('Cập nhật lịch học thất bại.');
+      alert(tExtracted('capNhatLichHocThatBai'));
     } finally {
       setSubmittingEdit(false);
     }
   };
 
   const breadcrumbItems = [
-    { label: 'Trang chủ', href: '/' },
-    { label: 'Bảng điều khiển', href: '/dashboard' },
-    { label: 'Lịch trình tổng quan' },
+    { label: tExtracted('trangChu'), href: '/' },
+    { label: tExtracted('bangDieuKhien'), href: '/dashboard' },
+    { label: tExtracted('lichTrinhTongQuan2') },
   ];
 
   return (
-    <div className="w-full bg-[#FAFBFD] min-h-screen py-8 px-4 md:px-8 font-sans">
-      <div className="max-w-7xl mx-auto flex flex-col gap-8">
-        
+    <div className="w-full flex flex-col gap-8 font-sans">
+
         {/* Header Section */}
         <div className="flex flex-col gap-2">
           <Breadcrumb items={breadcrumbItems} />
           <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mt-1 font-[Montserrat]">
-            Lịch trình Tổng quan
-          </h1>
+            {tExtracted('lichTrinhTongQuan')}</h1>
           <p className="text-sm text-[#64748b] font-semibold">
-            {isMentor 
-              ? 'Theo dõi toàn bộ lịch giảng dạy thiện nguyện của bạn dưới giao diện Google Calendar trực quan.' 
-              : 'Theo dõi toàn bộ lịch học của bạn từ các Cố vấn học tập dưới dạng Google Calendar.'}
+            {isMentor
+              ? tExtracted('theoDoiToanBoLichGiangDayThien')
+              : tExtracted('theoDoiToanBoLichHocCuaBan')}
           </p>
         </div>
 
@@ -226,7 +226,7 @@ export default function CalendarClient() {
           <div className="w-full bg-white border border-[#E2E8F0] rounded-[32px] p-16 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-10 h-10 border-4 border-[#005BBF]/30 border-t-[#005BBF] rounded-full animate-spin" />
-              <p className="text-xs font-black text-[#64748B] uppercase tracking-widest">Đang tải lịch trình...</p>
+              <p className="text-xs font-black text-[#64748B] uppercase tracking-widest">{tExtracted('dangTaiLichTrinh')}</p>
             </div>
           </div>
         ) : error ? (
@@ -234,7 +234,7 @@ export default function CalendarClient() {
             <p className="text-sm font-semibold text-rose-500">{error}</p>
             <Button
               variant="outline"
-              label="Tải lại dữ liệu"
+              label={tExtracted('taiLaiDuLieu')}
               onClick={fetchBookings}
               className="mt-4 rounded-full text-xs font-black"
             />
@@ -258,7 +258,7 @@ export default function CalendarClient() {
         <Modal
           isOpen={editBooking !== null}
           onClose={() => setEditBooking(null)}
-          title={isMentor ? 'Cập nhật thông tin buổi học' : 'Hủy lịch học với Cố vấn'}
+          title={isMentor ? tExtracted('capNhatThongTinBuoiHoc') : tExtracted('huyLichHocVoiCoVan')}
           containerClassName="max-w-md"
           className="p-8 pt-0 font-sans"
         >
@@ -266,28 +266,28 @@ export default function CalendarClient() {
             <div className="flex flex-col gap-4 py-2">
               <div className="flex flex-col gap-1 bg-[#DFEFFF]/30 border border-[#DFEFFF]/80 p-4 rounded-2xl text-xs text-slate-600 font-semibold leading-relaxed">
                 <span className="text-[10px] font-black text-[#005BBF] uppercase tracking-wider">
-                  {isMentor ? 'Học viên đăng ký:' : 'Cố vấn đảm nhận:'}
+                  {isMentor ? tExtracted('hocVienDangKy') : tExtracted('coVanDamNhan')}
                 </span>
                 <strong className="text-slate-800">
                   {isMentor ? editBooking.mentee?.name : editBooking.course?.mentor?.name}
                 </strong>
-                <span className="text-slate-500">Khóa học: {editBooking.course?.title}</span>
+                <span className="text-slate-500">{tExtracted('khoaHoc')}{editBooking.course?.title}</span>
               </div>
 
               {isMentor ? (
                 <>
                   {/* Status Input for Mentor */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Trạng thái buổi học:</label>
+                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('trangThaiBuoiHoc')}</label>
                     <select
                       value={newStatus}
                       onChange={(e: any) => setNewStatus(e.target.value)}
                       className="w-full border border-slate-200 focus:border-[#005BBF] rounded-xl p-3 outline-none text-xs font-black text-[#475569] bg-white cursor-pointer"
                     >
-                      <option value="pending">Đang xử lý (Pending)</option>
-                      <option value="confirmed">Đã xác nhận (Confirmed)</option>
-                      <option value="completed">Đã hoàn thành (Completed)</option>
-                      <option value="cancelled">Hủy bỏ lịch dạy (Cancelled)</option>
+                      <option value="pending">{tExtracted('dangXuLyPending')}</option>
+                      <option value="confirmed">{tExtracted('daXacNhanConfirmed')}</option>
+                      <option value="completed">{tExtracted('daHoanThanhCompleted')}</option>
+                      <option value="cancelled">{tExtracted('huyBoLichDayCancelled')}</option>
                     </select>
                   </div>
 
@@ -296,7 +296,7 @@ export default function CalendarClient() {
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
                         <LuLink size={13} className="text-[#005BBF]" />
-                        <span>Link phòng học Google Meet:</span>
+                        <span>{tExtracted('linkPhongHocGoogleMeet')}</span>
                       </label>
                       <input
                         type="url"
@@ -313,12 +313,12 @@ export default function CalendarClient() {
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-black text-rose-500 uppercase tracking-wider flex items-center gap-1">
                         <LuTriangleAlert size={13} />
-                        <span>Lý do hủy buổi học:</span>
+                        <span>{tExtracted('lyDoHuyBuoiHoc')}</span>
                       </label>
                       <textarea
                         value={cancellationReason}
                         onChange={(e) => setCancellationReason(e.target.value)}
-                        placeholder="Ví dụ: Cố vấn bận việc đột xuất..."
+                        placeholder={tExtracted('viDuCoVanBanViecDotXuat')}
                         className="w-full border border-slate-200 focus:border-[#005BBF] rounded-xl p-3 outline-none text-xs min-h-[80px] resize-none font-semibold leading-relaxed"
                       />
                     </div>
@@ -330,16 +330,15 @@ export default function CalendarClient() {
                   <div className="bg-rose-50 border border-rose-100 p-4 rounded-2xl flex gap-3 text-xs text-rose-800 leading-relaxed font-semibold">
                     <LuTriangleAlert size={24} className="text-rose-500 flex-shrink-0" />
                     <p>
-                      Hành động này sẽ gửi yêu cầu hủy buổi học của bạn đến Cố vấn. Vui lòng ghi rõ lý do hủy.
-                    </p>
+                      {tExtracted('hanhDongNaySeGuiYeuCauHuy')}</p>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Lý do hủy lịch học:</label>
+                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider">{tExtracted('lyDoHuyLichHoc')}</label>
                     <textarea
                       value={cancellationReason}
                       onChange={(e) => setCancellationReason(e.target.value)}
-                      placeholder="Ghi lý do hủy..."
+                      placeholder={tExtracted('ghiLyDoHuy')}
                       className="w-full border border-slate-200 focus:border-[#005BBF] rounded-xl p-3 outline-none text-xs min-h-[90px] resize-none font-semibold leading-relaxed"
                     />
                   </div>
@@ -351,19 +350,18 @@ export default function CalendarClient() {
                   onClick={() => setEditBooking(null)}
                   className="px-5 py-2.5 text-xs font-black text-[#64748b] hover:text-[#475569] uppercase tracking-wider transition-colors cursor-pointer border-0 bg-transparent"
                 >
-                  Hủy bỏ
-                </button>
+                  {tExtracted('huyBo')}</button>
                 <button
                   onClick={handleUpdateBookingSubmit}
                   disabled={submittingEdit || (!isMentor && !cancellationReason.trim())}
                   className={`text-white font-extrabold text-xs py-2.5 px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-[0.98] min-w-[120px] cursor-pointer border-0 ${
-                    !isMentor ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/10' : 'bg-[#005BBF] hover:bg-[#004493] shadow-[#005BBF]/10'
+                    !isMentor ? "bg-rose-500 hover:bg-rose-600 shadow-rose-500/10" : "bg-[#005BBF] hover:bg-[#004493] shadow-[#005BBF]/10"
                   }`}
                 >
                   {submittingEdit ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    <span>{isMentor ? 'Cập nhật' : 'Xác nhận hủy'}</span>
+                    <span>{isMentor ? tExtracted('capNhat') : tExtracted('xacNhanHuy')}</span>
                   )}
                 </button>
               </div>
@@ -371,6 +369,5 @@ export default function CalendarClient() {
           )}
         </Modal>
       </div>
-    </div>
   );
 }

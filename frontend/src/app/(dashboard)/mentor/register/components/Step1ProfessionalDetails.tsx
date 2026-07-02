@@ -11,6 +11,7 @@ interface Props {
 }
 
 export default function Step1ProfessionalDetails({ form }: Props) {
+  const tExtracted = useTranslations('Extracted.appDashboardMentorRegisterComponentsStep1ProfessionalDetails');
   const t = useTranslations("MentorRegister");
   const { register, formState: { errors } } = form;
 
@@ -18,29 +19,29 @@ export default function Step1ProfessionalDetails({ form }: Props) {
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
-          label={t("jobTitle")}
-          placeholder={t("jobTitlePlaceholder")}
+          label={t('jobTitle')}
+          placeholder={t('jobTitlePlaceholder')}
           {...register("jobTitle")}
           error={errors.jobTitle?.message}
         />
         <Input
-          label={t("company")}
-          placeholder={t("companyPlaceholder")}
+          label={t('company')}
+          placeholder={t('companyPlaceholder')}
           {...register("company")}
           error={errors.company?.message}
         />
         <Input
-          label={t("yearsOfExperience")}
+          label={t('yearsOfExperience')}
           type="number"
-          placeholder={t("yearsOfExperiencePlaceholder")}
+          placeholder={t('yearsOfExperiencePlaceholder')}
           {...register("yearsOfExperience", { valueAsNumber: true })}
           error={errors.yearsOfExperience?.message}
         />
         <div className="hidden md:block" />
       </div>
       <Input
-        label={t("linkedinUrl")}
-        placeholder={t("linkedinPlaceholder")}
+        label={t('linkedinUrl')}
+        placeholder={t('linkedinPlaceholder')}
         {...register("linkedinUrl")}
         error={errors.linkedinUrl?.message}
         iconLeft={<Icon name="ExternalLink" className="text-slate-400" size={18} />}

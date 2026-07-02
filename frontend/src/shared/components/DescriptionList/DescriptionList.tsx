@@ -22,8 +22,7 @@ export const DescriptionList: React.FC<DescriptionListProps> = ({
   variant = 'basic',
   columns = 2,
   className
-}) => {
-  const containerClasses = cn(
+}) => {  const containerClasses = cn(
     'grid gap-6 font-sans',
     variant === 'basic' && 'grid-cols-[repeat(var(--columns,2),1fr)]',
     variant === 'bordered' && 'grid-cols-[repeat(var(--columns,2),1fr)] gap-0 border border-border-subtle rounded-lg overflow-hidden bg-surface',
@@ -33,13 +32,13 @@ export const DescriptionList: React.FC<DescriptionListProps> = ({
   );
 
   return (
-    <div 
+    <div
       className={containerClasses}
-      style={{ '--columns': columns } as React.CSSProperties}
+      style={{ "--columns": columns } as React.CSSProperties}
     >
       {items.map((item) => (
-        <div 
-          key={item.id} 
+        <div
+          key={item.id}
           className={cn(
             'flex flex-col gap-1',
             variant === 'bordered' && 'p-4 border border-border-subtle',

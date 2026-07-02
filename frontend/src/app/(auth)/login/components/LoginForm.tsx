@@ -15,12 +15,53 @@ import {
   type LoginFormData,
 } from "@/app/(auth)/login/login.schema";
 import { signIn } from "next-auth/react";
+import { ensureDeviceId } from "@/shared/utils/device";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
+async function signInWithCredentials(email: string, password: string) {
+  ensureDeviceId();
+
+  const csrfResponse = await fetch("/api/auth/csrf", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  if (!csrfResponse.ok) {
+    throw new Error("Unable to fetch CSRF token");
+  }
+
+  const { csrfToken } = await csrfResponse.json();
+  const callbackUrl = window.location.origin;
+  const response = await fetch("/api/auth/callback/credentials", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-Auth-Return-Redirect": "1",
+    },
+    body: new URLSearchParams({
+      email,
+      password,
+      csrfToken,
+      callbackUrl,
+    }),
+    credentials: "same-origin",
+  });
+
+  const data = await response.json().catch(() => ({}));
+  const url = typeof data.url === "string" ? data.url : callbackUrl;
+  const error = new URL(url, window.location.origin).searchParams.get("error");
+
+  return {
+    ok: response.ok && !error,
+    error,
+    status: response.status,
+  };
+}
+
 export function LoginForm() {
-  const t = useTranslations("Auth");
+  const tExtracted = useTranslations('Extracted.appAuthLoginComponentsLoginForm');  const t = useTranslations("Auth");
   const tError = useTranslations("Error");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -60,11 +101,7 @@ export function LoginForm() {
 
     try {
       console.log("[LoginForm] Submitting login...");
-      const result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
+      const result = await signInWithCredentials(data.email, data.password);
 
       if (!result || result.error) {
         setGeneralError(tError("invalidCredentials"));
@@ -72,12 +109,12 @@ export function LoginForm() {
         // Lấy session mới nhất để check role
         const res = await fetch("/api/auth/session");
         const session = await res.json();
-        
+
         const redirectUrl = session?.user?.role === "admin" ? "/admin/dashboard" : "/";
         router.push(redirectUrl);
         router.refresh();
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("[LoginForm] Submit Error:", error);
       setGeneralError(tError("invalidCredentials"));
     } finally {
@@ -89,6 +126,7 @@ export function LoginForm() {
     setIsGoogleLoading(true);
     try {
       // Với Google, chúng ta để Middleware xử lý redirect dựa trên role ở trang callback
+      ensureDeviceId();
       await signIn("google", { callbackUrl: "/admin/dashboard" });
     } catch (error) {
       console.error("Google login failed:", error);
@@ -109,7 +147,7 @@ export function LoginForm() {
       </div>
 
       <GoogleSignInButton
-        label={t("signInWithGoogle")}
+        label={t('signInWithGoogle')}
         onClick={handleGoogleSignIn}
         loading={isGoogleLoading}
       />
@@ -124,7 +162,7 @@ export function LoginForm() {
       >
         <Input
           id="login-email"
-          label={t("emailAddress")}
+          label={t('emailAddress')}
           type="email"
           placeholder="name@atelier.edu"
           error={errors.email?.message}
@@ -140,7 +178,7 @@ export function LoginForm() {
 
         <Input
           id="login-password"
-          label={t("password")}
+          label={t('password')}
           type={showPassword ? "text" : "password"}
           placeholder="••••••••"
           error={errors.password?.message}
@@ -159,7 +197,7 @@ export function LoginForm() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="text-text-muted hover:text-text-heading transition-colors cursor-pointer focus:outline-none"
-              aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+              aria-label={showPassword ? t('hidePassword') : t('showPassword')}
               tabIndex={-1}
             >
               <Icon name={showPassword ? "EyeOff" : "Eye"} size={20} />
@@ -174,7 +212,7 @@ export function LoginForm() {
             render={({ field }) => (
               <Checkbox
                 id="remember-me"
-                label={t("rememberMe")}
+                label={t('rememberMe')}
                 checked={field.value}
                 onChange={field.onChange}
               />
@@ -195,7 +233,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          label={isSubmitting ? t("signingIn") : t("signIn")}
+          label={isSubmitting ? t('signingIn') : t('signIn')}
           variant="primary"
           size="md"
           fullWidth

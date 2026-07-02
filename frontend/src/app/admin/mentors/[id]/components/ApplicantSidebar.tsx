@@ -46,8 +46,7 @@ export function ApplicantSidebar({
   expertiseLabel,
   noSkillsMessage,
   sidebarTitle,
-}: ApplicantSidebarProps) {
-  return (
+}: ApplicantSidebarProps) {  return (
     <div className="space-y-8">
       {/* Candidate Card */}
       <Card className="p-8 border-none shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center space-y-6 relative overflow-hidden">

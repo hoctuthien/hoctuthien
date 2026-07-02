@@ -1,12 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { generateQrAction } from "@/app/(dashboard)/activation/actions";
 import ActivationClient from "@/app/(dashboard)/activation/ActivationClient";
 
-export const metadata = {
-  title: 'Kích hoạt tài khoản | Học Từ Thiện',
-  description: 'Kích hoạt tài khoản Mentee của bạn để đăng ký các khóa học thiện nguyện 100% miễn phí.',
-};
+export async function generateMetadata() {
+  const t = await getTranslations("PageMetadata.dashboard_activation");
+  return { title: t("title"), description: t("description") };
+}
 
 export default async function ActivationPage() {
   const session = await auth();

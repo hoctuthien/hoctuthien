@@ -7,7 +7,8 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
+    "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -19,7 +20,9 @@
     "build-storybook": "storybook build",
     "gen:api": "npx openapi-typescript https://api.hoctuthien.com/api/docs-json -o ./src/core/types/api.generated.ts",
     "gen:api:local": "npx openapi-typescript http://beta-api.hoctuthien.com/api/docs-json -o ./src/core/types/api.generated.ts",
-    "gen:route": "node scripts/gen-route.mjs"
+    "gen:route": "node scripts/gen-route.mjs",
+    "i18n:extract": "node scripts/extract-hardcoded-i18n.cjs",
+    "i18n:check": "node scripts/check-hardcoded-i18n.cjs"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

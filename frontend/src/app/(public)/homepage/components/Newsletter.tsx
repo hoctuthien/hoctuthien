@@ -5,6 +5,7 @@ import { Avatar } from '@/core/ui/Avatar';
 
 
 export const Newsletter = () => {
+  const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsNewsletter');
   const t = useTranslations('Homepage');
   const tCommon = useTranslations('Common');
 
@@ -24,7 +25,7 @@ export const Newsletter = () => {
             <p className="text-white/70 text-lg mb-10 max-w-md mx-auto lg:mx-0">
               {t('newsletterDesc')}
             </p>
-            
+
             <div className="relative max-w-md mx-auto lg:mx-0">
               <input
                 type="email"
@@ -46,7 +47,7 @@ export const Newsletter = () => {
               <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white overflow-hidden shadow-2xl z-20">
                 <Avatar size="xl" name="Admin" className="w-full h-full border-0" />
               </div>
- 
+
               {/* Orbiting Avatars */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 w-16 h-16 rounded-full border-4 border-white overflow-hidden shadow-xl z-10">
                 <Avatar size="lg" name="User 1" className="w-full h-full border-0" />

@@ -12,4 +12,19 @@ export class CourseReviewRepository extends BaseRepository<CourseReviewEntity> {
   ) {
     super(repo);
   }
+
+  async getAverageRatingForCourse(courseId: string): Promise<{ avg: number; count: number }> {
+    const result = await this.repo
+      .createQueryBuilder('review')
+      .select('AVG(review.rating)', 'avg')
+      .addSelect('COUNT(review.id)', 'count')
+      .where('review.courseId = :courseId', { courseId })
+      .andWhere('review.deletedAt IS NULL')
+      .getRawOne();
+
+    return {
+      avg: parseFloat(result?.avg ?? '0') || 0,
+      count: parseInt(result?.count ?? '0', 10) || 0,
+    };
+  }
 }

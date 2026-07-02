@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -43,6 +44,7 @@ const TIME_OPTIONS = [
 ];
 
 export default function CourseCreateClient() {
+  const tExtracted = useTranslations('Extracted.appPublicCoursesCreateCourseCreateClient');
   const router = useRouter();
 
   // Form states
@@ -87,22 +89,22 @@ export default function CourseCreateClient() {
     {
       id: "preset-1",
       url: "https://images.unsplash.com/photo-1541462608141-2f68c48a4077?q=80&w=600&auto=format&fit=crop",
-      label: "Thiết kế sản phẩm"
+      label: tExtracted('thietKeSanPham')
     },
     {
       id: "preset-2",
       url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
-      label: "Lập trình công nghệ"
+      label: tExtracted('lapTrinhCongNghe')
     },
     {
       id: "preset-3",
       url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop",
-      label: "Kinh tế & Phân tích"
+      label: tExtracted('kinhTePhanTich')
     },
     {
       id: "preset-4",
       url: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?q=80&w=600&auto=format&fit=crop",
-      label: "Viết sáng tạo & Báo chí"
+      label: tExtracted('vietSangTaoBaoChi')
     }
   ];
 
@@ -146,17 +148,17 @@ export default function CourseCreateClient() {
       setNewCatName("");
     } catch (err: any) {
       console.error("Failed to create category:", err);
-      alert("Tạo danh mục thất bại: " + (err?.error?.message || err?.message || "Lỗi không xác định"));
+      alert(tExtracted('taoDanhMucThatBai') + (err?.error?.message || err?.message || tExtracted('loiKhongXacDinh')));
     }
   };
 
   const addTimeSlot = (day: string) => {
     const slotStr = `${tempStart}-${tempEnd}`;
     const daySlots = schedule[day] || [];
-    
+
     // Check duplication
     if (daySlots.includes(slotStr)) {
-      alert("Khung giờ này đã tồn tại trong ngày.");
+      alert(tExtracted('khungGioNayDaTonTaiTrongNgay'));
       return;
     }
 
@@ -191,12 +193,12 @@ export default function CourseCreateClient() {
     // Check mandatory teaching schedule
     const totalSlots = countTotalSlots();
     if (totalSlots === 0) {
-      alert("Vui lòng thiết lập ít nhất một khung giờ lịch dạy (đây là điều kiện bắt buộc để học viên đăng ký học).");
+      alert(tExtracted('vuiLongThietLapItNhatMotKhung'));
       return;
     }
 
     if (!selectedCategoryId) {
-      alert("Vui lòng chọn danh mục cho khóa học.");
+      alert(tExtracted('vuiLongChonDanhMucChoKhoaHoc'));
       return;
     }
 
@@ -224,7 +226,7 @@ export default function CourseCreateClient() {
       setIsSuccess(true);
     } catch (error: any) {
       console.error("Failed to create course:", error);
-      let errorMsg = "Đã xảy ra lỗi khi tạo khóa học. Vui lòng kiểm tra lại quyền của Mentor (profile phải được duyệt).";
+      let errorMsg = tExtracted('daXayRaLoiKhiTaoKhoaHoc');
       if (error?.error?.details) {
         if (typeof error.error.details === "object") {
           if (error.error.details.message) {
@@ -256,10 +258,10 @@ export default function CourseCreateClient() {
   };
 
   const breadcrumbItems = [
-    { label: "Trang chủ", href: "/" },
-    { label: "Cố vấn", href: "/mentor/courses" },
-    { label: "Danh sách khóa học", href: "/mentor/courses" },
-    { label: "Tạo khóa học" },
+    { label: tExtracted('trangChu'), href: "/" },
+    { label: tExtracted('coVan'), href: "/mentor/courses" },
+    { label: tExtracted('danhSachKhoaHoc'), href: "/mentor/courses" },
+    { label: tExtracted('taoKhoaHoc') },
   ];
 
   const currentThumb = customThumbUrl.trim() ? customThumbUrl : selectedThumb;
@@ -267,17 +269,17 @@ export default function CourseCreateClient() {
   return (
     <div className="w-full bg-[#FAF9FF] min-h-screen py-8 px-4 md:px-8 font-sans overflow-x-hidden">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
-        
+
         {/* Navigation Breadcrumb & Back Arrow */}
         <div className="flex flex-col gap-3">
           <Breadcrumb items={breadcrumbItems} />
           <div className="flex items-center justify-between mt-1">
-            <Link 
-              href="/mentor/courses" 
+            <Link
+              href="/mentor/courses"
               className="inline-flex items-center gap-2 text-slate-500 hover:text-[#2563eb] text-sm font-bold transition-colors cursor-pointer group"
             >
               <LuArrowLeft className="group-hover:-translate-x-1 transition-transform" size={16} />
-              <span>Quay lại trang danh sách</span>
+              <span>{tExtracted('quayLaiTrangDanhSach')}</span>
             </Link>
           </div>
         </div>
@@ -292,27 +294,26 @@ export default function CourseCreateClient() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight">Khởi Tạo Khóa Học Thành Công!</h2>
+              <h2 className="text-3xl font-black text-slate-900 tracking-tight">{tExtracted('khoiTaoKhoaHocThanhCong')}</h2>
               <p className="text-slate-500 text-sm leading-relaxed max-w-md mx-auto">
-                Khóa học <span className="font-extrabold text-[#2563eb]">"{title}"</span> đã được ghi nhận trên hệ thống và chuyển đến trạng thái hoạt động.
-              </p>
+                {tExtracted('khoaHoc')}<span className="font-extrabold text-[#2563eb]">"{title}"</span> {tExtracted('daDuocGhiNhanTrenHeThongVa')}</p>
             </div>
 
             {/* Structured schedule details */}
             <div className="bg-[#FAF9FF] border border-slate-100 p-5 rounded-2xl w-full flex items-center justify-around gap-4 text-left">
               <div>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">LỊCH GIẢNG DẠY</span>
-                <span className="text-sm font-black text-slate-800">{countTotalSlots()} Khung giờ học</span>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">{tExtracted('lichGiangDay')}</span>
+                <span className="text-sm font-black text-slate-800">{countTotalSlots()} {tExtracted('khungGioHoc')}</span>
               </div>
               <div className="w-px h-8 bg-slate-200" />
               <div>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">HÌNH THỨC</span>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">{tExtracted('hinhThuc')}</span>
                 <span className="text-sm font-black text-slate-800 capitalize">{format}</span>
               </div>
               <div className="w-px h-8 bg-slate-200" />
               <div>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">HỌC PHÍ</span>
-                <span className="text-sm font-black text-[#10B981]">{isPaid ? `${Number(price).toLocaleString("vi-VN")}đ` : "Miễn Phí"}</span>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block">{tExtracted('hocPhi')}</span>
+                <span className="text-sm font-black text-[#10B981]">{isPaid ? `${Number(price).toLocaleString("vi-VN")}đ` : tExtracted('mienPhi2')}</span>
               </div>
             </div>
 
@@ -320,16 +321,15 @@ export default function CourseCreateClient() {
               onClick={handleFinishRedirect}
               className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-sm py-4 px-10 rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-[0.98] cursor-pointer mt-4"
             >
-              Về Trang Quản Lý Khóa Học
-            </button>
+              {tExtracted('veTrangQuanLyKhoaHoc')}</button>
           </div>
         ) : (
           /* FORM & REAL-TIME PREVIEW CONTAINER */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
+
             {/* LEFT COLUMN: THE PREMIUM FORM WIZARD */}
             <form onSubmit={handleSubmit} className="lg:col-span-8 flex flex-col gap-8">
-              
+
               {/* Box 1: General Info */}
               <div className="bg-white border border-slate-100 p-6 md:p-8 rounded-[32px] shadow-sm flex flex-col gap-6">
                 <div className="flex items-center gap-2 border-b border-slate-50 pb-4">
@@ -337,19 +337,19 @@ export default function CourseCreateClient() {
                     <LuSparkles size={16} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Thông Tin Cơ Bản</h3>
-                    <p className="text-[11px] text-slate-400 font-medium">Khởi tạo danh tính và nội dung tóm tắt định vị cho khóa học</p>
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">{tExtracted('thongTinCoBan')}</h3>
+                    <p className="text-[11px] text-slate-400 font-medium">{tExtracted('khoiTaoDanhTinhVaNoiDungTom')}</p>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-4">
                   <div>
                     <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
-                      Tên khóa học chính thức <span className="text-red-500">*</span>
+                      {tExtracted('tenKhoaHocChinhThuc')}<span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Ví dụ: Thiết kế hệ thống phân cấp thị giác chuyên sâu"
+                      placeholder={tExtracted('viDuThietKeHeThongPhanCap')}
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       required
@@ -360,10 +360,10 @@ export default function CourseCreateClient() {
 
                   <div>
                     <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
-                      Mô tả tóm tắt ngắn <span className="text-red-500">*</span>
+                      {tExtracted('moTaTomTatNgan')}<span className="text-red-500">*</span>
                     </label>
                     <textarea
-                      placeholder="Tóm tắt ngắn gọn mục tiêu, nội dung khóa học và giá trị cốt lõi học sinh nhận được trong 2-3 câu."
+                      placeholder={tExtracted('tomTatNganGonMucTieuNoiDung')}
                       value={subtitle}
                       onChange={(e) => setSubtitle(e.target.value)}
                       required
@@ -376,8 +376,7 @@ export default function CourseCreateClient() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
-                        Chủ đề / Danh mục đào tạo
-                      </label>
+                        {tExtracted('chuDeDanhMucDaoTao')}</label>
                       <div className="flex gap-2 items-center">
                         <select
                           value={selectedCategoryId}
@@ -390,7 +389,7 @@ export default function CourseCreateClient() {
                           className="flex-1 h-12 px-4 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] cursor-pointer"
                         >
                           {loadingCategories ? (
-                            <option key="loading" value="">Đang tải danh mục...</option>
+                            <option key="loading" value="">{tExtracted('dangTaiDanhMuc')}</option>
                           ) : categories.length > 0 ? (
                             categories.map((cat) => (
                               <option key={cat.id} value={cat.id}>
@@ -398,7 +397,7 @@ export default function CourseCreateClient() {
                               </option>
                             ))
                           ) : (
-                            <option key="empty" value="">Chưa có danh mục nào</option>
+                            <option key="empty" value="">{tExtracted('chuaCoDanhMucNao')}</option>
                           )}
                         </select>
                         <button
@@ -407,23 +406,22 @@ export default function CourseCreateClient() {
                           className="h-12 px-4 bg-blue-50 text-[#2563eb] text-xs font-bold rounded-xl border border-blue-100 hover:bg-blue-100 transition-all cursor-pointer flex items-center gap-1 flex-shrink-0"
                         >
                           <LuPlus size={14} />
-                          <span>Tạo mới</span>
+                          <span>{tExtracted('taoMoi')}</span>
                         </button>
                       </div>
                     </div>
 
                     <div>
                       <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
-                        Trình độ chuyên môn
-                      </label>
+                        {tExtracted('trinhDoChuyenMon')}</label>
                       <select
                         value={level}
                         onChange={(e) => setLevel(e.target.value)}
                         className="w-full h-12 px-4 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] cursor-pointer"
                       >
-                        <option key="beginner" value="beginner">Cơ bản (Beginner)</option>
-                        <option key="intermediate" value="intermediate">Trung cấp (Intermediate)</option>
-                        <option key="advanced" value="advanced">Nâng cao (Advanced)</option>
+                        <option key="beginner" value="beginner">{tExtracted('coBanBeginner')}</option>
+                        <option key="intermediate" value="intermediate">{tExtracted('trungCapIntermediate')}</option>
+                        <option key="advanced" value="advanced">{tExtracted('nangCaoAdvanced')}</option>
                       </select>
                     </div>
                   </div>
@@ -437,8 +435,8 @@ export default function CourseCreateClient() {
                     <LuClock size={16} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Chi Tiết & Chi Phí</h3>
-                    <p className="text-[11px] text-slate-400 font-medium">Cấu hình thời lượng học tập, định dạng học tập và biểu phí</p>
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">{tExtracted('chiTietChiPhi')}</h3>
+                    <p className="text-[11px] text-slate-400 font-medium">{tExtracted('cauHinhThoiLuongHocTapDinhDang')}</p>
                   </div>
                 </div>
 
@@ -446,41 +444,39 @@ export default function CourseCreateClient() {
                   <div className="flex flex-col gap-4">
                     <div>
                       <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
-                        Tổng thời lượng khóa học
-                      </label>
+                        {tExtracted('tongThoiLuongKhoaHoc')}</label>
                       <div className="relative">
                         <input
                           type="number"
-                          placeholder="Ví dụ: 12"
+                          placeholder={tExtracted('viDu12')}
                           value={duration}
                           onChange={(e) => setDuration(e.target.value)}
                           min={1}
                           required
                           className="w-full h-12 pl-4 pr-12 text-sm font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] transition-all"
                         />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold pointer-events-none">giờ học</span>
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold pointer-events-none">{tExtracted('gioHoc')}</span>
                       </div>
                     </div>
 
                     <div>
                       <label className="text-[10px] font-black text-slate-500 tracking-wider uppercase block mb-1.5">
-                        Hình thức giảng dạy
-                      </label>
+                        {tExtracted('hinhThucGiangDay')}</label>
                       <select
                         value={format}
                         onChange={(e) => setFormat(e.target.value)}
                         className="w-full h-12 px-4 text-xs font-bold bg-[#FAF9FF] border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] cursor-pointer"
                       >
-                        <option key="online" value="online">Học trực tuyến (Online)</option>
-                        <option key="offline" value="offline">Học trực tiếp (Offline)</option>
-                        <option key="hybrid" value="hybrid">Học kết hợp (Hybrid)</option>
+                        <option key="online" value="online">{tExtracted('hocTrucTuyenOnline')}</option>
+                        <option key="offline" value="offline">{tExtracted('hocTrucTiepOffline')}</option>
+                        <option key="hybrid" value="hybrid">{tExtracted('hocKetHopHybrid')}</option>
                       </select>
                     </div>
                   </div>
 
                   <div className="bg-[#FAF9FF] border border-slate-100 p-5 rounded-2xl flex flex-col gap-4">
-                    <span className="text-[10px] font-black text-slate-500 tracking-wider uppercase">THU PHÍ KHÓA HỌC</span>
-                    
+                    <span className="text-[10px] font-black text-slate-500 tracking-wider uppercase">{tExtracted('thuPhiKhoaHoc')}</span>
+
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
@@ -491,8 +487,7 @@ export default function CourseCreateClient() {
                             : "bg-transparent border border-slate-200 text-slate-500 hover:bg-slate-50"
                         }`}
                       >
-                        Miễn phí
-                      </button>
+                        {tExtracted('mienPhi')}</button>
                       <button
                         type="button"
                         onClick={() => setIsPaid(true)}
@@ -502,8 +497,7 @@ export default function CourseCreateClient() {
                             : "bg-transparent border border-slate-200 text-slate-500 hover:bg-slate-50"
                         }`}
                       >
-                        Trả phí
-                      </button>
+                        {tExtracted('traPhi')}</button>
                     </div>
 
                     {isPaid && (
@@ -511,14 +505,14 @@ export default function CourseCreateClient() {
                         <LuDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input
                           type="number"
-                          placeholder="Ví dụ: 250000"
+                          placeholder={tExtracted('viDu250000')}
                           value={price}
                           onChange={(e) => setPrice(e.target.value)}
                           min={1000}
                           required
                           className="w-full h-12 pl-9 pr-12 text-sm font-bold bg-white border border-slate-200 rounded-xl outline-none focus:border-[#2563eb] transition-all"
                         />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold pointer-events-none">VNĐ</span>
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold pointer-events-none">{tExtracted('vnd')}</span>
                       </div>
                     )}
                   </div>
@@ -532,8 +526,8 @@ export default function CourseCreateClient() {
                     <LuImage size={16} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Ảnh Bìa Đại Diện</h3>
-                    <p className="text-[11px] text-slate-400 font-medium">Tải hình ảnh hoặc chọn preset thiết kế chuyên nghiệp định hình nhận diện trực quan</p>
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">{tExtracted('anhBiaDaiDien')}</h3>
+                    <p className="text-[11px] text-slate-400 font-medium">{tExtracted('taiHinhAnhHoacChonPresetThietKe')}</p>
                   </div>
                 </div>
 
@@ -551,8 +545,8 @@ export default function CourseCreateClient() {
                             setCustomThumbUrl("");
                           }}
                           className={`relative aspect-[3/2] rounded-xl overflow-hidden border-2 transition-all ${
-                            isActive 
-                              ? "border-[#2563eb] ring-4 ring-blue-50 scale-[1.02]" 
+                            isActive
+                              ? "border-[#2563eb] ring-4 ring-blue-50 scale-[1.02]"
                               : "border-slate-200 hover:border-slate-400"
                           }`}
                         >
@@ -575,7 +569,7 @@ export default function CourseCreateClient() {
                   {/* Divider */}
                   <div className="flex items-center gap-3 py-1">
                     <div className="h-px bg-slate-100 flex-1" />
-                    <span className="text-[9px] text-slate-400 font-extrabold tracking-wider uppercase">TẢI ẢNH TỪ MÁY TÍNH</span>
+                    <span className="text-[9px] text-slate-400 font-extrabold tracking-wider uppercase">{tExtracted('taiAnhTuMayTinh')}</span>
                     <div className="h-px bg-slate-100 flex-1" />
                   </div>
 
@@ -595,10 +589,10 @@ export default function CourseCreateClient() {
                             const url = await uploadImageToCloud(file);
                             setCustomThumbUrl(url);
                             setSelectedThumb(url);
-                            alert("Đã upload ảnh thành công!");
+                            alert(tExtracted('daUploadAnhThanhCong'));
                           } catch (err: any) {
                             console.error("Upload failed:", err);
-                            alert("Tải ảnh thất bại: " + (err.message || "Lỗi không xác định"));
+                            alert(tExtracted('taiAnhThatBai') + (err.message || tExtracted('loiKhongXacDinh')));
                           } finally {
                             setIsUploadingImage(false);
                           }
@@ -609,13 +603,12 @@ export default function CourseCreateClient() {
                         className="flex items-center gap-2 px-5 py-3 border-2 border-dashed border-slate-200 hover:border-[#2563eb] hover:text-[#2563eb] text-slate-600 rounded-xl text-xs font-black transition-all cursor-pointer select-none"
                       >
                         <LuUpload size={14} />
-                        {isUploadingImage ? "Đang tải lên cloud..." : "Chọn tệp hình ảnh"}
+                        {isUploadingImage ? tExtracted('dangTaiLenCloud') : tExtracted('chonTepHinhAnh')}
                       </label>
                       {customThumbUrl && (
                         <span className="text-xs text-emerald-600 font-extrabold flex items-center gap-1.5">
                           <LuCheck size={14} />
-                          Tải ảnh lên thành công!
-                        </span>
+                          {tExtracted('taiAnhLenThanhCong')}</span>
                       )}
                     </div>
                   </div>
@@ -629,8 +622,8 @@ export default function CourseCreateClient() {
                     <LuCalendar size={16} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Cấu Hình Lịch Giảng Dạy</h3>
-                    <p className="text-[11px] text-slate-400 font-medium">Chọn ngày học trong tuần và thiết lập các khung giờ rảnh cố định của bạn (Bắt buộc)</p>
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">{tExtracted('cauHinhLichGiangDay')}</h3>
+                    <p className="text-[11px] text-slate-400 font-medium">{tExtracted('chonNgayHocTrongTuanVaThietLap')}</p>
                   </div>
                 </div>
 
@@ -638,12 +631,12 @@ export default function CourseCreateClient() {
                   {WEEKDAYS.map((day) => {
                     const slots = schedule[day.key] || [];
                     const isAddingThisDay = activeAddDay === day.key;
-                    
+
                     return (
                       <div key={day.key} className="border border-slate-100 rounded-2xl p-4 bg-[#FAF9FF]/40 flex flex-col gap-3">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-black text-slate-800">{day.label}</span>
-                          
+
                           <button
                             type="button"
                             onClick={() => {
@@ -652,15 +645,14 @@ export default function CourseCreateClient() {
                             className="bg-blue-50 hover:bg-blue-100 text-[#2563eb] text-[10px] font-black px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer border border-blue-100/50"
                           >
                             <LuPlus size={12} />
-                            Thêm khung giờ
-                          </button>
+                            {tExtracted('themKhungGio')}</button>
                         </div>
 
                         {/* Inline Adding Form */}
                         {isAddingThisDay && (
                           <div className="bg-white border border-blue-100 rounded-xl p-3.5 flex items-center gap-4 text-xs font-semibold animate-in slide-in-from-top-2 duration-200">
                             <div className="flex items-center gap-1.5">
-                              <span>Từ:</span>
+                              <span>{tExtracted('tu')}</span>
                               <select
                                 value={tempStart}
                                 onChange={(e) => setTempStart(e.target.value)}
@@ -672,7 +664,7 @@ export default function CourseCreateClient() {
                               </select>
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <span>Đến:</span>
+                              <span>{tExtracted('den')}</span>
                               <select
                                 value={tempEnd}
                                 onChange={(e) => setTempEnd(e.target.value)}
@@ -689,15 +681,13 @@ export default function CourseCreateClient() {
                                 onClick={() => setActiveAddDay(null)}
                                 className="px-3 py-1.5 border rounded-lg hover:bg-slate-50 font-bold"
                               >
-                                Hủy
-                              </button>
+                                {tExtracted('huy')}</button>
                               <button
                                 type="button"
                                 onClick={() => addTimeSlot(day.key)}
                                 className="px-3 py-1.5 bg-[#2563eb] text-white rounded-lg hover:bg-blue-700 font-black"
                               >
-                                Xác nhận
-                              </button>
+                                {tExtracted('xacNhan')}</button>
                             </div>
                           </div>
                         )}
@@ -706,8 +696,8 @@ export default function CourseCreateClient() {
                         {slots.length > 0 ? (
                           <div className="flex flex-wrap gap-2 mt-1">
                             {slots.map((slot, sIdx) => (
-                              <span 
-                                key={sIdx} 
+                              <span
+                                key={sIdx}
                                 className="bg-white border border-slate-200 text-xs font-black text-slate-700 px-3 py-1.5 rounded-xl flex items-center gap-2 hover:border-red-200 hover:text-red-500 group transition-all"
                               >
                                 <LuClock size={12} className="text-slate-400 group-hover:text-red-400" />
@@ -716,7 +706,7 @@ export default function CourseCreateClient() {
                                   type="button"
                                   onClick={() => removeTimeSlot(day.key, sIdx)}
                                   className="text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
-                                  title="Xóa khung giờ"
+                                  title={tExtracted('xoaKhungGio')}
                                 >
                                   <LuTrash2 size={12} />
                                 </button>
@@ -724,7 +714,7 @@ export default function CourseCreateClient() {
                             ))}
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-400 font-semibold italic">Chưa có lịch dạy trong ngày này.</span>
+                          <span className="text-[11px] text-slate-400 font-semibold italic">{tExtracted('chuaCoLichDayTrongNgayNay')}</span>
                         )}
                       </div>
                     );
@@ -738,8 +728,7 @@ export default function CourseCreateClient() {
                   href="/mentor/courses"
                   className="px-6 py-3.5 text-xs font-black text-slate-500 hover:text-slate-700 transition-colors uppercase tracking-wider cursor-pointer"
                 >
-                  Hủy bỏ & Trở lại
-                </Link>
+                  {tExtracted('huyBoTroLai')}</Link>
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -750,7 +739,7 @@ export default function CourseCreateClient() {
                   ) : (
                     <>
                       <LuCheck size={16} strokeWidth={2.5} />
-                      <span>Hoàn thành và Đăng ký</span>
+                      <span>{tExtracted('hoanThanhVaDangKy')}</span>
                     </>
                   )}
                 </button>
@@ -763,8 +752,8 @@ export default function CourseCreateClient() {
               <div className="bg-slate-900 text-white px-5 py-4 rounded-[20px] shadow-md border border-slate-800 flex items-center gap-2">
                 <LuSparkles size={16} className="text-blue-400 animate-pulse" />
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-blue-400 font-extrabold uppercase tracking-widest leading-none">Bản xem thử trực quan</span>
-                  <span className="text-xs text-slate-300 font-medium">Bản thẻ của bạn sẽ xuất hiện trên Dashboard</span>
+                  <span className="text-[10px] text-blue-400 font-extrabold uppercase tracking-widest leading-none">{tExtracted('banXemThuTrucQuan')}</span>
+                  <span className="text-xs text-slate-300 font-medium">{tExtracted('banTheCuaBanSeXuatHienTren')}</span>
                 </div>
               </div>
 
@@ -775,7 +764,7 @@ export default function CourseCreateClient() {
                   <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-sm bg-slate-50 border border-slate-100 mb-5">
                     <img
                       src={currentThumb}
-                      alt="Thumbnail preview"
+                      alt={tExtracted('thumbnailPreview')}
                       className="w-full h-full object-cover animate-in fade-in duration-300"
                     />
                     <div className="absolute top-3 left-3 bg-[#FFFBEB] text-[#B45309] px-2 py-1 rounded-lg text-[10px] font-black flex items-center gap-0.5">
@@ -793,15 +782,14 @@ export default function CourseCreateClient() {
                     <div className="w-10 h-10 rounded-xl overflow-hidden shadow-inner bg-slate-100 border border-slate-200/50 flex-shrink-0">
                       <img
                         src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"
-                        alt="Mentor placeholder"
+                        alt={tExtracted('mentorPlaceholder')}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-xs font-black text-slate-900 tracking-tight leading-none">Bạn (Cố vấn)</span>
+                      <span className="text-xs font-black text-slate-900 tracking-tight leading-none">{tExtracted('banCoVan')}</span>
                       <span className="text-[9px] text-[#2563eb] font-extrabold uppercase tracking-wider">
-                        Đào tạo chuyên môn cấp cao
-                      </span>
+                        {tExtracted('daoTaoChuyenMonCapCao')}</span>
                     </div>
                   </div>
 
@@ -811,57 +799,55 @@ export default function CourseCreateClient() {
                       {category}
                     </span>
                     <h4 className="text-base font-black text-[#0F172A] tracking-tight leading-snug line-clamp-2 min-h-[2.5rem]">
-                      {title.trim() ? title : "Tên khóa học của bạn sẽ hiển thị ở đây..."}
+                      {title.trim() ? title : tExtracted('tenKhoaHocCuaBanSeHienThi')}
                     </h4>
                   </div>
 
                   {/* Description subtitle */}
                   <p className="text-xs leading-relaxed text-[#475569] font-medium mb-4 line-clamp-3 min-h-[3.2rem]">
-                    {subtitle.trim() ? subtitle : "Viết mô tả tóm tắt thú vị, nhấn mạnh các mục tiêu đột phá để thu hút người học tiềm năng..."}
+                    {subtitle.trim() ? subtitle : tExtracted('vietMoTaTomTatThuViNhan')}
                   </p>
                 </div>
 
                 {/* Bottom Stats */}
                 <div>
                   <div className="h-px bg-[#F1F5F9] w-full my-4" />
-                  
+
                   <div className="flex flex-col gap-1.5 text-[10px] font-bold text-[#64748b]">
                     <div className="flex items-center justify-between">
-                      <span>CẤP ĐỘ KHÓA HỌC:</span>
+                      <span>{tExtracted('capDoKhoaHoc')}</span>
                       <span className="text-[#0F172A] font-black uppercase tracking-wide">{level}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>THỜI LƯỢNG HỌC:</span>
-                      <span className="text-[#0F172A] font-black">{duration || "0"} giờ giảng dạy</span>
+                      <span>{tExtracted('thoiLuongHoc')}</span>
+                      <span className="text-[#0F172A] font-black">{duration || "0"} {tExtracted('gioGiangDay')}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>HỌC PHÍ THAM KHẢO:</span>
+                      <span>{tExtracted('hocPhiThamKhao')}</span>
                       <span className="text-[#10B981] font-black uppercase tracking-wider">
-                        {isPaid ? `${Number(price).toLocaleString("vi-VN")} VNĐ` : "MIỄN PHÍ ĐÀO TẠO"}
+                        {isPaid ? `${Number(price).toLocaleString("vi-VN")} VNĐ` : tExtracted('mienPhiDaoTao')}
                       </span>
                     </div>
                   </div>
 
                   <div className="w-full bg-[#FAF9FF] text-center border border-slate-100 text-[10px] font-black text-slate-500 py-3 rounded-xl uppercase tracking-wider block mt-4 select-none">
-                    Bản Xem Thử (Preview)
-                  </div>
+                    {tExtracted('banXemThuPreview')}</div>
                 </div>
               </div>
 
               {/* High-fidelity summary schedule card */}
               <div className="bg-[#FAF9FF] border border-slate-100 rounded-2xl p-5 flex flex-col gap-3.5">
-                <span className="text-[10px] font-black text-slate-500 tracking-wider uppercase">TÓM TẮT LỊCH DẠY</span>
-                
+                <span className="text-[10px] font-black text-slate-500 tracking-wider uppercase">{tExtracted('tomTatLichDay')}</span>
+
                 <div className="flex items-center justify-between text-xs font-bold text-slate-600">
-                  <span>Số ngày dạy trong tuần:</span>
+                  <span>{tExtracted('soNgayDayTrongTuan')}</span>
                   <span className="font-black text-slate-800">
-                    {Object.values(schedule).filter(slots => slots.length > 0).length} ngày
-                  </span>
+                    {Object.values(schedule).filter(slots => slots.length > 0).length} {tExtracted('ngay')}</span>
                 </div>
 
                 <div className="flex items-center justify-between text-xs font-bold text-slate-600">
-                  <span>Tổng số khung giờ:</span>
-                  <span className="font-black text-slate-800">{countTotalSlots()} khung giờ</span>
+                  <span>{tExtracted('tongSoKhungGio')}</span>
+                  <span className="font-black text-slate-800">{countTotalSlots()} {tExtracted('khungGio')}</span>
                 </div>
               </div>
 
@@ -877,14 +863,14 @@ export default function CourseCreateClient() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-[24px] p-6 max-w-sm w-full border border-slate-100 shadow-2xl flex flex-col gap-5">
             <div>
-              <h3 className="text-base font-black text-slate-900">Thêm danh mục mới</h3>
-              <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Nhập tên danh mục, sau khi tạo sẽ được chọn tự động</p>
+              <h3 className="text-base font-black text-slate-900">{tExtracted('themDanhMucMoi')}</h3>
+              <p className="text-[11px] text-slate-400 font-semibold mt-0.5">{tExtracted('nhapTenDanhMucSauKhiTaoSe')}</p>
             </div>
 
             <form onSubmit={handleCreateCategorySubmit} className="flex flex-col gap-4">
               <input
                 type="text"
-                placeholder="Ví dụ: Lập trình Vue.js, Tiếng Nhật N3..."
+                placeholder={tExtracted('viDuLapTrinhVueJsTiengNhat')}
                 value={newCatName}
                 onChange={(e) => setNewCatName(e.target.value)}
                 required
@@ -898,15 +884,13 @@ export default function CourseCreateClient() {
                   onClick={() => { setIsCategoryModalOpen(false); setNewCatName(""); }}
                   className="px-4 py-2 text-xs font-extrabold text-slate-500 hover:text-slate-700 uppercase"
                 >
-                  Hủy
-                </button>
+                  {tExtracted('huy')}</button>
                 <button
                   type="submit"
                   disabled={!newCatName.trim()}
                   className="px-5 py-2.5 bg-[#2563eb] text-white text-xs font-black rounded-xl hover:bg-blue-700 uppercase shadow-md shadow-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Tạo danh mục
-                </button>
+                  {tExtracted('taoDanhMuc')}</button>
               </div>
             </form>
           </div>

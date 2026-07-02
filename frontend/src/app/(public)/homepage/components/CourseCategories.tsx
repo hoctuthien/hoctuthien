@@ -8,13 +8,14 @@ import { cn } from '@/core/utils/cn';
 import { MOCK_CATEGORIES } from '@/shared/mocks/homepage.mock';
 
 export const CourseCategories = () => {
+  const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsCourseCategories');
   const t = useTranslations('Homepage');
   const tCommon = useTranslations('Common');
 
   const categories = MOCK_CATEGORIES.map(cat => ({
     icon: cat.iconUrl,
     title: cat.name,
-    description: t(`${cat.slug}Desc` as any) || 'Master complex topics with expert guidance.',
+    description: t(`${cat.slug}Desc` as any) || tExtracted('masterComplexTopicsWithExpertGuidance'),
     color: cat.slug === 'mathematics' ? 'bg-blue-50 text-blue-600 border-blue-100' :
            cat.slug === 'science' ? 'bg-green-50 text-green-600 border-green-100' :
            cat.slug === 'geography' ? 'bg-orange-50 text-orange-600 border-orange-100' :

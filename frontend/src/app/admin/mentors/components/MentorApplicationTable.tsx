@@ -21,6 +21,7 @@ interface MentorApplicationTableProps {
 }
 
 export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationTableProps) => {
+  const tExtracted = useTranslations('Extracted.appAdminMentorsComponentsMentorApplicationTable');
   const [data, setData] = useState(initialData);
   const t = useTranslations("Admin.mentors");
   const router = useRouter();
@@ -69,11 +70,11 @@ export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationT
   };
 
   const statusOptions = [
-    { label: "All Statuses", value: "" },
-    { label: "PENDING", value: "PENDING" },
-    { label: "IN_PROGRESS", value: "IN_PROGRESS" },
-    { label: "APPROVED", value: "APPROVED" },
-    { label: "REJECTED", value: "REJECTED" },
+    { label: tExtracted('allStatuses'), value: "" },
+    { label: tExtracted('pending'), value: "PENDING" },
+    { label: tExtracted('inProgress'), value: "IN_PROGRESS" },
+    { label: tExtracted('approved'), value: "APPROVED" },
+    { label: tExtracted('rejected'), value: "REJECTED" },
   ];
 
   const columns: Column<AdminMentorApplication>[] = [
@@ -84,8 +85,8 @@ export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationT
         <div className="flex items-center gap-3">
           <Avatar name={item.user?.name || "N/A"} src={item.user?.avatarUrl || undefined} size="sm" className="w-8 h-8" />
           <div>
-            <p className="font-bold text-[#1e293b]">{item.user?.name || "N/A"}</p>
-            <p className="text-[12px] text-slate-400 font-normal">{item.user?.email || "N/A"}</p>
+            <p className="font-bold text-[#1e293b]">{item.user?.name || tExtracted('nA')}</p>
+            <p className="text-[12px] text-slate-400 font-normal">{item.user?.email || tExtracted('nA')}</p>
           </div>
         </div>
       ),
@@ -128,7 +129,7 @@ export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationT
       render: (item) => (
         <Link href={`/admin/mentors/${item.id}`}>
           <Button
-            label={t("viewDetails")}
+            label={t('viewDetails')}
             variant="outline"
             size="sm"
             iconLeft={<Icon name="Eye" size={14} />}
@@ -143,20 +144,20 @@ export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationT
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <h2 className="text-xl font-bold text-slate-800">{t("tableTitle")}</h2>
-        
+
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
           {/* Search Box */}
           <div className="relative w-full sm:w-64 group">
-            <Icon 
-              name="Search" 
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" 
-              size={16} 
+            <Icon
+              name="Search"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors"
+              size={16}
             />
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search applications..." 
+              placeholder={tExtracted('searchApplications')}
               className="w-full pl-10 pr-4 py-2 bg-slate-50 border-transparent focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-xl transition-all outline-none text-xs"
             />
           </div>
@@ -167,20 +168,20 @@ export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationT
               options={statusOptions}
               value={status}
               onChange={(val) => setStatus(val)}
-              placeholder="Status"
+              placeholder={tExtracted('status')}
               className="!rounded-xl"
             />
           </div>
 
-          <Button label={t("export")} variant="outline" size="sm" iconLeft={<Icon name="Download" size={16} />} className="w-full sm:w-auto" />
+          <Button label={t('export')} variant="outline" size="sm" iconLeft={<Icon name="Download" size={16} />} className="w-full sm:w-auto" />
         </div>
       </div>
-      
+
       <DataTable
         data={data}
         columns={columns}
         onSelect={(id) => {
-          setData(prev => prev.map(item => 
+          setData(prev => prev.map(item =>
             item.id === id ? { ...item, selected: !item.selected } : item
           ));
         }}
@@ -194,24 +195,23 @@ export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationT
       {meta && meta.totalPages > 1 && (
         <div className="p-4 border border-slate-100 flex items-center justify-between bg-slate-50/30 rounded-2xl mt-4">
           <p className="text-xs text-slate-500">
-            Showing {data.length} entries of {meta.total} total
-          </p>
+            {tExtracted('showing')}{data.length} {tExtracted('entriesOf')}{meta.total} {tExtracted('total')}</p>
           <div className="flex items-center gap-1">
-            <Button 
-              variant="secondary" 
-              label={<Icon name="ChevronLeft" size={14} />} 
-              className="!p-2 !rounded-lg" 
+            <Button
+              variant="secondary"
+              label={<Icon name="ChevronLeft" size={14} />}
+              className="!p-2 !rounded-lg"
               onClick={() => handlePageChange(meta.page - 1)}
               disabled={meta.page <= 1}
             />
-            
+
             {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => handlePageChange(p)}
                 className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
-                  meta.page === p 
-                    ? "bg-primary text-white shadow-md shadow-primary/20" 
+                  meta.page === p
+                    ? "bg-primary text-white shadow-md shadow-primary/20"
                     : "hover:bg-slate-100 text-slate-600"
                 }`}
               >
@@ -219,10 +219,10 @@ export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationT
               </button>
             ))}
 
-            <Button 
-              variant="secondary" 
-              label={<Icon name="ChevronRight" size={14} />} 
-              className="!p-2 !rounded-lg" 
+            <Button
+              variant="secondary"
+              label={<Icon name="ChevronRight" size={14} />}
+              className="!p-2 !rounded-lg"
               onClick={() => handlePageChange(meta.page + 1)}
               disabled={meta.page >= meta.totalPages}
             />

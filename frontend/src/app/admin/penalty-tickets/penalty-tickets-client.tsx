@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import React, { useState, useEffect, useCallback } from 'react';
 import { penaltyTicketGateway } from '@/core/gateway';
 import {
@@ -80,6 +81,7 @@ interface UpdateModalProps {
 }
 
 function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
+  const tExtracted = useTranslations('Extracted.appAdminPenaltyTicketsPenaltyTicketsClient');
   const [status, setStatus] = useState<TicketStatus>(ticket.status);
   const [pointsDeducted, setPointsDeducted] = useState(ticket.pointsDeducted);
   const [loading, setLoading] = useState(false);
@@ -94,7 +96,7 @@ function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
       onUpdated();
       onClose();
     } catch (err: any) {
-      setError(err?.message || 'Cập nhật thất bại.');
+      setError(err?.message || tExtracted('capNhatThatBai'));
     } finally {
       setLoading(false);
     }
@@ -106,16 +108,15 @@ function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
       <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-5">
-          <h2 className="text-white font-black text-lg">Cập nhật báo cáo vi phạm</h2>
-          <p className="text-slate-300 text-xs mt-1 truncate">ID: {ticket.id}</p>
+          <h2 className="text-white font-black text-lg">{tExtracted('capNhatBaoCaoViPham')}</h2>
+          <p className="text-slate-300 text-xs mt-1 truncate">{tExtracted('id')}{ticket.id}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Reason (read-only) */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              Lý do báo cáo
-            </label>
+              {tExtracted('lyDoBaoCao')}</label>
             <p className="text-sm text-slate-700 bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
               {ticket.reason}
             </p>
@@ -124,8 +125,7 @@ function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
           {/* Status */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              Trạng thái xử lý
-            </label>
+              {tExtracted('trangThaiXuLy')}</label>
             <div className="relative">
               <select
                 id="modal-status-select"
@@ -133,10 +133,10 @@ function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
                 onChange={(e) => setStatus(e.target.value as TicketStatus)}
                 className="w-full appearance-none bg-white border-2 border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
               >
-                <option value="pending">⏳ Đang chờ (PENDING)</option>
-                <option value="penalty">🚨 Phạt (PENALTY)</option>
-                <option value="rejected">❌ Từ chối (REJECTED)</option>
-                <option value="cancel">🚫 Hủy bỏ (CANCEL)</option>
+                <option value="pending">{tExtracted('dangChoPending')}</option>
+                <option value="penalty">{tExtracted('phatPenalty')}</option>
+                <option value="rejected">{tExtracted('tuChoiRejected')}</option>
+                <option value="cancel">{tExtracted('huyBoCancel')}</option>
               </select>
               <LuChevronDown
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
@@ -148,8 +148,7 @@ function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
           {/* Points */}
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              Điểm trừ phạt
-            </label>
+              {tExtracted('diemTruPhat')}</label>
             <input
               id="modal-points-input"
               type="number"
@@ -160,8 +159,7 @@ function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
             />
             {status === 'penalty' && pointsDeducted === 0 && (
               <p className="text-xs text-amber-600 mt-1 font-medium">
-                ⚠ Trạng thái PENALTY nhưng chưa nhập điểm trừ.
-              </p>
+                {tExtracted('trangThaiPenaltyNhungChuaNhapDiemTru')}</p>
             )}
           </div>
 
@@ -178,8 +176,7 @@ function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
               onClick={onClose}
               className="flex-1 border-2 border-slate-200 text-slate-600 font-bold text-sm rounded-xl py-3 hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Hủy
-            </button>
+              {tExtracted('huy')}</button>
             <button
               id="modal-submit-btn"
               type="submit"
@@ -191,7 +188,7 @@ function UpdateModal({ ticket, onClose, onUpdated }: UpdateModalProps) {
               ) : (
                 <LuCheck size={14} />
               )}
-              {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+              {loading ? tExtracted('dangLuu') : tExtracted('luuThayDoi')}
             </button>
           </div>
         </form>
@@ -209,6 +206,7 @@ const FILTER_OPTIONS: { value: string; label: string }[] = [
 ];
 
 export function PenaltyTicketsClient() {
+  const tExtracted = useTranslations('Extracted.appAdminPenaltyTicketsPenaltyTicketsClient');
   const [tickets, setTickets] = useState<PenaltyTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -227,7 +225,7 @@ export function PenaltyTicketsClient() {
       const data = Array.isArray(res) ? res : res?.data ?? [];
       setTickets(data);
     } catch (err: any) {
-      setError(err?.message || 'Không thể tải danh sách báo cáo vi phạm.');
+      setError(err?.message || tExtracted('khongTheTaiDanhSachBaoCaoVi'));
     } finally {
       setLoading(false);
     }
@@ -243,7 +241,7 @@ export function PenaltyTicketsClient() {
   };
 
   const handleUpdated = () => {
-    showToast('success', 'Cập nhật báo cáo vi phạm thành công!');
+    showToast("success", tExtracted('capNhatBaoCaoViPhamThanhCong'));
     fetchTickets();
   };
 
@@ -274,8 +272,8 @@ export function PenaltyTicketsClient() {
         <div
           className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-2xl shadow-xl border text-sm font-semibold animate-in slide-in-from-bottom duration-300 ${
             toastMsg.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-red-50 border-red-200 text-red-800'
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-red-50 border-red-200 text-red-800"
           }`}
         >
           {toastMsg.type === 'success' ? <LuCheck size={16} /> : <LuX size={16} />}
@@ -299,10 +297,9 @@ export function PenaltyTicketsClient() {
             <LuTriangleAlert className="text-red-600" size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900">Báo cáo vi phạm</h1>
+            <h1 className="text-2xl font-black text-slate-900">{tExtracted('baoCaoViPham')}</h1>
             <p className="text-slate-500 text-sm">
-              Quản lý các báo cáo vắng mặt & vi phạm từ học viên và mentor
-            </p>
+              {tExtracted('quanLyCacBaoCaoVangMatVi')}</p>
           </div>
         </div>
       </div>
@@ -310,13 +307,13 @@ export function PenaltyTicketsClient() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Tổng', value: counts.all, color: 'from-slate-600 to-slate-700' },
-          { label: 'Chờ xử lý', value: counts.pending, color: 'from-amber-500 to-amber-600' },
-          { label: 'Đã phạt', value: counts.penalty, color: 'from-red-500 to-red-600' },
+          { label: tExtracted('tong'), value: counts.all, color: "from-slate-600 to-slate-700" },
+          { label: tExtracted('choXuLy'), value: counts.pending, color: "from-amber-500 to-amber-600" },
+          { label: tExtracted('daPhat'), value: counts.penalty, color: "from-red-500 to-red-600" },
           {
-            label: 'Từ chối / Hủy',
+            label: tExtracted('tuChoiHuy'),
             value: counts.rejected + counts.cancel,
-            color: 'from-slate-400 to-slate-500',
+            color: "from-slate-400 to-slate-500",
           },
         ].map((stat) => (
           <div
@@ -338,14 +335,14 @@ export function PenaltyTicketsClient() {
             onClick={() => setFilterStatus(opt.value)}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
               filterStatus === opt.value
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'
+                ? "bg-slate-900 text-white shadow-md"
+                : "bg-white text-slate-600 border border-slate-200 hover:border-slate-400"
             }`}
           >
             {opt.label}
             <span
               className={`ml-2 text-xs px-1.5 py-0.5 rounded-md ${
-                filterStatus === opt.value ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                filterStatus === opt.value ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
               }`}
             >
               {counts[opt.value as keyof typeof counts] ?? counts.all}
@@ -357,9 +354,8 @@ export function PenaltyTicketsClient() {
           onClick={fetchTickets}
           className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all cursor-pointer"
         >
-          <LuRefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-          Tải lại
-        </button>
+          <LuRefreshCw size={14} className={loading ? "animate-spin" : ''} />
+          {tExtracted('taiLai')}</button>
       </div>
 
       {/* Content */}
@@ -367,7 +363,7 @@ export function PenaltyTicketsClient() {
         <div className="flex items-center justify-center py-24">
           <div className="flex flex-col items-center gap-3">
             <LuRefreshCw size={32} className="animate-spin text-blue-500" />
-            <p className="text-slate-500 text-sm font-medium">Đang tải dữ liệu...</p>
+            <p className="text-slate-500 text-sm font-medium">{tExtracted('dangTaiDuLieu')}</p>
           </div>
         </div>
       ) : error ? (
@@ -378,16 +374,15 @@ export function PenaltyTicketsClient() {
             onClick={fetchTickets}
             className="mt-4 px-5 py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors cursor-pointer"
           >
-            Thử lại
-          </button>
+            {tExtracted('thuLai')}</button>
         </div>
       ) : filteredTickets.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-100 p-16 text-center shadow-sm">
           <LuFileText size={48} className="text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500 font-semibold text-lg">Không có báo cáo nào</p>
+          <p className="text-slate-500 font-semibold text-lg">{tExtracted('khongCoBaoCaoNao')}</p>
           <p className="text-slate-400 text-sm mt-1">
             {filterStatus === 'all'
-              ? 'Hệ thống chưa có báo cáo vi phạm nào.'
+              ? tExtracted('heThongChuaCoBaoCaoViPham')
               : `Không có báo cáo ở trạng thái "${FILTER_OPTIONS.find((o) => o.value === filterStatus)?.label}".`}
           </p>
         </div>
@@ -411,8 +406,7 @@ export function PenaltyTicketsClient() {
                       <StatusBadge status={ticket.status} />
                       {ticket.pointsDeducted > 0 && (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full uppercase tracking-wide">
-                          -{ticket.pointsDeducted} điểm
-                        </span>
+                          -{ticket.pointsDeducted} {tExtracted('diem')}</span>
                       )}
                     </div>
 
@@ -423,13 +417,13 @@ export function PenaltyTicketsClient() {
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
                       <span className="flex items-center gap-1">
                         <LuUser size={11} />
-                        Người bị báo cáo:{' '}
+                        {tExtracted('nguoiBiBaoCao')}{' '}
                         <code className="font-mono text-slate-600">{ticket.userId.slice(0, 8)}…</code>
                       </span>
                       {ticket.reportedById && (
                         <span className="flex items-center gap-1">
                           <LuUser size={11} />
-                          Người báo cáo:{' '}
+                          {tExtracted('nguoiBaoCao')}{' '}
                           <code className="font-mono text-slate-600">
                             {ticket.reportedById.slice(0, 8)}…
                           </code>
@@ -462,8 +456,7 @@ export function PenaltyTicketsClient() {
                         rel="noopener noreferrer"
                         className="inline-block mt-2 text-xs text-blue-600 hover:underline font-medium"
                       >
-                        🔗 Xem bằng chứng
-                      </a>
+                        {tExtracted('xemBangChung')}</a>
                     )}
                   </div>
 
@@ -474,8 +467,7 @@ export function PenaltyTicketsClient() {
                       onClick={() => setSelectedTicket(ticket)}
                       className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-700 transition-colors cursor-pointer"
                     >
-                      Xử lý
-                    </button>
+                      {tExtracted('xuLy')}</button>
                   </div>
                 </div>
               </div>

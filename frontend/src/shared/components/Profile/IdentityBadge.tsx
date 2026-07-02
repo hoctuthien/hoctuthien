@@ -38,17 +38,16 @@ const config = {
 /**
  * A specialized card component used to showcase user achievements, verification status, or expertise.
  */
-export const IdentityBadge = ({ type, title, subtitle, className = '' }: IdentityBadgeProps) => {
-  const item = config[type];
-  
+export const IdentityBadge = ({ type, title, subtitle, className = '' }: IdentityBadgeProps) => {  const item = config[type];
+
   return (
     <div className={`flex items-center gap-4 p-4 rounded-[24px] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-slate-100/50 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group max-w-sm ${className}`}>
-      <div 
-        style={{ 
+      <div
+        style={{
           backgroundColor: item.bgColor,
           color: item.textColor,
-          width: '40px',
-          height: '40px'
+          width: "40px",
+          height: "40px"
         }}
         className="flex items-center justify-center rounded-full shrink-0 transition-all duration-500 group-hover:scale-105"
       >

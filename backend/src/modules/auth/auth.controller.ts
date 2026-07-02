@@ -15,7 +15,13 @@ import {
 import { Public } from 'src/common/decorators/public.decorator';
 import { Request, Response } from 'express';
 import { AuthService } from './services/auth.service';
-import { LoginDto, GoogleTokenDto, RegisterDto } from './dtos/auth.dto';
+import {
+  ForgotPasswordDto,
+  GoogleTokenDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from './dtos/auth.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { AUTH_MESSAGES } from 'src/common/constants/message.constant';
 import { RateLimitFail } from 'src/common/decorators/rate-limit-fail.decorator';
@@ -41,7 +47,6 @@ export class AuthController {
   @Post('register')
   @UseInterceptors(RateLimitFailInterceptor)
   @RateLimitFail({ type: 'register', limit: 3, ttl: 60, blockDuration: 60 })
-  @ApiRegisterDoc()
   @ApiRegisterDoc()
   async register(
     @Body() registerDto: RegisterDto,
@@ -71,6 +76,20 @@ export class AuthController {
       ip,
       deviceId: deviceId as string,
     });
+  }
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() payload: ForgotPasswordDto, @Ip() ip: string) {
+    return this.authService.requestPasswordReset(payload.email, { ip });
+  }
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() payload: ResetPasswordDto, @Ip() ip: string) {
+    return this.authService.resetPasswordWithOtp(payload, { ip });
   }
 
   @Public()
@@ -122,7 +141,6 @@ export class AuthController {
   @Get('google/callback')
   @ApiGoogleAuthCallbackDoc()
   @UseGuards(GoogleAuthGuard)
-  @ApiGoogleAuthCallbackDoc()
   async googleAuthRedirect(@Req() req: any) {
     const deviceId = req.cookies['device_id'] || req.headers['x-device-id'];
     return this.authService.validateGoogleUser(req.user, deviceId as string);

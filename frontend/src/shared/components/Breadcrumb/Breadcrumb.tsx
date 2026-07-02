@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from "react";
 import { cn } from "@/core/utils/cn";
 
@@ -20,8 +21,9 @@ export const Breadcrumb = ({
   separator = <span className="text-text-disabled text-[12px] font-light">/</span>,
   className
 }: BreadcrumbProps) => {
+  const tExtracted = useTranslations('Extracted.sharedComponentsBreadcrumbBreadcrumb');
   return (
-    <nav className={cn('flex py-2 font-sans', className)} aria-label="Breadcrumb">
+    <nav className={cn('flex py-2 font-sans', className)} aria-label={tExtracted('breadcrumb')}>
       <ol className="flex flex-wrap items-center p-0 m-0 gap-2 list-none">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
@@ -38,8 +40,8 @@ export const Breadcrumb = ({
           return (
             <li key={index} className="flex items-center gap-2 text-body-sm">
               {!isLast && item.href ? (
-                <a 
-                  href={item.href} 
+                <a
+                  href={item.href}
                   className="inline-flex items-center gap-1.5 text-primary no-underline font-medium transition-opacity hover:opacity-80 hover:underline"
                 >
                   {item.icon && (

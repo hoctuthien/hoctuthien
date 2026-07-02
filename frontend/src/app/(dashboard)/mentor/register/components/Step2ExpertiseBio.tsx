@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function Step2ExpertiseBio({ form }: Props) {
-  const t = useTranslations("MentorRegister");
+  const tExtracted = useTranslations('Extracted.appDashboardMentorRegisterComponentsStep2ExpertiseBio');  const t = useTranslations("MentorRegister");
   const { register, formState: { errors }, watch, setValue } = form;
   const selectedSkills = watch("skills") || [];
   const [customSkill, setCustomSkill] = useState("");
@@ -50,7 +50,7 @@ export default function Step2ExpertiseBio({ form }: Props) {
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-500">
-      
+
       {/* Expertise Selection */}
       <div className="flex flex-col gap-4">
         <label className="text-sm font-semibold text-[#181C20] font-[Montserrat]">
@@ -66,8 +66,8 @@ export default function Step2ExpertiseBio({ form }: Props) {
                 onClick={() => toggleSkill(opt.label)}
                 className={cn(
                   "relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-300 gap-3 group",
-                  isSelected 
-                    ? "border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10" 
+                  isSelected
+                    ? "border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10"
                     : "border-slate-100 bg-slate-50/50 text-slate-500 hover:border-slate-200 hover:bg-white"
                 )}
               >
@@ -93,23 +93,23 @@ export default function Step2ExpertiseBio({ form }: Props) {
         {/* Custom Skills Input */}
         <div className="mt-4 flex flex-col gap-3">
           <Input
-            placeholder={t("addSkillPlaceholder")}
+            placeholder={t('addSkillPlaceholder')}
             value={customSkill}
             onChange={(e) => setCustomSkill(e.target.value)}
             onKeyDown={addCustomSkill}
             iconLeft={<Icon name="Plus" className="text-slate-400" size={18} />}
           />
-          
+
           {customSkills.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {customSkills.map((skill) => (
-                <div 
+                <div
                   key={skill}
                   className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full text-xs font-semibold text-slate-700 shadow-sm animate-in zoom-in-95 duration-200"
                 >
                   {skill}
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => toggleSkill(skill)}
                     className="text-slate-400 hover:text-red-500 transition-colors"
                   >
@@ -130,8 +130,8 @@ export default function Step2ExpertiseBio({ form }: Props) {
 
       {/* Bio */}
       <Textarea
-        label={t("professionalBio")}
-        placeholder={t("bioPlaceholder")}
+        label={t('professionalBio')}
+        placeholder={t('bioPlaceholder')}
         {...register("bio")}
         error={errors.bio?.message}
         className="min-h-[150px]"
@@ -139,8 +139,8 @@ export default function Step2ExpertiseBio({ form }: Props) {
 
       {/* Note to Admin */}
       <Textarea
-        label={t("noteToAdmin")}
-        placeholder={t("notePlaceholder")}
+        label={t('noteToAdmin')}
+        placeholder={t('notePlaceholder')}
         {...register("note")}
         error={errors.note?.message}
         className="min-h-[100px]"

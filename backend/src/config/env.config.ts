@@ -28,4 +28,18 @@ export default () => ({
     url: process.env.OPENINARY_URL,
     apiKey: process.env.OPENINARY_API_KEY,
   },
+  mail: {
+    enabled: process.env.MAIL_ENABLED === 'true',
+    host: process.env.MAIL_HOST,
+    port: parseInt(process.env.MAIL_PORT || '587', 10),
+    secure: process.env.MAIL_SECURE === 'true',
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+    fromName: process.env.MAIL_FROM_NAME || 'HocTuThien',
+    fromEmail: process.env.MAIL_FROM_EMAIL,
+    replyTo: process.env.MAIL_REPLY_TO,
+    frontendBaseUrl: process.env.FRONTEND_BASE_URL,
+    publicAssetBaseUrl:
+      process.env.PUBLIC_ASSET_BASE_URL || process.env.FRONTEND_BASE_URL,
+  },
 });
