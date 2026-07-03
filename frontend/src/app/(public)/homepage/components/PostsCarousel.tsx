@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Icon } from "@/core/ui/Icon";
 import { Badge } from "@/core/ui/Badge";
+import { Icon } from "@/core/ui/Icon";
 
 interface Post {
   id: string;
@@ -32,57 +32,13 @@ interface PostsCarouselProps {
 export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
   const tExtracted = useTranslations('Extracted.appPublicHomepageComponentsPostsCarousel');
   const t = useTranslations("Homepage");
-  const tCommon = useTranslations("Common");
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
-  // Fallback beautiful mockup data in case there are no posts in the DB
-  const mockPosts: Post[] = [
-    {
-      id: "mock-1",
-      title: tExtracted('hanhTrinhMangLopHocYeuThuongLen'),
-      slug: "hanh-trinh-mang-lop-hoc-yeu-thuong-len-ban-cao",
-      summary: "Chia sẻ những kỷ niệm và câu chuyện cảm động về dự án xây dựng trường học kiên cố cho hơn 120 học sinh nghèo tại vùng núi cao.",
-      createdAt: new Date().toISOString(),
-      publishedAt: new Date().toISOString(),
-      category: { name: "Hoạt động từ thiện", slug: "tu-thien" },
-      metadata: { thumbnail: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop" }
-    },
-    {
-      id: "mock-2",
-      title: tExtracted('phuongPhapDayTiengAnhSangTaoCho'),
-      slug: "phuong-phap-day-tieng-anh-sang-tao",
-      summary: "Khám phá các công cụ hỗ trợ và giáo án trực quan giúp các em dễ dàng tiếp thu ngôn ngữ mới một cách đầy hứng khởi.",
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      publishedAt: new Date(Date.now() - 86400000).toISOString(),
-      category: { name: "Chia sẻ tri thức", slug: "giao-duc" },
-      metadata: { thumbnail: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=800&auto=format&fit=crop" }
-    },
-    {
-      id: "mock-3",
-      title: tExtracted('quyenGopTuSachLopHocMoRa'),
-      slug: "quyen-gop-tu-sach-lop-hoc",
-      summary: "Chiến dịch quyên góp sách cũ và tài liệu học tập thiết thực đã tiếp cận hơn 50 trường học nghèo miền Trung trong năm qua.",
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-      publishedAt: new Date(Date.now() - 172800000).toISOString(),
-      category: { name: "Chiến dịch cộng đồng", slug: "cong-dong" },
-      metadata: { thumbnail: "https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=800&auto=format&fit=crop" }
-    },
-    {
-      id: "mock-4",
-      title: tExtracted('lanToaCongNgheSoPhoCapLap'),
-      slug: "lan-toa-cong-nghe-so-pho-cap-lap-trinh",
-      summary: "Dự án mang máy tính cũ lắp đặt phòng máy và giảng dạy tư duy thuật toán cơ bản cho thanh thiếu niên có hoàn cảnh đặc biệt.",
-      createdAt: new Date(Date.now() - 259200000).toISOString(),
-      publishedAt: new Date(Date.now() - 259200000).toISOString(),
-      category: { name: "Công nghệ & Giáo dục", slug: "cong-nghe" },
-      metadata: { thumbnail: "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop" }
-    }
-  ];
-
-  // If there are real database posts, use them, otherwise use the beautiful fallback mocks
-  const activePosts = initialPosts.length > 0 ? initialPosts : mockPosts;
+  if (initialPosts.length === 0) {
+    return null;
+  }
 
   const updateScrollState = () => {
     if (carouselRef.current) {
@@ -97,7 +53,6 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
     if (el) {
       el.addEventListener("scroll", updateScrollState);
       updateScrollState();
-      // Recalculate on window resize
       window.addEventListener("resize", updateScrollState);
     }
     return () => {
@@ -106,12 +61,12 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
       }
       window.removeEventListener("resize", updateScrollState);
     };
-  }, [activePosts]);
+  }, [initialPosts]);
 
   const scroll = (direction: "left" | "right") => {
     if (carouselRef.current) {
       const { clientWidth } = carouselRef.current;
-      const scrollAmount = clientWidth * 0.75; // Scroll 75% of container width
+      const scrollAmount = clientWidth * 0.75;
       carouselRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -134,12 +89,10 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
 
   return (
     <section className="py-24 bg-slate-50/60 border-y border-slate-100 overflow-hidden relative">
-      {/* Visual background details */}
       <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container-custom relative z-10">
-        {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div className="max-w-2xl">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-wider mb-4">
@@ -153,7 +106,6 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
             </p>
           </div>
 
-          {/* Navigation Chevrons */}
           <div className="flex gap-3 self-end md:self-auto">
             <button
               onClick={() => scroll("left")}
@@ -182,12 +134,11 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
           </div>
         </div>
 
-        {/* Carousel Container */}
         <div
           ref={carouselRef}
           className="flex gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory no-scrollbar pb-6 -mx-4 px-4 sm:mx-0 sm:px-0"
         >
-          {activePosts.map((post) => {
+          {initialPosts.map((post) => {
             const imageUrl = post.metadata?.thumbnail || post.coverImage?.url;
             const categoryName = post.category?.name || t("uncategorized");
 
@@ -196,7 +147,6 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
                 key={post.id}
                 className="flex-shrink-0 w-[290px] sm:w-[340px] snap-start bg-white rounded-3xl border border-slate-100/80 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 flex flex-col group"
               >
-                {/* Square Cover Image Container */}
                 <div className="relative aspect-square w-full overflow-hidden bg-slate-50">
                   {imageUrl ? (
                     <img
@@ -211,7 +161,6 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
                     </div>
                   )}
 
-                  {/* Absolute Category Tag */}
                   <div className="absolute top-4 left-4">
                     <Badge
                       variant="primary"
@@ -222,22 +171,18 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
                   </div>
                 </div>
 
-                {/* Card Content Body */}
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div>
-                    {/* Date Details */}
                     <div className="flex items-center gap-2 text-[10px] text-slate-400 font-extrabold uppercase tracking-wider mb-3">
                       <span>{tExtracted('admin')}</span>
                       <span className="w-1 h-1 rounded-full bg-slate-300" />
                       <span>{formatDate(post.publishedAt || post.createdAt)}</span>
                     </div>
 
-                    {/* Post Title */}
                     <h3 className="text-lg font-black text-slate-900 leading-snug group-hover:text-primary transition-colors duration-300 line-clamp-2">
                       {post.title}
                     </h3>
 
-                    {/* Excerpt/Summary */}
                     {post.summary && (
                       <p className="text-slate-500 text-xs font-medium mt-2.5 leading-relaxed line-clamp-2">
                         {post.summary}
@@ -245,7 +190,6 @@ export function PostsCarousel({ initialPosts }: PostsCarouselProps) {
                     )}
                   </div>
 
-                  {/* Read More Action */}
                   <Link href={`/posts/${post.slug}`} className="block mt-6">
                     <button className="flex items-center gap-1.5 font-extrabold text-primary text-xs hover:gap-2.5 transition-all duration-300">
                       <span>{t("readMore")}</span>

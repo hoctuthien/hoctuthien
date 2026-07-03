@@ -50,8 +50,8 @@ export class MentorAvailabilityEntity extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: ['PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED'],
-    default: 'PENDING',
+    enum: MentorAvailabilityStatus,
+    default: MentorAvailabilityStatus.PENDING,
   })
   status: MentorAvailabilityStatus;
 

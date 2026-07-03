@@ -4,6 +4,7 @@ import nodemailer, { Transporter } from 'nodemailer';
 import {
   buildCourseBookingEmailTemplate,
   buildPasswordResetOtpEmailTemplate,
+  buildPaymentTransactionEmailTemplate,
   buildRegistrationEmailTemplate,
   buildMentorBookingNotificationEmailTemplate,
   buildMentorApprovalEmailTemplate,
@@ -95,28 +96,20 @@ export class MailService {
     transactionCode: string;
     qrUrl: string;
   }) {
-    const subject = `Giao dịch phát sinh: ${input.paymentType.toUpperCase()} - ${input.transactionCode}`;
-    const intro = `Hệ thống vừa phát sinh một yêu cầu thanh toán mới.`;
-    const summary = `
-      Loại giao dịch: ${input.paymentType.toUpperCase()} <br/>
-      Mã chuyển khoản (Nội dung CK): <strong>${input.transactionCode}</strong> <br/>
-      Số tiền: <strong>${input.amount.toLocaleString('vi-VN')} VND</strong> <br/>
-      Link QR: <a href="${input.qrUrl}">${input.qrUrl}</a>
-    `;
+    const template = buildPaymentTransactionEmailTemplate({
+      paymentType: input.paymentType,
+      amount: input.amount,
+      transactionCode: input.transactionCode,
+      qrUrl: input.qrUrl,
+      frontendBaseUrl: this.frontendBaseUrl,
+      logoUrl: this.getLogoUrl(),
+    });
 
     await this.sendMail({
       to: input.to,
-      subject,
-      text: `${intro}\n\nLoại giao dịch: ${input.paymentType}\nMã chuyển khoản: ${input.transactionCode}\nSố tiền: ${input.amount} VND\nQR URL: ${input.qrUrl}`,
-      html: buildCourseBookingEmailTemplate({
-        recipientName: 'Ban quản trị',
-        courseTitle: `Giao dịch ${input.paymentType.toUpperCase()}`,
-        mentorName: `Nội dung: ${input.transactionCode}`,
-        meetingTimeLabel: `Số tiền: ${input.amount.toLocaleString('vi-VN')}đ`,
-        status: 'pending',
-        frontendBaseUrl: this.frontendBaseUrl,
-        logoUrl: this.getLogoUrl(),
-      }).html,
+      subject: template.subject,
+      text: template.text,
+      html: template.html,
     });
   }
 

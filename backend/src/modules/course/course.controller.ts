@@ -11,6 +11,7 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { AppLogger } from '../../common/logger/app-logger.service';
 import { CourseService } from './services/course.service';
 import {
@@ -46,6 +47,7 @@ export class CourseController {
   constructor(
     private readonly courseService: CourseService,
     private readonly logger: AppLogger,
+    private readonly jwtService: JwtService,
   ) {
     this.logger.setContext(CourseController.name);
   }
@@ -66,7 +68,7 @@ export class CourseController {
   @Get()
   @ApiFindAllCoursesDoc()
   @Public()
-  findAll(@Query() query: FindCoursesQuery, @Req() req: any) {
+  async findAll(@Query() query: FindCoursesQuery, @Req() req: any) {
     this.logger.log({ query }, 'Finding all courses');
     let userRole: string | undefined = undefined;
     let userId: string | undefined = undefined;
@@ -83,16 +85,13 @@ export class CourseController {
     }
     if (token) {
       try {
-        const parts = token.split('.');
-        if (parts.length === 3) {
-          const payload = JSON.parse(
-            Buffer.from(parts[1], 'base64').toString('utf-8'),
-          );
-          userRole = payload.role;
-          userId = payload.sub || payload.id;
-        }
+        // Optional auth: verify the signature so an unauthenticated caller
+        // cannot forge a role/id to see non-ACTIVE or other mentors' courses.
+        const payload = await this.jwtService.verifyAsync(token);
+        userRole = payload.role;
+        userId = payload.sub || payload.id;
       } catch (e) {
-        // ignore decoding errors
+        // invalid/expired token on a public route: treat as anonymous
       }
     }
     return this.courseService.findAll(query, userRole, userId);

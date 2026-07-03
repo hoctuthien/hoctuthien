@@ -11,7 +11,7 @@ import {
   UpdateCourseInput,
   ApproveCourseInput,
 } from '../types/course.types';
-import { DataSource, ILike, In } from 'typeorm';
+import { DataSource, ILike, In, Raw } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { CourseCategoryEntity } from '../../course-category/entities/course-category.entity';
 import { MentorProfileEntity } from '../../mentor-profile/entities/mentor-profile.entity';
@@ -102,6 +102,12 @@ export class CourseService {
       where['status'] = CourseStatus.ACTIVE;
     }
 
+    if (isFree === true) {
+      where['price'] = Raw((alias) => `${alias} = 0`);
+    } else if (isFree === false) {
+      where['price'] = Raw((alias) => `${alias} > 0`);
+    }
+
     const [items, total] = await this.courseRepository.findManyWithCount({
       where,
       order: sortBy === 'newest' || !sortBy ? { createdAt: 'DESC' } : { createdAt: 'DESC' },
@@ -109,13 +115,7 @@ export class CourseService {
       take: limit,
     });
 
-    let results = items.map((course) => courseSchema.parse(course));
-
-    if (isFree === true) {
-      results = results.filter((c) => Number(c.price) === 0);
-    } else if (isFree === false) {
-      results = results.filter((c) => Number(c.price) > 0);
-    }
+    const results = items.map((course) => courseSchema.parse(course));
 
     return {
       items: results,

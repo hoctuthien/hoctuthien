@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { cn } from "@/core/utils/cn";
+import { SITE_URL } from "@/core/utils/site";
 import { Providers } from "./providers";
 import { AuthProvider } from "./auth-provider";
 import { DeviceInitializer } from "@/shared/components/DeviceInitializer";
@@ -20,17 +21,20 @@ const montserrat = Montserrat({
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Metadata");
   return {
-    metadataBase: new URL("https://hoctuthien.com"),
-    title: t("siteTitle"),
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: t("siteTitle"),
+      template: `%s | ${t("siteTitle")}`,
+    },
     description: t("siteDescription"),
     icons: { icon: "/images/avatar_browser.png" },
     openGraph: {
       title: t("siteTitle"),
       description: t("siteDescription"),
-      url: "https://hoctuthien.com",
+      url: SITE_URL,
       siteName: t("siteTitle"),
       images: [{
-        url: "https://hoctuthien.com/images/avatar_main.png",
+        url: `${SITE_URL}/images/avatar_main.png`,
         width: 1200,
         height: 630,
         alt: t("ogAlt"),
@@ -42,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: t("siteTitle"),
       description: t("siteDescription"),
-      images: ["https://hoctuthien.com/images/avatar_main.png"],
+      images: [`${SITE_URL}/images/avatar_main.png`],
     },
   };
 }

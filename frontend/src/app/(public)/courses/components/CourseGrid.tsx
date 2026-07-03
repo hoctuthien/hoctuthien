@@ -64,7 +64,7 @@ const CourseCard = ({ course }: { course: Course }) => {
         {/* Rating badge */}
         <div className="flex items-center gap-1.5 bg-slate-50 text-slate-700 px-3 py-1.5 rounded-full text-sm font-bold border border-slate-100 shadow-sm">
           <LuStar size={14} className="fill-amber-400 text-amber-400" />
-          <span>{course.rating > 0 ? course.rating.toFixed(1) : "4.8"}</span>
+          <span>{course.rating > 0 ? course.rating.toFixed(1) : tExtracted('chuaCoDanhGia')}</span>
         </div>
       </div>
 

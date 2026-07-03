@@ -115,8 +115,15 @@ export class MentorAvailabilityController {
   update(
     @Param('id') id: string,
     @Body() payload: UpdateMentorAvailabilityDto,
+    @User('id') requestingUserId: string,
+    @User('role') requestingUserRole: string,
   ) {
-    return this.mentorAvailabilityService.update(id, payload);
+    return this.mentorAvailabilityService.update(
+      id,
+      payload,
+      requestingUserId,
+      requestingUserRole,
+    );
   }
 
   /**

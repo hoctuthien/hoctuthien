@@ -17,7 +17,7 @@ const categoryProperties = {
     nullable: true,
     example: 'https://example.com/icon.png',
   },
-  metadata: { type: 'object', example: {} },
+  metadata: { type: 'object', example: { icon: 'Code2' } },
   status: { type: 'string', example: 'ACTIVE' },
 
   createdAt: { type: 'string', format: 'date-time' },
@@ -46,7 +46,7 @@ export const ApiCreateCategoryDoc = () => {
             nullable: true,
             example: 'https://example.com/icon.png',
           },
-          metadata: { type: 'object', example: { color: '#ff0000' } },
+          metadata: { type: 'object', example: { icon: 'Code2', color: '#ff0000' } },
           status: {
             type: 'string',
             example: 'ACTIVE',
@@ -175,7 +175,7 @@ export const ApiUpdateCategoryDoc = () => {
           name: { type: 'string', maxLength: 255 },
           slug: { type: 'string', maxLength: 255 },
           iconUrl: { type: 'string', maxLength: 500, nullable: true },
-          metadata: { type: 'object' },
+          metadata: { type: 'object', example: { icon: 'Code2' } },
           status: { type: 'string', example: 'ACTIVE' },
         },
       },

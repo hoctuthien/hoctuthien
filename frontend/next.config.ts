@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     const backendUrl = (process.env.BACKEND_URL || 'http://localhost:5050').replace(/\/$/, '');
-    
+
     return {
       fallback: [
         {
@@ -45,6 +45,38 @@ const nextConfig: NextConfig = {
         },
       ],
     };
+  },
+  async headers() {
+    // Chặn index các trang riêng tư (dashboard/mentor/admin/auth) ở mức header,
+    // vì layout của các route này là Client Component nên không thể export `metadata.robots`.
+    const noIndexHeader = {
+      key: 'X-Robots-Tag',
+      value: 'noindex, nofollow',
+    };
+    const privatePaths = [
+      '/dashboard',
+      '/dashboard/:path*',
+      '/calendar',
+      '/calendar/:path*',
+      '/my-courses',
+      '/my-courses/:path*',
+      '/profile',
+      '/profile/:path*',
+      '/mentor',
+      '/mentor/:path*',
+      '/activation',
+      '/activation/:path*',
+      '/login',
+      '/register',
+      '/forgot-password',
+      '/admin',
+      '/admin/:path*',
+    ];
+
+    return privatePaths.map((source) => ({
+      source,
+      headers: [noIndexHeader],
+    }));
   },
   experimental: {
     serverActions: {
