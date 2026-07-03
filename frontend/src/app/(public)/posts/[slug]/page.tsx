@@ -8,6 +8,7 @@ import { Badge } from "@/core/ui/Badge";
 import { getPostAction } from "@/app/admin/posts/actions/posts";
 import { PostContent } from "./components/PostContent";
 import { auth } from "@/auth";
+import { SITE_URL } from "@/core/utils/site";
 
 export const dynamic = "force-dynamic";
 
@@ -78,7 +79,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     // Process cover / thumbnail URL to ensure it is properly encoded (no space characters)
     let imageUrl = post.metadata?.image || post.metadata?.thumbnail || post.coverImage?.url;
-    const appUrl = process.env.AUTH_URL || "https://beta-app.hoctuthien.com";
+    const appUrl = SITE_URL;
 
     if (imageUrl) {
       if (imageUrl.startsWith("/")) {

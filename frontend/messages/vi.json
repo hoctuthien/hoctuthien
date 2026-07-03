@@ -14,7 +14,6 @@
     "postFallbackTitle": "Bài viết | Học Từ Thiện",
     "postFallbackDescription": "Đọc các câu chuyện và kiến thức từ nền tảng Học Từ Thiện."
   },
-
   "Common": {
     "brandName": "Học Từ Thiện",
     "home": "Trang chủ",
@@ -45,7 +44,6 @@
     "createdCourses": "Khóa học đã tạo",
     "signOut": "Đăng xuất"
   },
-
   "Homepage": {
     "heroTitle1": "Học để Chia sẻ",
     "heroTitle2": "Dạy để Kiến tạo",
@@ -67,32 +65,16 @@
     "premiumCourses": "Khóa học cao cấp",
     "premiumCoursesDesc": "Chọn từ một loạt các khóa học chuyên sâu được thiết kế để giúp bạn xuất sắc trong lĩnh vực đã chọn.",
     "allCategories": "Tất cả danh mục",
-    "marketing": "Marketing",
-    "design": "Thiết kế",
-    "business": "Kinh doanh",
-    "technology": "Công nghệ",
     "instructorTitle": "Chuyên gia của chúng tôi",
     "instructorHeading": "Đội ngũ giảng viên chuyên nghiệp",
-    "mathExpert": "Chuyên gia Toán học",
-    "scienceResearcher": "Nhà nghiên cứu Khoa học",
-    "globalHistorian": "Nhà sử học Thế giới",
-    "financialAnalyst": "Chuyên viên Phân tích Tài chính",
     "joinWithMe": "Tham gia cùng tôi",
     "viewAllInstructors": "Xem tất cả giảng viên",
-    "testimonialsTitle": "Đánh giá",
-    "testimonialsHeading": "Sự hài lòng luôn hiện hữu",
-    "student": "Học viên",
-    "happyStudents": "Tham gia cùng hơn 2,000 học viên hạnh phúc trên toàn thế giới",
     "newsletterHeading": "Đăng ký để nhận cập nhật hàng ngày về khóa học mới",
     "newsletterDesc": "Nhận thông báo về các khóa học mới, ưu đãi đặc biệt và cập nhật ngành.",
     "becomeMentorTitle": "Trở thành Cố vấn",
     "becomeMentorHeading": "Chia sẻ tri thức, kiến tạo tương lai",
     "becomeMentorDesc": "Tham gia cùng đội ngũ chuyên gia của chúng tôi để chia sẻ kinh nghiệm và hướng dẫn thế hệ tài năng tiếp theo.",
     "becomeMentorButton": "Đăng ký làm Mentor ngay",
-    "mathematicsDesc": "Làm chủ các phương trình phức tạp và tư duy logic.",
-    "scienceDesc": "Khám phá những bí ẩn của thế giới tự nhiên.",
-    "geographyDesc": "Hiểu về hành tinh của chúng ta và các nền văn hóa đa dạng.",
-    "economicsDesc": "Phân tích thị trường và hệ thống tài chính toàn cầu.",
     "brandDescription": "Nền tảng giáo dục phi lợi nhuận, kết nối tri thức và lan tỏa yêu thương thông qua các khóa học và chương trình cố vấn chất lượng cao.",
     "latestPosts": "Bài viết & Tin tức mới nhất",
     "latestPostsDesc": "Cập nhật những kiến thức, câu chuyện ý nghĩa và hoạt động giáo dục từ cộng đồng của chúng tôi.",
@@ -100,7 +82,6 @@
     "noPostsFound": "Không tìm thấy bài viết nào.",
     "uncategorized": "Chưa phân loại"
   },
-
   "Auth": {
     "backToHome": "Quay lại Trang chủ",
     "heroTitle": "Khám phá những ranh giới mới của học thuật xuất sắc.",
@@ -108,7 +89,6 @@
     "policy": "Chính sách",
     "aboutUs": "Về chúng tôi",
     "reportIssue": "Báo lỗi",
-
     "welcomeBack": "Chào mừng trở lại!",
     "loginSubtitle": "Chào mừng bạn quay trở lại với Học Từ Thiện. Vui lòng nhập thông tin để truy cập vào tài khoản của bạn.",
     "signInWithGoogle": "Đăng nhập bằng Google",
@@ -123,7 +103,6 @@
     "createAccount": "Tạo tài khoản mới",
     "showPassword": "Hiện mật khẩu",
     "hidePassword": "Ẩn mật khẩu",
-
     "createAccountTitle": "Khai phá tiềm năng của bạn",
     "createAccountSubtitle": "Tạo tài khoản để truy cập vào kho tài nguyên học thuật độc quyền của chúng tôi.",
     "fullName": "Họ và tên",
@@ -135,11 +114,9 @@
     "alreadyHaveAccount": "Bạn đã có tài khoản?",
     "agreeToTerms": "Tôi đồng ý với",
     "termsOfService": "Điều khoản dịch vụ",
-
     "loginLoadingText": "Đang tải trang đăng nhập...",
     "registerLoadingText": "Đang chuẩn bị trang đăng ký..."
   },
-
   "Validation": {
     "emailRequired": "Vui lòng nhập địa chỉ email.",
     "emailInvalid": "Địa chỉ email không đúng định dạng.",
@@ -150,7 +127,6 @@
     "passwordsMustMatch": "Mật khẩu xác nhận không khớp.",
     "dataInvalid": "Dữ liệu không hợp lệ."
   },
-
   "Error": {
     "default": "Đã có lỗi xảy ra. Vui lòng thử lại sau.",
     "pageTitle": "Đã có lỗi xảy ra!",
@@ -161,7 +137,6 @@
     "forbidden": "Phiên làm việc đã hết hạn.",
     "invalidCredentials": "Email hoặc mật khẩu không chính xác. Vui lòng thử lại."
   },
-
   "Success": {
     "default": "Thao tác thành công.",
     "created": "Đã tạo thành công.",
@@ -190,7 +165,6 @@
     "errorMessage": "Đã có lỗi xảy ra, vui lòng thử lại sau.",
     "backToHome": "Về trang chủ",
     "close": "Đóng",
-
     "jobTitle": "Chức danh công việc",
     "jobTitlePlaceholder": "VD: Senior Software Engineer",
     "company": "Công ty",
@@ -199,7 +173,6 @@
     "yearsOfExperiencePlaceholder": "VD: 5",
     "linkedinUrl": "Link hồ sơ LinkedIn",
     "linkedinPlaceholder": "https://linkedin.com/in/your-profile",
-
     "teachingExpertise": "Lĩnh vực chuyên môn",
     "addSkillPlaceholder": "Thêm kỹ năng khác (nhấn Enter)...",
     "professionalBio": "Giới thiệu chuyên môn",
@@ -207,14 +180,12 @@
     "noteToAdmin": "Ghi chú cho Admin (Tùy chọn)",
     "notePlaceholder": "Bất kỳ thông tin bổ sung nào bạn muốn chia sẻ với đội ngũ đánh giá...",
     "reviewInfo": "Đơn đăng ký của bạn sẽ được đội ngũ của chúng tôi xem xét trong vòng 3-5 ngày làm việc. Sau khi được phê duyệt, bạn sẽ có thể tạo khóa học và bắt đầu cố vấn.",
-
     "expSoftware": "Phát triển phần mềm",
     "expDataScience": "Khoa học dữ liệu",
     "expDesign": "Thiết kế & Sáng tạo",
     "expBusiness": "Kinh doanh & Marketing",
     "expLanguage": "Ngôn ngữ & Văn học",
     "expScience": "Khoa học & Kỹ thuật",
-
     "certificates": "Chứng chỉ",
     "certificatesDesc": "Chứng chỉ chuyên môn, chứng chỉ ngoại ngữ (IELTS, v.v.)",
     "addCertificate": "Thêm chứng chỉ",
@@ -224,7 +195,6 @@
     "issuedByPlaceholder": "VD: Amazon Web Services",
     "verificationUrl": "Link ảnh xác minh",
     "noCertificates": "Chưa có chứng chỉ nào được thêm.",
-
     "degrees": "Bằng cấp học thuật",
     "degreesDesc": "Bằng đại học, bằng tốt nghiệp, v.v.",
     "addDegree": "Thêm bằng cấp",
@@ -233,7 +203,6 @@
     "university": "Trường đại học",
     "universityPlaceholder": "VD: Đại học Bách Khoa",
     "noDegrees": "Chưa có bằng cấp nào được thêm.",
-
     "validation": {
       "jobTitleMin": "Chức danh phải có ít nhất 2 ký tự",
       "companyMin": "Tên công ty phải có ít nhất 2 ký tự",
@@ -395,9 +364,7 @@
     "severityMedium": "Trung bình",
     "severityHigh": "Cao",
     "severityCritical": "Nghiêm trọng"
-  }
-
-,
+  },
   "PageMetadata": {
     "dashboard_calendar": {
       "title": "Lịch học & Lịch dạy | Học Từ Thiện",
@@ -446,6 +413,45 @@
     "admin_bugreports": {
       "title": "Báo cáo lỗi | Admin - Học Từ Thiện",
       "description": "Quản lý và xử lý các báo cáo lỗi từ học viên và mentor."
+    },
+    "public_home": {
+      "title": "Học Từ Thiện | Kết nối tri thức, lan toả yêu thương",
+      "description": "Nền tảng học tập thiện nguyện, kết nối học viên với các Cố vấn (Mentor) tận tâm, mang tri thức chất lượng đến với mọi người."
+    },
+    "public_mentorship": {
+      "title": "Cố vấn học tập | Học Từ Thiện",
+      "description": "Tìm kiếm và kết nối với các Cố vấn (Mentor) giàu kinh nghiệm, đồng hành cùng bạn trên hành trình học tập."
+    },
+    "public_campaigns": {
+      "title": "Chiến dịch thiện nguyện | Học Từ Thiện",
+      "description": "Theo dõi các chiến dịch gây quỹ và hoạt động thiện nguyện đang diễn ra tại Học Từ Thiện."
+    },
+    "public_leaderboard": {
+      "title": "Bảng xếp hạng | Học Từ Thiện",
+      "description": "Vinh danh những học viên và Cố vấn tích cực nhất trong cộng đồng Học Từ Thiện."
+    },
+    "public_transparency": {
+      "title": "Minh bạch tài chính | Học Từ Thiện",
+      "description": "Báo cáo minh bạch về nguồn thu, chi và tác động của các chiến dịch thiện nguyện tại Học Từ Thiện."
+    },
+    "public_mentor_profile": {
+      "title": "Hồ sơ Cố vấn | Học Từ Thiện",
+      "description": "Xem thông tin, kỹ năng và các khóa học đang giảng dạy của Cố vấn trên Học Từ Thiện."
+    },
+    "public_course_detail": {
+      "title": "{courseTitle} | Học Từ Thiện",
+      "siteName": "Học Từ Thiện",
+      "defaultDescription": "Khóa học chất lượng cao được thiết kế và cố vấn bởi chuyên gia thực chiến trên Học Từ Thiện.",
+      "notFoundTitle": "Khóa học không tồn tại | Học Từ Thiện",
+      "notFoundDescription": "Khóa học bạn tìm không tồn tại hoặc đã bị gỡ bỏ."
+    },
+    "public_mentor_detail": {
+      "title": "{mentorName} - Hồ sơ Cố vấn | Học Từ Thiện",
+      "siteName": "Học Từ Thiện",
+      "fallbackName": "Cố vấn",
+      "defaultDescription": "Xem thông tin, kỹ năng và các khóa học đang giảng dạy của Cố vấn trên Học Từ Thiện.",
+      "notFoundTitle": "Không tìm thấy hồ sơ Cố vấn | Học Từ Thiện",
+      "notFoundDescription": "Hồ sơ Cố vấn bạn tìm không tồn tại hoặc đã bị gỡ bỏ."
     }
   },
   "Extracted": {
@@ -962,7 +968,8 @@
       "xemChiTiet": "Xem chi tiết",
       "khongTimThayKhoaHoc": "Không tìm thấy khóa học",
       "chuaCoKhoaHocNaoPhuHopVoi": "Chưa có khóa học nào phù hợp với bộ lọc này.",
-      "xemTatCaKhoaHoc": "Xem tất cả khóa học"
+      "xemTatCaKhoaHoc": "Xem tất cả khóa học",
+      "chuaCoDanhGia": "Mới"
     },
     "appPublicCoursesComponentsCourseHero": {
       "institutionalLearning": "Institutional Learning",
@@ -1088,6 +1095,8 @@
       "taoDanhMuc": "Tạo danh mục"
     },
     "appPublicCoursesDetailIdPage": {
+      "danhGia": "đánh giá",
+      "chuaCoDanhGia": "Chưa có đánh giá",
       "khoaHocKhongTonTaiHoacDaBi": "Khóa học không tồn tại hoặc đã bị gỡ bỏ.",
       "khongTheKetNoiVoiMayChuDe": "Không thể kết nối với máy chủ để lấy thông tin khóa học.",
       "vuiLongDangNhapTaiKhoanHocVien": "Vui lòng đăng nhập tài khoản Học viên để thực hiện đăng ký khóa học.",
@@ -1201,9 +1210,6 @@
       "dangTai": "Đang tải...",
       "khongTheTaiDanhSachKhoaHocVui": "Không thể tải danh sách khóa học. Vui lòng thử lại sau."
     },
-    "appPublicHomepageComponentsCourseCategories": {
-      "masterComplexTopicsWithExpertGuidance": "Master complex topics with expert guidance."
-    },
     "appPublicHomepageComponentsFeaturesSection": {
       "benefit": "Benefit"
     },
@@ -1215,16 +1221,9 @@
       "scrollRight": "Scroll right"
     },
     "appPublicHomepageComponentsPostsCarousel": {
-      "hanhTrinhMangLopHocYeuThuongLen": "Hành trình mang lớp học yêu thương lên bản cao Hà Giang",
-      "phuongPhapDayTiengAnhSangTaoCho": "Phương pháp dạy tiếng Anh sáng tạo cho trẻ em khuyết tật",
-      "quyenGopTuSachLopHocMoRa": "Quyên góp tủ sách lớp học - Mở ra bầu trời mơ ước cho em",
-      "lanToaCongNgheSoPhoCapLap": "Lan tỏa công nghệ số - Phổ cập lập trình miễn phí vùng sâu",
       "scrollLeft": "Scroll left",
       "scrollRight": "Scroll right",
       "admin": "Admin"
-    },
-    "appPublicHomepageComponentsTestimonials": {
-      "text2k": "+2K"
     },
     "appPublicHomepageError": {
       "somethingWentWrong": "Something went wrong!",

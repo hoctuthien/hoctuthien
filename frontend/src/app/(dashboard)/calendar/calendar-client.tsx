@@ -105,7 +105,7 @@ export default function CalendarClient() {
     const isValid = bTime && !isNaN(bTime.getTime());
     return {
       id: b.id,
-      timeLabel: isValid ? bTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : tExtracted('chuaDinhGio'),
+      timeLabel: isValid ? bTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' }) : tExtracted('chuaDinhGio'),
       dateStr: (isValid && bTime) ? getLocalDateString(bTime) : '',
       courseTitle: b.course?.title || 'Khóa học',
       partnerName: isMentor ? (b.mentee?.name || 'Học viên') : (b.course?.mentor?.name || 'Cố vấn học tập'),

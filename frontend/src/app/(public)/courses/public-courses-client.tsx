@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Breadcrumb } from "@shared";
 import { courseGateway } from "@/core/gateway";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 
 import { CourseHero } from "./components/CourseHero";
 import { CourseFilters } from "./components/CourseFilters";
@@ -46,6 +47,8 @@ const TAG_MAP: Record<string, string[]> = {
 
 export default function PublicCoursesClient() {
   const tExtracted = useTranslations('Extracted.appPublicCoursesPublicCoursesClient');
+  const searchParams = useSearchParams();
+  const selectedCategoryId = searchParams.get("categoryId") || "";
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState("All Topics");
   const [academicLevel, setAcademicLevel] = useState("");
@@ -94,6 +97,10 @@ export default function PublicCoursesClient() {
       catLower.includes(selectedTag.toLowerCase()) ||
       (TAG_MAP[selectedTag] || []).some((k) => catLower.includes(k));
 
+    const matchCategory =
+      selectedCategoryId === "" ||
+      course.categoryIds?.includes(selectedCategoryId);
+
     const matchLevel =
       academicLevel === "" ||
       normalizeLevel(course.metadata?.level || "") === academicLevel;
@@ -113,7 +120,7 @@ export default function PublicCoursesClient() {
       (priceFilter === "free" && Number(course.price) === 0) ||
       (priceFilter === "paid" && Number(course.price) > 0);
 
-    return matchSearch && matchTag && matchLevel && matchFormat && matchDuration && matchPrice;
+    return matchSearch && matchTag && matchCategory && matchLevel && matchFormat && matchDuration && matchPrice;
   });
 
   return (

@@ -1,11 +1,13 @@
 import {
   Injectable,
   NotFoundException,
+  ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
 import { In, DataSource } from 'typeorm';
 import { ErrorCode, ErrorMessage } from '../../../common/enums/error-code.enum';
 import { MentorAvailabilityStatus } from '../../../common/enums/mentor-availability-status.enum';
+import { Role } from '../../../common/enums/role.enum';
 import { APPLICATION_MESSAGES } from '../../../common/constants/message.constant';
 import { MentorAvailabilityRepository } from '../repositories/mentor-availability.repository';
 import {
@@ -124,7 +126,12 @@ export class MentorAvailabilityService {
     }
   }
 
-  async update(id: string, payload: UpdateMentorAvailabilityInput) {
+  async update(
+    id: string,
+    payload: UpdateMentorAvailabilityInput,
+    requestingUserId: string,
+    requestingUserRole: string,
+  ) {
     return this.dataSource.transaction(async (manager) => {
       const current = await manager.findOne(MentorAvailabilityEntity, {
         where: { id },
@@ -135,7 +142,23 @@ export class MentorAvailabilityService {
         throw new NotFoundException('Mentor availability not found');
       }
 
+      const isAdmin = requestingUserRole === Role.ADMIN;
+
+      if (!isAdmin && current.mentorId !== requestingUserId) {
+        throw new ForbiddenException(
+          'Bạn không có quyền cập nhật yêu cầu này.',
+        );
+      }
+
       const parsed = updateMentorAvailabilitySchema.parse(payload);
+
+      // Chỉ Admin được phép thay đổi status/approvedBy/isActive qua endpoint chung này,
+      // các luồng chuyển trạng thái của Mentee phải đi qua endpoint cancel() riêng.
+      if (!isAdmin) {
+        delete parsed.status;
+        delete parsed.approvedBy;
+        delete parsed.isActive;
+      }
 
       if (
         parsed.status === MentorAvailabilityStatus.IN_PROGRESS &&

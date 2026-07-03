@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { Card } from '@/core/ui/Card';
 import { Icon } from '@/core/ui/Icon';
 import { Button } from '@/core/ui/Button';
-import { MOCK_INSTRUCTORS } from '@/shared/mocks/homepage.mock';
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 
@@ -26,19 +25,13 @@ export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
   const [startX, setStartX] = useState(0);
   const [scrollLeftState, setScrollLeftState] = useState(0);
 
-  const mentorsList = (initialMentors && initialMentors.length > 0)
-    ? initialMentors
-    : MOCK_INSTRUCTORS;
+  if (!initialMentors || initialMentors.length === 0) {
+    return null;
+  }
 
-  const instructors = mentorsList.map((ins) => {
+  const instructors = initialMentors.map((ins) => {
     const name = ins.user?.name || ins.name || "Mentor";
-    const role = ins.jobTitle || (
-      ins.id === 'ins-1' ? t('mathExpert') :
-      ins.id === 'ins-2' ? t('scienceResearcher') :
-      ins.id === 'ins-3' ? t('globalHistorian') :
-      ins.id === 'ins-4' ? t('financialAnalyst') :
-      ins.jobTitle || t('financialAnalyst')
-    );
+    const role = ins.jobTitle || t('mentor');
     const image = ins.user?.avatarUrl || ins.avatarUrl || '/images/avatar_logo.png';
     const targetUserId = ins.userId || ins.user?.id || ins.id;
     return { name, role, image, targetUserId };

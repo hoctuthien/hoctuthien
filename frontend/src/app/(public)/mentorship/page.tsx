@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import { Metadata } from 'next';
 import { MentorshipFilters } from './components/MentorshipFilters';
 import { MentorsGridList } from './components/MentorsGridList';
 import { MentorsGridSkeleton } from './components/MentorsGridSkeleton';
@@ -11,6 +12,15 @@ interface MentorshipPageProps {
     skills?: string;
     minExperience?: string;
   }>;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.public_mentorship");
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: { canonical: "/mentorship" },
+  };
 }
 
 export default async function MentorshipPage({ searchParams }: MentorshipPageProps) {

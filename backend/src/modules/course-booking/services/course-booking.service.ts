@@ -509,6 +509,22 @@ export class CourseBookingService {
     }
 
     const parsed = updateCourseBookingSchema.parse(payload);
+
+    // Chỉ cho phép chuyển sang COMPLETED khi buổi học đã được xác nhận (đã thanh toán/miễn phí)
+    // và thời gian học đã thực sự diễn ra, tránh việc Mentor tự đánh dấu hoàn thành để hợp thức hóa review.
+    if (parsed.status === BookingStatus.COMPLETED) {
+      if (item.status !== BookingStatus.CONFIRMED) {
+        throw new BadRequestException(
+          'Chỉ có thể hoàn thành buổi học đã được xác nhận.',
+        );
+      }
+      if (new Date(item.meetingTime) > new Date()) {
+        throw new BadRequestException(
+          'Không thể đánh dấu hoàn thành khi buổi học chưa diễn ra.',
+        );
+      }
+    }
+
     const updated = await this.courseBookingRepository.updateById(id, parsed);
 
     if (parsed.status === BookingStatus.COMPLETED) {

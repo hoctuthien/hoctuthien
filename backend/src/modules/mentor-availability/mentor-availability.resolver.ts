@@ -126,8 +126,15 @@ export class MentorAvailabilityResolver {
   async update(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateMentorAvailabilityGqlInput,
+    @User('id') requestingUserId: string,
+    @User('role') requestingUserRole: string,
   ) {
-    return this.mentorAvailabilityService.update(id, input);
+    return this.mentorAvailabilityService.update(
+      id,
+      input,
+      requestingUserId,
+      requestingUserRole,
+    );
   }
 
   /**
