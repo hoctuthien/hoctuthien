@@ -271,12 +271,21 @@ export class AuthService implements IAuthService {
     });
     await this.otpRepository.save(otpToken);
 
-    await this.mailService.sendPasswordResetOtpEmail({
-      to: user.email,
-      recipientName: user.name,
-      otp,
-      expiresInMinutes,
-    });
+    // Lỗi gửi mail (SMTP down/rate-limit...) không được làm lộ ra ngoài dưới dạng 500,
+    // vì response message ở endpoint này phải luôn giống nhau bất kể email có tồn tại
+    // hay không (chống email enumeration) — OTP vẫn đã được lưu, user có thể yêu cầu lại.
+    await this.mailService
+      .sendPasswordResetOtpEmail({
+        to: user.email,
+        recipientName: user.name,
+        otp,
+        expiresInMinutes,
+      })
+      .catch((err) => {
+        this.logger.error(
+          `Failed to send password reset OTP email to ${user.email}: ${err?.message || err}`,
+        );
+      });
 
     return {
       message:
