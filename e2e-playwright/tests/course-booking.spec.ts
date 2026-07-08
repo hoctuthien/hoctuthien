@@ -6,6 +6,7 @@ import {
   loginAsAdmin,
   nextWeekdayAt,
   onboardMentor,
+  pastWeekdayAt,
   registerAndLogin,
   unwrap,
 } from './support/api';
@@ -192,5 +193,83 @@ test.describe('Course booking flow (free course, auto-confirm)', () => {
 
     const res = await otherMentorClient.get(`course-bookings/${booking.id}`);
     expect(res.status()).toBe(403);
+  });
+
+  test('cancelling an upcoming booking releases the course for another mentee', async ({ request }) => {
+    const { course, menteeClient } = await setupFreeCourseWithSchedule(request);
+    const { client: secondMenteeClient } = await registerAndLogin(request, { prefix: 'booking_after_cancel' });
+    const firstMeetingTime = nextWeekdayAt('friday', 14, 0, 2);
+
+    const firstRes = await menteeClient.post('course-bookings', {
+      courseId: course.id,
+      meetingTime: firstMeetingTime.toISOString(),
+    });
+    const firstBooking = unwrap<any>(await jsonOf(firstRes));
+
+    const cancelRes = await menteeClient.patch(`course-bookings/${firstBooking.id}/me`, {
+      status: 'cancelled',
+      cancellationReason: 'Cannot attend',
+    });
+    expect(cancelRes.status()).toBe(200);
+
+    const secondMeetingTime = nextWeekdayAt('monday', 15, 30, 3);
+    const secondRes = await secondMenteeClient.post('course-bookings', {
+      courseId: course.id,
+      meetingTime: secondMeetingTime.toISOString(),
+    });
+    expect(secondRes.status()).toBe(201);
+    expect(unwrap<any>(await jsonOf(secondRes)).status).toBe('confirmed');
+  });
+
+  test('mentee cannot spoof booking status or cancel a meeting after it has happened', async ({ request }) => {
+    const { client: adminClient } = await loginAsAdmin(request);
+    const { client: mentorClient } = await onboardMentor(request, adminClient, {
+      prefix: 'booking_past_mentor',
+    });
+    const { client: menteeClient } = await registerAndLogin(request, { prefix: 'booking_past_mentee' });
+    const course = await createActiveCourse(mentorClient, {
+      price: 0,
+      time: { wednesday: ['15:00-16:00'] },
+    });
+    const meetingTime = pastWeekdayAt('wednesday', 15, 0, 2);
+
+    const bookingRes = await menteeClient.post('course-bookings', {
+      courseId: course.id,
+      meetingTime: meetingTime.toISOString(),
+    });
+    expect(bookingRes.status()).toBe(201);
+    const booking = unwrap<any>(await jsonOf(bookingRes));
+
+    const completeByMenteeRes = await menteeClient.patch(`course-bookings/${booking.id}/me`, {
+      status: 'completed',
+    });
+    expect(completeByMenteeRes.status()).toBe(400);
+
+    const cancelPastRes = await menteeClient.patch(`course-bookings/${booking.id}/me`, {
+      status: 'cancelled',
+    });
+    expect(cancelPastRes.status()).toBe(400);
+  });
+
+  test('mentee booking list ignores foreign menteeId filters', async ({ request }) => {
+    const { course, menteeClient } = await setupFreeCourseWithSchedule(request);
+    const { client: strangerClient, user: stranger } = await registerAndLogin(request, {
+      prefix: 'booking_list_stranger',
+    });
+    const meetingTime = nextWeekdayAt('friday', 14, 0, 2);
+    const bookingRes = await menteeClient.post('course-bookings', {
+      courseId: course.id,
+      meetingTime: meetingTime.toISOString(),
+    });
+    const booking = unwrap<any>(await jsonOf(bookingRes));
+
+    const strangerListRes = await strangerClient.get('course-bookings', {
+      params: { menteeId: booking.menteeId, limit: 100 },
+    });
+    expect(strangerListRes.status()).toBe(200);
+    const body = await jsonOf(strangerListRes);
+    const items = Array.isArray(body?.data) ? body.data : [];
+    expect(items.every((item: any) => item.menteeId === stranger.id)).toBe(true);
+    expect(items.some((item: any) => item.id === booking.id)).toBe(false);
   });
 });
