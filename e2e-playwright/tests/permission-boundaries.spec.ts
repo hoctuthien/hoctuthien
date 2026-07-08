@@ -1,39 +1,45 @@
 import { test, expect } from '@playwright/test';
 import { jsonOf, loginAsAdmin, registerAndLogin, unwrap, unwrapList } from './support/api';
 
-/**
- * Bộ test này tập trung riêng vào ranh giới phân quyền giữa các role, tách khỏi các
- * test luồng nghiệp vụ chính. Một số test ở đây khẳng định hành vi ĐÚNG (chặn được),
- * một số khác CHỦ ĐỘNG ghi nhận lỗ hổng đã biết (chưa chặn) để việc thay đổi hành vi
- * trong tương lai không lọt qua âm thầm — nếu ai đó vá lỗ hổng, test tương ứng ở đây
- * sẽ đỏ và cần được cập nhật thành assertion "đã chặn", không phải xóa test.
- */
-
-test.describe('Known gap: /system-configs has no role restriction', () => {
-  test('a mentee (any authenticated role) can read, create, update and delete system configs', async ({
+test.describe('System configs policy boundaries', () => {
+  test('public can read active policy by key, but system-config management is admin-only', async ({
     request,
   }) => {
-    const { client: menteeClient } = await registerAndLogin(request, { prefix: 'sysconfig_gap' });
+    const { client: adminClient } = await loginAsAdmin(request);
+    const { client: menteeClient } = await registerAndLogin(request, { prefix: 'sysconfig_boundary' });
 
-    // Baseline đã đúng: chưa đăng nhập thì bị chặn bởi JWT guard toàn cục.
+    const publicPolicyRes = await request.get('system-configs/public/mentee_policy');
+    expect(publicPolicyRes.status()).toBe(200);
+    const publicPolicy = unwrap<any>(await jsonOf(publicPolicyRes));
+    expect(publicPolicy.configKey).toBe('mentee_policy');
+    expect(publicPolicy.configValue?.sections?.length).toBeGreaterThan(0);
+
     const anonRes = await request.get('system-configs');
     expect(anonRes.status()).toBe(401);
 
-    // Lỗ hổng: controller không có @Roles(ADMIN)/RolesGuard nào — mọi role đã login
-    // (kể cả mentee) đều CRUD được config toàn hệ thống. Ghi nhận rõ hành vi hiện tại.
-    const createRes = await menteeClient.post('system-configs', {
+    const menteeCreateRes = await menteeClient.post('system-configs', {
       configKey: `e2e_gap_key_${Date.now()}`,
       configValue: { note: 'created by mentee in e2e test' },
     });
-    expect(createRes.status()).toBe(201);
-    const config = unwrap<any>(await jsonOf(createRes));
+    expect(menteeCreateRes.status()).toBe(403);
 
-    const updateRes = await menteeClient.patch(`system-configs/${config.id}`, {
-      configValue: { note: 'updated by mentee' },
+    const adminCreateRes = await adminClient.post('system-configs', {
+      configKey: `e2e_admin_policy_${Date.now()}`,
+      configValue: { note: 'created by admin in e2e test' },
+      status: 'active',
+    });
+    expect(adminCreateRes.status()).toBe(201);
+    const config = unwrap<any>(await jsonOf(adminCreateRes));
+
+    const menteeListRes = await menteeClient.get('system-configs');
+    expect(menteeListRes.status()).toBe(403);
+
+    const updateRes = await adminClient.patch(`system-configs/${config.id}`, {
+      configValue: { note: 'updated by admin' },
     });
     expect(updateRes.status()).toBe(200);
 
-    const deleteRes = await menteeClient.delete(`system-configs/${config.id}`);
+    const deleteRes = await adminClient.delete(`system-configs/${config.id}`);
     expect(deleteRes.status()).toBe(200);
   });
 });
@@ -53,7 +59,6 @@ test.describe('Known gap: /notifications has no per-user ownership scoping', () 
     expect(createRes.status()).toBe(201);
     const notification = unwrap<any>(await jsonOf(createRes));
 
-    // Lỗ hổng: findAll()/findOne() không lọc theo userId của người gọi.
     const strangerListRes = await strangerClient.get('notifications');
     expect(strangerListRes.status()).toBe(200);
     const list = unwrapList<any>(await jsonOf(strangerListRes));
@@ -86,10 +91,6 @@ test.describe('Correctly enforced ownership/role boundaries (regression guard)',
     const { client: authorClient } = await registerAndLogin(request, { prefix: 'review_owner' });
     const { client: intruderClient } = await registerAndLogin(request, { prefix: 'review_intruder2' });
 
-    // Không thể tạo review hợp lệ nhanh ở đây (cần booking COMPLETED thật), nên ta
-    // verify ranh giới quyền edit/delete bằng một id ngẫu nhiên hợp lệ dạng UUID:
-    // service phải trả 404 (not found) cho author lẫn 403/404 cho kẻ lạ - không bao giờ
-    // để lộ được nội dung của review không thuộc về mình qua PATCH/DELETE.
     const randomId = '11111111-1111-1111-1111-111111111111';
     const authorRes = await authorClient.patch(`course-reviews/${randomId}`, { rating: 3 });
     expect([403, 404]).toContain(authorRes.status());
@@ -101,8 +102,6 @@ test.describe('Correctly enforced ownership/role boundaries (regression guard)',
   test('a mentee cannot access mentor-only "my courses" listing via mentorId spoofing', async ({ request }) => {
     const { client: menteeClient, user: mentee } = await registerAndLogin(request, { prefix: 'spoof_mentee' });
 
-    // Mentee cố lấy danh sách khóa học lọc theo chính mentorId của mình (giả làm mentor).
-    // Vì mentee không sở hữu course nào, kỳ vọng hợp lý nhất là danh sách rỗng, không lỗi 500.
     const res = await menteeClient.get('courses', { params: { mentorId: mentee.id, limit: '50' } });
     expect(res.status()).toBe(200);
     const items = unwrapList<any>(await jsonOf(res));
@@ -117,7 +116,6 @@ test.describe('Correctly enforced ownership/role boundaries (regression guard)',
 
     const meRes = await userAClient.get('users/me');
     expect(meRes.status()).toBe(200);
-    // Response shape đặc biệt của route này: { message, user: {...} } (không phải { data: user }).
     const meBody = unwrap<any>(await jsonOf(meRes));
     expect(meBody.user.id).toBe(userA.id);
     expect(meBody.user.id).not.toBe(userB.id);

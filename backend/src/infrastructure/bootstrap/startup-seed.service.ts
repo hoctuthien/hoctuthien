@@ -6,6 +6,11 @@ import * as bcrypt from 'bcrypt';
 import { GroupCategoryEntity } from '../../modules/group-category/entities/group-category.entity';
 import { CategoryEntity } from '../../modules/category/entities/category.entity';
 import { UserEntity, UserRole } from '../../modules/user/entities/user.entity';
+import { SystemConfigEntity } from '../../modules/system-config/entities/system-config.entity';
+import {
+  defaultMenteePolicyConfig,
+  MENTEE_POLICY_CONFIG_KEY,
+} from '../../modules/system-config/default-policy.config';
 
 type GroupCategorySeedRecord = {
   id: string;
@@ -39,12 +44,35 @@ export class StartupSeedService {
   constructor(private readonly dataSource: DataSource) {}
 
   async runIfNeeded() {
+    await this.seedMenteePolicyIfNeeded();
+
     if (process.env.NODE_ENV !== 'production') {
       return;
     }
 
     await this.seedCatalogIfNeeded();
     await this.seedAdminIfNeeded();
+  }
+
+  private async seedMenteePolicyIfNeeded() {
+    const configRepository = this.dataSource.getRepository(SystemConfigEntity);
+    const existingPolicy = await configRepository.findOne({
+      where: { configKey: MENTEE_POLICY_CONFIG_KEY },
+      withDeleted: true,
+    });
+
+    if (existingPolicy) {
+      return;
+    }
+
+    await configRepository.insert({
+      configKey: MENTEE_POLICY_CONFIG_KEY,
+      configValue: defaultMenteePolicyConfig as any,
+      description: 'Chính sách Mentee hiển thị tại footer và màn hình đăng ký',
+      status: 'active',
+    });
+
+    this.logger.log(`Seeded default ${MENTEE_POLICY_CONFIG_KEY} system config.`);
   }
 
   private async seedCatalogIfNeeded() {

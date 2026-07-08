@@ -9,6 +9,10 @@ import {
   CreateSystemConfigInput,
   UpdateSystemConfigInput,
 } from '../types/system-config.types';
+import {
+  defaultMenteePolicyConfig,
+  MENTEE_POLICY_CONFIG_KEY,
+} from '../default-policy.config';
 
 @Injectable()
 export class SystemConfigService {
@@ -30,6 +34,33 @@ export class SystemConfigService {
   async findByKey(key: string) {
     const item = await this.systemConfigRepository.findOne({ configKey: key });
     return item ? systemConfigSchema.parse(item) : null;
+  }
+
+  async findPublicByKey(key: string) {
+    const item = await this.systemConfigRepository.findOne({
+      configKey: key,
+      status: 'active',
+    });
+
+    if (item) {
+      return systemConfigSchema.parse(item);
+    }
+
+    if (key === MENTEE_POLICY_CONFIG_KEY) {
+      return {
+        id: MENTEE_POLICY_CONFIG_KEY,
+        configKey: MENTEE_POLICY_CONFIG_KEY,
+        configValue: defaultMenteePolicyConfig,
+        description: 'Default mentee policy',
+        createdBy: null,
+        status: 'active',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      };
+    }
+
+    throw new NotFoundException('System configuration not found');
   }
 
   async create(payload: CreateSystemConfigInput) {
