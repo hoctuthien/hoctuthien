@@ -38,8 +38,8 @@ export const Footer = () => {
     {
       title: t('legal'),
       links: [
-        { label: t('privacyPolicy'), href: '/privacy' },
-        { label: t('termsOfService'), href: '/terms' },
+        { label: t('privacyPolicy'), href: '/policies' },
+        { label: t('termsOfService'), href: '/policies' },
       ],
     },
   ];
@@ -101,13 +101,13 @@ export const Footer = () => {
             {t('copyright')}
           </p>
           <div className="flex items-center gap-8">
-            <Link href="/terms" className="text-sm text-text-muted hover:text-primary">
+            <Link href="/policies" className="text-sm text-text-muted hover:text-primary">
               {t('termsOfService')}
             </Link>
-            <Link href="/privacy" className="text-sm text-text-muted hover:text-primary">
+            <Link href="/policies" className="text-sm text-text-muted hover:text-primary">
               {t('privacyPolicy')}
             </Link>
-            <Link href="/cookies" className="text-sm text-text-muted hover:text-primary">
+            <Link href="/policies" className="text-sm text-text-muted hover:text-primary">
               {t('cookies')}
             </Link>
           </div>

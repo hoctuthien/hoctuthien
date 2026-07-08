@@ -1,0 +1,17 @@
+{
+  "name": "hoctuthien-e2e-playwright",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Playwright API E2E tests covering all HocTuThien backend business flows",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/pg": "^8.20.0",
+    "dotenv": "^17.4.2",
+    "pg": "^8.22.0"
+  }
+}

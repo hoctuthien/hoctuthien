@@ -86,6 +86,8 @@ export default function MyCoursesClient() {
   const [mentorComment, setMentorComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewedBookingIds, setReviewedBookingIds] = useState<string[]>([]);
+  const currentUserId = (session?.user as any)?.id || 'anonymous';
+  const reviewedStorageKey = `reviewed_booking_ids:${currentUserId}`;
 
   // Trạng thái tích hợp thanh toán khóa học
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -341,15 +343,19 @@ export default function MyCoursesClient() {
   }, [status]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('reviewed_booking_ids');
+    if (status !== 'authenticated') return;
+
+    const saved = localStorage.getItem(reviewedStorageKey);
     if (saved) {
       try {
         setReviewedBookingIds(JSON.parse(saved));
       } catch (e) {
         console.error(e);
       }
+    } else {
+      setReviewedBookingIds([]);
     }
-  }, []);
+  }, [reviewedStorageKey, status]);
 
   const handleReviewSubmit = async () => {
     if (!reviewBooking) return;
@@ -378,7 +384,7 @@ export default function MyCoursesClient() {
       // Save to local storage
       const nextReviewed = [...reviewedBookingIds, reviewBooking.id];
       setReviewedBookingIds(nextReviewed);
-      localStorage.setItem('reviewed_booking_ids', JSON.stringify(nextReviewed));
+      localStorage.setItem(reviewedStorageKey, JSON.stringify(nextReviewed));
 
       alert(tExtracted('camOnBanDaGuiDanhGiaBuoi'));
       setReviewBooking(null);
@@ -386,6 +392,7 @@ export default function MyCoursesClient() {
       setCourseComment('');
       setMentorRating(5);
       setMentorComment('');
+      await fetchBookings();
     } catch (err: any) {
       console.error('Failed to submit reviews:', err);
       alert(err.response?.data?.message || err.message || tExtracted('guiDanhGiaThatBaiVuiLongThu'));

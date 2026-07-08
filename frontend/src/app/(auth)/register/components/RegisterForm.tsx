@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +15,11 @@ import {
   type RegisterFormData,
 } from "@/app/(auth)/register/register.schema";
 import { authGateway } from "@/core/gateway/authGateway";
+import {
+  MENTEE_POLICY_CONFIG_KEY,
+  systemConfigGateway,
+  type PolicyConfigValue,
+} from "@/core/gateway/systemConfigGateway";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { ensureDeviceId } from "@/shared/utils/device";
@@ -31,6 +36,14 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [policy, setPolicy] = useState<PolicyConfigValue | null>(null);
+
+  useEffect(() => {
+    systemConfigGateway
+      .getPublicByKey<PolicyConfigValue>(MENTEE_POLICY_CONFIG_KEY)
+      .then((res) => setPolicy(res.configValue))
+      .catch(() => setPolicy(null));
+  }, []);
 
   const {
     register,
@@ -219,7 +232,7 @@ export function RegisterForm() {
                   <span className="text-xs">
                     {t('agreeToTerms')}{" "}
                     <Link
-                      href="/terms"
+                      href="/policies"
                       className="text-primary font-semibold hover:underline"
                     >
                       {t('termsOfService')}
@@ -230,6 +243,17 @@ export function RegisterForm() {
             )}
           />
         </div>
+        {policy && (
+          <p className="text-[11px] leading-relaxed text-text-muted font-[Montserrat] -mt-2">
+            Chính sách áp dụng: {policy.title} phiên bản {policy.version}
+            {policy.effectiveDate ? `, hiệu lực từ ${new Date(policy.effectiveDate).toLocaleDateString('vi-VN')}` : ''}.
+          </p>
+        )}
+        {errors.agreeTerms?.message && (
+          <p className="text-xs text-[#BA1A1A] font-semibold -mt-2">
+            {errors.agreeTerms.message}
+          </p>
+        )}
 
         {generalError && (
           <p

@@ -15,6 +15,10 @@ export const registerSchema = z
     confirmPassword: z.string().min(1, MESSAGES.ERROR.AUTH.PASSWORD_CONFIRM_REQUIRED),
     agreeTerms: z.boolean().default(false),
   })
+  .refine((data) => data.agreeTerms === true, {
+    message: "Bạn cần đồng ý với chính sách và điều khoản trước khi đăng ký.",
+    path: ["agreeTerms"],
+  })
   .refine((data) => data.password === data.confirmPassword, {
     message: MESSAGES.ERROR.AUTH.PASSWORDS_MUST_MATCH,
     path: ["confirmPassword"],

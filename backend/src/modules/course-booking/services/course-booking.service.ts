@@ -87,7 +87,9 @@ export class CourseBookingService {
     }
     // ADMIN thấy tất cả — áp dụng filter từ query
     if (courseId) where['courseId'] = courseId;
-    if (menteeId) where['menteeId'] = menteeId;
+    if (requestingUserRole === Role.ADMIN && menteeId) {
+      where['menteeId'] = menteeId;
+    }
     if (status) where['status'] = status;
 
     const [items, total] = await this.courseBookingRepository.findManyWithCount(

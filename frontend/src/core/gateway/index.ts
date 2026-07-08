@@ -8,3 +8,4 @@ export * from './categoryGateway';
 export * from './penaltyTicketGateway';
 export * from './bugReportGateway';
 export * from './reviewGateway';
+export * from './systemConfigGateway';
