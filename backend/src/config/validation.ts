@@ -40,7 +40,7 @@ const envSchema = z
     MAIL_FROM_NAME: z.string().default('HocTuThien'),
     MAIL_FROM_EMAIL: z.string().optional(),
     MAIL_REPLY_TO: z.string().optional(),
-    FRONTEND_BASE_URL: z.string().optional(),
+    FRONTEND_BASE_URL: z.string().default('https://hoctuthien.com'),
     PUBLIC_ASSET_BASE_URL: z.string().optional(),
   })
   .superRefine((data, ctx) => {
