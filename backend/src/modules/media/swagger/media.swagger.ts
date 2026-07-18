@@ -10,7 +10,7 @@ import {
 export const ApiUploadMediaDoc = () => {
   return applyDecorators(
     ApiBearerAuth(),
-    ApiOperation({ summary: 'Upload hình ảnh lên hệ thống (Openinary)' }),
+    ApiOperation({ summary: 'Upload hình ảnh lên hệ thống (MinIO)' }),
     ApiConsumes('multipart/form-data'),
     ApiBody({
       schema: {
@@ -44,7 +44,7 @@ export const ApiUploadMediaDoc = () => {
                     size: { type: 'number', example: 55733 },
                     url: {
                       type: 'string',
-                      example: 'https://cloud.hoctuthien.com/t/image.png',
+                      example: 'http://localhost:9000/hoctuthien-media/image.png',
                     },
                   },
                 },

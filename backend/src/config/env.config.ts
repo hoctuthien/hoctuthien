@@ -24,9 +24,11 @@ export default () => ({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackUrl: process.env.GOOGLE_CALLBACK_URL,
   },
-  openinary: {
-    url: process.env.OPENINARY_URL,
-    apiKey: process.env.OPENINARY_API_KEY,
+  minio: {
+    endpoint: process.env.MINIO_ENDPOINT,
+    accessKey: process.env.MINIO_ACCESS_KEY,
+    secretKey: process.env.MINIO_SECRET_KEY,
+    bucketName: process.env.MINIO_BUCKET_NAME || 'hoctuthien-media',
   },
   mail: {
     enabled: process.env.MAIL_ENABLED === 'true',
