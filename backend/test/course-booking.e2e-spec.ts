@@ -58,12 +58,14 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       // 1. Register
       const regRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/register`)
+        .set('x-device-id', 'test-device-id')
         .send(testMentee);
       expect(regRes.status).toBe(201);
 
       // 2. Login
       const loginRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/login`)
+        .set('x-device-id', 'test-device-id')
         .send({ email: testMentee.email, password: testMentee.password });
       expect(loginRes.status).toBe(200);
       menteeAccessToken =
@@ -75,12 +77,14 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       // 1. Register candidate
       const regRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/register`)
+        .set('x-device-id', 'test-device-id')
         .send(testMentor);
       expect(regRes.status).toBe(201);
 
       // 2. Login candidate
       const loginRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/login`)
+        .set('x-device-id', 'test-device-id')
         .send({ email: testMentor.email, password: testMentor.password });
       expect(loginRes.status).toBe(200);
       const tempAccessToken =
@@ -107,6 +111,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       // 4. Admin Login
       const adminLoginRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/login`)
+        .set('x-device-id', 'test-device-id')
         .send(adminCredentials);
       expect(adminLoginRes.status).toBe(200);
       adminAccessToken =
@@ -130,6 +135,7 @@ describe('Course Booking and Schedule Validation (E2E)', () => {
       // 6. Login as Mentor (now promoted)
       const mentorLoginRes = await supertest(app.getHttpServer())
         .post(`${apiPrefix}/auths/login`)
+        .set('x-device-id', 'test-device-id')
         .send({ email: testMentor.email, password: testMentor.password });
       expect(mentorLoginRes.status).toBe(200);
       expect(mentorLoginRes.body.user.role).toBe(UserRole.MENTOR);
