@@ -59,7 +59,7 @@ export class MailService {
     this.fromEmail = this.configService.get<string>('mail.fromEmail') || '';
     this.replyTo = this.configService.get<string>('mail.replyTo') || undefined;
     this.frontendBaseUrl = this.trimTrailingSlash(
-      this.configService.get<string>('mail.frontendBaseUrl') || '',
+      this.configService.get<string>('mail.frontendBaseUrl') || 'https://hoctuthien.com',
     );
     this.publicAssetBaseUrl = this.trimTrailingSlash(
       this.configService.get<string>('mail.publicAssetBaseUrl') ||

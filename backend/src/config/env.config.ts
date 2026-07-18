@@ -40,8 +40,8 @@ export default () => ({
     fromName: process.env.MAIL_FROM_NAME || 'HocTuThien',
     fromEmail: process.env.MAIL_FROM_EMAIL,
     replyTo: process.env.MAIL_REPLY_TO,
-    frontendBaseUrl: process.env.FRONTEND_BASE_URL,
+    frontendBaseUrl: process.env.FRONTEND_BASE_URL || 'https://hoctuthien.com',
     publicAssetBaseUrl:
-      process.env.PUBLIC_ASSET_BASE_URL || process.env.FRONTEND_BASE_URL,
+      process.env.PUBLIC_ASSET_BASE_URL || process.env.FRONTEND_BASE_URL || 'https://hoctuthien.com',
   },
 });
