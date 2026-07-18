@@ -29,7 +29,6 @@ export default () => ({
     accessKey: process.env.MINIO_ACCESS_KEY,
     secretKey: process.env.MINIO_SECRET_KEY,
     bucketName: process.env.MINIO_BUCKET_NAME || 'hoctuthien-media',
-    publicUrl: process.env.MINIO_PUBLIC_URL,
   },
   mail: {
     enabled: process.env.MAIL_ENABLED === 'true',

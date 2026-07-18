@@ -31,7 +31,6 @@ const envSchema = z
     MINIO_ACCESS_KEY: z.string().optional(),
     MINIO_SECRET_KEY: z.string().optional(),
     MINIO_BUCKET_NAME: z.string().default('hoctuthien-media'),
-    MINIO_PUBLIC_URL: z.string().optional(),
     MAIL_ENABLED: z.enum(['true', 'false']).default('false'),
     MAIL_HOST: z.string().optional(),
     MAIL_PORT: z.coerce.number().default(587),

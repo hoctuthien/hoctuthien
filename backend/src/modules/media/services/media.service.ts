@@ -11,22 +11,19 @@ import { randomUUID } from 'crypto';
 export class MediaService {
   private readonly s3Client: S3Client;
   private readonly bucketName: string;
-  private readonly publicUrl: string;
+  private readonly endpoint: string;
 
   constructor(
     private configService: ConfigService,
     @InjectRepository(MediaEntity)
     private mediaRepository: Repository<MediaEntity>,
   ) {
-    const endpoint = this.configService.get<string>('minio.endpoint');
+    const endpoint = this.configService.get<string>('minio.endpoint') || '';
+    this.endpoint = endpoint.replace(/\/$/, '');
     const accessKey = this.configService.get<string>('minio.accessKey');
     const secretKey = this.configService.get<string>('minio.secretKey');
 
     this.bucketName = this.configService.get<string>('minio.bucketName') || 'hoctuthien-media';
-    
-    // Nếu không cấu hình publicUrl, tự động fallback về endpoint + bucketName
-    const rawPublicUrl = this.configService.get<string>('minio.publicUrl') || `${endpoint}/${this.bucketName}`;
-    this.publicUrl = rawPublicUrl.replace(/\/$/, '');
 
     if (!endpoint || !accessKey || !secretKey) {
       // Đừng ném lỗi ngay khi khởi tạo vì có thể chạy test hoặc các CLI tool không có config này.
@@ -50,9 +47,9 @@ export class MediaService {
     const endpoint = this.configService.get<string>('minio.endpoint');
     const accessKey = this.configService.get<string>('minio.accessKey');
     const secretKey = this.configService.get<string>('minio.secretKey');
-    if (!endpoint || !accessKey || !secretKey || !this.publicUrl || !this.s3Client) {
+    if (!endpoint || !accessKey || !secretKey || !this.s3Client) {
       throw new HttpException(
-        'Cấu hình MinIO thiếu thông tin kết nối (endpoint, accessKey, secretKey hoặc publicUrl). Vui lòng kiểm tra file .env',
+        'Cấu hình MinIO thiếu thông tin kết nối (endpoint, accessKey hoặc secretKey). Vui lòng kiểm tra file .env',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -75,7 +72,7 @@ export class MediaService {
 
       await this.s3Client.send(uploadCommand);
 
-      const fileUrl = `${this.publicUrl}/${objectKey}`;
+      const fileUrl = `${this.endpoint}/${this.bucketName}/${objectKey}`;
 
       const media = this.mediaRepository.create({
         url: fileUrl,
