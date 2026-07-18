@@ -2,105 +2,115 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import axios from 'axios';
-import FormData from 'form-data';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { MediaEntity } from '../entities/media.entity';
+import * as path from 'path';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class MediaService {
-  private readonly openinaryUrl: string;
-  private readonly apiKey: string;
+  private readonly s3Client: S3Client;
+  private readonly bucketName: string;
+  private readonly publicUrl: string;
 
   constructor(
     private configService: ConfigService,
     @InjectRepository(MediaEntity)
     private mediaRepository: Repository<MediaEntity>,
   ) {
-    this.openinaryUrl = (
-      this.configService.get<string>('openinary.url') || ''
-    ).replace(/\/$/, '');
-    this.apiKey = this.configService.get<string>('openinary.apiKey') || '';
+    const endpoint = this.configService.get<string>('minio.endpoint');
+    const accessKey = this.configService.get<string>('minio.accessKey');
+    const secretKey = this.configService.get<string>('minio.secretKey');
+
+    this.bucketName = this.configService.get<string>('minio.bucketName') || 'hoctuthien-media';
+    
+    // Nếu không cấu hình publicUrl, tự động fallback về endpoint + bucketName
+    const rawPublicUrl = this.configService.get<string>('minio.publicUrl') || `${endpoint}/${this.bucketName}`;
+    this.publicUrl = rawPublicUrl.replace(/\/$/, '');
+
+    if (!endpoint || !accessKey || !secretKey) {
+      // Đừng ném lỗi ngay khi khởi tạo vì có thể chạy test hoặc các CLI tool không có config này.
+      // Sẽ kiểm tra lúc thực hiện hành động upload/delete.
+      return;
+    }
+
+    // Khởi tạo S3 Client tương thích với MinIO
+    this.s3Client = new S3Client({
+      endpoint: endpoint,
+      credentials: {
+        accessKeyId: accessKey,
+        secretAccessKey: secretKey,
+      },
+      region: 'us-east-1', // Bắt buộc đối với AWS SDK v3
+      forcePathStyle: true, // Bắt buộc đối với MinIO tự host
+    });
   }
 
-  async uploadImage(file: any, folder?: string, uploaderId?: string) {
-    if (!this.openinaryUrl || !this.apiKey) {
+  private checkConfig() {
+    const endpoint = this.configService.get<string>('minio.endpoint');
+    const accessKey = this.configService.get<string>('minio.accessKey');
+    const secretKey = this.configService.get<string>('minio.secretKey');
+    if (!endpoint || !accessKey || !secretKey || !this.publicUrl || !this.s3Client) {
       throw new HttpException(
-        'Cấu hình Openinary thiếu URL hoặc API Key. Vui lòng kiểm tra file .env',
+        'Cấu hình MinIO thiếu thông tin kết nối (endpoint, accessKey, secretKey hoặc publicUrl). Vui lòng kiểm tra file .env',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async uploadImage(file: any, folder?: string, uploaderId?: string) {
+    this.checkConfig();
 
     try {
-      const formData = new FormData();
-      formData.append('files', file.buffer, {
+      const ext = path.extname(file.originalname);
+      const uniqueFilename = `${randomUUID()}${ext}`;
+      const objectKey = folder ? `${folder}/${uniqueFilename}` : uniqueFilename;
+
+      const uploadCommand = new PutObjectCommand({
+        Bucket: this.bucketName,
+        Key: objectKey,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      });
+
+      await this.s3Client.send(uploadCommand);
+
+      const fileUrl = `${this.publicUrl}/${objectKey}`;
+
+      const media = this.mediaRepository.create({
+        url: fileUrl,
         filename: file.originalname,
-        contentType: file.mimetype,
-      });
-
-      if (folder) {
-        formData.append('folder', folder);
-      }
-
-      const response = await axios.post(
-        `${this.openinaryUrl}/api/upload`,
-        formData,
-        {
-          timeout: 15000,
-          headers: {
-            ...formData.getHeaders(),
-            Authorization: `Bearer ${this.apiKey}`,
-          },
+        mimeType: file.mimetype,
+        size: file.size,
+        uploaderId: uploaderId || null,
+        metadata: {
+          folder: folder || '',
+          bucket: this.bucketName,
+          objectKey: objectKey,
         },
-      );
-
-      if (response.data.success && Array.isArray(response.data.files)) {
-        response.data.files = response.data.files.map((f: any) => ({
-          ...f,
-          url: `${this.openinaryUrl}${f.url}`,
-        }));
-
-        for (const fileObj of response.data.files) {
-          const media = this.mediaRepository.create({
-            url: fileObj.url,
-            filename: fileObj.name || file.originalname,
-            mimeType: fileObj.type || file.mimetype,
-            size: fileObj.size || file.size,
-            uploaderId: uploaderId || null,
-            metadata: {
-              folder: folder || '',
-              openinaryPath: fileObj.url.replace(this.openinaryUrl, ''),
-            },
-          });
-          await this.mediaRepository.save(media);
-          fileObj.id = media.id;
-        }
-      }
-
-      return response.data;
-    } catch (error: any) {
-      const isTimeout =
-        error.code === 'ECONNABORTED' ||
-        error.code === 'ETIMEDOUT' ||
-        error.response?.status === HttpStatus.GATEWAY_TIMEOUT;
-      const status = isTimeout
-        ? HttpStatus.GATEWAY_TIMEOUT
-        : error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
-      const message =
-        (isTimeout
-          ? 'Dịch vụ lưu trữ ảnh đang không phản hồi. Vui lòng kiểm tra OPENINARY_URL hoặc trạng thái cloud upload.'
-          : error.response?.data?.message) ||
-        error.message ||
-        'Lỗi khi upload ảnh lên Openinary';
-
-      console.error('Openinary Upload Error:', {
-        status,
-        message,
-        data: error.response?.data,
-        code: error.code,
-        uploadUrl: `${this.openinaryUrl}/api/upload`,
       });
 
-      throw new HttpException(message, status);
+      await this.mediaRepository.save(media);
+      file.id = media.id;
+
+      return {
+        success: true,
+        files: [
+          {
+            id: media.id,
+            filename: file.originalname,
+            path: objectKey,
+            size: file.size,
+            url: fileUrl,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error('MinIO Upload Error:', error);
+      throw new HttpException(
+        `Lỗi khi upload ảnh lên MinIO: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -125,6 +135,22 @@ export class MediaService {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    try {
+      const objectKey = media.metadata?.objectKey;
+      const bucket = media.metadata?.bucket || this.bucketName;
+
+      if (objectKey && this.s3Client) {
+        const deleteCommand = new DeleteObjectCommand({
+          Bucket: bucket,
+          Key: objectKey,
+        });
+        await this.s3Client.send(deleteCommand);
+      }
+    } catch (error) {
+      console.error('Lỗi khi xóa file vật lý trên MinIO:', error);
+    }
+
     await this.mediaRepository.remove(media);
     return { success: true };
   }
