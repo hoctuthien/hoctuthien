@@ -109,8 +109,11 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
                     {/* Action buttons (Standard behavior) */}
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Link href={`/admin/posts/${post.id}/edit`}>
-                          <Button variant="text" label={<Icon name="Pencil" size={16} />} className="!p-2 text-slate-400 hover:text-primary" />
+                        <Link 
+                          href={`/admin/posts/${post.id}/edit`}
+                          className="inline-flex items-center justify-center font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-transparent text-slate-400 hover:text-primary active:scale-95 p-2 hover:no-underline"
+                        >
+                          <Icon name="Pencil" size={16} />
                         </Link>
                         <DeletePostButton postId={post.id} />
                         <Button variant="text" label={<Icon name="MoreVertical" size={16} />} className="!p-2 text-slate-400" />
@@ -147,13 +150,12 @@ export function PostsTable({ posts, categories, tags }: PostsTableProps) {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Link href={`/admin/posts/${previewPost.id}/edit`}>
-                  <Button
-                    label={tExtracted('chinhSuaBaiViet')}
-                    variant="primary"
-                    iconLeft={<Icon name="Pencil" size={14} />}
-                    className="!px-4 !py-2 !rounded-xl !text-xs shadow-lg shadow-primary/20"
-                  />
+                <Link 
+                  href={`/admin/posts/${previewPost.id}/edit`}
+                  className="inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-xl transition-all duration-300 outline-none select-none hover:cursor-pointer bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:bg-[#004493] active:scale-95 text-xs px-4 py-2 hover:no-underline"
+                >
+                  <Icon name="Pencil" size={14} />
+                  <span className="leading-tight">{tExtracted('chinhSuaBaiViet')}</span>
                 </Link>
                 <button
                   onClick={() => setPreviewPost(null)}

@@ -46,13 +46,12 @@ export default async function MentorApplicationDetailPage(props: PageProps) {
             {fetchError || tMentors("notFoundDesc")}
           </p>
         </div>
-        <Link href="/admin/mentors">
-          <Button
-            label={tMentors('backToList')}
-            variant="outline"
-            iconLeft={<Icon name="ArrowLeft" size={16} />}
-            className="!px-6 !py-2.5 !rounded-xl"
-          />
+        <Link 
+          href="/admin/mentors"
+          className="inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-xl transition-all duration-300 outline-none select-none hover:cursor-pointer bg-transparent text-primary border-primary border-2 hover:bg-primary/5 active:scale-95 text-base px-6 py-2.5 hover:no-underline font-semibold"
+        >
+          <Icon name="ArrowLeft" size={16} />
+          <span className="leading-tight">{tMentors('backToList')}</span>
         </Link>
       </div>
     );

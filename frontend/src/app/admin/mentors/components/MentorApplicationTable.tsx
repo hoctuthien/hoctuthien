@@ -127,14 +127,12 @@ export const MentorApplicationTable = ({ initialData, meta }: MentorApplicationT
       key: "actions",
       header: t("viewDetails"),
       render: (item) => (
-        <Link href={`/admin/mentors/${item.id}`}>
-          <Button
-            label={t('viewDetails')}
-            variant="outline"
-            size="sm"
-            iconLeft={<Icon name="Eye" size={14} />}
-            className="!px-3 !py-1 text-xs hover:bg-slate-50 transition-colors"
-          />
+        <Link 
+          href={`/admin/mentors/${item.id}`}
+          className="inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-transparent text-primary border-primary border-2 hover:bg-primary/5 active:scale-95 text-xs px-3 py-1 h-8 hover:no-underline font-semibold"
+        >
+          <Icon name="Eye" size={14} />
+          <span className="leading-tight">{t('viewDetails')}</span>
         </Link>
       ),
     },

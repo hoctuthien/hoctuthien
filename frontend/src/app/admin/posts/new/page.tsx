@@ -182,8 +182,11 @@ export default function AdminEditorPage() {
         {/* Header */}
         <div className="h-16 border-b border-slate-100 px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
-            <Link href="/admin/posts">
-              <Button variant="text" label={<Icon name="ArrowLeft" size={18} />} className="!p-2 text-slate-400 hover:text-slate-900" />
+            <Link 
+              href="/admin/posts"
+              className="inline-flex items-center justify-center font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-transparent text-slate-400 hover:text-slate-900 active:scale-95 p-2 hover:no-underline"
+            >
+              <Icon name="ArrowLeft" size={18} />
             </Link>
             <div className="h-4 w-px bg-slate-200" />
             <div className="flex items-center gap-2 text-xs font-medium text-slate-400">

@@ -88,18 +88,12 @@ export const CourseFilters = ({
         </div>
 
         {session?.user?.role === "mentor" && (
-          <Link href="/courses/create" className="shrink-0">
-            <Button
-              variant="primary"
-              label={
-                <div className="flex items-center gap-2">
-                  <LuPlus size={15} />
-                  <span>{tExtracted('taoKhoaHoc')}</span>
-                </div>
-              }
-              size="md"
-              className="rounded-2xl font-bold w-full sm:w-auto"
-            />
+          <Link 
+            href="/courses/create" 
+            className="shrink-0 inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-2xl transition-all duration-300 outline-none select-none hover:cursor-pointer bg-primary text-white font-bold shadow-[0_4px_6px_-4px_#005BBF,0_10px_15px_-3px_#005BBF] hover:bg-[#004493] hover:shadow-lg active:scale-95 text-base px-8 py-3 h-12 w-full sm:w-auto hover:no-underline"
+          >
+            <LuPlus size={15} />
+            <span>{tExtracted('taoKhoaHoc')}</span>
           </Link>
         )}
       </div>

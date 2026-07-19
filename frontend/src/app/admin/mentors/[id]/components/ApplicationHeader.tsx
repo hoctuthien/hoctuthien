@@ -130,12 +130,11 @@ export function ApplicationHeader({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-6">
       <div className="flex items-center gap-4">
-        <Link href="/admin/mentors">
-          <Button
-            variant="outline"
-            label={<Icon name="ArrowLeft" size={18} />}
-            className="!p-2.5 !rounded-xl text-slate-400 hover:text-slate-900 border-slate-200"
-          />
+        <Link 
+          href="/admin/mentors"
+          className="inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-xl transition-all duration-300 outline-none select-none hover:cursor-pointer bg-transparent text-slate-400 border-slate-200 border-2 hover:border-slate-900 hover:bg-slate-50 active:scale-95 p-2.5 hover:no-underline"
+        >
+          <Icon name="ArrowLeft" size={18} />
         </Link>
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
