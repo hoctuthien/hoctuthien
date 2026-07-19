@@ -38,13 +38,12 @@ export default async function AdminPostsPage({
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">{tExtracted('postManagement')}</h1>
           <p className="text-slate-500 text-sm mt-1">{tExtracted('createEditAndManageYourBlogContent')}</p>
         </div>
-        <Link href="/admin/posts/new">
-          <Button
-            label={tExtracted('createNewPost')}
-            variant="primary"
-            iconLeft={<Icon name="Plus" size={18} />}
-            className="!rounded-xl shadow-lg shadow-primary/20"
-          />
+        <Link 
+          href="/admin/posts/new"
+          className="inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-xl transition-all duration-300 outline-none select-none hover:cursor-pointer bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:bg-[#004493] active:scale-95 text-base px-8 py-3 h-12 hover:no-underline"
+        >
+          <Icon name="Plus" size={18} />
+          <span className="leading-tight">{tExtracted('createNewPost')}</span>
         </Link>
       </div>
 

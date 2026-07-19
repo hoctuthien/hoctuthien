@@ -55,13 +55,11 @@ export const ExpertMentorsSection = () => {
           <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
             {tExtracted('mentorNoiBat')}</h2>
         </div>
-        <Link href="/mentorship" className="shrink-0">
-          <Button
-            variant="outline"
-            label={tExtracted('xemTatCa')}
-            size="md"
-            className="rounded-full font-bold text-sm border-slate-200 hover:border-primary/40"
-          />
+        <Link 
+          href="/mentorship" 
+          className="shrink-0 inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-transparent text-primary border-slate-200 border-2 hover:border-primary/40 hover:bg-primary/5 active:scale-95 text-sm px-8 py-3 h-12 hover:no-underline font-bold"
+        >
+          <span className="leading-tight">{tExtracted('xemTatCa')}</span>
         </Link>
       </div>
 

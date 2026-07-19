@@ -102,13 +102,11 @@ export const PhDMentorsSection = () => {
           <p className="text-slate-500 text-sm font-medium leading-relaxed">
             {tExtracted('ketNoiVoiCacNhaNghienCuuVa')}</p>
         </div>
-        <Link href="/mentorship" className="shrink-0">
-          <Button
-            variant="outline"
-            label={tExtracted('gapGoTatCa')}
-            size="md"
-            className="rounded-full font-bold border-slate-200 bg-white hover:border-primary/40 shadow-sm"
-          />
+        <Link 
+          href="/mentorship" 
+          className="shrink-0 inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-white text-primary border-slate-200 border-2 hover:border-primary/40 hover:bg-primary/5 active:scale-95 text-base px-8 py-3 h-12 hover:no-underline font-bold shadow-sm"
+        >
+          <span className="leading-tight">{tExtracted('gapGoTatCa')}</span>
         </Link>
       </div>
 
