@@ -245,8 +245,8 @@ export function RegisterForm() {
         </div>
         {policy && (
           <p className="text-[11px] leading-relaxed text-text-muted font-[Montserrat] -mt-2">
-            Chính sách áp dụng: {policy.title} phiên bản {policy.version}
-            {policy.effectiveDate ? `, hiệu lực từ ${new Date(policy.effectiveDate).toLocaleDateString('vi-VN')}` : ''}.
+            {tExtracted('policyApplied')}{policy.title} {tExtracted('version')} {policy.version}
+            {policy.effectiveDate ? `, ${tExtracted('effectiveFrom')} ${new Date(policy.effectiveDate).toLocaleDateString('vi-VN')}` : ''}.
           </p>
         )}
         {errors.agreeTerms?.message && (

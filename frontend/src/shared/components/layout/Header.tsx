@@ -19,6 +19,7 @@ import {
   DropdownDivider
 } from '@/core/ui/Dropdown';
 import { cn } from '@/core/utils/cn';
+import { LocaleSwitcher } from '../LocaleSwitcher';
 
 const navLinks = [
   { label: 'home', href: '/' },
@@ -37,6 +38,7 @@ export const Header = () => {
   const isAuthenticated = status === 'authenticated';
   const isLoading = status === 'loading';
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>
@@ -76,6 +78,10 @@ export const Header = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
+          <div className="hidden md:block">
+            <LocaleSwitcher />
+          </div>
+
           <button
             onClick={() => setIsSearchOpen(true)}
             className="p-2 text-text-muted hover:text-primary transition-colors border-0 bg-transparent cursor-pointer"
@@ -157,12 +163,134 @@ export const Header = () => {
           )}
 
           {/* Mobile Menu Toggle */}
-          <button className="md:hidden p-2 text-text-heading">
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="md:hidden p-2 text-text-heading border-0 bg-transparent cursor-pointer"
+          >
             <Icon name="Menu" size={24} />
           </button>
         </div>
       </div>
     </header>
+    
+    {/* Mobile Navigation Drawer */}
+    {isMobileMenuOpen && (
+      <div className="fixed inset-0 z-50 flex md:hidden">
+        {/* Backdrop */}
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+        
+        {/* Drawer Content */}
+        <div className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white p-6 shadow-xl animate-in slide-in-from-right duration-300">
+          <div className="flex items-center justify-between mb-8">
+            <span className="font-extrabold text-lg text-primary">{t('brandName')}</span>
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 -mr-2 text-text-heading border-0 bg-transparent cursor-pointer"
+            >
+              <Icon name="X" size={24} />
+            </button>
+          </div>
+          
+          {/* Language Switcher in Mobile Drawer */}
+          <div className="mb-6 pb-6 border-b border-outline-variant flex items-center justify-between">
+            <span className="text-sm font-bold text-text-muted">{tExtracted('ngonNguLanguage') || 'Ngôn ngữ / Language'}</span>
+            <LocaleSwitcher />
+          </div>
+
+          <nav className="flex flex-col gap-5 mb-8">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || (link.href !== '/' && pathname?.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    "text-base font-bold transition-colors capitalize no-underline py-2",
+                    isActive ? "text-primary" : "text-text-heading hover:text-primary"
+                  )}
+                >
+                  {t(link.label)}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="mt-auto border-t border-outline-variant pt-6 flex flex-col gap-4">
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar
+                    src={session.user?.image || undefined}
+                    name={session.user?.name || ''}
+                    size="sm"
+                  />
+                  <div>
+                    <p className="text-sm font-bold text-text-heading">{session.user?.name}</p>
+                    <p className="text-xs text-text-muted truncate">{session.user?.email}</p>
+                  </div>
+                </div>
+                <Link 
+                  href="/dashboard" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="no-underline text-sm font-bold text-text-heading hover:text-primary flex items-center gap-2 py-2"
+                >
+                  <Icon name="Layers" size={18} /> {tExtracted('bangDieuKhien')}
+                </Link>
+                <Link 
+                  href="/profile" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="no-underline text-sm font-bold text-text-heading hover:text-primary flex items-center gap-2 py-2"
+                >
+                  <Icon name="User" size={18} /> {t('profile')}
+                </Link>
+                <Link 
+                  href="/my-courses" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="no-underline text-sm font-bold text-text-heading hover:text-primary flex items-center gap-2 py-2"
+                >
+                  <Icon name="BookOpen" size={18} /> {t('myCourses')}
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    signOut();
+                  }}
+                  className="w-full text-left rounded-xl border border-rose-200 bg-rose-50 text-rose-600 px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 hover:bg-rose-100 cursor-pointer"
+                >
+                  <Icon name="LogOut" size={18} /> {t('signOut')}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="no-underline">
+                  <Button
+                    label={t('signIn')}
+                    variant="outline"
+                    size="md"
+                    fullWidth
+                    className="rounded-full"
+                  />
+                </Link>
+                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="no-underline">
+                  <Button
+                    label={t('getStarted')}
+                    variant="primary"
+                    size="md"
+                    fullWidth
+                    className="rounded-full"
+                  />
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    
     <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
   </>
   );

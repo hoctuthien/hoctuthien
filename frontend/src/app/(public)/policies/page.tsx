@@ -1,4 +1,5 @@
 import { apiService } from '@/core/api/base';
+import { getTranslations } from 'next-intl/server';
 
 type PolicySection = {
   title: string;
@@ -51,19 +52,20 @@ function formatDate(value: string) {
 
 export default async function PoliciesPage() {
   const policy = await getMenteePolicy();
+  const t = await getTranslations('Extracted.appPublicPoliciesPage');
 
   return (
     <main className="bg-[#F8FAFC] py-12 md:py-16">
       <div className="container-custom max-w-4xl">
         <div className="mb-8">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-[#005BBF]">
-            Học Từ Thiện
+            {t('hocTuThien')}
           </p>
           <h1 className="mt-3 text-3xl md:text-4xl font-black text-[#0F172A] tracking-tight">
             {policy.title}
           </h1>
           <p className="mt-3 text-sm font-semibold text-[#64748B]">
-            Phiên bản {policy.version} - Áp dụng từ {formatDate(policy.effectiveDate)}
+            {t('version')} {policy.version} {t('effectiveFrom')} {formatDate(policy.effectiveDate)}
             {policy.subtitle ? ` - ${policy.subtitle}` : ''}
           </p>
           {policy.acknowledgement && (
@@ -93,9 +95,9 @@ export default async function PoliciesPage() {
         </div>
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 text-sm text-[#475569]">
-          <p className="font-bold text-[#0F172A]">Liên hệ hỗ trợ</p>
+          <p className="font-bold text-[#0F172A]">{t('supportContact')}</p>
           <p className="mt-1">
-            Email: {policy.supportEmail || 'support@hoctuthien.com'} | Website:{' '}
+            {t('email')}: {policy.supportEmail || 'support@hoctuthien.com'} | {t('website')}:{' '}
             {policy.websiteUrl || 'https://hoctuthien.com'}
           </p>
         </div>

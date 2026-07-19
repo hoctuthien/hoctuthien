@@ -31,12 +31,14 @@ export const HeroSection = () => {
               {t('heroSubtitle')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <Button
-                label={tCommon('getStarted')}
-                variant="primary"
-                size="lg"
-                className="w-full sm:w-auto px-10 rounded-full shadow-lg hover:shadow-primary/30"
-              />
+              <Link href="/courses" className="w-full sm:w-auto">
+                <Button
+                  label={tCommon('getStarted')}
+                  variant="primary"
+                  size="lg"
+                  className="w-full px-10 rounded-full shadow-lg hover:shadow-primary/30"
+                />
+              </Link>
               <Link href="/mentor/register" className="w-full sm:w-auto">
                 <Button
                   label={t('becomeMentorButton')}
