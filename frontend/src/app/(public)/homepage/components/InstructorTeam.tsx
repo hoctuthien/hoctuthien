@@ -202,13 +202,11 @@ export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
                 </div>
 
                 <div className="px-6 pb-6">
-                  <Link href={`/courses?mentorId=${instructor.targetUserId}`} className="no-underline block w-full">
-                    <Button
-                      label={t('joinWithMe')}
-                      variant="outline"
-                      size="sm"
-                      className="w-full rounded-full border-primary/20 hover:border-primary text-primary"
-                    />
+                  <Link 
+                    href={`/courses?mentorId=${instructor.targetUserId}`} 
+                    className="inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-transparent text-primary border-primary/20 hover:border-primary border-2 active:scale-95 text-sm px-5 py-2 h-10 w-full no-underline font-semibold"
+                  >
+                    <span className="leading-tight">{t('joinWithMe')}</span>
                   </Link>
                 </div>
               </Card>
@@ -217,13 +215,12 @@ export const InstructorTeam = ({ initialMentors }: InstructorTeamProps) => {
         </div>
 
         <div className="mt-16 flex justify-center">
-          <Link href="/mentorship" className="no-underline">
-            <Button
-              label={t('viewAllInstructors')}
-              variant="primary"
-              className="rounded-full px-10"
-              iconRight={<Icon name="ArrowRight" size={18} />}
-            />
+          <Link 
+            href="/mentorship" 
+            className="inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-primary text-white font-bold shadow-[0_4px_6px_-4px_#005BBF,0_10px_15px_-3px_#005BBF] hover:bg-[#004493] hover:shadow-lg active:scale-95 text-base px-10 py-4 h-[56px] no-underline"
+          >
+            <span className="leading-tight">{t('viewAllInstructors')}</span>
+            <Icon name="ArrowRight" size={18} />
           </Link>
         </div>
       </div>

@@ -30,22 +30,18 @@ export const HeroSection = () => {
             <p className="text-lg text-text-muted mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
               {t('heroSubtitle')}
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <Link href="/courses" className="w-full sm:w-auto">
-                <Button
-                  label={tCommon('getStarted')}
-                  variant="primary"
-                  size="lg"
-                  className="w-full px-10 rounded-full shadow-lg hover:shadow-primary/30"
-                />
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full">
+              <Link 
+                href="/courses" 
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-primary text-white font-bold shadow-[0_4px_6px_-4px_#005BBF,0_10px_15px_-3px_#005BBF] hover:bg-[#004493] hover:shadow-lg active:scale-95 text-base px-10 py-4 h-[56px] hover:no-underline"
+              >
+                <span className="leading-tight">{tCommon('getStarted')}</span>
               </Link>
-              <Link href="/mentor/register" className="w-full sm:w-auto">
-                <Button
-                  label={t('becomeMentorButton')}
-                  variant="outline"
-                  size="lg"
-                  className="w-full px-10 rounded-full bg-white border-primary text-primary hover:bg-primary/5"
-                />
+              <Link 
+                href="/mentor/register" 
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-white text-primary border-primary border-2 hover:bg-primary/5 active:scale-95 text-base px-10 py-4 h-[56px] hover:no-underline"
+              >
+                <span className="leading-tight">{t('becomeMentorButton')}</span>
               </Link>
             </div>
           </div>

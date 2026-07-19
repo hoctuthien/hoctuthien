@@ -152,13 +152,11 @@ export const Header = () => {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <Link href="/register" className="hidden md:block">
-              <Button
-                label={t('getStarted')}
-                variant="primary"
-                size="sm"
-                className="rounded-full px-6"
-              />
+            <Link 
+              href="/register" 
+              className="hidden md:inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-primary text-white font-bold shadow-[0_4px_6px_-4px_#005BBF,0_10px_15px_-3px_#005BBF] hover:bg-[#004493] hover:shadow-lg active:scale-95 text-sm px-6 py-2 h-10 hover:no-underline"
+            >
+              <span className="leading-tight">{t('getStarted')}</span>
             </Link>
           )}
 
@@ -266,23 +264,19 @@ export const Header = () => {
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="no-underline">
-                  <Button
-                    label={t('signIn')}
-                    variant="outline"
-                    size="md"
-                    fullWidth
-                    className="rounded-full"
-                  />
+                <Link 
+                  href="/login" 
+                  onClick={() => setIsMobileMenuOpen(false)} 
+                  className="w-full inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-transparent text-primary border-primary border-2 hover:bg-primary/5 active:scale-95 text-base px-8 py-3 h-12 hover:no-underline font-bold"
+                >
+                  <span className="leading-tight">{t('signIn')}</span>
                 </Link>
-                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="no-underline">
-                  <Button
-                    label={t('getStarted')}
-                    variant="primary"
-                    size="md"
-                    fullWidth
-                    className="rounded-full"
-                  />
+                <Link 
+                  href="/register" 
+                  onClick={() => setIsMobileMenuOpen(false)} 
+                  className="w-full inline-flex items-center justify-center gap-2 font-[Montserrat] rounded-full transition-all duration-300 outline-none select-none hover:cursor-pointer bg-primary text-white font-bold shadow-[0_4px_6px_-4px_#005BBF,0_10px_15px_-3px_#005BBF] hover:bg-[#004493] hover:shadow-lg active:scale-95 text-base px-8 py-3 h-12 hover:no-underline"
+                >
+                  <span className="leading-tight">{t('getStarted')}</span>
                 </Link>
               </>
             )}
