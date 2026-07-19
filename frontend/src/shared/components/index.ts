@@ -8,6 +8,7 @@ export * from './DescriptionList';
 export * from './EmptyState';
 export * from '../../core/ui/Feedback';
 export * from './List';
+export * from './LocaleSwitcher';
 export * from './MentorCard';
 export * from './Modal';
 export * from './Profile';

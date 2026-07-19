@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { Button } from '@/core/ui/Button';
 import { Icon } from '@/core/ui/Icon';
 
@@ -80,11 +81,13 @@ export const FeaturesSection = () => {
               ))}
             </div>
 
-            <Button
-              label={tCommon('getStarted')}
-              variant="primary"
-              className="rounded-full px-8"
-            />
+            <Link href="/courses">
+              <Button
+                label={tCommon('getStarted')}
+                variant="primary"
+                className="rounded-full px-8"
+              />
+            </Link>
           </div>
         </div>
       </div>

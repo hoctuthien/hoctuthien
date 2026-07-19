@@ -12,7 +12,7 @@
  *   3. Done — không cần sửa gì khác
  */
 
-export const locales = ['vi'] as const;
+export const locales = ['vi', 'en'] as const;
 
 export type Locale = (typeof locales)[number];
 

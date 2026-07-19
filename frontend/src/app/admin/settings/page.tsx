@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   MENTEE_POLICY_CONFIG_KEY,
   systemConfigGateway,
@@ -46,6 +47,7 @@ function splitItems(value: string) {
 }
 
 export default function AdminSettingsPage() {
+  const t = useTranslations("Extracted.appAdminSettingsPage");
   const [config, setConfig] = useState<SystemConfigRecord<PolicyConfigValue> | null>(null);
   const [policy, setPolicy] = useState<PolicyConfigValue>(EMPTY_POLICY);
   const [description, setDescription] = useState(
@@ -155,9 +157,9 @@ export default function AdminSettingsPage() {
             <LuFileText size={22} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900">Cấu hình chính sách</h1>
+            <h1 className="text-2xl font-black text-slate-900">{t("policyConfig")}</h1>
             <p className="mt-1 text-sm text-slate-500">
-              Chính sách này hiển thị ở footer, trang điều khoản và lúc đăng ký tài khoản.
+              {t("policyDesc")}
             </p>
           </div>
         </div>
@@ -168,7 +170,7 @@ export default function AdminSettingsPage() {
             className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition-colors hover:border-blue-300 hover:text-blue-600"
           >
             <LuRefreshCw size={15} className={loading ? "animate-spin" : ""} />
-            Tải lại
+            {t("reload")}
           </button>
           <button
             type="button"
@@ -177,7 +179,7 @@ export default function AdminSettingsPage() {
             className="flex items-center gap-2 rounded-xl border-0 bg-blue-600 px-4 py-2.5 text-sm font-black text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saving ? <LuRefreshCw size={15} className="animate-spin" /> : <LuSave size={15} />}
-            Lưu chính sách
+            {t("savePolicy")}
           </button>
         </div>
       </div>
@@ -198,7 +200,7 @@ export default function AdminSettingsPage() {
         <div className="space-y-5">
           <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
             <h2 className="text-sm font-black uppercase tracking-wide text-slate-500">
-              Thông tin chung
+              {t("generalInfo")}
             </h2>
             <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
               {[
@@ -224,7 +226,7 @@ export default function AdminSettingsPage() {
             </div>
             <label className="mt-4 flex flex-col gap-1.5">
               <span className="text-xs font-black uppercase tracking-wide text-slate-500">
-                Lời xác nhận khi đăng ký
+                {t("agreeOnRegister")}
               </span>
               <textarea
                 value={policy.acknowledgement || ""}
@@ -234,7 +236,7 @@ export default function AdminSettingsPage() {
             </label>
             <label className="mt-4 flex flex-col gap-1.5">
               <span className="text-xs font-black uppercase tracking-wide text-slate-500">
-                Ghi chú nội bộ
+                {t("internalNote")}
               </span>
               <input
                 value={description}
@@ -249,7 +251,7 @@ export default function AdminSettingsPage() {
               <div key={`${section.title}-${index}`} className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h3 className="text-sm font-black uppercase tracking-wide text-slate-500">
-                    Mục chính sách {index + 1}
+                    {t("policySection")} {index + 1}
                   </h3>
                   <button
                     type="button"
@@ -257,12 +259,12 @@ export default function AdminSettingsPage() {
                     className="flex items-center gap-1 rounded-lg border border-rose-100 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-100"
                   >
                     <LuTrash2 size={13} />
-                    Xóa
+                    {t("delete")}
                   </button>
                 </div>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-black uppercase tracking-wide text-slate-500">
-                    Tiêu đề mục
+                    {t("sectionTitle")}
                   </span>
                   <input
                     value={section.title}
@@ -272,7 +274,7 @@ export default function AdminSettingsPage() {
                 </label>
                 <label className="mt-4 flex flex-col gap-1.5">
                   <span className="text-xs font-black uppercase tracking-wide text-slate-500">
-                    Nội dung - mỗi dòng là một ý
+                    {t("sectionContent")}
                   </span>
                   <textarea
                     value={section.items.join("\n")}
@@ -292,17 +294,17 @@ export default function AdminSettingsPage() {
             className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-blue-200 bg-blue-50 px-4 py-4 text-sm font-black text-blue-700 transition-colors hover:bg-blue-100"
           >
             <LuPlus size={16} />
-            Thêm mục chính sách
+            {t("addPolicySection")}
           </button>
         </div>
 
         <aside className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm xl:sticky xl:top-6 xl:self-start">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-600">
-            Xem trước
+            {t("preview")}
           </p>
           <h2 className="mt-3 text-2xl font-black text-slate-900">{policy.title}</h2>
           <p className="mt-2 text-xs font-semibold text-slate-500">
-            Phiên bản {policy.version} - Áp dụng từ {policy.effectiveDate}
+            {t("version")} {policy.version} {t("effectiveFrom")} {policy.effectiveDate}
           </p>
           {policy.acknowledgement && (
             <p className="mt-4 rounded-xl bg-blue-50 p-3 text-xs font-semibold leading-relaxed text-blue-900">

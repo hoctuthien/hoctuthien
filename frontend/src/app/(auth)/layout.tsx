@@ -61,15 +61,15 @@ export default function AuthLayout({
           </div>
 
           <div className="flex gap-10 text-white/40 text-sm font-medium">
-            <span className="hover:text-white transition-colors cursor-pointer">
+            <Link href="/policies" className="hover:text-white transition-colors no-underline">
               {t("policy")}
-            </span>
-            <span className="hover:text-white transition-colors cursor-pointer">
+            </Link>
+            <Link href="/" className="hover:text-white transition-colors no-underline">
               {t("aboutUs")}
-            </span>
-            <span className="hover:text-white transition-colors cursor-pointer">
+            </Link>
+            <a href="mailto:support@hoctuthien.com" className="hover:text-white transition-colors no-underline">
               {t("reportIssue")}
-            </span>
+            </a>
           </div>
         </div>
       </aside>
