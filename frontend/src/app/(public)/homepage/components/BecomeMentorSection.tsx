@@ -30,15 +30,13 @@ export const BecomeMentorSection = () => {
             </p>
           </div>
 
-          <div className="flex-shrink-0">
-            <Link href="/mentor/register">
-              <Button
-                label={t('becomeMentorButton')}
-                variant="primary"
-                size="lg"
-                className="bg-white text-primary hover:bg-slate-50 border-none px-12 h-[64px] text-lg rounded-2xl shadow-xl shadow-black/10 transition-transform active:scale-95"
-                iconRight={<Icon name="ArrowRight" size={20} />}
-              />
+          <div className="flex-shrink-0 w-full md:w-auto text-center">
+            <Link 
+              href="/mentor/register"
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2 font-[Montserrat] transition-all duration-300 outline-none select-none hover:cursor-pointer bg-white text-primary hover:bg-slate-50 border-none px-12 h-[64px] text-lg rounded-2xl shadow-xl shadow-black/10 active:scale-95 hover:no-underline font-bold"
+            >
+              <span className="leading-tight">{t('becomeMentorButton')}</span>
+              <Icon name="ArrowRight" size={20} />
             </Link>
           </div>
         </div>
