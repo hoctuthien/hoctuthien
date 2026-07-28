@@ -10,8 +10,6 @@ import { useSearchParams } from "next/navigation";
 import { CourseHero } from "./components/CourseHero";
 import { CourseFilters } from "./components/CourseFilters";
 import { CourseGrid } from "./components/CourseGrid";
-import { ExpertMentorsSection } from "./components/ExpertMentorsSection";
-import { PhDMentorsSection } from "./components/PhDMentorsSection";
 
 const BREADCRUMB_ITEMS = [
   { label: "Trang chủ", href: "/" },
@@ -195,12 +193,6 @@ export default function PublicCoursesClient() {
             onClearFilters={clearAllFilters}
           />
         </div>
-
-        {/* 4. Expert Mentors */}
-        <ExpertMentorsSection />
-
-        {/* 5. PhD Mentors */}
-        <PhDMentorsSection />
       </div>
     </div>
   );
